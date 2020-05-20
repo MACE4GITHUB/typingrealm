@@ -9,4 +9,8 @@
     <PackageReference Include="AutoFixture" Version="4.11.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
+  </ItemGroup>
+
 </Project>
