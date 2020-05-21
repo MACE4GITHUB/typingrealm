@@ -4,6 +4,8 @@ namespace TypingRealm.Messaging.Connecting
 {
     /// <summary>
     /// ConnectedClientStore provides access to the pool of currently connected clients.
+    /// Methods on this store can be called concurrently, implementation should
+    /// be thread-safe.
     /// </summary>
     public interface IConnectedClientStore
     {

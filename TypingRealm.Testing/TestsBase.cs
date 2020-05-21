@@ -8,12 +8,9 @@ namespace TypingRealm.Testing
 {
     public abstract class TestsBase
     {
-        private readonly Fixture _fixture = AutoMoqDataAttribute.CreateFixture();
+        protected Fixture Fixture { get; } = AutoMoqDataAttribute.CreateFixture();
 
-        protected T Create<T>()
-        {
-            return _fixture.Create<T>();
-        }
+        protected T Create<T>() => Fixture.Create<T>();
 
         protected void AssertSerializable<T>()
         {
