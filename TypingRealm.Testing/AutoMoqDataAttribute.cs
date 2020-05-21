@@ -2,6 +2,7 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
+using TypingRealm.Messaging;
 
 namespace TypingRealm.Testing
 {
@@ -15,6 +16,7 @@ namespace TypingRealm.Testing
             fixture.Customize(new AutoMoqCustomization());
 
             fixture.Register<Stream>(() => new MemoryStream());
+            fixture.Customize<ConnectedClient>(x => x.OmitAutoProperties());
 
             return fixture;
         }

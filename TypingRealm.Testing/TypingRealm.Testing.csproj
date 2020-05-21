@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
   </ItemGroup>
 
 </Project>
