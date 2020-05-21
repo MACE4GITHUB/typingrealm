@@ -9,9 +9,9 @@ namespace TypingRealm.Messaging.Tests
     public class MessagesTests : TestsBase
     {
         [Fact]
-        public void ShouldBe1MessageInAssembly()
+        public void ShouldBe2MessagesInAssembly()
         {
-            Assert.Equal(1, typeof(Announce).Assembly.GetTypes().Count(
+            Assert.Equal(2, typeof(Announce).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -28,6 +28,21 @@ namespace TypingRealm.Messaging.Tests
 
             sut = new Announce("message");
             Assert.Equal("message", sut.Message);
+        }
+
+        [Fact]
+        public void DisconnectedMessage()
+        {
+            AssertSerializable<Disconnected>();
+
+            var sut = new Disconnected
+            {
+                Reason = "reason"
+            };
+            Assert.Equal("reason", sut.Reason);
+
+            sut = new Disconnected("reason");
+            Assert.Equal("reason", sut.Reason);
         }
     }
 }
