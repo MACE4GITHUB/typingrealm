@@ -15,9 +15,9 @@ namespace TypingRealm.Messaging
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectedClient"/> class.
         /// </summary>
-        /// <param name="clientId">Unique connected client identifier. There
+        /// <param name="clientId">Unique connected client identity. There
         /// should be no any clients connected at the same time with the same
-        /// identifier.</param>
+        /// identity.</param>
         /// <param name="connection">Client's connection.</param>
         /// <param name="group">Messaging group where the client is placed initially.</param>
         /// <param name="updateDetector">Update detector for marking groups for
@@ -35,7 +35,7 @@ namespace TypingRealm.Messaging
         }
 
         /// <summary>
-        /// Gets unique connected client identifier.
+        /// Gets unique connected client identity.
         /// </summary>
         public string ClientId { get; }
 
