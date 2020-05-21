@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoFixture;
 using Xunit;
@@ -29,5 +30,8 @@ namespace TypingRealm.Testing
         protected ValueTask Wait() => Wait(100);
         protected async ValueTask Wait(int milliseconds)
             => await Task.Delay(milliseconds).ConfigureAwait(false);
+
+        protected object? GetPrivateField(object instance, string fieldName)
+            => instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(instance);
     }
 }
