@@ -3,7 +3,7 @@
 namespace TypingRealm.Messaging.Updating
 {
     /// <summary>
-    /// Marks messaging groups for update.
+    /// Marks messaging groups for update. It should be thread-safe.
     /// </summary>
     public interface IUpdateDetector
     {
