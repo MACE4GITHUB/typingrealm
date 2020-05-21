@@ -6,7 +6,7 @@ namespace TypingRealm.Testing
 {
     public abstract class TestsBase
     {
-        private readonly Fixture _fixture = new Fixture();
+        private readonly Fixture _fixture = AutoMoqDataAttribute.CreateFixture();
 
         protected T Create<T>()
         {
