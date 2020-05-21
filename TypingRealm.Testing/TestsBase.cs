@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Threading.Tasks;
 using AutoFixture;
 using Xunit;
 
@@ -24,5 +25,9 @@ namespace TypingRealm.Testing
                 Assert.Equal(property.GetValue(message), property.GetValue(result));
             }
         }
+
+        protected ValueTask Wait() => Wait(100);
+        protected async ValueTask Wait(int milliseconds)
+            => await Task.Delay(milliseconds).ConfigureAwait(false);
     }
 }
