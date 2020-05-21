@@ -16,22 +16,28 @@ namespace TypingRealm.Messaging.Tests.Connecting
         [Theory, AutoMoqData]
         public void ShouldAddClient_WhenNotAdded(
             [Frozen]IUpdateDetector updateDetector,
-            string clientId, IConnection connection, string group,
+            ConnectedClient client,
             ConnectedClientStore sut)
         {
-            var client = sut.Add(clientId, connection, group);
-            Assert.NotNull(client);
-            Assert.Equal(clientId, client!.ClientId);
-            Assert.Equal(connection, client.Connection);
-            Assert.Equal(group, client.Group);
+            sut.Add(client);
+            var result = sut.Find(client.ClientId);
+            Assert.NotNull(result);
+            Assert.Equal(client, result);
             Assert.Equal(updateDetector, GetPrivateField(client, "_updateDetector"));
         }
 
         [Theory, AutoMoqData]
-        public void ShouldNotAddClient_WhenAlreadyAdded(string clientId, ConnectedClientStore sut)
+        public void ShouldThrow_WhenAlreadyAdded(
+            ConnectedClient client,
+            ConnectedClientStore sut)
         {
-            sut.Add(clientId, Create<IConnection>(), Create<string>());
-            Assert.Null(sut.Add(clientId, Create<IConnection>(), Create<string>()));
+            sut.Add(client);
+            Assert.Throws<ClientAlreadyConnectedException>(
+                () => sut.Add(new ConnectedClient(
+                    client.ClientId,
+                    Create<IConnection>(),
+                    Create<string>(),
+                    Create<IUpdateDetector>())));
         }
 
         [Theory, AutoMoqData]
@@ -41,49 +47,74 @@ namespace TypingRealm.Messaging.Tests.Connecting
         }
 
         [Theory, AutoMoqData]
-        public void ShouldFind_WhenAdded(string clientId, ConnectedClientStore sut)
+        public void ShouldFind_WhenAdded(
+            ConnectedClient client,
+            ConnectedClientStore sut)
         {
-            var created = sut.Add(clientId, Create<IConnection>(), Create<string>());
-            var found = sut.Find(clientId);
+            sut.Add(client);
+            var found = sut.Find(client.ClientId);
 
-            Assert.Equal(created, found);
+            Assert.Equal(client, found);
         }
 
         [Theory, AutoMoqData]
         public void ShouldMarkForUpdate_WhenSuccessfullyAdded(
             [Frozen]Mock<IUpdateDetector> updateDetector,
-            string clientId,
-            string group,
+            ConnectedClient client,
             ConnectedClientStore sut)
         {
-            sut.Add(clientId, Create<IConnection>(), group);
-            updateDetector.Verify(x => x.MarkForUpdate(group), Times.Once);
+            sut.Add(client);
+            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Once);
 
-            sut.Add(clientId, Create<IConnection>(), group); // Unsuccessful add.
-            updateDetector.Verify(x => x.MarkForUpdate(group), Times.Once);
+            // Unsuccessful add.
+            try
+            {
+                sut.Add(client);
+            }
+            catch (ClientAlreadyConnectedException) { }
+
+            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Once);
+        }
+
+        [Theory, AutoMoqData]
+        public void ShouldMarkForUpdate_WhenSuccessfullyRemoved(
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            ConnectedClient client,
+            ConnectedClientStore sut)
+        {
+            sut.Add(client);
+            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Once);
+
+            sut.Remove(client.ClientId);
+            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Exactly(2));
         }
 
         [Theory, AutoMoqData]
         public void ShouldFindAllClientsInGroups(ConnectedClientStore sut)
         {
-            var ids = Fixture.CreateMany<string>(6).ToList();
             var groups = Fixture.CreateMany<string>(3).ToList();
 
-            var c1 = sut.Add(ids[0], Create<IConnection>(), groups[0]);
-            var c2 = sut.Add(ids[1], Create<IConnection>(), groups[1]);
-            var c3 = sut.Add(ids[2], Create<IConnection>(), groups[2]);
-            var c4 = sut.Add(ids[3], Create<IConnection>(), groups[0]);
-            var c5 = sut.Add(ids[4], Create<IConnection>(), groups[1]);
-            var c6 = sut.Add(ids[5], Create<IConnection>(), groups[2]);
+            var clients = Fixture.CreateMany<ConnectedClient>(6).ToList();
+            clients[0].Group = groups[0];
+            clients[1].Group = groups[1];
+            clients[2].Group = groups[2];
+            clients[3].Group = groups[0];
+            clients[4].Group = groups[1];
+            clients[5].Group = groups[2];
 
-            var clients = sut.FindInGroups(new[] { groups[0], groups[2] });
-            Assert.Equal(4, clients.Count());
-            Assert.Contains(c1, clients);
-            Assert.DoesNotContain(c2, clients);
-            Assert.Contains(c3, clients);
-            Assert.Contains(c4, clients);
-            Assert.DoesNotContain(c5, clients);
-            Assert.Contains(c6, clients);
+            foreach (var client in clients)
+            {
+                sut.Add(client);
+            }
+
+            var result = sut.FindInGroups(new[] { groups[0], groups[2] });
+            Assert.Equal(4, result.Count());
+            Assert.Contains(clients[0], result);
+            Assert.DoesNotContain(clients[1], result);
+            Assert.Contains(clients[2], result);
+            Assert.Contains(clients[3], result);
+            Assert.DoesNotContain(clients[4], result);
+            Assert.Contains(clients[5], result);
         }
 
         [Theory, AutoMoqData]
@@ -93,13 +124,14 @@ namespace TypingRealm.Messaging.Tests.Connecting
         }
 
         [Theory, AutoMoqData]
-        public void ShouldRemoveClient(string clientId, ConnectedClientStore sut)
+        public void ShouldRemoveClient(
+            ConnectedClient client, ConnectedClientStore sut)
         {
-            var client = sut.Add(clientId, Create<IConnection>(), Create<string>());
-            Assert.Equal(client, sut.Find(clientId));
+            sut.Add(client);
+            Assert.Equal(client, sut.Find(client.ClientId));
 
-            sut.Remove(clientId);
-            Assert.Null(sut.Find(clientId));
+            sut.Remove(client.ClientId);
+            Assert.Null(sut.Find(client.ClientId));
         }
 
         [Theory, AutoMoqData]
@@ -108,15 +140,24 @@ namespace TypingRealm.Messaging.Tests.Connecting
             var tasks = new List<Task>();
             for (var i = 0; i < 100; i++)
             {
-                tasks.Add(new Task(() => sut.Add(clientId, Create<IConnection>(), Create<string>())));
+                tasks.Add(new Task(() => sut.Add(ClientWithId(clientId))));
                 tasks.Add(new Task(() => sut.Remove(clientId)));
                 tasks.Add(new Task(() => sut.Find(clientId)));
             }
 
             Parallel.ForEach(tasks, task => task.Start());
-            await Task.WhenAll(tasks);
-            sut.Add(clientId, Create<IConnection>(), Create<string>());
+            try { await Task.WhenAll(tasks); } catch (ClientAlreadyConnectedException) { }
+            try { sut.Add(ClientWithId(clientId)); } catch (ClientAlreadyConnectedException) { }
             Assert.NotNull(sut.Find(clientId));
+        }
+
+        private ConnectedClient ClientWithId(string clientId)
+        {
+            return new ConnectedClient(
+                clientId,
+                Create<IConnection>(),
+                Create<string>(),
+                Create<IUpdateDetector>());
         }
     }
 }

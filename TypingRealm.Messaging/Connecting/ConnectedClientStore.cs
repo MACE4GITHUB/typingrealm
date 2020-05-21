@@ -16,17 +16,12 @@ namespace TypingRealm.Messaging.Connecting
             _updateDetector = updateDetector;
         }
 
-        public ConnectedClient? Add(string clientId, IConnection connection, string group)
+        public void Add(ConnectedClient connectedClient)
         {
-            var client = new ConnectedClient(clientId, connection, group, _updateDetector);
+            if (!_connectedClients.TryAdd(connectedClient.ClientId, connectedClient))
+                throw new ClientAlreadyConnectedException(connectedClient);
 
-            if (_connectedClients.TryAdd(client.ClientId, client))
-            {
-                _updateDetector.MarkForUpdate(client.Group);
-                return client;
-            }
-
-            return null;
+            _updateDetector.MarkForUpdate(connectedClient.Group);
         }
 
         public ConnectedClient? Find(string clientId)

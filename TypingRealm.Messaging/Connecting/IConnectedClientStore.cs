@@ -6,22 +6,18 @@ namespace TypingRealm.Messaging.Connecting
     /// ConnectedClientStore provides access to the pool of currently connected clients.
     /// Methods on this store can be called concurrently, implementation should
     /// be thread-safe.
+    /// Implementation should throw <see cref="ClientAlreadyConnectedException"/>
+    /// when adding a client that has already connected.
     /// </summary>
     public interface IConnectedClientStore
     {
         /// <summary>
-        /// This method serves as a factory for a new ConnectedClient. When client
-        /// is connected, this method is called and it should provide atomic
-        /// operation of constructing and adding the instance of ConnectedClient
-        /// to this store.
-        /// Returns null if the client is already present in the store.
+        /// Adds connected client to the store if it isn't connected yet.
         /// </summary>
-        /// <param name="clientId">Unique connected client's identity.</param>
-        /// <param name="connection">Client's connection.</param>
-        /// <param name="group">Messaging group.</param>
-        /// <returns>New added ConnectedClient instance or null if the client
-        /// was already present in the store.</returns>
-        ConnectedClient? Add(string clientId, IConnection connection, string group);
+        /// <param name="connectedClient">Connected client.</param>
+        /// <exception cref="ClientAlreadyConnectedException">Thrown when trying
+        /// to add a client that has already connected (by ClientId).</exception>
+        void Add(ConnectedClient connectedClient);
 
         /// <summary>
         /// Finds a client by its identity, returns null if the client is not found.
