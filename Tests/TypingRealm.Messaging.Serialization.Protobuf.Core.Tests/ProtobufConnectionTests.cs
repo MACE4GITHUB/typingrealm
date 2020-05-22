@@ -25,6 +25,9 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             TestMessage message,
             ProtobufConnection sut)
         {
+            cache.Setup(x => x.GetTypeId(typeof(TestMessage)))
+                .Returns("3");
+
             // Should throw when message not registered.
             await Assert.ThrowsAsync<InvalidOperationException>(
                 () => sut.SendAsync(message, default).AsTask());
