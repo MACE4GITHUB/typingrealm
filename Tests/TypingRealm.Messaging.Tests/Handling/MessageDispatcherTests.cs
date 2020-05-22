@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Xunit2;
@@ -17,6 +18,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         public async Task ShouldDispatchToMultipleHandlers(
             ConnectedClient sender,
             [Frozen]Mock<IMessageHandlerFactory> handlerFactory,
+            CancellationToken ct,
             MessageDispatcher sut)
         {
             var handlers = Fixture.CreateMany<Mock<IMessageHandler<AnotherTestMessage>>>();
@@ -24,11 +26,11 @@ namespace TypingRealm.Messaging.Tests.Handling
                 .Returns(handlers.Select(h => h.Object));
             TestMessage message = new AnotherTestMessage();
 
-            await sut.DispatchAsync(sender, message, default);
+            await sut.DispatchAsync(sender, message, ct);
 
             foreach (var handler in handlers)
             {
-                handler.Verify(x => x.HandleAsync(sender, (AnotherTestMessage)message, default));
+                handler.Verify(x => x.HandleAsync(sender, (AnotherTestMessage)message, ct));
             }
         }
     }

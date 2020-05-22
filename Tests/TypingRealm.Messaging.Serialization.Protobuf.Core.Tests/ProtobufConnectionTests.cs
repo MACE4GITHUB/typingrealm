@@ -16,6 +16,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
     }
 
     // Protobuf tests require static data so there is only one test.
+    // Passing cancellation token to Stream is not tested.
     public class ProtobufConnectionTests
     {
         [Theory, AutoMoqData]

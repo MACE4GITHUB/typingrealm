@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using TypingRealm.Messaging.Connecting.Initializers;
@@ -47,6 +48,12 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
         {
             var client = await sut.ConnectAsync(Create<IConnection>(), default);
             Assert.Equal("Lobby", client.Group);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldNotUseCancellationToken(AnonymousConnectionInitializer sut)
+        {
+            Assert.NotNull(await sut.ConnectAsync(Create<IConnection>(), new CancellationToken(true)));
         }
     }
 }

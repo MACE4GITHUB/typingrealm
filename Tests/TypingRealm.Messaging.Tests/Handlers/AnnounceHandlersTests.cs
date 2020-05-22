@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Xunit2;
@@ -21,6 +22,7 @@ namespace TypingRealm.Messaging.Tests.Handlers
             [Frozen] Mock<IConnectedClientStore> connectedClients,
             ConnectedClient sender,
             Announce message,
+            CancellationToken ct,
             AnnounceHandler sut)
         {
             var connections = Fixture.CreateMany<Mock<IConnection>>().ToList();
@@ -32,13 +34,13 @@ namespace TypingRealm.Messaging.Tests.Handlers
                         && groups.Contains(sender.Group))))
                 .Returns(clients);
 
-            await sut.HandleAsync(sender, message, default);
+            await sut.HandleAsync(sender, message, ct);
 
             foreach (var connection in connections)
             {
                 connection.Verify(x => x.SendAsync(
                     It.Is<Announce>(m => m.Message.Contains(message.Message)),
-                    default));
+                    ct));
             }
         }
 

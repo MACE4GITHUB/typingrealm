@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
@@ -40,7 +41,9 @@ namespace TypingRealm.Messaging.Tests.Connecting
         }
 
         [Theory, AutoMoqData]
-        public async Task SendAsync_ShouldSendToAllClientsThatAreInGroups(ConnectedClientStore sut)
+        public async Task SendAsync_ShouldSendToAllClientsThatAreInGroups(
+            CancellationToken ct,
+            ConnectedClientStore sut)
         {
             var connections = Fixture.CreateMany<Mock<IConnection>>(3).ToList();
             var clients = connections.Select(x => WithConnection(x.Object)).ToList();
@@ -48,11 +51,11 @@ namespace TypingRealm.Messaging.Tests.Connecting
             clients[1].Group = clients[0].Group;
 
             var message = Create<object>();
-            await sut.SendAsync(message, clients[0].Group, default);
+            await sut.SendAsync(message, clients[0].Group, ct);
 
-            connections[0].Verify(x => x.SendAsync(message, default));
-            connections[1].Verify(x => x.SendAsync(message, default));
-            connections[2].Verify(x => x.SendAsync(message, default), Times.Never);
+            connections[0].Verify(x => x.SendAsync(message, ct));
+            connections[1].Verify(x => x.SendAsync(message, ct));
+            connections[2].Verify(x => x.SendAsync(message, ct), Times.Never);
         }
 
         private ConnectedClient WithConnection(IConnection connection)
