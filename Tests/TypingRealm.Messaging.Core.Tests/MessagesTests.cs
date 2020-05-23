@@ -11,7 +11,7 @@ namespace TypingRealm.Messaging.Tests
         [Fact]
         public void ShouldBe2MessagesInAssembly()
         {
-            Assert.Equal(2, typeof(Announce).Assembly.GetTypes().Count(
+            Assert.Equal(3, typeof(Announce).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -43,6 +43,14 @@ namespace TypingRealm.Messaging.Tests
 
             sut = new Disconnected("reason");
             Assert.Equal("reason", sut.Reason);
+        }
+
+        [Fact]
+        public void DisconnectMessage()
+        {
+            AssertSerializable<Disconnect>();
+
+            _ = new Disconnect();
         }
     }
 }
