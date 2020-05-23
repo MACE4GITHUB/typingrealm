@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using Moq.Language;
@@ -9,11 +10,13 @@ using Xunit;
 
 namespace TypingRealm.Testing
 {
-    public abstract class TestsBase
+    public abstract class TestsBase : IDisposable
     {
         protected Fixture Fixture { get; } = AutoMoqDataAttribute.CreateFixture();
 
         protected T Create<T>() => Fixture.Create<T>();
+
+        protected CancellationTokenSource Cts { get; } = new CancellationTokenSource();
 
         protected void AssertSerializable<T>()
         {
@@ -45,6 +48,11 @@ namespace TypingRealm.Testing
             where TException : Exception
         {
             await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
+        }
+
+        public void Dispose()
+        {
+            Cts.Dispose();
         }
     }
 }
