@@ -1,7 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoFixture;
+using Moq.Language;
+using Moq.Language.Flow;
 using Xunit;
 
 namespace TypingRealm.Testing
@@ -30,5 +33,18 @@ namespace TypingRealm.Testing
 
         protected object? GetPrivateField(object instance, string fieldName)
             => instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(instance);
+
+        protected async ValueTask AssertThrowsAsync<TException>(Task task, TException exception)
+            where TException : Exception
+        {
+            var thrown = await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
+            Assert.Equal(exception, thrown);
+        }
+
+        protected async ValueTask AssertThrowsAsync<TException>(Task task)
+            where TException : Exception
+        {
+            await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
+        }
     }
 }
