@@ -19,7 +19,7 @@ namespace TypingRealm.Messaging
             // Connecting.
             // By default accept all connections without validation.
             services.AddTransient<IConnectionInitializer, AnonymousConnectionInitializer>();
-            services.AddTransient<IConnectedClientStore, ConnectedClientStore>();
+            services.AddSingleton<IConnectedClientStore, ConnectedClientStore>();
 
             // Message dispatching and handling.
             services.AddTransient<IConnectionHandler, ConnectionHandler>();

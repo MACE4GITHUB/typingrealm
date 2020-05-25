@@ -35,7 +35,6 @@ namespace TypingRealm.Messaging.Tests
 
         [Theory]
         [InlineData(typeof(IConnectionInitializer), typeof(AnonymousConnectionInitializer))]
-        [InlineData(typeof(IConnectedClientStore), typeof(ConnectedClientStore))]
         [InlineData(typeof(IConnectionHandler), typeof(ConnectionHandler))]
         [InlineData(typeof(IMessageDispatcher), typeof(MessageDispatcher))]
         [InlineData(typeof(IMessageHandlerFactory), typeof(MessageHandlerFactory))]
@@ -49,6 +48,7 @@ namespace TypingRealm.Messaging.Tests
 
         [Theory]
         [InlineData(typeof(IUpdateDetector), typeof(UpdateDetector))]
+        [InlineData(typeof(IConnectedClientStore), typeof(ConnectedClientStore))]
         public void ShouldRegisterSingletonTypes(Type interfaceType, Type implementationType)
         {
             _provider.AssertRegisteredSingleton(interfaceType, implementationType);
