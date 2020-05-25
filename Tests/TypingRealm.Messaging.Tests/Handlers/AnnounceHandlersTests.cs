@@ -7,7 +7,7 @@ using AutoFixture;
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Messaging.Connecting;
-using TypingRealm.Messaging.Handling.Handlers;
+using TypingRealm.Messaging.Handlers;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Updating;
 using TypingRealm.Testing;

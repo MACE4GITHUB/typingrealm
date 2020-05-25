@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
 
-namespace TypingRealm.Messaging.Handling.Handlers
+namespace TypingRealm.Messaging.Handlers
 {
     public sealed class AnnounceHandler : IMessageHandler<Announce>
     {
