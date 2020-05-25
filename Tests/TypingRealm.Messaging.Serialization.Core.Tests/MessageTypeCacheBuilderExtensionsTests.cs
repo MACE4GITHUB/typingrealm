@@ -28,7 +28,7 @@ namespace TypingRealm.Messaging.Serialization.Tests
             Assert.Contains(typeof(AMessage), messages);
             Assert.Contains(typeof(BMessage), messages);
 
-            foreach (var message in messages )
+            foreach (var message in messages)
             {
                 Assert.Equal(typeof(AMessage).Assembly, message.Assembly);
                 Assert.NotNull(message.GetCustomAttribute<MessageAttribute>());
