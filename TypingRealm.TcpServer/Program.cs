@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
 namespace TypingRealm.TcpServer
@@ -14,6 +15,10 @@ namespace TypingRealm.TcpServer
         public static async Task Main()
         {
             var provider = new ServiceCollection()
+                .AddSerializationCore()
+                .AddProtobuf()
+                .Services
+                .RegisterMessaging()
                 .AddLogging(builder => builder.AddConsole())
                 .Configure<LoggerFilterOptions>(options => options.MinLevel = LogLevel.Trace)
                 .AddTcpServer(Port)
