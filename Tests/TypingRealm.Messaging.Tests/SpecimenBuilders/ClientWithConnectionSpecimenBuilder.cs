@@ -15,8 +15,7 @@ namespace TypingRealm.Messaging.Tests.SpecimenBuilders
         public object Create(object request, ISpecimenContext context)
         {
             if (!(request is ParameterInfo pi)
-                || pi.ParameterType != typeof(IConnection)
-                || pi.Name != "connection")
+                || pi.ParameterType != typeof(IConnection))
                 return new NoSpecimen();
 
             return _connection;
