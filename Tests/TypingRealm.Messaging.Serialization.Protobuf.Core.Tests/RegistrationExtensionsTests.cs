@@ -50,7 +50,6 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             _ = provider.GetRequiredService<IMessageTypeCache>();
             types = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>().ToList();
             Assert.Equal(2, types.Count);
-            MetaType type;
 
             var type1 = types.Single(t => t.Type == typeof(AMessage));
             var type2 = types.Single(t => t.Type == typeof(BMessage));

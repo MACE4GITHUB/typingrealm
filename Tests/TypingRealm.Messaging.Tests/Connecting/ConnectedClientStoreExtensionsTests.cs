@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
 using TypingRealm.Messaging.Connecting;
-using TypingRealm.Messaging.Updating;
+using TypingRealm.Messaging.Tests.SpecimenBuilders;
 using TypingRealm.Testing;
 using Xunit;
 
@@ -13,7 +13,7 @@ namespace TypingRealm.Messaging.Tests.Connecting
     public class ConnectedClientStoreExtensionsTests : TestsBase
     {
         [Theory, AutoMoqData]
-        public void IsClientConnected_ShouldBeConnected(
+        public void IsClientConnected_ShouldBeConnected_WhenClientExists(
             ConnectedClient client,
             ConnectedClientStore sut)
         {
@@ -23,48 +23,38 @@ namespace TypingRealm.Messaging.Tests.Connecting
         }
 
         [Theory, AutoMoqData]
-        public void IsClientConnected_ShouldNotBeConnected(ConnectedClientStore sut)
+        public void IsClientConnected_ShouldNotBeConnected_WhenClientDoesNotExist(ConnectedClientStore sut)
         {
             Assert.False(sut.IsClientConnected(Create<string>()));
         }
 
         [Theory, AutoMoqData]
-        public void FindInGroups_ShouldFindAllClientsInGroupsAsParams(ConnectedClientStore sut)
-        {
-            var clients = Fixture.CreateMany<ConnectedClient>(5).ToList();
-            foreach (var client in clients) { sut.Add(client); }
-            clients[1].Group = clients[0].Group;
-            clients[3].Group = clients[2].Group;
-
-            Assert.Equal(2, sut.FindInGroups(clients[0].Group).Count());
-            Assert.Equal(4, sut.FindInGroups(clients[0].Group, clients[0].Group, clients[2].Group).Count());
-        }
-
-        [Theory, AutoMoqData]
-        public async Task SendAsync_ShouldSendToAllClientsThatAreInGroups(
+        public async Task SendAsync_ShouldSendMessageToAllClientsThatAreInSpecifiedGroup(
             CancellationToken ct,
             ConnectedClientStore sut)
         {
-            var connections = Fixture.CreateMany<Mock<IConnection>>(3).ToList();
-            var clients = connections.Select(x => WithConnection(x.Object)).ToList();
+            var connections = Fixture.CreateMany<IConnection>(3).ToList();
+            var clients = connections.Select(connection => WithConnection(connection)).ToList();
             foreach (var client in clients) { sut.Add(client); }
             clients[1].Group = clients[0].Group;
 
-            var message = Create<object>();
+            var message = Create<TestMessage>();
             await sut.SendAsync(message, clients[0].Group, ct);
 
-            connections[0].Verify(x => x.SendAsync(message, ct));
-            connections[1].Verify(x => x.SendAsync(message, ct));
-            connections[2].Verify(x => x.SendAsync(message, ct), Times.Never);
+            Mock.Get(connections[0]).Verify(x => x.SendAsync(message, ct));
+            Mock.Get(connections[1]).Verify(x => x.SendAsync(message, ct));
+            Mock.Get(connections[2]).Verify(x => x.SendAsync(message, ct), Times.Never);
         }
 
         private ConnectedClient WithConnection(IConnection connection)
         {
-            return new ConnectedClient(
-                Create<string>(),
-                connection,
-                Create<string>(),
-                Create<IUpdateDetector>());
+            var builder = new ClientWithConnectionSpecimenBuilder(connection);
+
+            Fixture.Customizations.Add(builder);
+            var client = Fixture.Create<ConnectedClient>();
+            Fixture.Customizations.Remove(builder);
+
+            return client;
         }
     }
 }

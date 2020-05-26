@@ -12,15 +12,18 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
     public class AnonymousConnectionInitializerTests : TestsBase
     {
         [Theory, AutoMoqData]
-        public async Task ShouldCreateUniqueGuidIdentities(AnonymousConnectionInitializer sut)
+        public async Task ShouldCreateClientWithGuidIdentity(AnonymousConnectionInitializer sut)
+        {
+            var client = await sut.ConnectAsync(Create<IConnection>(), default);
+            Assert.False(string.IsNullOrWhiteSpace(client.ClientId));
+            Assert.NotEqual(Guid.Empty, Guid.Parse(client.ClientId));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldCreateUniqueIdentities(AnonymousConnectionInitializer sut)
         {
             var client1 = await sut.ConnectAsync(Create<IConnection>(), default);
-            Assert.False(string.IsNullOrWhiteSpace(client1.ClientId));
-            Assert.NotEqual(Guid.Empty, Guid.Parse(client1.ClientId));
-
             var client2 = await sut.ConnectAsync(Create<IConnection>(), default);
-            Assert.False(string.IsNullOrWhiteSpace(client2.ClientId));
-            Assert.NotEqual(Guid.Empty, Guid.Parse(client2.ClientId));
 
             Assert.NotEqual(client1.ClientId, client2.ClientId);
         }
@@ -44,7 +47,7 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldSetGroupToLobbyByDefault(AnonymousConnectionInitializer sut)
+        public async Task ShouldSetGroupToLobby(AnonymousConnectionInitializer sut)
         {
             var client = await sut.ConnectAsync(Create<IConnection>(), default);
             Assert.Equal("Lobby", client.Group);
