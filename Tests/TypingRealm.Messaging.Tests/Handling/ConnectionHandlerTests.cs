@@ -50,13 +50,12 @@ namespace TypingRealm.Messaging.Tests.Handling
             [Frozen]Mock<IConnectionInitializer> initializer,
             IConnection connection,
             TestException exception,
-            CancellationToken ct,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, ct))
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
                 .ThrowsAsync(exception);
 
-            await AssertThrowsAsync(sut.HandleAsync(connection, ct), exception);
+            await AssertThrowsAsync(sut.HandleAsync(connection, Cts.Token), exception);
         }
 
         [Theory, AutoMoqData]
@@ -64,13 +63,12 @@ namespace TypingRealm.Messaging.Tests.Handling
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnectedClientStore> store,
             IConnection connection,
-            CancellationToken ct,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, ct))
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
                 .ThrowsAsync(Create<TestException>());
 
-            try { await sut.HandleAsync(connection, ct); } catch { }
+            try { await sut.HandleAsync(connection, Cts.Token); } catch { }
 
             store.Verify(x => x.Add(It.IsAny<ConnectedClient>()), Times.Never);
         }
@@ -84,7 +82,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             store.Setup(x => x.Add(It.IsAny<ConnectedClient>()))
                 .Throws(exception);
 
-            await AssertThrowsAsync(sut.HandleAsync(Create<IConnection>(), Create<CancellationToken>()), exception);
+            await AssertThrowsAsync(sut.HandleAsync(Create<IConnection>(), Cts.Token), exception);
         }
 
         [Theory, AutoMoqData]
@@ -93,16 +91,15 @@ namespace TypingRealm.Messaging.Tests.Handling
             [Frozen]Mock<IConnectedClientStore> store,
             IConnection connection,
             ConnectedClient client,
-            CancellationToken ct,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, ct))
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
                 .ReturnsAsync(client);
 
             store.Setup(x => x.Find(client.ClientId))
                 .Returns<ConnectedClient>(null);
 
-            await sut.HandleAsync(connection, ct);
+            await sut.HandleAsync(connection, Cts.Token);
 
             store.Verify(x => x.Add(client), Times.Once);
         }
@@ -113,18 +110,17 @@ namespace TypingRealm.Messaging.Tests.Handling
             [Frozen]Mock<IConnectedClientStore> store,
             Mock<IConnection> connection,
             ConnectedClient client,
-            CancellationToken ct,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection.Object, ct))
+            initializer.Setup(x => x.ConnectAsync(connection.Object, Cts.Token))
                 .ReturnsAsync(client);
 
             store.Setup(x => x.Find(client.ClientId))
                 .Returns<ConnectedClient>(null);
 
-            await sut.HandleAsync(connection.Object, ct);
+            await sut.HandleAsync(connection.Object, Cts.Token);
 
-            connection.Verify(x => x.ReceiveAsync(It.IsAny<CancellationToken>()), Times.Never);
+            connection.Verify(x => x.ReceiveAsync(Cts.Token), Times.Never);
         }
 
         [Theory, AutoMoqData]
@@ -133,7 +129,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             ConnectionHandler sut)
         {
             var connection = new TestConnection();
-            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), default))
+            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), Cts.Token))
                 .ReturnsAsync(new ConnectedClient(Create<string>(), connection, Create<string>(), Create<IUpdateDetector>()));
 
             using var cts = new CancellationTokenSource();
@@ -153,21 +149,20 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
             var client = new ConnectedClient(Create<string>(), connection, Create<string>(), Create<IUpdateDetector>());
-            using var cts = new CancellationTokenSource();
-            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), cts.Token))
+            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), Cts.Token))
                 .ReturnsAsync(client);
 
             var message = Create<TestMessage>();
-            var result = sut.HandleAsync(connection, cts.Token);
+            var result = sut.HandleAsync(connection, Cts.Token);
             await Wait();
             Assert.False(result.IsCompleted);
 
             connection.Received = message;
             await Wait();
 
-            dispatcher.Verify(x => x.DispatchAsync(client, message, cts.Token));
+            dispatcher.Verify(x => x.DispatchAsync(client, message, Cts.Token));
 
-            cts.Cancel();
+            Cts.Cancel();
         }
 
         [Theory, InlineAutoMoqData(false), InlineAutoMoqData(true)]
@@ -182,8 +177,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
             var client = CreateClient(connection, initialGroup);
-            using var cts = new CancellationTokenSource();
-            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), cts.Token))
+            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), Cts.Token))
                 .ReturnsAsync(client);
 
             var message = Create<TestMessage>();
@@ -200,13 +194,13 @@ namespace TypingRealm.Messaging.Tests.Handling
                     .Callback(() => client.Group = updatedGroup);
             }
 
-            _ = sut.HandleAsync(connection, cts.Token);
+            _ = sut.HandleAsync(connection, Cts.Token);
             connection.Received = message;
             await Wait();
 
             updateDetector.Verify(x => x.MarkForUpdate(initialGroup));
             updateDetector.Verify(x => x.MarkForUpdate(updatedGroup));
-            cts.Cancel();
+            Cts.Cancel();
         }
 
         [Theory, AutoMoqData]
@@ -215,11 +209,11 @@ namespace TypingRealm.Messaging.Tests.Handling
             TestException exception,
             ConnectionHandler sut)
         {
-            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))
                 .Returns(new ValueTask(Task.FromException(exception)));
 
             await AssertThrowsAsync(
-                sut.HandleAsync(Create<IConnection>(), default),
+                sut.HandleAsync(Create<IConnection>(), Cts.Token),
                 exception);
         }
 
@@ -230,14 +224,14 @@ namespace TypingRealm.Messaging.Tests.Handling
             TestException exception,
             ConnectionHandler sut)
         {
-            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))
                 .Returns(new ValueTask(Task.FromException(exception)));
 
             updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
                 .Throws(Create<Exception>());
 
             await AssertThrowsAsync(
-                sut.HandleAsync(Create<IConnection>(), default),
+                sut.HandleAsync(Create<IConnection>(), Cts.Token),
                 exception);
         }
 
@@ -250,13 +244,13 @@ namespace TypingRealm.Messaging.Tests.Handling
             IConnection connection,
             ConnectionHandler sut)
         {
-            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))
                 .Returns(new ValueTask(Task.FromException(Create<Exception>())));
 
-            initializer.Setup(x => x.ConnectAsync(connection, default))
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
                 .ReturnsAsync(new ConnectedClient(clientId, connection, Create<string>(), Create<IUpdateDetector>()));
 
-            await AssertThrowsAsync<Exception>(sut.HandleAsync(connection, default));
+            await AssertThrowsAsync<Exception>(sut.HandleAsync(connection, Cts.Token));
 
             store.Verify(x => x.Remove(clientId));
         }
@@ -277,21 +271,20 @@ namespace TypingRealm.Messaging.Tests.Handling
             var connection = new TestConnection();
             var client = CreateClient(connection, initialGroup);
             var anotherClient = CreateClient(anotherConnection.Object, initialGroup);
-            using var cts = new CancellationTokenSource();
-            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), cts.Token))
+            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), Cts.Token))
                 .ReturnsAsync(client);
 
             var message = Create<TestMessage>();
 
             if (dispatcherThrows)
             {
-                dispatcher.Setup(x => x.DispatchAsync(client, message, cts.Token))
+                dispatcher.Setup(x => x.DispatchAsync(client, message, Cts.Token))
                     .Callback(() => client.Group = updatedGroup)
                     .Returns(new ValueTask(Task.FromException(Create<TestException>())));
             }
             else
             {
-                dispatcher.Setup(x => x.DispatchAsync(client, message, cts.Token))
+                dispatcher.Setup(x => x.DispatchAsync(client, message, Cts.Token))
                     .Callback(() => client.Group = updatedGroup);
             }
 
@@ -309,12 +302,12 @@ namespace TypingRealm.Messaging.Tests.Handling
             updateDetector.Setup(x => x.PopMarked())
                 .Returns(popGroups);
 
-            _ = sut.HandleAsync(connection, cts.Token);
+            _ = sut.HandleAsync(connection, Cts.Token);
             connection.Received = message;
             await Wait();
 
-            updater.Verify(x => x.SendUpdateAsync(client, cts.Token));
-            updater.Verify(x => x.SendUpdateAsync(anotherClient, cts.Token));
+            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token));
+            updater.Verify(x => x.SendUpdateAsync(anotherClient, Cts.Token));
         }
 
         [Theory, AutoMoqData]
@@ -324,17 +317,16 @@ namespace TypingRealm.Messaging.Tests.Handling
             Mock<IConnection> connection,
             ConnectionHandler sut)
         {
-            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+            dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))
                 .Returns(new ValueTask(Task.FromException(Create<TestException>())));
 
-            using var cts = new CancellationTokenSource();
 
-            initializer.Setup(x => x.ConnectAsync(connection.Object, cts.Token))
+            initializer.Setup(x => x.ConnectAsync(connection.Object, Cts.Token))
                 .ReturnsAsync(CreateClient(connection.Object));
 
-            await AssertThrowsAsync<TestException>(sut.HandleAsync(connection.Object, cts.Token));
+            await AssertThrowsAsync<TestException>(sut.HandleAsync(connection.Object, Cts.Token));
 
-            connection.Verify(x => x.SendAsync(It.IsAny<Disconnected>(), cts.Token));
+            connection.Verify(x => x.SendAsync(It.IsAny<Disconnected>(), Cts.Token));
         }
 
         [Theory, AutoMoqData]
@@ -345,7 +337,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
                 .Throws<TestException>();
 
-            await AssertThrowsAsync<TestException>(sut.HandleAsync(Create<IConnection>(), default));
+            await AssertThrowsAsync<TestException>(sut.HandleAsync(Create<IConnection>(), Cts.Token));
         }
 
         [Theory, AutoMoqData]
@@ -353,10 +345,10 @@ namespace TypingRealm.Messaging.Tests.Handling
             [Frozen]Mock<IUpdater> updater,
             ConnectionHandler sut)
         {
-            updater.Setup(x => x.SendUpdateAsync(It.IsAny<ConnectedClient>(), default))
+            updater.Setup(x => x.SendUpdateAsync(It.IsAny<ConnectedClient>(), Cts.Token))
                 .Returns(new ValueTask(Task.FromException(Create<TestException>())));
 
-            await AssertThrowsAsync<TestException>(sut.HandleAsync(Create<IConnection>(), default));
+            await AssertThrowsAsync<TestException>(sut.HandleAsync(Create<IConnection>(), Cts.Token));
         }
 
         private ConnectedClient CreateClient(IConnection connection, string? initialGroup = null)

@@ -14,7 +14,7 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
         [Theory, AutoMoqData]
         public async Task ShouldCreateClientWithGuidIdentity(AnonymousConnectionInitializer sut)
         {
-            var client = await sut.ConnectAsync(Create<IConnection>(), default);
+            var client = await sut.ConnectAsync(Create<IConnection>(), Cts.Token);
             Assert.False(string.IsNullOrWhiteSpace(client.ClientId));
             Assert.NotEqual(Guid.Empty, Guid.Parse(client.ClientId));
         }
@@ -22,8 +22,8 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
         [Theory, AutoMoqData]
         public async Task ShouldCreateUniqueIdentities(AnonymousConnectionInitializer sut)
         {
-            var client1 = await sut.ConnectAsync(Create<IConnection>(), default);
-            var client2 = await sut.ConnectAsync(Create<IConnection>(), default);
+            var client1 = await sut.ConnectAsync(Create<IConnection>(), Cts.Token);
+            var client2 = await sut.ConnectAsync(Create<IConnection>(), Cts.Token);
 
             Assert.NotEqual(client1.ClientId, client2.ClientId);
         }
@@ -33,7 +33,7 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
             IConnection connection,
             AnonymousConnectionInitializer sut)
         {
-            var client = await sut.ConnectAsync(connection, default);
+            var client = await sut.ConnectAsync(connection, Cts.Token);
             Assert.Equal(connection, client.Connection);
         }
 
@@ -42,14 +42,14 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
             [Frozen]IUpdateDetector updateDetector,
             AnonymousConnectionInitializer sut)
         {
-            var client = await sut.ConnectAsync(Create<IConnection>(), default);
+            var client = await sut.ConnectAsync(Create<IConnection>(), Cts.Token);
             Assert.Equal(updateDetector, GetPrivateField(client, "_updateDetector"));
         }
 
         [Theory, AutoMoqData]
         public async Task ShouldSetGroupToLobby(AnonymousConnectionInitializer sut)
         {
-            var client = await sut.ConnectAsync(Create<IConnection>(), default);
+            var client = await sut.ConnectAsync(Create<IConnection>(), Cts.Token);
             Assert.Equal("Lobby", client.Group);
         }
 

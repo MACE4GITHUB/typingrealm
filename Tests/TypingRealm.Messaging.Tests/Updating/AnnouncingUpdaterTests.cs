@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Messaging.Messages;
@@ -17,10 +16,9 @@ namespace TypingRealm.Messaging.Tests.Updating
             ConnectedClient client,
             AnnouncingUpdater sut)
         {
-            using var cts = new CancellationTokenSource();
-            await sut.SendUpdateAsync(client, cts.Token);
+            await sut.SendUpdateAsync(client, Cts.Token);
 
-            connection.Verify(x => x.SendAsync(It.IsAny<Announce>(), cts.Token));
+            connection.Verify(x => x.SendAsync(It.IsAny<Announce>(), Cts.Token));
         }
     }
 }
