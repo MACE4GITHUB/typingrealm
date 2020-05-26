@@ -34,7 +34,11 @@ namespace TypingRealm.Messaging.Tests.Connecting
             ConnectedClientStore sut)
         {
             var connections = Fixture.CreateMany<IConnection>(3).ToList();
-            var clients = connections.Select(connection => WithConnection(connection)).ToList();
+            var clients = connections
+                .Select(connection => Create<ConnectedClient>(
+                    new ClientWithConnectionSpecimenBuilder(connection)))
+                .ToList();
+
             foreach (var client in clients) { sut.Add(client); }
             clients[1].Group = clients[0].Group;
 
@@ -44,12 +48,6 @@ namespace TypingRealm.Messaging.Tests.Connecting
             Mock.Get(connections[0]).Verify(x => x.SendAsync(message, ct));
             Mock.Get(connections[1]).Verify(x => x.SendAsync(message, ct));
             Mock.Get(connections[2]).Verify(x => x.SendAsync(message, ct), Times.Never);
-        }
-
-        private ConnectedClient WithConnection(IConnection connection)
-        {
-            return Create<ConnectedClient>(
-                new ClientWithConnectionSpecimenBuilder(connection));
         }
     }
 }

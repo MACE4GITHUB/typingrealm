@@ -9,24 +9,27 @@ using Moq;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Handlers;
 using TypingRealm.Messaging.Messages;
-using TypingRealm.Messaging.Updating;
+using TypingRealm.Messaging.Tests.SpecimenBuilders;
 using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Messaging.Tests.Handlers
 {
-    public class AnnounceHandlersTests : TestsBase
+    public class AnnounceHandlerTests : TestsBase
     {
         [Theory, AutoMoqData]
-        public async Task ShouldBroadcastToGroup(
+        public async Task ShouldBroadcastMessageToGroup(
             [Frozen] Mock<IConnectedClientStore> connectedClients,
             ConnectedClient sender,
-            Announce message,
+            Announce announce,
             CancellationToken ct,
             AnnounceHandler sut)
         {
-            var connections = Fixture.CreateMany<Mock<IConnection>>().ToList();
-            var clients = connections.Select(x => FromConnection(x.Object)).ToList();
+            var connections = Fixture.CreateMany<IConnection>().ToList();
+            var clients = connections
+                .Select(connection => Create<ConnectedClient>(
+                    new ClientWithConnectionSpecimenBuilder(connection)))
+                .ToList();
 
             connectedClients
                 .Setup(x => x.FindInGroups(It.Is<IEnumerable<string>>(
@@ -34,23 +37,14 @@ namespace TypingRealm.Messaging.Tests.Handlers
                         && groups.Contains(sender.Group))))
                 .Returns(clients);
 
-            await sut.HandleAsync(sender, message, ct);
+            await sut.HandleAsync(sender, announce, ct);
 
             foreach (var connection in connections)
             {
-                connection.Verify(x => x.SendAsync(
-                    It.Is<Announce>(m => m.Message.Contains(message.Message)),
+                Mock.Get(connection).Verify(x => x.SendAsync(
+                    It.Is<Announce>(m => m.Message.Contains(announce.Message)),
                     ct));
             }
-        }
-
-        private ConnectedClient FromConnection(IConnection connection)
-        {
-            return new ConnectedClient(
-                Create<string>(),
-                connection,
-                Create<string>(),
-                Create<IUpdateDetector>());
         }
     }
 }
