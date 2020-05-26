@@ -6,39 +6,37 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests
 {
-    public class ConnectedClientTests
+    public class ConnectedClientTests : TestsBase
     {
         [Theory, AutoMoqData]
         public void ShouldBeCreatedUsingConstructor(
             string clientId,
             IConnection connection,
             string group,
-            Mock<IUpdateDetector> updateDetector)
+            IUpdateDetector updateDetector)
         {
-            var client = new ConnectedClient(clientId, connection, group, updateDetector.Object);
+            var client = new ConnectedClient(clientId, connection, group, updateDetector);
 
             Assert.Equal(clientId, client.ClientId);
             Assert.Equal(connection, client.Connection);
             Assert.Equal(group, client.Group);
-
-            client.Group = "another";
-            updateDetector.Verify(x => x.MarkForUpdate("another"));
+            Assert.Equal(updateDetector, GetPrivateField(client, "_updateDetector"));
         }
 
         [Theory, AutoMoqData]
-        public void ShouldNotMarkForUpdateOnCreation(
-            string clientId,
-            IConnection connection,
-            string group,
-            Mock<IUpdateDetector> updateDetector)
+        public void ShouldNotMarkForUpdateOnCreation(IUpdateDetector updateDetector)
         {
-            _ = new ConnectedClient(clientId, connection, group, updateDetector.Object);
+            _ = new ConnectedClient(
+                Create<string>(),
+                Create<IConnection>(),
+                Create<string>(),
+                updateDetector);
 
-            updateDetector.Verify(x => x.MarkForUpdate(It.IsAny<string>()), Times.Never);
+            Mock.Get(updateDetector).Verify(x => x.MarkForUpdate(It.IsAny<string>()), Times.Never);
         }
 
         [Theory, AutoMoqData]
-        public void ShouldMarkPreviousAndNewGroupsForUpdate(
+        public void ShouldMarkPreviousAndNewGroupsForUpdate_WhenGroupIsChanged(
             [Frozen]Mock<IUpdateDetector> updateDetector,
             string newGroup,
             ConnectedClient sut)
@@ -51,12 +49,12 @@ namespace TypingRealm.Messaging.Tests
         }
 
         [Theory, AutoMoqData]
-        public void ShouldNotMarkCurrentGroupForUpdate(
+        public void ShouldNotMarkNewGroupForUpdate_WhenSetToTheSameGroup(
             [Frozen]Mock<IUpdateDetector> updateDetector,
             string newGroup,
             ConnectedClient sut)
         {
-            updateDetector.Verify(x => x.MarkForUpdate(sut.Group), Times.Never);
+            updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Never);
 
             sut.Group = newGroup;
             updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Once);
