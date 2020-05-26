@@ -13,10 +13,9 @@ namespace TypingRealm.Messaging.Tests.Updating
         [Theory, AutoMoqData]
         public async Task ShouldSendAnnounceMessage(
             [Frozen]Mock<IConnection> connection,
-            ConnectedClient client,
             AnnouncingUpdater sut)
         {
-            await sut.SendUpdateAsync(client, Cts.Token);
+            await sut.SendUpdateAsync(Create<ConnectedClient>(), Cts.Token);
 
             connection.Verify(x => x.SendAsync(It.IsAny<Announce>(), Cts.Token));
         }

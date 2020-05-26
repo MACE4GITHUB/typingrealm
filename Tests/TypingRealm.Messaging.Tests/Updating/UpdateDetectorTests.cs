@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
 using TypingRealm.Messaging.Updating;
 using TypingRealm.Testing;
 using Xunit;
@@ -34,14 +35,13 @@ namespace TypingRealm.Messaging.Tests.Updating
             sut.MarkForUpdate(group);
             sut.MarkForUpdate(group);
 
-            Assert.Single(sut.PopMarked());
+            Assert.Equal(group, sut.PopMarked().Single());
         }
 
         [Theory, AutoMoqData]
-        public void ShouldPopAllMarkedGroups(
-            string[] groups,
-            UpdateDetector sut)
+        public void ShouldPopAllMarkedGroups(UpdateDetector sut)
         {
+            var groups = Fixture.CreateMany<string>(3).ToList();
             foreach (var group in groups)
             {
                 sut.MarkForUpdate(group);
@@ -55,7 +55,7 @@ namespace TypingRealm.Messaging.Tests.Updating
             Assert.Empty(sut.PopMarked());
         }
 
-        // This test is likely useless.
+        // This test is likely useless and locking is not properly tested.
         [Theory, AutoMoqData]
         public async Task ShouldMarkThreadSafely(UpdateDetector sut)
         {
