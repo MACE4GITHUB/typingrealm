@@ -370,5 +370,61 @@ namespace TypingRealm.Messaging.Tests.Handling
 
             await AssertThrowsAsync<TestException>(sut.HandleAsync(Create<IConnection>(), Cts.Token));
         }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldHandleFullIntegrationScenario(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            [Frozen]Mock<IConnectedClientStore> store,
+            [Frozen]Mock<IMessageDispatcher> dispatcher,
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            [Frozen]Mock<IUpdater> updater,
+            ConnectionHandler sut)
+        {
+            var connection = new TestConnection();
+            var client = Create<ConnectedClient>(
+                new ClientWithConnectionBuilder(connection),
+                new ClientWithUpdateDetectorBuilder(updateDetector.Object));
+
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
+                .ReturnsAsync(client);
+
+            var groups = Fixture.CreateMany<string>();
+            updateDetector.Setup(x => x.PopMarked())
+                .Returns(groups);
+            store.Setup(x => x.FindInGroups(groups))
+                .Returns(new[] { client });
+
+            _ = sut.HandleAsync(connection, Cts.Token);
+            await Wait();
+            dispatcher.Verify(x => x.DispatchAsync(client, It.IsAny<object>(), Cts.Token), Times.Never);
+
+            var message = Create<object>();
+            connection.Received = message;
+            await Wait();
+            dispatcher.Verify(x => x.DispatchAsync(client, message, Cts.Token));
+
+            message = Create<TestMessage>();
+            var newGroup = Create<string>();
+            dispatcher.Setup(x => x.DispatchAsync(client, message, Cts.Token))
+                .Callback<ConnectedClient, object, CancellationToken>(
+                    (client, message, token) =>
+                    {
+                        client.Group = newGroup;
+                    });
+
+            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Once);
+            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Once);
+
+            connection.Received = message;
+            await Wait();
+
+            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Exactly(2));
+
+            // One time from ConnectedClient.Group setter, another one from ConnectionHandler.
+            // Consider changing this logic.
+            updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Exactly(2));
+
+            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(2));
+        }
     }
 }
