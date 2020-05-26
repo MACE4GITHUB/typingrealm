@@ -9,26 +9,24 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests.Handling
 {
-    public class AnotherTestMessage : TestMessage { }
-
     public class MessageDispatcherTests : TestsBase
     {
         [Theory, AutoMoqData]
         public async Task ShouldDispatchToMultipleHandlers(
             ConnectedClient sender,
             [Frozen]Mock<IMessageHandlerFactory> handlerFactory,
+            TestMessage message,
             MessageDispatcher sut)
         {
-            var handlers = Fixture.CreateMany<Mock<IMessageHandler<AnotherTestMessage>>>();
-            handlerFactory.Setup(x => x.GetHandlersFor<AnotherTestMessage>())
+            var handlers = Fixture.CreateMany<Mock<IMessageHandler<TestMessage>>>();
+            handlerFactory.Setup(x => x.GetHandlersFor<TestMessage>())
                 .Returns(handlers.Select(h => h.Object));
-            TestMessage message = new AnotherTestMessage();
 
             await sut.DispatchAsync(sender, message, Cts.Token);
 
             foreach (var handler in handlers)
             {
-                handler.Verify(x => x.HandleAsync(sender, (AnotherTestMessage)message, Cts.Token));
+                handler.Verify(x => x.HandleAsync(sender, message, Cts.Token));
             }
         }
     }
