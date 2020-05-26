@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
+using AutoFixture.Kernel;
 using Xunit;
 
 namespace TypingRealm.Testing
@@ -13,6 +14,27 @@ namespace TypingRealm.Testing
         protected Fixture Fixture { get; } = AutoMoqDataAttribute.CreateFixture();
 
         protected T Create<T>() => Fixture.Create<T>();
+
+        private readonly object _lock = new object();
+        protected T Create<T>(params ISpecimenBuilder[] builders)
+        {
+            lock (_lock)
+            {
+                foreach (var builder in builders)
+                {
+                    Fixture.Customizations.Add(builder);
+                }
+
+                var result = Fixture.Create<T>();
+
+                foreach (var builder in builders)
+                {
+                    Fixture.Customizations.Remove(builder);
+                }
+
+                return result;
+            }
+        }
 
         protected CancellationTokenSource Cts { get; } = new CancellationTokenSource();
 

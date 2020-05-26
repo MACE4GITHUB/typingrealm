@@ -48,13 +48,8 @@ namespace TypingRealm.Messaging.Tests.Connecting
 
         private ConnectedClient WithConnection(IConnection connection)
         {
-            var builder = new ClientWithConnectionSpecimenBuilder(connection);
-
-            Fixture.Customizations.Add(builder);
-            var client = Fixture.Create<ConnectedClient>();
-            Fixture.Customizations.Remove(builder);
-
-            return client;
+            return Create<ConnectedClient>(
+                new ClientWithConnectionSpecimenBuilder(connection));
         }
     }
 }
