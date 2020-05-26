@@ -33,7 +33,7 @@ namespace TypingRealm.Messaging.Tests.Connecting
             var connections = Fixture.CreateMany<IConnection>(3).ToList();
             var clients = connections
                 .Select(connection => Create<ConnectedClient>(
-                    new ClientWithConnectionSpecimenBuilder(connection)))
+                    new ClientWithConnectionBuilder(connection)))
                 .ToList();
 
             foreach (var client in clients) { sut.Add(client); }

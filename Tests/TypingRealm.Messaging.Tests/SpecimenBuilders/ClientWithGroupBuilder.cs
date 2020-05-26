@@ -3,23 +3,24 @@ using AutoFixture.Kernel;
 
 namespace TypingRealm.Messaging.Tests.SpecimenBuilders
 {
-    public class ClientWithIdSpecimenBuilder : ISpecimenBuilder
-    {
-        private readonly string _clientId;
 
-        public ClientWithIdSpecimenBuilder(string clientId)
+    public class ClientWithGroupBuilder : ISpecimenBuilder
+    {
+        private readonly string _group;
+
+        public ClientWithGroupBuilder(string group)
         {
-            _clientId = clientId;
+            _group = group;
         }
 
         public object Create(object request, ISpecimenContext context)
         {
             if (!(request is ParameterInfo pi)
                 || pi.ParameterType != typeof(string)
-                || pi.Name != "clientId")
+                || pi.Name != "group")
                 return new NoSpecimen();
 
-            return _clientId;
+            return _group;
         }
     }
 }

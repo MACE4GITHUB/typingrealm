@@ -19,7 +19,7 @@ namespace TypingRealm.Messaging.Tests.Connecting
         public void Add_ShouldThrow_WhenAlreadyAdded(ConnectedClientStore sut)
         {
             Fixture.Customizations.Add(
-                new ClientWithIdSpecimenBuilder(Create<string>()));
+                new ClientWithIdBuilder(Create<string>()));
 
             sut.Add(Create<ConnectedClient>());
 
@@ -147,7 +147,7 @@ namespace TypingRealm.Messaging.Tests.Connecting
             string clientId,
             ConnectedClientStore sut)
         {
-            Fixture.Customizations.Add(new ClientWithIdSpecimenBuilder(clientId));
+            Fixture.Customizations.Add(new ClientWithIdBuilder(clientId));
 
             var tasks = new List<Task>();
             for (var i = 0; i < 100; i++)

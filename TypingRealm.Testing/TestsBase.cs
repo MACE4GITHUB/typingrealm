@@ -70,8 +70,12 @@ namespace TypingRealm.Testing
             await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
         }
 
+        protected Task<Exception> SwallowAnyAsync(Task task)
+            => Assert.ThrowsAnyAsync<Exception>(() => task);
+
         public void Dispose()
         {
+            Cts.Cancel();
             Cts.Dispose();
         }
     }

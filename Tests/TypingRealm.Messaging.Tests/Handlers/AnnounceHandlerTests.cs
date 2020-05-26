@@ -28,7 +28,7 @@ namespace TypingRealm.Messaging.Tests.Handlers
             var connections = Fixture.CreateMany<IConnection>().ToList();
             var clients = connections
                 .Select(connection => Create<ConnectedClient>(
-                    new ClientWithConnectionSpecimenBuilder(connection)))
+                    new ClientWithConnectionBuilder(connection)))
                 .ToList();
 
             connectedClients

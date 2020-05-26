@@ -3,11 +3,11 @@ using AutoFixture.Kernel;
 
 namespace TypingRealm.Messaging.Tests.SpecimenBuilders
 {
-    public class ClientWithConnectionSpecimenBuilder : ISpecimenBuilder
+    public class ClientWithConnectionBuilder : ISpecimenBuilder
     {
         private readonly IConnection _connection;
 
-        public ClientWithConnectionSpecimenBuilder(IConnection connection)
+        public ClientWithConnectionBuilder(IConnection connection)
         {
             _connection = connection;
         }

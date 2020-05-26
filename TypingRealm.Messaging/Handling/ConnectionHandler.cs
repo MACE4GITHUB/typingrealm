@@ -49,7 +49,6 @@ namespace TypingRealm.Messaging.Handling
 
         private async ValueTask DispatchAndUpdateAsync(ConnectedClient sender, object message, CancellationToken cancellationToken)
         {
-            var previousGroup = sender.Group;
             ValueTask? disconnecting = null;
 
             try
@@ -74,7 +73,6 @@ namespace TypingRealm.Messaging.Handling
                 // Do not lose the exception from catch block.
                 try
                 {
-                    _updateDetector.MarkForUpdate(previousGroup);
                     _updateDetector.MarkForUpdate(sender.Group);
 
                     var clientsThatNeedUpdate = _connectedClients.FindInGroups(_updateDetector.PopMarked()).ToList();
