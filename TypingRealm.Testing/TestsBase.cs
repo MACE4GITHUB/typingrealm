@@ -11,11 +11,13 @@ namespace TypingRealm.Testing
 {
     public abstract class TestsBase : IDisposable
     {
+        // Used for creating instances with custom ISpecimenBuilder.
+        private readonly object _lock = new object();
+
         protected Fixture Fixture { get; } = AutoMoqDataAttribute.CreateFixture();
+        protected CancellationTokenSource Cts { get; } = new CancellationTokenSource();
 
         protected T Create<T>() => Fixture.Create<T>();
-
-        private readonly object _lock = new object();
         protected T Create<T>(params ISpecimenBuilder[] builders)
         {
             lock (_lock)
@@ -35,8 +37,6 @@ namespace TypingRealm.Testing
                 return result;
             }
         }
-
-        protected CancellationTokenSource Cts { get; } = new CancellationTokenSource();
 
         protected void AssertSerializable<T>()
         {

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace TypingRealm.Testing
 {
-    public static class AssertExtensions
+    public static class AssertServiceProviderExtensions
     {
         public static object AssertRegistered(
             this IServiceProvider provider,
@@ -18,7 +18,7 @@ namespace TypingRealm.Testing
             return implementation;
         }
 
-        public static void AssertRegisteredTransient(
+        public static object AssertRegisteredTransient(
             this IServiceProvider provider,
             Type interfaceType,
             Type implementationType)
@@ -27,9 +27,11 @@ namespace TypingRealm.Testing
             var i2 = provider.AssertRegistered(interfaceType, implementationType);
 
             Assert.NotEqual(i1, i2);
+
+            return i1;
         }
 
-        public static void AssertRegisteredSingleton(
+        public static object AssertRegisteredSingleton(
             this IServiceProvider provider,
             Type interfaceType,
             Type implementationType)
@@ -42,12 +44,17 @@ namespace TypingRealm.Testing
 
             Assert.Equal(i1, i2);
             Assert.Equal(i1, i3);
+
+            return i1;
         }
 
-        public static void AssertRegisteredTransient<TInterface, TImplementation>(this IServiceProvider provider)
-            => provider.AssertRegisteredTransient(typeof(TInterface), typeof(TImplementation));
+        public static TImplementation AssertRegistered<TInterface, TImplementation>(this IServiceProvider provider)
+            => (TImplementation)provider.AssertRegistered(typeof(TInterface), typeof(TImplementation));
 
-        public static void AssertRegisteredSingleton<TInterface, TImplementation>(this IServiceProvider provider)
-            => provider.AssertRegisteredSingleton(typeof(TInterface), typeof(TImplementation));
+        public static TImplementation AssertRegisteredTransient<TInterface, TImplementation>(this IServiceProvider provider)
+            => (TImplementation)provider.AssertRegisteredTransient(typeof(TInterface), typeof(TImplementation));
+
+        public static TImplementation AssertRegisteredSingleton<TInterface, TImplementation>(this IServiceProvider provider)
+            => (TImplementation)provider.AssertRegisteredSingleton(typeof(TInterface), typeof(TImplementation));
     }
 }
