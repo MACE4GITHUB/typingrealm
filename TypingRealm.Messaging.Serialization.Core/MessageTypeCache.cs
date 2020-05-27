@@ -5,7 +5,7 @@ using System.Linq;
 namespace TypingRealm.Messaging.Serialization
 {
     /// <summary>
-    /// The cache stores mapping between message type and its string identity.
+    /// The cache stores mapping between message type and its identity.
     /// </summary>
     public sealed class MessageTypeCache : IMessageTypeCache
     {
