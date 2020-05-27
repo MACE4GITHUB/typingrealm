@@ -25,9 +25,6 @@ namespace TypingRealm.Tests
         public AsyncManagedDisposableTests()
         {
             _sut = new TestAsyncManagedDisposable();
-
-            // Valid initial state.
-            Assert.False(_sut.IsDisposed);
         }
 
         public void Dispose()

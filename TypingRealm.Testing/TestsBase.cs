@@ -64,10 +64,10 @@ namespace TypingRealm.Testing
             Assert.Equal(exception, thrown);
         }
 
-        protected async ValueTask AssertThrowsAsync<TException>(Task task)
+        protected async ValueTask<TException> AssertThrowsAsync<TException>(Task task)
             where TException : Exception
         {
-            await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
+            return await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
         }
 
         protected async ValueTask AssertThrowsAsync<TException>(ValueTask vt, TException exception)
@@ -77,10 +77,10 @@ namespace TypingRealm.Testing
             Assert.Equal(exception, thrown);
         }
 
-        protected async ValueTask AssertThrowsAsync<TException>(ValueTask vt)
+        protected async ValueTask<TException> AssertThrowsAsync<TException>(ValueTask vt)
             where TException : Exception
         {
-            await Assert.ThrowsAsync<TException>(() => vt.AsTask()).ConfigureAwait(false);
+            return await Assert.ThrowsAsync<TException>(() => vt.AsTask()).ConfigureAwait(false);
         }
 
         protected Task<Exception> SwallowAnyAsync(Task task)

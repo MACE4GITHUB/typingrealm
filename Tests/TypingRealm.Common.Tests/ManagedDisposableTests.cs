@@ -44,7 +44,7 @@ namespace TypingRealm.Tests
         }
 
         [Fact]
-        public void ThrowIfDisposedShouldNotBeVirtual() // So we can test it only here.
+        public void ThrowIfDisposed_ShouldNotBeVirtual() // So we can test it only here.
         {
             Assert.False(typeof(ManagedDisposable).GetMethod("ThrowIfDisposed", BindingFlags.Instance | BindingFlags.NonPublic)?.IsVirtual);
         }

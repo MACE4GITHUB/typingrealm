@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Testing;
@@ -6,164 +6,166 @@ using Xunit;
 
 namespace TypingRealm.Tests
 {
-    public class AsyncHelpersTests
+    public class AsyncHelpersTests : TestsBase
     {
-        [Fact]
-        public async Task WhenAll_ShouldCompleteAsynchronously()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task WhenAll_ShouldComplete(bool isAsynchronous)
         {
             var isRunning = true;
 
-            var empty = new ValueTask();
-            var running = new ValueTask(Task.Run(async () =>
+            var completed1 = new ValueTask();
+            var completed2 = new ValueTask();
+            var running1 = new ValueTask(Task.Run(async () =>
             {
                 while (isRunning)
-                    await WaitAsync();
+                    await Wait();
+            }));
+            var running2 = new ValueTask(Task.Run(async () =>
+            {
+                while (isRunning)
+                    await Wait();
             }));
 
-            var result = AsyncHelpers.WhenAll(new[] { empty, running });
-            Assert.False(result.IsCompleted);
+            var result = isAsynchronous
+                ? AsyncHelpers.WhenAll(new[] { completed1, running1, running2 })
+                : AsyncHelpers.WhenAll(new[] { completed1, completed2 });
 
-            await WaitAsync();
-            isRunning = false;
+            if (isAsynchronous)
+            {
+                await Wait();
+                Assert.False(result.IsCompleted);
+                isRunning = false;
+            }
 
             await result;
             Assert.True(result.IsCompletedSuccessfully);
         }
 
-        [Fact]
-        public async Task WhenAll_ShouldCancelAsynchronously()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task WhenAll_ShouldCancel(bool isAsynchronous)
         {
-            using var cts = new CancellationTokenSource();
+            var canceled1 = new ValueTask(Task.FromCanceled(new CancellationToken(true)));
+            var canceled2 = new ValueTask(Task.FromCanceled(new CancellationToken(true)));
+            var running1 = new ValueTask(Task.Delay(Timeout.Infinite, Cts.Token));
+            var running2 = new ValueTask(Task.Delay(Timeout.Infinite, Cts.Token));
 
-            var empty = new ValueTask();
-            var canceled = new ValueTask(Task.Delay(Timeout.Infinite, cts.Token));
+            var result = isAsynchronous
+                ? AsyncHelpers.WhenAll(new[] { canceled1, running1, running2 })
+                : AsyncHelpers.WhenAll(new[] { canceled1, canceled2 });
 
-            var result = AsyncHelpers.WhenAll(new[] { empty, canceled });
-            Assert.False(result.IsCompleted);
+            if (isAsynchronous)
+            {
+                await Wait();
+                Assert.False(result.IsCompleted);
+                Cts.Cancel();
+            }
 
-            cts.Cancel();
-
-            await Assert.ThrowsAsync<TaskCanceledException>(async () => await result);
+            await AssertThrowsAsync<TaskCanceledException>(result);
             Assert.True(result.IsCanceled);
         }
 
-        [Fact]
-        public async Task WhenAll_ShouldThrowAsyncException()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task WhenAll_ShouldThrow(bool isAsynchronous)
         {
             var isRunning = true;
 
-            var empty = new ValueTask();
-            var running = new ValueTask(Task.Run(async () =>
+            var thrown1 = new ValueTask(Task.FromException(Create<TestException>()));
+            var thrown2 = new ValueTask(Task.FromException(Create<TestException>()));
+            var running1 = new ValueTask(Task.Run(async () =>
             {
                 while (isRunning)
-                    await WaitAsync();
+                    await Wait();
+
+                throw new TestException();
+            }));
+            var running2 = new ValueTask(Task.Run(async () =>
+            {
+                while (isRunning)
+                    await Wait();
 
                 throw new TestException();
             }));
 
-            var result = AsyncHelpers.WhenAll(new[] { empty, running });
-            Assert.False(result.IsCompleted);
+            var result = isAsynchronous
+                ? AsyncHelpers.WhenAll(new[] { thrown1, running1, running2 })
+                : AsyncHelpers.WhenAll(new[] { thrown1, thrown2 });
 
-            await WaitAsync();
-            isRunning = false;
+            if (isAsynchronous)
+            {
+                await Wait();
+                Assert.False(result.IsCompleted);
+                isRunning = false;
+            }
 
-            await Assert.ThrowsAsync<TestException>(async () => await result);
+            await AssertThrowsAsync<TestException>(result);
             Assert.True(result.IsFaulted);
         }
 
-        [Fact]
-        public async Task WhenAll_ShouldThrowMultipleAsyncExceptions()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task WhenAll_ShouldThrowMultipleExceptions(bool isAsynchronous)
         {
             var isRunning = true;
 
-            var empty = new ValueTask();
+            var thrown1 = new ValueTask(Task.FromException(Create<TestException>()));
+            var thrown2 = new ValueTask(Task.FromException(Create<TestException>()));
             var running1 = new ValueTask(Task.Run(async () =>
             {
                 while (isRunning)
-                    await WaitAsync();
+                    await Wait();
 
                 throw new TestException("1");
             }));
-
             var running2 = new ValueTask(Task.Run(async () =>
             {
                 while (isRunning)
-                    await WaitAsync();
+                    await Wait();
 
                 throw new TestException("2");
             }));
 
-            var result = AsyncHelpers.WhenAll(new[] { empty, running1, running2 });
-            Assert.False(running1.IsCompleted);
-            Assert.False(running2.IsCompleted);
-            Assert.False(result.IsCompleted);
+            var result = isAsynchronous
+                ? AsyncHelpers.WhenAll(new[] { running1, running2, thrown1 })
+                : AsyncHelpers.WhenAll(new[] { thrown1, thrown2 });
 
-            await WaitAsync();
-            isRunning = false;
+            if (isAsynchronous)
+            {
+                await Wait();
+                Assert.False(running1.IsCompleted);
+                Assert.False(running2.IsCompleted);
+                Assert.False(result.IsCompleted);
 
-            var exception = await Assert.ThrowsAsync<TestException>(async () => await result);
-            Assert.True(running1.IsFaulted);
-            Assert.True(running2.IsFaulted);
+                isRunning = false;
+            }
+
+            var exception = await AssertThrowsAsync<TestException>(result);
+
+            if (isAsynchronous)
+            {
+                Assert.True(running1.IsFaulted);
+                Assert.True(running2.IsFaulted);
+                Assert.Equal("1", exception.Message); // First exception.
+            }
+
             Assert.True(result.IsFaulted);
-            Assert.Equal("1", exception.Message);
-            Assert.Equal(2, result.AsTask().Exception?.Flatten().InnerExceptions.Count);
+            var allThrown = result.AsTask().Exception!.Flatten().InnerExceptions.ToList();
+
+            if (isAsynchronous)
+            {
+                Assert.Equal(3, allThrown.Count);
+                Assert.Contains(allThrown, x => x.Message == "2");
+            }
+            else
+            {
+                Assert.Equal(2, allThrown.Count);
+            }
         }
-
-        [Fact]
-        public async Task WhenAll_ShouldCompleteSynchronously()
-        {
-            var empty = new ValueTask();
-
-            var result = AsyncHelpers.WhenAll(new[] { empty });
-            await result;
-
-            Assert.True(result.IsCompletedSuccessfully);
-        }
-
-        [Fact]
-        public async Task WhenAll_ShouldCancelSynchronously()
-        {
-            static async ValueTask GetCanceledValueTask() => throw new OperationCanceledException();
-
-            var empty = new ValueTask();
-            var canceled = GetCanceledValueTask();
-
-            var result = AsyncHelpers.WhenAll(new[] { empty, canceled });
-            Assert.True(result.IsCompleted);
-            Assert.True(result.IsCanceled);
-
-            await Assert.ThrowsAsync<OperationCanceledException>(async () => await result);
-        }
-
-        [Fact]
-        public async Task WhenAll_ShouldThrowSyncException()
-        {
-            var empty = new ValueTask();
-            var fromException = new ValueTask(Task.FromException(new TestException()));
-
-            var result = AsyncHelpers.WhenAll(new[] { empty, fromException });
-            Assert.True(result.IsCompleted);
-            Assert.True(result.IsFaulted);
-
-            await Assert.ThrowsAsync<TestException>(async () => await result);
-        }
-
-        [Fact]
-        public async Task WhenAll_ShouldThrowMultipleSyncExceptions()
-        {
-            var empty = new ValueTask();
-            var fromException1 = new ValueTask(Task.FromException(new TestException("1")));
-            var fromException2 = new ValueTask(Task.FromException(new TestException("2")));
-
-            var result = AsyncHelpers.WhenAll(new[] { empty, fromException1, fromException2 });
-            Assert.True(result.IsCompleted);
-            Assert.True(result.IsFaulted);
-
-            var exception = await Assert.ThrowsAsync<TestException>(async () => await result);
-            Assert.Equal("1", exception.Message);
-            Assert.Equal(2, result.AsTask().Exception?.Flatten().InnerExceptions.Count);
-        }
-
-        private static Task WaitAsync() => Task.Delay(100);
     }
 }
