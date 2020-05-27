@@ -70,6 +70,19 @@ namespace TypingRealm.Testing
             await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
         }
 
+        protected async ValueTask AssertThrowsAsync<TException>(ValueTask vt, TException exception)
+            where TException : Exception
+        {
+            var thrown = await Assert.ThrowsAsync<TException>(() => vt.AsTask()).ConfigureAwait(false);
+            Assert.Equal(exception, thrown);
+        }
+
+        protected async ValueTask AssertThrowsAsync<TException>(ValueTask vt)
+            where TException : Exception
+        {
+            await Assert.ThrowsAsync<TException>(() => vt.AsTask()).ConfigureAwait(false);
+        }
+
         protected Task<Exception> SwallowAnyAsync(Task task)
             => Assert.ThrowsAnyAsync<Exception>(() => task);
 

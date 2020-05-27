@@ -1,34 +1,25 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using ProtoBuf.Meta;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf
 {
     public static class RegistrationExtensions
     {
         /// <summary>
-        /// Registers protobuf stream connection factory and adds a post-build
-        /// action to register all messages in protobuf RuntimeTypeModel.
+        /// Registers protobuf stream connection factory.
         /// </summary>
-        public static MessageTypeCacheBuilder AddProtobuf(this MessageTypeCacheBuilder builder)
+        public static IServiceCollection AddProtobuf(this IServiceCollection services)
         {
-            builder.Services.AddTransient<IProtobufConnectionFactory, ProtobufConnectionFactory>();
-            builder.AddPostBuildAction(messageTypes => RegisterProtobufMessages(messageTypes));
-
-            return builder;
-        }
-
-        private static void RegisterProtobufMessages(IMessageTypeCache messageTypes)
-        {
-            foreach (var type in messageTypes.GetAllTypes())
+            services.AddTransient<IProtobufConnectionFactory, ProtobufConnectionFactory>();
+            services.AddSingleton<IProtobuf>(provider =>
             {
-                RuntimeTypeModel.Default.Add(type.Value, false)
-                    .Add(type.Value
-                        .GetProperties()
-                        .Select(property => property.Name)
-                        .OrderBy(name => name)
-                        .ToArray());
-            }
+                var messageTypeCache = provider.GetRequiredService<IMessageTypeCache>();
+                var types = messageTypeCache.GetAllTypes().Select(idToType => idToType.Value);
+
+                return new Protobuf(types);
+            });
+
+            return services;
         }
     }
 }

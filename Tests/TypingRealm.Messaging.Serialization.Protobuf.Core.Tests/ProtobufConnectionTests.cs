@@ -3,71 +3,66 @@ using System.IO;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using Moq;
-using ProtoBuf;
-using ProtoBuf.Meta;
 using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
 {
-    public class AnotherMessage : TestMessage
-    {
-        public int IntValue { get; set; }
-    }
-
-    // Protobuf tests require static data so there is only one test.
-    // Passing cancellation token to Stream is not tested.
-    public class ProtobufConnectionTests
+    public class ProtobufConnectionTests : TestsBase
     {
         [Theory, AutoMoqData]
-        public async Task ShouldWork(
+        public async Task ShouldReceive(
             [Frozen]Stream stream,
+            [Frozen]Mock<IProtobuf> protobuf,
             [Frozen]Mock<IMessageTypeCache> cache,
             TestMessage message,
             ProtobufConnection sut)
         {
-            cache.Setup(x => x.GetTypeId(typeof(TestMessage)))
-                .Returns("3");
+            cache.Setup(x => x.GetTypeById("5")).Returns(typeof(TestMessage));
 
-            // Should throw when message not registered.
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => sut.SendAsync(message, default).AsTask());
+            protobuf.Setup(x => x.Deserialize(stream, It.Is<Func<int, Type>>(
+                func => func.Invoke(5) == typeof(TestMessage))))
+                .Returns(message);
 
-            // Should send and receive.
-            cache.Setup(x => x.GetTypeId(typeof(TestMessage))).Returns("10");
-            cache.Setup(x => x.GetTypeById("10")).Returns(typeof(TestMessage));
-            RuntimeTypeModel.Default.Add(typeof(TestMessage), false)
-                .Add(nameof(message.Value));
+            var result = await sut.ReceiveAsync(Cts.Token);
 
-            await sut.SendAsync(message, default);
-            Assert.NotEqual(0, stream.Length);
-
-            stream.Seek(0, SeekOrigin.Begin);
-            var result = (TestMessage)await sut.ReceiveAsync(default);
-
-            Assert.Equal(message.Value, result.Value);
-
-            // Should throw if type is wrong in cache.
-            RuntimeTypeModel.Default.Add(typeof(AnotherMessage), false)
-                .Add("IntValue");
-            cache.Setup(x => x.GetTypeById("10"))
-                .Returns(typeof(AnotherMessage));
-            stream.Seek(0, SeekOrigin.Begin);
-            await Assert.ThrowsAsync<ProtoException>(
-                () => sut.ReceiveAsync(default).AsTask());
+            Assert.Equal(message, result);
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldThrowIfTypeIdIsNotInt(
+        public async Task ShouldSend(
+            [Frozen]Stream stream,
+            [Frozen]Mock<IProtobuf> protobuf,
             [Frozen]Mock<IMessageTypeCache> cache,
+            byte[] writtenBytes,
             TestMessage message,
             ProtobufConnection sut)
         {
             cache.Setup(x => x.GetTypeId(typeof(TestMessage)))
-                .Returns("string");
+                .Returns("5");
 
-            await Assert.ThrowsAsync<FormatException>(
-                () => sut.SendAsync(message, default).AsTask());
+            Stream writeStream = null!;
+            protobuf.Setup(x => x.Serialize(It.IsAny<MemoryStream>(), message, 5))
+                .Callback<Stream, object, int>((stream, message, fieldNumber) =>
+                {
+                    writeStream = stream;
+                    writeStream.Write(writtenBytes, 0, writtenBytes.Length);
+                });
+
+            await sut.SendAsync(message, Cts.Token);
+
+            protobuf.Verify(x => x.Serialize(It.IsAny<MemoryStream>(), message, 5));
+
+            // Temporary stream should be disposed.
+            Assert.Throws<ObjectDisposedException>(
+                () => writeStream.Read(Array.Empty<byte>(), 0, 0));
+
+            // Should write the value to stream.
+            Assert.NotEmpty(writtenBytes);
+            var resultBytes = new byte[writtenBytes.Length];
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Read(resultBytes, 0, writtenBytes.Length);
+            Assert.Equal(writtenBytes, resultBytes);
         }
     }
 }

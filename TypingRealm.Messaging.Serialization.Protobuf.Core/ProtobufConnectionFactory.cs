@@ -5,15 +5,17 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
     public sealed class ProtobufConnectionFactory : IProtobufConnectionFactory
     {
         private readonly IMessageTypeCache _messageTypes;
+        private readonly IProtobuf _protobuf;
 
-        public ProtobufConnectionFactory(IMessageTypeCache messageTypes)
+        public ProtobufConnectionFactory(IMessageTypeCache messageTypes, IProtobuf protobuf)
         {
             _messageTypes = messageTypes;
+            _protobuf = protobuf;
         }
 
         public ProtobufConnection CreateProtobufConnection(Stream stream)
         {
-            return new ProtobufConnection(stream, _messageTypes);
+            return new ProtobufConnection(stream, _messageTypes, _protobuf);
         }
     }
 }

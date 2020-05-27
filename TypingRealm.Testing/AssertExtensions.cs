@@ -43,5 +43,11 @@ namespace TypingRealm.Testing
             Assert.Equal(i1, i2);
             Assert.Equal(i1, i3);
         }
+
+        public static void AssertRegisteredTransient<TInterface, TImplementation>(this IServiceProvider provider)
+            => provider.AssertRegisteredTransient(typeof(TInterface), typeof(TImplementation));
+
+        public static void AssertRegisteredSingleton<TInterface, TImplementation>(this IServiceProvider provider)
+            => provider.AssertRegisteredSingleton(typeof(TInterface), typeof(TImplementation));
     }
 }

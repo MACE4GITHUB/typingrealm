@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using ProtoBuf.Meta;
 using TypingRealm.Testing;
 using Xunit;
@@ -19,66 +21,76 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         public int Age { get; set; }
     }
 
-    public class RegistrationExtensionsTests
+    public class RegistrationExtensionsTests : TestsBase
     {
-        [Theory, AutoMoqData]
+        [Fact]
         public void AddProtobuf_ShouldRegisterProtobufConnectionFactory()
         {
-            var services = new ServiceCollection();
-            var sut = new MessageTypeCacheBuilder(services);
+            var sut = new ServiceCollection();
+            sut.AddTransient<IMessageTypeCache, MessageTypeCache>();
 
             sut.AddProtobuf();
 
-            var provider = services.BuildServiceProvider();
-            AssertRegisteredTransient<IProtobufConnectionFactory, ProtobufConnectionFactory>(provider);
+            var provider = sut.BuildServiceProvider();
+            provider.AssertRegisteredTransient<IProtobufConnectionFactory, ProtobufConnectionFactory>();
         }
 
-        [Theory, AutoMoqData]
-        public void AddProtobuf_ShouldAddAllRegisteredTypesToProtobufRuntimeTypeModel_WithAllProperties_OrderedByName()
+        [Fact]
+        public void AddProtobuf_ShouldRegisterProtobufSingleton()
         {
-            var services = new ServiceCollection();
-            var sut = new MessageTypeCacheBuilder(services);
+            var sut = new ServiceCollection();
+            sut.AddTransient<IMessageTypeCache, MessageTypeCache>();
 
             sut.AddProtobuf();
-            sut.AddMessageType(typeof(AMessage));
-            sut.AddMessageType(typeof(BMessage));
 
-            var provider = services.BuildServiceProvider();
-            var types = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>().ToList();
-            Assert.Empty(types);
+            var provider = sut.BuildServiceProvider();
+            provider.AssertRegisteredSingleton<IProtobuf, Protobuf>();
+        }
 
-            _ = provider.GetRequiredService<IMessageTypeCache>();
-            types = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>().ToList();
-            Assert.Equal(2, types.Count);
+        // This test adds AMessage and BMessage to RuntimeTypeModel.
+        [Theory, AutoMoqData]
+        public void AddProtobuf_ShouldCreateProtobufWithTypesFromMessageTypeCache(Mock<IMessageTypeCache> cache)
+        {
+            var sut = new ServiceCollection();
+            sut.AddSingleton(cache.Object);
 
-            var type1 = types.Single(t => t.Type == typeof(AMessage));
-            var type2 = types.Single(t => t.Type == typeof(BMessage));
+            sut.AddProtobuf();
+            var provider = sut.BuildServiceProvider();
 
-            var type1Members = type1.GetFields().ToList();
+            var types = new List<KeyValuePair<string, Type>>
+            {
+                new KeyValuePair<string, Type>("1", typeof(AMessage)),
+                new KeyValuePair<string, Type>("1", typeof(BMessage))
+            };
 
-            var member1 = type1Members.Single(t => t.FieldNumber == 1);
-            var member2 = type1Members.Single(t => t.FieldNumber == 2);
+            cache.Setup(x => x.GetAllTypes())
+                .Returns(types);
+
+            var registeredTypes = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
+                .Select(t => t.Type)
+                .ToList();
+            Assert.DoesNotContain(typeof(AMessage), registeredTypes);
+            Assert.DoesNotContain(typeof(BMessage), registeredTypes);
+
+            _ = provider.GetRequiredService<IProtobuf>();
+            registeredTypes = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
+                .Select(t => t.Type)
+                .ToList();
+            Assert.Contains(typeof(AMessage), registeredTypes);
+            Assert.Contains(typeof(BMessage), registeredTypes);
+
+            var typeMembers = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
+                .Single(x => x.Type == typeof(AMessage))
+                .GetFields()
+                .ToList();
+
+            var member1 = typeMembers.Single(t => t.FieldNumber == 1);
+            var member2 = typeMembers.Single(t => t.FieldNumber == 2);
 
             Assert.Equal(typeof(int), member1.MemberType);
             Assert.Equal(nameof(AMessage.Age), member1.Name);
             Assert.Equal(typeof(string), member2.MemberType);
             Assert.Equal(nameof(AMessage.Name), member2.Name);
-        }
-
-        private void AssertRegisteredTransient<TInterface, TImplementation>(IServiceProvider provider)
-        {
-            var implementation = provider.GetRequiredService<TInterface>();
-            var implementation2 = provider.GetRequiredService<TInterface>();
-
-            using var scope = provider.CreateScope();
-            var implementation3 = scope.ServiceProvider.GetRequiredService<TInterface>();
-
-            Assert.NotNull(implementation);
-            Assert.IsType<TImplementation>(implementation);
-            Assert.IsType<TImplementation>(implementation2);
-            Assert.IsType<TImplementation>(implementation3);
-            Assert.NotEqual(implementation, implementation2);
-            Assert.NotEqual(implementation, implementation3);
         }
     }
 }

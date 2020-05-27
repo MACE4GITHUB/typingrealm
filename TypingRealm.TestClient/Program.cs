@@ -19,9 +19,8 @@ namespace TypingRealm.TestClient
             Console.WriteLine("=== TypingRealm test client ===");
 
             var provider = new ServiceCollection()
-                .AddSerializationCore()
+                .AddSerializationCore().Services
                 .AddProtobuf()
-                .Services
                 .BuildServiceProvider();
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()

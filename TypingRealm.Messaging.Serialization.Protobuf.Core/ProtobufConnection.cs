@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ProtoBuf;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf
 {
@@ -13,11 +12,16 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
     {
         private readonly Stream _stream;
         private readonly IMessageTypeCache _messageTypes;
+        private readonly IProtobuf _protobuf;
 
-        public ProtobufConnection(Stream stream, IMessageTypeCache messageTypes)
+        public ProtobufConnection(
+            Stream stream,
+            IMessageTypeCache messageTypes,
+            IProtobuf protobuf)
         {
             _stream = stream;
             _messageTypes = messageTypes;
+            _protobuf = protobuf;
         }
 
         public async ValueTask<object> ReceiveAsync(CancellationToken cancellationToken)
@@ -26,17 +30,9 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
             // This will throw OperationCanceledException if cancellation token signals for cancellation.
             await _stream.ReadAsync(Array.Empty<byte>(), 0, 0, cancellationToken).ConfigureAwait(false);
 
-            if (Serializer.NonGeneric.TryDeserializeWithLengthPrefix(
+            return _protobuf.Deserialize(
                 _stream,
-                PrefixStyle.Base128,
-                fieldNumber => _messageTypes.GetTypeById(fieldNumber.ToString()),
-                out var message))
-            {
-                return message;
-            }
-
-            // We can get here if client invalidly disconnected.
-            throw new InvalidOperationException("Could not deserialize message from stream.");
+                fieldNumber => _messageTypes.GetTypeById(fieldNumber.ToString()));
         }
 
         public async ValueTask SendAsync(object message, CancellationToken cancellationToken)
@@ -46,8 +42,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
             var fieldNumber = Convert.ToInt32(
                 _messageTypes.GetTypeId(message.GetType()));
 
-            Serializer.NonGeneric.SerializeWithLengthPrefix(
-                memoryStream, message, PrefixStyle.Base128, fieldNumber);
+            _protobuf.Serialize(memoryStream, message, fieldNumber);
 
             await _stream.WriteAsync(memoryStream.GetBuffer(), 0, (int)memoryStream.Position, cancellationToken)
                 .ConfigureAwait(false);

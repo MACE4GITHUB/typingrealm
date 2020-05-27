@@ -15,9 +15,8 @@ namespace TypingRealm.TcpServer
         public static async Task Main()
         {
             var provider = new ServiceCollection()
-                .AddSerializationCore()
+                .AddSerializationCore().Services
                 .AddProtobuf()
-                .Services
                 .RegisterMessaging()
                 .AddLogging(builder => builder.AddConsole())
                 .Configure<LoggerFilterOptions>(options => options.MinLevel = LogLevel.Trace)

@@ -11,6 +11,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         [Theory, AutoMoqData]
         public async Task ShouldCreateWithStreamAndCache(
             [Frozen]IMessageTypeCache cache,
+            [Frozen]IProtobuf protobuf,
             Stream stream,
             ProtobufConnectionFactory sut)
         {
@@ -18,6 +19,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
 
             Assert.Equal(cache, GetPrivateField(connection, "_messageTypes"));
             Assert.Equal(stream, GetPrivateField(connection, "_stream"));
+            Assert.Equal(protobuf, GetPrivateField(connection, "_protobuf"));
         }
     }
 }
