@@ -33,7 +33,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
 
             // Should throw when message not registered.
             await AssertThrowsAsync<InvalidOperationException>(
-                sut.SendAsync(message, Cts.Token));
+                () => sut.SendAsync(message, Cts.Token));
 
             // List should be registered by default.
             await sut.SendAsync(list, Cts.Token);
@@ -55,8 +55,8 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             Assert.Equal(list, result);
 
             // There should be no more messages.
-            await AssertThrowsAsync<InvalidOperationException>(
-                sut.ReceiveAsync(Cts.Token).AsTask());
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => sut.ReceiveAsync(Cts.Token).AsTask());
         }
     }
 }

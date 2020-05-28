@@ -64,7 +64,7 @@ namespace TypingRealm.Tests
                 Cts.Cancel();
             }
 
-            await AssertThrowsAsync<TaskCanceledException>(result);
+            await AssertThrowsAsync<TaskCanceledException>(() => result);
             Assert.True(result.IsCanceled);
         }
 
@@ -103,7 +103,7 @@ namespace TypingRealm.Tests
                 isRunning = false;
             }
 
-            await AssertThrowsAsync<TestException>(result);
+            await AssertThrowsAsync<TestException>(() => result);
             Assert.True(result.IsFaulted);
         }
 
@@ -145,7 +145,7 @@ namespace TypingRealm.Tests
                 isRunning = false;
             }
 
-            var exception = await AssertThrowsAsync<TestException>(result);
+            var exception = await AssertThrowsAsync<TestException>(() => result);
 
             if (isAsynchronous)
             {

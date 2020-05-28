@@ -57,37 +57,22 @@ namespace TypingRealm.Testing
         protected object? GetPrivateField(object instance, string fieldName)
             => instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(instance);
 
-        protected async ValueTask AssertThrowsAsync<TException>(Task task, TException exception)
+        protected async ValueTask<TException> AssertThrowsAsync<TException>(Func<Task> taskFactory, TException exception)
             where TException : Exception
         {
-            var thrown = await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
+            var thrown = await Assert.ThrowsAsync<TException>(() => taskFactory()).ConfigureAwait(false);
             Assert.Equal(exception, thrown);
+
+            return thrown;
         }
 
-        protected async ValueTask AssertThrowsAsync<TException>(Func<Task> taskFactory, TException exception)
+        protected async ValueTask<TException> AssertThrowsAsync<TException>(Func<ValueTask> vtFactory, TException exception)
             where TException : Exception
         {
-            var thrown = await Assert.ThrowsAsync<TException>(taskFactory).ConfigureAwait(false);
+            var thrown = await Assert.ThrowsAsync<TException>(() => vtFactory().AsTask()).ConfigureAwait(false);
             Assert.Equal(exception, thrown);
-        }
 
-        protected async ValueTask<TException> AssertThrowsAsync<TException>(Task task)
-            where TException : Exception
-        {
-            return await Assert.ThrowsAsync<TException>(() => task).ConfigureAwait(false);
-        }
-
-        protected async ValueTask AssertThrowsAsync<TException>(ValueTask vt, TException exception)
-            where TException : Exception
-        {
-            var thrown = await Assert.ThrowsAsync<TException>(() => vt.AsTask()).ConfigureAwait(false);
-            Assert.Equal(exception, thrown);
-        }
-
-        protected async ValueTask<TException> AssertThrowsAsync<TException>(ValueTask vt)
-            where TException : Exception
-        {
-            return await Assert.ThrowsAsync<TException>(() => vt.AsTask()).ConfigureAwait(false);
+            return thrown;
         }
 
         protected async ValueTask<TException> AssertThrowsAsync<TException>(Func<ValueTask> vtFactory)

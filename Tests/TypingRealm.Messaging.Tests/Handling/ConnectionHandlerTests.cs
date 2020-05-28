@@ -57,7 +57,8 @@ namespace TypingRealm.Messaging.Tests.Handling
             initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
                 .ThrowsAsync(exception);
 
-            await AssertThrowsAsync(sut.HandleAsync(connection, Cts.Token), exception);
+            await AssertThrowsAsync(
+                () => sut.HandleAsync(connection, Cts.Token), exception);
         }
 
         [Theory, AutoMoqData]
@@ -91,7 +92,8 @@ namespace TypingRealm.Messaging.Tests.Handling
             store.Setup(x => x.Add(client))
                 .Throws(exception);
 
-            await AssertThrowsAsync(sut.HandleAsync(connection, Cts.Token), exception);
+            await AssertThrowsAsync(
+                () => sut.HandleAsync(connection, Cts.Token), exception);
         }
 
         [Theory, AutoMoqData]
@@ -149,7 +151,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             Assert.False(result.IsCompleted);
 
             Cts.Cancel();
-            await AssertThrowsAsync<OperationCanceledException>(result);
+            await Assert.ThrowsAsync<OperationCanceledException>(() => result);
         }
 
         [Theory, AutoMoqData]
@@ -285,7 +287,7 @@ namespace TypingRealm.Messaging.Tests.Handling
                 .ThrowsAsync(exception);
 
             await AssertThrowsAsync(
-                sut.HandleAsync(Create<IConnection>(), Cts.Token),
+                () => sut.HandleAsync(Create<IConnection>(), Cts.Token),
                 exception);
         }
 
@@ -303,7 +305,7 @@ namespace TypingRealm.Messaging.Tests.Handling
                 .Throws(Create<Exception>());
 
             await AssertThrowsAsync(
-                sut.HandleAsync(Create<IConnection>(), Cts.Token),
+                () => sut.HandleAsync(Create<IConnection>(), Cts.Token),
                 exception);
         }
 
@@ -357,7 +359,8 @@ namespace TypingRealm.Messaging.Tests.Handling
             updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
                 .Throws<TestException>();
 
-            await AssertThrowsAsync<TestException>(sut.HandleAsync(Create<IConnection>(), Cts.Token));
+            await Assert.ThrowsAsync<TestException>(
+                () => sut.HandleAsync(Create<IConnection>(), Cts.Token));
         }
 
         [Theory, AutoMoqData]
@@ -368,7 +371,8 @@ namespace TypingRealm.Messaging.Tests.Handling
             updater.Setup(x => x.SendUpdateAsync(It.IsAny<ConnectedClient>(), Cts.Token))
                 .ThrowsAsync(Create<TestException>());
 
-            await AssertThrowsAsync<TestException>(sut.HandleAsync(Create<IConnection>(), Cts.Token));
+            await Assert.ThrowsAsync<TestException>(
+                () => sut.HandleAsync(Create<IConnection>(), Cts.Token));
         }
 
         [Theory, AutoMoqData]
