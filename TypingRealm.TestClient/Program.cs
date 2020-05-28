@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Protobuf;
@@ -37,7 +38,10 @@ namespace TypingRealm.TestClient
             await client.ConnectAsync("127.0.0.1", 30100).ConfigureAwait(false);
 
             using var stream = client.GetStream();
-            var connection = protobufConnectionFactory.CreateProtobufConnection(stream);
+            using var sendLock = new SemaphoreSlimLock();
+            using var receiveLock = new SemaphoreSlimLock();
+            var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
+                .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
 namespace TypingRealm.TcpServer
@@ -114,7 +115,10 @@ namespace TypingRealm.TcpServer
                 connectionDetails = tcpClient.Client.RemoteEndPoint.ToString() ?? "No details";
 
                 using var stream = tcpClient.GetStream();
-                var connection = _protobufConnectionFactory.CreateProtobufConnection(stream);
+                using var sendLock = new SemaphoreSlimLock();
+                using var receiveLock = new SemaphoreSlimLock();
+                var connection = _protobufConnectionFactory.CreateProtobufConnection(stream)
+                    .WithLocking(sendLock, receiveLock);
 
                 await _connectionHandler
                     .HandleAsync(connection, _cts.Token)
