@@ -1,5 +1,8 @@
 ﻿namespace TypingRealm.Messaging.Serialization.Json
 {
+    /// <summary>
+    /// Wrapper message around serialized message.
+    /// </summary>
     [Message]
     public sealed class JsonSerializedMessage
     {
@@ -12,7 +15,15 @@
             Json = json;
         }
 
+        /// <summary>
+        /// Type identity, should be set from <see cref="IMessageTypeCache"/>
+        /// for proper deserialization.
+        /// </summary>
         public string TypeId { get; set; }
+
+        /// <summary>
+        /// Serialized message json content.
+        /// </summary>
         public string Json { get; set; }
     }
 }
