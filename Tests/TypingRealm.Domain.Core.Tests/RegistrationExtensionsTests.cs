@@ -1,27 +1,21 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using TypingRealm.Messaging.Messages;
+using TypingRealm.Domain.Messages;
+using TypingRealm.Messaging;
+using TypingRealm.Messaging.Serialization;
 using Xunit;
 
-namespace TypingRealm.Messaging.Serialization.Tests
+namespace TypingRealm.Domain.Tests
 {
     public class RegistrationExtensionsTests
     {
         [Fact]
-        public void AddSerializationCore_ShouldSetValidServices()
+        public void AddDomainCore_ShouldAddAllMessagesFromDomainAssemblyAndOnlyThem()
         {
             var services = new ServiceCollection();
-            var sut = services.AddSerializationCore();
-
-            Assert.Equal(services, sut.Services);
-        }
-
-        [Fact]
-        public void AddSerializationCore_ShouldAddAllMessagesFromMessagingAssemblyAndOnlyThem()
-        {
-            var services = new ServiceCollection();
-            _ = services.AddSerializationCore();
+            _ = new MessageTypeCacheBuilder(services)
+                .AddDomainCore();
 
             var messages = services.BuildServiceProvider()
                 .GetRequiredService<IMessageTypeCache>()
@@ -29,7 +23,7 @@ namespace TypingRealm.Messaging.Serialization.Tests
                 .Select(x => x.Value)
                 .ToList();
 
-            var asmMessages = typeof(Announce).Assembly
+            var asmMessages = typeof(Join).Assembly
                 .GetTypes()
                 .Where(x => x.GetCustomAttribute<MessageAttribute>() != null)
                 .ToList();

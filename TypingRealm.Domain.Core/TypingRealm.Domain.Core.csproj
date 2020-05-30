@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
   </ItemGroup>
 
 </Project>
