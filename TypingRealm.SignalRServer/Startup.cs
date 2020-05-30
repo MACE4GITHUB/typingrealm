@@ -26,6 +26,8 @@ namespace TypingRealm.SignalRServer
                 {
                     await context.Response.WriteAsync("=== TypingRealm server ===").ConfigureAwait(false);
                 });
+
+                endpoints.MapHub<JsonSerializedMessageHub>("/hub");
             });
         }
     }
