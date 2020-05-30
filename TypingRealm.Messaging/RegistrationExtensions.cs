@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Connecting.Initializers;
 using TypingRealm.Messaging.Handlers;
@@ -44,6 +45,14 @@ namespace TypingRealm.Messaging
             services.AddTransient<IMessageHandler<TMessage>, TMessageHandler>();
 
             return services;
+        }
+
+        public static IServiceCollection UseUpdateFactory<TUpdateFactory>(this IServiceCollection services)
+            where TUpdateFactory : class, IUpdateFactory
+        {
+            return services
+                .AddTransient<IUpdater, Updater>()
+                .AddTransient<IUpdateFactory, TUpdateFactory>();
         }
     }
 }

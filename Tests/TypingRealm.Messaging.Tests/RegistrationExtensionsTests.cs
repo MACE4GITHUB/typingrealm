@@ -21,6 +21,14 @@ namespace TypingRealm.Messaging.Tests
         }
     }
 
+    public class TestUpdateFactory : IUpdateFactory
+    {
+        public object GetUpdateFor(string clientId)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class RegistrationExtensionsTests
     {
         private readonly IServiceProvider _provider;
@@ -62,6 +70,17 @@ namespace TypingRealm.Messaging.Tests
                 .BuildServiceProvider();
 
             provider.AssertRegisteredTransient(typeof(IMessageHandler<TestMessage>), typeof(TestMessageHandler));
+        }
+
+        [Fact]
+        public void UseUpdateFactory_ShouldRegisterUpdaterAndCustomUpdateFactoryTransient()
+        {
+            var provider = new ServiceCollection()
+                .UseUpdateFactory<TestUpdateFactory>()
+                .BuildServiceProvider();
+
+            provider.AssertRegisteredTransient<IUpdater, Updater>();
+            provider.AssertRegisteredTransient<IUpdateFactory, TestUpdateFactory>();
         }
     }
 }
