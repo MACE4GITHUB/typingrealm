@@ -1,0 +1,11 @@
+﻿{
+  "profiles": {
+    "TypingRealm.SignalRServer": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:30100"
+    }
+  }
+}
