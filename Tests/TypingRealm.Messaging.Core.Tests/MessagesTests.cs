@@ -9,9 +9,9 @@ namespace TypingRealm.Messaging.Tests
     public class MessagesTests : TestsBase
     {
         [Fact]
-        public void ShouldBe2MessagesInAssembly()
+        public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(3, typeof(Announce).Assembly.GetTypes().Count(
+            Assert.Equal(4, typeof(Announce).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -51,6 +51,29 @@ namespace TypingRealm.Messaging.Tests
             AssertSerializable<Disconnect>();
 
             _ = new Disconnect();
+        }
+
+        [Fact]
+        public void ConnectMessage()
+        {
+            Assert.NotNull(Connect.DefaultGroup);
+            AssertSerializable<Connect>();
+
+            var sut = new Connect
+            {
+                ClientId = "clientId",
+                Group = "group"
+            };
+            Assert.Equal("clientId", sut.ClientId);
+            Assert.Equal("group", sut.Group);
+
+            sut = new Connect("clientId");
+            Assert.Equal("clientId", sut.ClientId);
+            Assert.Equal(Connect.DefaultGroup, sut.Group);
+
+            sut = new Connect("clientId", "group");
+            Assert.Equal("clientId", sut.ClientId);
+            Assert.Equal("group", sut.Group);
         }
     }
 }
