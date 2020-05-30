@@ -4,11 +4,13 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
+using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
 namespace TypingRealm.TestClient
@@ -18,7 +20,17 @@ namespace TypingRealm.TestClient
         public static async Task Main()
         {
             Console.WriteLine("=== TypingRealm test client ===");
+            Console.Write("Type of connection (s - SignalR, default - TCP): ");
 
+            await (Console.ReadLine() switch
+            {
+                "s" => MainSignalR(),
+                _ => MainTpc()
+            }).ConfigureAwait(false);
+        }
+
+        public static async Task MainTpc()
+        {
             var provider = new ServiceCollection()
                 .AddSerializationCore().Services
                 .AddProtobuf()
@@ -41,6 +53,41 @@ namespace TypingRealm.TestClient
             using var sendLock = new SemaphoreSlimLock();
             using var receiveLock = new SemaphoreSlimLock();
             var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
+                .WithLocking(sendLock, receiveLock);
+
+            await Handle(connection, messageTypes).ConfigureAwait(false);
+        }
+
+        public static async Task MainSignalR()
+        {
+            var provider = new ServiceCollection()
+                .AddSerializationCore().Services
+                .AddJson()
+                .BuildServiceProvider();
+
+            var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
+                .GetAllTypes()
+                .Select(idToType => idToType.Value)
+                .ToList();
+
+            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
+
+            Console.WriteLine("Press enter to connect.");
+            Console.ReadLine();
+
+            var hub = new HubConnectionBuilder()
+                .WithUrl("http://localhost:30100/hub")
+                .Build();
+
+            var notificator = new Notificator();
+            hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
+
+            await hub.StartAsync(default).ConfigureAwait(false);
+
+            using var sendLock = new SemaphoreSlimLock();
+            using var receiveLock = new SemaphoreSlimLock();
+            var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
+                .WithJson(jsonConnectionFactory)
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
