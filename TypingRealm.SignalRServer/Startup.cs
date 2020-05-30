@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TypingRealm.Messaging;
+using TypingRealm.Messaging.Serialization;
 
 namespace TypingRealm.SignalRServer
 {
@@ -11,6 +13,11 @@ namespace TypingRealm.SignalRServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSignalR();
+
+            services.AddSerializationCore().Services
+                .RegisterMessaging();
+
+            services.AddSingleton<ActiveConnectionCache>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
