@@ -41,7 +41,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Common.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.TestClient", "TypingRealm.TestClient\TypingRealm.TestClient.csproj", "{1A860EE6-65E3-477E-BC5B-A8C125B4671C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.SignalRServer", "TypingRealm.SignalRServer\TypingRealm.SignalRServer.csproj", "{56BA27A4-7D22-49BC-874D-AEF306324EFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.SignalRServer", "TypingRealm.SignalRServer\TypingRealm.SignalRServer.csproj", "{56BA27A4-7D22-49BC-874D-AEF306324EFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Core", "TypingRealm.Domain.Core\TypingRealm.Domain.Core.csproj", "{593125D6-0157-4303-8642-51E92A8EB2F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Core.Tests", "Tests\TypingRealm.Domain.Core.Tests\TypingRealm.Domain.Core.Tests.csproj", "{F9AF8743-12AA-4E79-B88F-84DA43AC723D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +109,14 @@ Global
 		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{593125D6-0157-4303-8642-51E92A8EB2F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{593125D6-0157-4303-8642-51E92A8EB2F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{593125D6-0157-4303-8642-51E92A8EB2F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{593125D6-0157-4303-8642-51E92A8EB2F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9AF8743-12AA-4E79-B88F-84DA43AC723D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9AF8743-12AA-4E79-B88F-84DA43AC723D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9AF8743-12AA-4E79-B88F-84DA43AC723D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9AF8743-12AA-4E79-B88F-84DA43AC723D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,6 +132,8 @@ Global
 		{05FC5614-30E5-49BA-AC0A-CADECEB425E1} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
 		{3B28B6C1-9055-4440-83F9-0986C3DC4A9F} = {792AC347-74FB-4A4E-AD3B-D78B344D17BB}
 		{2999E361-CE1D-4773-B933-D2AC764AF4D7} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
+		{593125D6-0157-4303-8642-51E92A8EB2F0} = {792AC347-74FB-4A4E-AD3B-D78B344D17BB}
+		{F9AF8743-12AA-4E79-B88F-84DA43AC723D} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}
