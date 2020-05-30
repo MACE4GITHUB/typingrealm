@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
+using TypingRealm.Messaging.Serialization.Json;
 
 namespace TypingRealm.SignalRServer
 {
@@ -15,6 +16,7 @@ namespace TypingRealm.SignalRServer
             services.AddSignalR();
 
             services.AddSerializationCore().Services
+                .AddJson()
                 .RegisterMessaging();
 
             services.AddSingleton<ActiveConnectionCache>();
