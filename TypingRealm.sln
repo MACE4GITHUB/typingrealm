@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Messaging.Seria
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Messaging.Serialization.Protobuf.Core", "TypingRealm.Messaging.Serialization.Protobuf.Core\TypingRealm.Messaging.Serialization.Protobuf.Core.csproj", "{2C6D4875-73BD-48DD-B00D-FDC08823D43A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Messaging.Serialization.Protobuf.Core.Tests", "Tests\TypingRealm.Messaging.Serialization.Protobuf.Core.Tests\TypingRealm.Messaging.Serialization.Protobuf.Core.Tests.csproj", "{576D1BF3-0BD0-4571-9CBB-C052B62C7B55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Messaging.Serialization.Protobuf.Core.Tests", "Tests\TypingRealm.Messaging.Serialization.Protobuf.Core.Tests\TypingRealm.Messaging.Serialization.Protobuf.Core.Tests.csproj", "{576D1BF3-0BD0-4571-9CBB-C052B62C7B55}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Messaging", "TypingRealm.Messaging\TypingRealm.Messaging.csproj", "{EEE3FE4E-E52D-41ED-A51E-60F2EFED7CB0}"
 EndProject
@@ -37,9 +37,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.TcpServer", "Ty
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Common", "TypingRealm.Common\TypingRealm.Common.csproj", "{3B28B6C1-9055-4440-83F9-0986C3DC4A9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Common.Tests", "Tests\TypingRealm.Common.Tests\TypingRealm.Common.Tests.csproj", "{2999E361-CE1D-4773-B933-D2AC764AF4D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Common.Tests", "Tests\TypingRealm.Common.Tests\TypingRealm.Common.Tests.csproj", "{2999E361-CE1D-4773-B933-D2AC764AF4D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.TestClient", "TypingRealm.TestClient\TypingRealm.TestClient.csproj", "{1A860EE6-65E3-477E-BC5B-A8C125B4671C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.TestClient", "TypingRealm.TestClient\TypingRealm.TestClient.csproj", "{1A860EE6-65E3-477E-BC5B-A8C125B4671C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.SignalRServer", "TypingRealm.SignalRServer\TypingRealm.SignalRServer.csproj", "{56BA27A4-7D22-49BC-874D-AEF306324EFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +101,10 @@ Global
 		{1A860EE6-65E3-477E-BC5B-A8C125B4671C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A860EE6-65E3-477E-BC5B-A8C125B4671C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A860EE6-65E3-477E-BC5B-A8C125B4671C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
