@@ -12,6 +12,8 @@ namespace TypingRealm.Domain
             services.RegisterHandler<Join, JoinHandler>();
             services.RegisterHandler<MoveTo, MoveToHandler>();
 
+            services.UseUpdateFactory<UpdateFactory>();
+
             return services;
         }
     }

@@ -26,6 +26,18 @@ namespace TypingRealm.Domain
             return _playerIdToPlayer[playerId];
         }
 
+        public IEnumerable<Player> GetPlayersVisibleTo(string playerId)
+        {
+            var player = _playerIdToPlayer[playerId];
+            var uniqueLocation = player.GetUniqueLocation();
+
+            foreach (var visiblePlayer in _playerIdToPlayer.Values)
+            {
+                if (visiblePlayer.GetUniqueLocation() == uniqueLocation)
+                    yield return visiblePlayer;
+            }
+        }
+
         public void Save(string clientId, Player player)
         {
             if (_playerIdToPlayer.ContainsKey(player.Id))

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TypingRealm.Domain.Messages;
 using TypingRealm.Messaging;
@@ -12,7 +13,7 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(2, typeof(Join).Assembly.GetTypes().Count(
+            Assert.Equal(3, typeof(Join).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -44,6 +45,26 @@ namespace TypingRealm.Domain.Tests
 
             sut = new MoveTo("locationId");
             Assert.Equal("locationId", sut.LocationId);
+        }
+
+        [Theory, AutoMoqData]
+        public void UpdateMessage(
+            string locationId,
+            IEnumerable<string> visiblePlayers)
+        {
+            AssertSerializable<Update>();
+
+            var sut = new Update
+            {
+                LocationId = locationId,
+                VisiblePlayers = visiblePlayers
+            };
+            Assert.Equal(locationId, sut.LocationId);
+            Assert.Equal(visiblePlayers, sut.VisiblePlayers);
+
+            sut = new Update(locationId, visiblePlayers);
+            Assert.Equal(locationId, sut.LocationId);
+            Assert.Equal(visiblePlayers, sut.VisiblePlayers);
         }
     }
 }
