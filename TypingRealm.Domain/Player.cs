@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.Domain
+﻿using TypingRealm.Domain.Movement;
+
+namespace TypingRealm.Domain
 {
     public sealed class Player
     {

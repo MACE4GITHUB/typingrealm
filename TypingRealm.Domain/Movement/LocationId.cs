@@ -1,7 +1,7 @@
 ﻿using System;
 using TypingRealm.Domain.Common;
 
-namespace TypingRealm.Domain
+namespace TypingRealm.Domain.Movement
 {
     public sealed class LocationId : Identity<string>
     {
