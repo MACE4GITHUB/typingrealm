@@ -21,6 +21,7 @@ namespace TypingRealm.Domain
             var player = new Player(playerId, message.Name);
 
             _playerRepository.Save(sender.ClientId, player);
+            sender.Group = player.GetUniqueLocation();
             return default;
         }
     }

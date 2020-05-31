@@ -10,6 +10,7 @@ namespace TypingRealm.Domain
         {
             services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
             services.RegisterHandler<Join, JoinHandler>();
+            services.RegisterHandler<MoveTo, MoveToHandler>();
 
             return services;
         }

@@ -12,7 +12,7 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(1, typeof(Join).Assembly.GetTypes().Count(
+            Assert.Equal(2, typeof(Join).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -29,6 +29,21 @@ namespace TypingRealm.Domain.Tests
 
             sut = new Join("name");
             Assert.Equal("name", sut.Name);
+        }
+
+        [Fact]
+        public void MoveToMessage()
+        {
+            AssertSerializable<MoveTo>();
+
+            var sut = new MoveTo
+            {
+                LocationId = "locationId"
+            };
+            Assert.Equal("locationId", sut.LocationId);
+
+            sut = new MoveTo("locationId");
+            Assert.Equal("locationId", sut.LocationId);
         }
     }
 }
