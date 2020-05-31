@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Domain;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
@@ -32,7 +33,9 @@ namespace TypingRealm.TestClient
         public static async Task MainTpc()
         {
             var provider = new ServiceCollection()
-                .AddSerializationCore().Services
+                .AddSerializationCore()
+                .AddDomainCore()
+                .Services
                 .AddProtobuf()
                 .BuildServiceProvider();
 
@@ -61,7 +64,9 @@ namespace TypingRealm.TestClient
         public static async Task MainSignalR()
         {
             var provider = new ServiceCollection()
-                .AddSerializationCore().Services
+                .AddSerializationCore()
+                .AddDomainCore()
+                .Services
                 .AddJson()
                 .BuildServiceProvider();
 
