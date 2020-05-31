@@ -35,15 +35,15 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void MoveToMessage()
         {
-            AssertSerializable<MoveTo>();
+            AssertSerializable<MoveToLocation>();
 
-            var sut = new MoveTo
+            var sut = new MoveToLocation
             {
                 LocationId = "locationId"
             };
             Assert.Equal("locationId", sut.LocationId);
 
-            sut = new MoveTo("locationId");
+            sut = new MoveToLocation("locationId");
             Assert.Equal("locationId", sut.LocationId);
         }
 

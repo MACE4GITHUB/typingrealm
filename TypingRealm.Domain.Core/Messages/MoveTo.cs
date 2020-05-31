@@ -3,12 +3,12 @@
 namespace TypingRealm.Domain.Messages
 {
     [Message]
-    public sealed class MoveTo
+    public sealed class MoveToLocation
     {
 #pragma warning disable CS8618
-        public MoveTo() { }
+        public MoveToLocation() { }
 #pragma warning restore CS8618
-        public MoveTo(string locationId) => LocationId = locationId;
+        public MoveToLocation(string locationId) => LocationId = locationId;
 
         public string LocationId { get; set; }
     }

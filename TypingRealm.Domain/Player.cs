@@ -1,24 +1,38 @@
-﻿namespace TypingRealm.Domain
+﻿using System;
+using System.Linq;
+using TypingRealm.Domain.Movement;
+
+namespace TypingRealm.Domain
 {
     public sealed class Player
     {
-        public Player(string id, string name)
+        private readonly ILocationStore _locationStore;
+
+        public Player(PlayerId playerId, string name, LocationId locationId, ILocationStore locationStore)
         {
-            Id = id;
+            PlayerId = playerId;
             Name = name;
-            LocationId = "Starting location";
+            LocationId = locationId;
+            _locationStore = locationStore;
         }
 
-        public string Id { get; }
+        public PlayerId PlayerId { get; }
         public string Name { get; }
-        public string LocationId { get; private set; }
+        public LocationId LocationId { get; private set; }
 
-        public void MoveTo(string locationId)
+        public void MoveToLocation(LocationId locationId)
         {
+            var currentLocation = _locationStore.Find(LocationId);
+            if (currentLocation == null)
+                throw new InvalidOperationException($"The player {PlayerId} is currently at invalid location {LocationId}. Cannot move to another location.");
+
+            if (!currentLocation.Locations.Contains(locationId))
+                throw new InvalidOperationException($"Cannot move the player {PlayerId} from {LocationId} to {locationId}.");
+
             LocationId = locationId;
         }
 
-        public string GetUniqueLocation()
+        public string GetUniquePlayerPosition()
         {
             return $"l_{LocationId}";
         }
