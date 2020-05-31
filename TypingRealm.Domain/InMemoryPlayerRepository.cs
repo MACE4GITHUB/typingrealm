@@ -10,7 +10,7 @@ namespace TypingRealm.Domain
         private readonly Dictionary<PlayerId, Player> _playerIdToPlayer
             = new Dictionary<PlayerId, Player>();
 
-        public Player GetByClientId(string clientId)
+        public Player FindByClientId(string clientId)
         {
             if (!_clientIdToPlayer.ContainsKey(clientId))
                 throw new InvalidOperationException($"Player with client id {clientId} does not exist.");
@@ -18,7 +18,7 @@ namespace TypingRealm.Domain
             return _clientIdToPlayer[clientId];
         }
 
-        public Player GetByPlayerId(PlayerId playerId)
+        public Player FindByPlayerId(PlayerId playerId)
         {
             if (!_playerIdToPlayer.ContainsKey(playerId))
                 throw new InvalidOperationException($"Player with player id {playerId} does not exist.");
@@ -26,7 +26,7 @@ namespace TypingRealm.Domain
             return _playerIdToPlayer[playerId];
         }
 
-        public IEnumerable<Player> GetPlayersVisibleTo(PlayerId playerId)
+        public IEnumerable<Player> FindPlayersVisibleTo(PlayerId playerId)
         {
             var player = _playerIdToPlayer[playerId];
             var uniqueLocation = player.GetUniquePlayerPosition();

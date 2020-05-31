@@ -4,10 +4,10 @@ namespace TypingRealm.Domain
 {
     public interface IPlayerRepository
     {
-        Player GetByClientId(string clientId);
-        Player GetByPlayerId(PlayerId playerId);
+        Player FindByClientId(string clientId);
+        Player FindByPlayerId(PlayerId playerId);
         void Save(string clientId, Player player);
 
-        public IEnumerable<Player> GetPlayersVisibleTo(PlayerId playerId);
+        public IEnumerable<Player> FindPlayersVisibleTo(PlayerId playerId);
     }
 }

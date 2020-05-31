@@ -16,7 +16,7 @@ namespace TypingRealm.Domain.Movement
 
         public ValueTask HandleAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
         {
-            var player = _players.GetByClientId(sender.ClientId);
+            var player = _players.FindByClientId(sender.ClientId);
             var locationId = new LocationId(message.LocationId);
             player.MoveToLocation(locationId);
             _players.Save(sender.ClientId, player);
