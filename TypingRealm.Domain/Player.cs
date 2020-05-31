@@ -2,23 +2,23 @@
 {
     public sealed class Player
     {
-        public Player(string id, string name)
+        public Player(PlayerId playerId, string name)
         {
-            Id = id;
+            PlayerId = playerId;
             Name = name;
-            LocationId = "Starting location";
+            LocationId = new LocationId("Starting location");
         }
 
-        public string Id { get; }
+        public PlayerId PlayerId { get; }
         public string Name { get; }
-        public string LocationId { get; private set; }
+        public LocationId LocationId { get; private set; }
 
-        public void MoveTo(string locationId)
+        public void MoveToLocation(LocationId locationId)
         {
             LocationId = locationId;
         }
 
-        public string GetUniqueLocation()
+        public string GetUniquePlayerPosition()
         {
             return $"l_{LocationId}";
         }

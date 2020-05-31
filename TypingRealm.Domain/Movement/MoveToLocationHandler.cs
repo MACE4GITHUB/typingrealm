@@ -17,10 +17,11 @@ namespace TypingRealm.Domain.Movement
         public ValueTask HandleAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
         {
             var player = _players.GetByClientId(sender.ClientId);
-            player.MoveTo(message.LocationId);
+            var locationId = new LocationId(message.LocationId);
+            player.MoveToLocation(locationId);
             _players.Save(sender.ClientId, player);
 
-            sender.Group = player.GetUniqueLocation();
+            sender.Group = player.GetUniquePlayerPosition();
 
             return default;
         }

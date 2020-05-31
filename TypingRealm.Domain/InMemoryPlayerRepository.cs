@@ -7,8 +7,8 @@ namespace TypingRealm.Domain
     {
         private readonly Dictionary<string, Player> _clientIdToPlayer
             = new Dictionary<string, Player>();
-        private readonly Dictionary<string, Player> _playerIdToPlayer
-            = new Dictionary<string, Player>();
+        private readonly Dictionary<PlayerId, Player> _playerIdToPlayer
+            = new Dictionary<PlayerId, Player>();
 
         public Player GetByClientId(string clientId)
         {
@@ -18,7 +18,7 @@ namespace TypingRealm.Domain
             return _clientIdToPlayer[clientId];
         }
 
-        public Player GetByPlayerId(string playerId)
+        public Player GetByPlayerId(PlayerId playerId)
         {
             if (!_playerIdToPlayer.ContainsKey(playerId))
                 throw new InvalidOperationException($"Player with player id {playerId} does not exist.");
@@ -26,23 +26,23 @@ namespace TypingRealm.Domain
             return _playerIdToPlayer[playerId];
         }
 
-        public IEnumerable<Player> GetPlayersVisibleTo(string playerId)
+        public IEnumerable<Player> GetPlayersVisibleTo(PlayerId playerId)
         {
             var player = _playerIdToPlayer[playerId];
-            var uniqueLocation = player.GetUniqueLocation();
+            var uniqueLocation = player.GetUniquePlayerPosition();
 
             foreach (var visiblePlayer in _playerIdToPlayer.Values)
             {
-                if (visiblePlayer.GetUniqueLocation() == uniqueLocation)
+                if (visiblePlayer.GetUniquePlayerPosition() == uniqueLocation)
                     yield return visiblePlayer;
             }
         }
 
         public void Save(string clientId, Player player)
         {
-            if (_playerIdToPlayer.ContainsKey(player.Id))
+            if (_playerIdToPlayer.ContainsKey(player.PlayerId))
             {
-                _playerIdToPlayer[player.Id] = player;
+                _playerIdToPlayer[player.PlayerId] = player;
 
                 if (!_clientIdToPlayer.ContainsKey(clientId))
                     _clientIdToPlayer.Add(clientId, player);
@@ -51,7 +51,7 @@ namespace TypingRealm.Domain
                 return;
             }
 
-            _playerIdToPlayer.Add(player.Id, player);
+            _playerIdToPlayer.Add(player.PlayerId, player);
 
             if (!_clientIdToPlayer.ContainsKey(clientId))
                 _clientIdToPlayer.Add(clientId, player);

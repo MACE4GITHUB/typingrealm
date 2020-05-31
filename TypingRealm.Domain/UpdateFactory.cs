@@ -16,10 +16,10 @@ namespace TypingRealm.Domain
         public object GetUpdateFor(string clientId)
         {
             var player = _playerRepository.GetByClientId(clientId);
-            var visiblePlayers = _playerRepository.GetPlayersVisibleTo(player.Id)
-                .Select(x => x.Id);
+            var visiblePlayers = _playerRepository.GetPlayersVisibleTo(player.PlayerId)
+                .Select(x => x.PlayerId.Value.ToString());
 
-            return new Update(player.LocationId, visiblePlayers);
+            return new Update(player.LocationId.Value, visiblePlayers);
         }
     }
 }
