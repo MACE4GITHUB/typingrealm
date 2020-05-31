@@ -9,7 +9,10 @@ namespace TypingRealm.Domain
     {
         public static IServiceCollection AddDomain(this IServiceCollection services)
         {
+            services.AddSingleton<ILocationStore, InMemoryLocationStore>();
             services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
+            services.AddTransient<IPlayerFactory, PlayerFactory>();
+
             services.RegisterHandler<Join, JoinHandler>();
             services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
 

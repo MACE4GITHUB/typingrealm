@@ -8,17 +8,19 @@ namespace TypingRealm.Domain
     public sealed class JoinHandler : IMessageHandler<Join>
     {
         private readonly IPlayerRepository _playerRepository;
+        private readonly IPlayerFactory _playerFactory;
 
-        public JoinHandler(IPlayerRepository playerRepository)
+        public JoinHandler(
+            IPlayerRepository playerRepository,
+            IPlayerFactory playerFactory)
         {
             _playerRepository = playerRepository;
+            _playerFactory = playerFactory;
         }
 
         public ValueTask HandleAsync(ConnectedClient sender, Join message, CancellationToken cancellationToken)
         {
-            var playerId = PlayerId.New();
-
-            var player = new Player(playerId, message.Name);
+            var player = _playerFactory.CreateNew(message.Name);
 
             _playerRepository.Save(sender.ClientId, player);
             sender.Group = player.GetUniquePlayerPosition();
