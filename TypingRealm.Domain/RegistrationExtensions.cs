@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Domain.Messages;
+using TypingRealm.Domain.Movement;
 using TypingRealm.Messaging;
 
 namespace TypingRealm.Domain
@@ -10,7 +11,7 @@ namespace TypingRealm.Domain
         {
             services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
             services.RegisterHandler<Join, JoinHandler>();
-            services.RegisterHandler<MoveTo, MoveToHandler>();
+            services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
 
             services.UseUpdateFactory<UpdateFactory>();
 
