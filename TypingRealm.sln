@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Core", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Core.Tests", "Tests\TypingRealm.Domain.Core.Tests\TypingRealm.Domain.Core.Tests.csproj", "{F9AF8743-12AA-4E79-B88F-84DA43AC723D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain", "TypingRealm.Domain\TypingRealm.Domain.csproj", "{5603DDCC-F818-46FC-916D-413C86556887}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{F9AF8743-12AA-4E79-B88F-84DA43AC723D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9AF8743-12AA-4E79-B88F-84DA43AC723D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9AF8743-12AA-4E79-B88F-84DA43AC723D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5603DDCC-F818-46FC-916D-413C86556887}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5603DDCC-F818-46FC-916D-413C86556887}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5603DDCC-F818-46FC-916D-413C86556887}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5603DDCC-F818-46FC-916D-413C86556887}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
