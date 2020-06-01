@@ -32,7 +32,7 @@ namespace TypingRealm.Domain.Common
             return Value!.ToString();
         }
 
-        public static bool operator ==(Primitive<TValue> left, Primitive<TValue> right)
+        public static bool operator ==(Primitive<TValue>? left, Primitive<TValue>? right)
         {
             if (left is null)
             {
@@ -45,7 +45,7 @@ namespace TypingRealm.Domain.Common
             return left.Equals(right);
         }
 
-        public static bool operator !=(Primitive<TValue> left, Primitive<TValue> right)
+        public static bool operator !=(Primitive<TValue>? left, Primitive<TValue>? right)
             => !(left == right);
 
         public static implicit operator TValue(Primitive<TValue> identity)
