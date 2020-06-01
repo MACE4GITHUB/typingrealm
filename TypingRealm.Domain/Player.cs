@@ -8,7 +8,7 @@ namespace TypingRealm.Domain
     {
         private readonly ILocationStore _locationStore;
 
-        public Player(PlayerId playerId, string name, LocationId locationId, ILocationStore locationStore)
+        public Player(PlayerId playerId, PlayerName name, LocationId locationId, ILocationStore locationStore)
         {
             PlayerId = playerId;
             Name = name;
@@ -17,7 +17,7 @@ namespace TypingRealm.Domain
         }
 
         public PlayerId PlayerId { get; }
-        public string Name { get; }
+        public PlayerName Name { get; }
         public LocationId LocationId { get; private set; }
 
         public void MoveToLocation(LocationId locationId)

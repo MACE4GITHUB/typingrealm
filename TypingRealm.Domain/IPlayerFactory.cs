@@ -4,7 +4,7 @@ namespace TypingRealm.Domain
 {
     public interface IPlayerFactory
     {
-        Player CreateNew(string name);
+        Player CreateNew(PlayerName name);
     }
 
     public sealed class PlayerFactory : IPlayerFactory
@@ -18,7 +18,7 @@ namespace TypingRealm.Domain
             _playerRepository = playerRepository;
         }
 
-        public Player CreateNew(string name)
+        public Player CreateNew(PlayerName name)
         {
             var nextId = _playerRepository.NextId();
             var startingLocationId = _locationStore.GetStartingLocationId();

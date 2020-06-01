@@ -20,7 +20,8 @@ namespace TypingRealm.Domain
 
         public ValueTask HandleAsync(ConnectedClient sender, Join message, CancellationToken cancellationToken)
         {
-            var player = _playerFactory.CreateNew(message.Name);
+            var playerName = new PlayerName(message.Name);
+            var player = _playerFactory.CreateNew(playerName);
 
             _playerRepository.Save(sender.ClientId, player);
             sender.Group = player.GetUniquePlayerPosition();
