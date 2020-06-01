@@ -22,9 +22,12 @@ namespace TypingRealm.Domain
 
         public void MoveToLocation(LocationId locationId)
         {
+            if (LocationId == locationId)
+                throw new InvalidOperationException($"Player {PlayerId} is already at location {LocationId}. Cannot move to the same location.");
+
             var currentLocation = _locationStore.Find(LocationId);
             if (currentLocation == null)
-                throw new InvalidOperationException($"The player {PlayerId} is currently at invalid location {LocationId}. Cannot move to another location.");
+                throw new InvalidOperationException($"The player {PlayerId} is currently at invalid location {LocationId}. Cannot move to location {locationId}.");
 
             if (!currentLocation.Locations.Contains(locationId))
                 throw new InvalidOperationException($"Cannot move the player {PlayerId} from {LocationId} to {locationId}.");
