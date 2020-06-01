@@ -38,6 +38,11 @@ namespace TypingRealm.Domain
             }
         }
 
+        public PlayerId NextId()
+        {
+            return new PlayerId(Guid.NewGuid().ToString());
+        }
+
         public void Save(string clientId, Player player)
         {
             if (_playerIdToPlayer.ContainsKey(player.PlayerId))

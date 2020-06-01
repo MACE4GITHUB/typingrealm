@@ -10,16 +10,20 @@ namespace TypingRealm.Domain
     public sealed class PlayerFactory : IPlayerFactory
     {
         private readonly ILocationStore _locationStore;
+        private readonly IPlayerRepository _playerRepository;
 
-        public PlayerFactory(ILocationStore locationStore)
+        public PlayerFactory(ILocationStore locationStore, IPlayerRepository playerRepository)
         {
             _locationStore = locationStore;
+            _playerRepository = playerRepository;
         }
 
         public Player CreateNew(string name)
         {
+            var nextId = _playerRepository.NextId();
             var startingLocationId = _locationStore.GetStartingLocationId();
-            return new Player(PlayerId.New(), name, startingLocationId, _locationStore);
+
+            return new Player(nextId, name, startingLocationId, _locationStore);
         }
     }
 }

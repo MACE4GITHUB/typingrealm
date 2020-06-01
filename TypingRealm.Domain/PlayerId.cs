@@ -1,5 +1,4 @@
-﻿using System;
-using TypingRealm.Domain.Common;
+﻿using TypingRealm.Domain.Common;
 
 namespace TypingRealm.Domain
 {
@@ -7,11 +6,6 @@ namespace TypingRealm.Domain
     {
         public PlayerId(string value) : base(value)
         {
-        }
-
-        public static PlayerId New()
-        {
-            return new PlayerId(Guid.NewGuid().ToString());
         }
     }
 }

@@ -9,5 +9,7 @@ namespace TypingRealm.Domain
         void Save(string clientId, Player player);
 
         public IEnumerable<Player> FindPlayersVisibleTo(PlayerId playerId);
+
+        public PlayerId NextId();
     }
 }
