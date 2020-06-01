@@ -17,9 +17,9 @@ namespace TypingRealm.Domain
         {
             var player = _playerRepository.FindByClientId(clientId);
             var visiblePlayers = _playerRepository.FindPlayersVisibleTo(player.PlayerId)
-                .Select(x => x.PlayerId.Value.ToString());
+                .Select<Player, string>(x => x.PlayerId);
 
-            return new Update(player.LocationId.Value, visiblePlayers);
+            return new Update(player.LocationId, visiblePlayers);
         }
     }
 }

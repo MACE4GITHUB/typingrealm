@@ -47,5 +47,8 @@ namespace TypingRealm.Domain.Common
 
         public static bool operator !=(Identity<TValue> left, Identity<TValue> right)
             => !(left == right);
+
+        public static implicit operator TValue(Identity<TValue> identity)
+            => identity.Value;
     }
 }
