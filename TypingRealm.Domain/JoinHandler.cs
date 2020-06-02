@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Domain.Messages;
 using TypingRealm.Messaging;
@@ -20,6 +21,10 @@ namespace TypingRealm.Domain
 
         public ValueTask HandleAsync(ConnectedClient sender, Join message, CancellationToken cancellationToken)
         {
+            var joinedPlayer = _playerRepository.FindByClientId(sender.ClientId);
+            if (joinedPlayer != null)
+                throw new InvalidOperationException($"CLient {sender.ClientId} already has joined with player {joinedPlayer.PlayerId}.");
+
             var playerName = new PlayerName(message.Name);
             var player = _playerFactory.CreateNew(playerName);
 
