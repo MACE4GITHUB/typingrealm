@@ -43,11 +43,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.TestClient", "T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.SignalRServer", "TypingRealm.SignalRServer\TypingRealm.SignalRServer.csproj", "{56BA27A4-7D22-49BC-874D-AEF306324EFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Core", "TypingRealm.Domain.Core\TypingRealm.Domain.Core.csproj", "{593125D6-0157-4303-8642-51E92A8EB2F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain.Core", "TypingRealm.Domain.Core\TypingRealm.Domain.Core.csproj", "{593125D6-0157-4303-8642-51E92A8EB2F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Core.Tests", "Tests\TypingRealm.Domain.Core.Tests\TypingRealm.Domain.Core.Tests.csproj", "{F9AF8743-12AA-4E79-B88F-84DA43AC723D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain.Core.Tests", "Tests\TypingRealm.Domain.Core.Tests\TypingRealm.Domain.Core.Tests.csproj", "{F9AF8743-12AA-4E79-B88F-84DA43AC723D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain", "TypingRealm.Domain\TypingRealm.Domain.csproj", "{5603DDCC-F818-46FC-916D-413C86556887}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain", "TypingRealm.Domain\TypingRealm.Domain.csproj", "{5603DDCC-F818-46FC-916D-413C86556887}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Tests", "Tests\TypingRealm.Domain.Tests\TypingRealm.Domain.Tests.csproj", "{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,10 @@ Global
 		{5603DDCC-F818-46FC-916D-413C86556887}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5603DDCC-F818-46FC-916D-413C86556887}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5603DDCC-F818-46FC-916D-413C86556887}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -140,6 +146,7 @@ Global
 		{2999E361-CE1D-4773-B933-D2AC764AF4D7} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
 		{593125D6-0157-4303-8642-51E92A8EB2F0} = {792AC347-74FB-4A4E-AD3B-D78B344D17BB}
 		{F9AF8743-12AA-4E79-B88F-84DA43AC723D} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
+		{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}
