@@ -16,7 +16,8 @@ namespace TypingRealm.Domain
 
         public object GetUpdateFor(string clientId)
         {
-            var player = _playerRepository.FindByClientId(clientId);
+            var playerId = new PlayerId(clientId);
+            var player = _playerRepository.Find(playerId);
             if (player == null)
                 throw new InvalidOperationException("Player is not found.");
 

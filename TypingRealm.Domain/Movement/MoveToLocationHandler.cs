@@ -17,13 +17,14 @@ namespace TypingRealm.Domain.Movement
 
         public ValueTask HandleAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
         {
-            var player = _players.FindByClientId(sender.ClientId);
+            var playerId = new PlayerId(sender.ClientId);
+            var player = _players.Find(playerId);
             if (player == null)
                 throw new InvalidOperationException("Player is not found.");
 
             var locationId = new LocationId(message.LocationId);
             player.MoveToLocation(locationId);
-            _players.Save(sender.ClientId, player);
+            _players.Save(player);
 
             sender.Group = player.GetUniquePlayerPosition();
 
