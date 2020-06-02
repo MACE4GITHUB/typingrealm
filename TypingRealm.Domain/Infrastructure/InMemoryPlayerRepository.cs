@@ -10,7 +10,7 @@ namespace TypingRealm.Domain.Infrastructure
         private readonly Dictionary<PlayerId, Player> _playerIdToPlayer
             = new Dictionary<PlayerId, Player>();
 
-        public Player FindByClientId(string clientId)
+        public Player? FindByClientId(string clientId)
         {
             if (!_clientIdToPlayer.ContainsKey(clientId))
                 throw new InvalidOperationException($"Player with client id {clientId} does not exist.");
@@ -18,7 +18,7 @@ namespace TypingRealm.Domain.Infrastructure
             return _clientIdToPlayer[clientId];
         }
 
-        public Player FindByPlayerId(PlayerId playerId)
+        public Player? FindByPlayerId(PlayerId playerId)
         {
             if (!_playerIdToPlayer.ContainsKey(playerId))
                 throw new InvalidOperationException($"Player with player id {playerId} does not exist.");
