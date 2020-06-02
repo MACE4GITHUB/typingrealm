@@ -3,6 +3,7 @@ using TypingRealm.Domain.Infrastructure;
 using TypingRealm.Domain.Messages;
 using TypingRealm.Domain.Movement;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Connecting;
 
 namespace TypingRealm.Domain
 {
@@ -14,10 +15,10 @@ namespace TypingRealm.Domain
             services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
             services.AddTransient<IPlayerFactory, PlayerFactory>();
 
-            services.RegisterHandler<Join, JoinHandler>();
             services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
 
             services.UseUpdateFactory<UpdateFactory>();
+            services.AddTransient<IConnectionInitializer, ConnectionInitializer>();
 
             return services;
         }
