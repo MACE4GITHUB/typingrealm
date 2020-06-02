@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TypingRealm.Domain
+namespace TypingRealm.Domain.Infrastructure
 {
     public sealed class InMemoryPlayerRepository : IPlayerRepository
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Domain.Infrastructure;
 using TypingRealm.Domain.Messages;
 using TypingRealm.Domain.Movement;
 using TypingRealm.Messaging;
