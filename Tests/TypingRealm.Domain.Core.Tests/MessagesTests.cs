@@ -24,12 +24,12 @@ namespace TypingRealm.Domain.Tests
 
             var sut = new Join
             {
-                Name = "name"
+                PlayerId = "name"
             };
-            Assert.Equal("name", sut.Name);
+            Assert.Equal("name", sut.PlayerId);
 
             sut = new Join("name");
-            Assert.Equal("name", sut.Name);
+            Assert.Equal("name", sut.PlayerId);
         }
 
         [Fact]

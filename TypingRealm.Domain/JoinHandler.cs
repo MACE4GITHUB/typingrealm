@@ -25,7 +25,7 @@ namespace TypingRealm.Domain
             if (joinedPlayer != null)
                 throw new InvalidOperationException($"CLient {sender.ClientId} already has joined with player {joinedPlayer.PlayerId}.");
 
-            var playerName = new PlayerName(message.Name);
+            var playerName = new PlayerName(message.PlayerId);
             var player = _playerFactory.CreateNew(playerName);
 
             _playerRepository.Save(sender.ClientId, player);

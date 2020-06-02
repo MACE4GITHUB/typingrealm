@@ -8,8 +8,8 @@ namespace TypingRealm.Domain.Messages
 #pragma warning disable CS8618
         public Join() { }
 #pragma warning restore CS8618
-        public Join(string name) => Name = name;
+        public Join(string playerId) => PlayerId = playerId;
 
-        public string Name { get; set; }
+        public string PlayerId { get; set; }
     }
 }
