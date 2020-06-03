@@ -1,6 +1,5 @@
 ﻿using AutoFixture;
 using AutoFixture.Xunit2;
-using TypingRealm.Domain.Messages;
 using TypingRealm.Testing;
 
 namespace TypingRealm.Domain.Tests
@@ -20,7 +19,6 @@ namespace TypingRealm.Domain.Tests
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Register(() => new Join(CreateValidPlayerName(fixture)));
             fixture.Register(() => new PlayerName(CreateValidPlayerName(fixture)));
         }
 

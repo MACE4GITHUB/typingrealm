@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TypingRealm.Domain.Movement;
 
 namespace TypingRealm.Domain.Infrastructure
 {
@@ -7,6 +8,21 @@ namespace TypingRealm.Domain.Infrastructure
     {
         private readonly Dictionary<PlayerId, Player> _playerIdToPlayer
             = new Dictionary<PlayerId, Player>();
+
+        public InMemoryPlayerRepository(ILocationStore locationStore)
+        {
+            _playerIdToPlayer.Add(new PlayerId("ivan-id"), new Player(
+                new PlayerId("ivan-id"),
+                new PlayerName("ivan"),
+                new LocationId("village"),
+                locationStore));
+
+            _playerIdToPlayer.Add(new PlayerId("john-id"), new Player(
+                new PlayerId("john-id"),
+                new PlayerName("john"),
+                new LocationId("village"),
+                locationStore));
+        }
 
         public Player? Find(PlayerId playerId)
         {

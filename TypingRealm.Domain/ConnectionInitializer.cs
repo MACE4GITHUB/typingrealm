@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Domain.Messages;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Updating;
@@ -26,7 +27,16 @@ namespace TypingRealm.Domain
 
         public async ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (!(await connection.ReceiveAsync(cancellationToken).ConfigureAwait(false) is Join join))
+                throw new InvalidOperationException($"Could not connect: first message is not a valid {nameof(Join)} message.");
+
+            var playerId = new PlayerId(join.PlayerId);
+            var player = _playerRepository.Find(playerId);
+            if (player == null)
+                throw new InvalidOperationException($"Could not connect: could not find player {playerId}.");
+
+            var group = player.GetUniquePlayerPosition();
+            return new ConnectedClient(playerId, connection, group, _updateDetector);
         }
     }
 }
