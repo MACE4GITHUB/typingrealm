@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TypingRealm.Domain.Messages;
+using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Updating;
 
 namespace TypingRealm.Domain
@@ -8,10 +9,14 @@ namespace TypingRealm.Domain
     public sealed class UpdateFactory : IUpdateFactory
     {
         private readonly IPlayerRepository _playerRepository;
+        private readonly IConnectedClientStore _connectedClients;
 
-        public UpdateFactory(IPlayerRepository playerRepository)
+        public UpdateFactory(
+            IPlayerRepository playerRepository,
+            IConnectedClientStore connectedClients)
         {
             _playerRepository = playerRepository;
+            _connectedClients = connectedClients;
         }
 
         public object GetUpdateFor(string clientId)
@@ -21,8 +26,8 @@ namespace TypingRealm.Domain
             if (player == null)
                 throw new InvalidOperationException("Player is not found.");
 
-            var visiblePlayers = _playerRepository.FindPlayersVisibleTo(player.PlayerId)
-                .Select<Player, string>(x => x.PlayerId);
+            var visiblePlayers = _connectedClients.FindInGroups(player.GetUniquePlayerPosition())
+                .Select(client => client.ClientId);
 
             return new Update(player.LocationId, visiblePlayers);
         }

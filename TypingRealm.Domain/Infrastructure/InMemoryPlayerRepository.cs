@@ -32,23 +32,6 @@ namespace TypingRealm.Domain.Infrastructure
             return _playerIdToPlayer[playerId];
         }
 
-        public IEnumerable<Player> FindPlayersVisibleTo(PlayerId playerId)
-        {
-            var player = _playerIdToPlayer[playerId];
-            var uniqueLocation = player.GetUniquePlayerPosition();
-
-            foreach (var visiblePlayer in _playerIdToPlayer.Values)
-            {
-                if (visiblePlayer.GetUniquePlayerPosition() == uniqueLocation)
-                    yield return visiblePlayer;
-            }
-        }
-
-        public PlayerId NextId()
-        {
-            return new PlayerId(Guid.NewGuid().ToString());
-        }
-
         public void Save(Player player)
         {
             if (_playerIdToPlayer.ContainsKey(player.PlayerId))
@@ -58,6 +41,11 @@ namespace TypingRealm.Domain.Infrastructure
             }
 
             _playerIdToPlayer.Add(player.PlayerId, player);
+        }
+
+        public PlayerId NextId()
+        {
+            return new PlayerId(Guid.NewGuid().ToString());
         }
     }
 }
