@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using TypingRealm.Domain.Messages;
 using TypingRealm.Messaging.Updating;
 
@@ -15,7 +16,11 @@ namespace TypingRealm.Domain
 
         public object GetUpdateFor(string clientId)
         {
-            var player = _playerRepository.FindByClientId(clientId);
+            var playerId = new PlayerId(clientId);
+            var player = _playerRepository.Find(playerId);
+            if (player == null)
+                throw new InvalidOperationException("Player is not found.");
+
             var visiblePlayers = _playerRepository.FindPlayersVisibleTo(player.PlayerId)
                 .Select<Player, string>(x => x.PlayerId);
 

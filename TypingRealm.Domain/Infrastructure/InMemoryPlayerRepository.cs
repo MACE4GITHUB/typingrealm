@@ -1,27 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using TypingRealm.Domain.Movement;
 
 namespace TypingRealm.Domain.Infrastructure
 {
     public sealed class InMemoryPlayerRepository : IPlayerRepository
     {
-        private readonly Dictionary<string, Player> _clientIdToPlayer
-            = new Dictionary<string, Player>();
         private readonly Dictionary<PlayerId, Player> _playerIdToPlayer
             = new Dictionary<PlayerId, Player>();
 
-        public Player FindByClientId(string clientId)
+        public InMemoryPlayerRepository(ILocationStore locationStore)
         {
-            if (!_clientIdToPlayer.ContainsKey(clientId))
-                throw new InvalidOperationException($"Player with client id {clientId} does not exist.");
+            _playerIdToPlayer.Add(new PlayerId("ivan-id"), new Player(
+                new PlayerId("ivan-id"),
+                new PlayerName("ivan"),
+                new LocationId("village"),
+                locationStore));
 
-            return _clientIdToPlayer[clientId];
+            _playerIdToPlayer.Add(new PlayerId("john-id"), new Player(
+                new PlayerId("john-id"),
+                new PlayerName("john"),
+                new LocationId("village"),
+                locationStore));
         }
 
-        public Player FindByPlayerId(PlayerId playerId)
+        public Player? Find(PlayerId playerId)
         {
             if (!_playerIdToPlayer.ContainsKey(playerId))
-                throw new InvalidOperationException($"Player with player id {playerId} does not exist.");
+                return null;
 
             return _playerIdToPlayer[playerId];
         }
@@ -43,25 +49,15 @@ namespace TypingRealm.Domain.Infrastructure
             return new PlayerId(Guid.NewGuid().ToString());
         }
 
-        public void Save(string clientId, Player player)
+        public void Save(Player player)
         {
             if (_playerIdToPlayer.ContainsKey(player.PlayerId))
             {
                 _playerIdToPlayer[player.PlayerId] = player;
-
-                if (!_clientIdToPlayer.ContainsKey(clientId))
-                    _clientIdToPlayer.Add(clientId, player);
-
-                _clientIdToPlayer[clientId] = player;
                 return;
             }
 
             _playerIdToPlayer.Add(player.PlayerId, player);
-
-            if (!_clientIdToPlayer.ContainsKey(clientId))
-                _clientIdToPlayer.Add(clientId, player);
-
-            _clientIdToPlayer[clientId] = player;
         }
     }
 }

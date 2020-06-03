@@ -39,15 +39,26 @@ namespace TypingRealm.Messaging.Handling
             var connectedClient = await _connectionInitializer.ConnectAsync(connection, cancellationToken).ConfigureAwait(false);
             _connectedClients.Add(connectedClient);
 
+            if (!_connectedClients.IsClientConnected(connectedClient.ClientId))
+                throw new InvalidOperationException("Client already connected.");
+
+            await TrySendPendingUpdates(connectedClient.Group, cancellationToken).ConfigureAwait(false);
             while (_connectedClients.IsClientConnected(connectedClient.ClientId))
             {
                 var message = await connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
 
-                await DispatchAndUpdateAsync(connectedClient, message, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await DispatchMessageAsync(connectedClient, message, cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    await TrySendPendingUpdates(connectedClient.Group, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
 
-        private async ValueTask DispatchAndUpdateAsync(ConnectedClient sender, object message, CancellationToken cancellationToken)
+        private async ValueTask DispatchMessageAsync(ConnectedClient sender, object message, CancellationToken cancellationToken)
         {
             ValueTask? disconnecting = null;
 
@@ -73,13 +84,6 @@ namespace TypingRealm.Messaging.Handling
                 // Do not lose the exception from catch block.
                 try
                 {
-                    _updateDetector.MarkForUpdate(sender.Group);
-
-                    var clientsThatNeedUpdate = _connectedClients.FindInGroups(_updateDetector.PopMarked()).ToList();
-
-                    await AsyncHelpers.WhenAll(clientsThatNeedUpdate
-                        .Select(c => _updater.SendUpdateAsync(c, cancellationToken))).ConfigureAwait(false);
-
                     if (disconnecting != null)
                     {
                         await disconnecting.Value.ConfigureAwait(false);
@@ -87,11 +91,25 @@ namespace TypingRealm.Messaging.Handling
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogError(exception, $"Error during cleanup & update sending after message handling.");
-
-                    if (disconnecting == null)
-                        throw; // No exception was thrown in catch block - safe to throw here.
+                    _logger.LogError(exception, $"Error during sending Disconnected message after message handling failed.");
                 }
+            }
+        }
+
+        private async ValueTask TrySendPendingUpdates(string group, CancellationToken cancellationToken)
+        {
+            try
+            {
+                _updateDetector.MarkForUpdate(group);
+
+                var clientsThatNeedUpdate = _connectedClients.FindInGroups(_updateDetector.PopMarked()).ToList();
+
+                await AsyncHelpers.WhenAll(clientsThatNeedUpdate
+                    .Select(c => _updater.SendUpdateAsync(c, cancellationToken))).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, $"Error during sending pending updates.");
             }
         }
     }
