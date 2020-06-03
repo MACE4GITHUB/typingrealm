@@ -97,7 +97,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldAddClientToStore_WhenInitializedCorrectly(
+        public async Task ShouldThrow_WhenClientAlreadyConnected(
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnectedClientStore> store,
             IConnection connection,
@@ -107,33 +107,141 @@ namespace TypingRealm.Messaging.Tests.Handling
             initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
                 .ReturnsAsync(client);
 
-            // Stop receiving messages.
+            // IsClientConnected returns false.
             store.Setup(x => x.Find(client.ClientId))
                 .Returns<ConnectedClient>(null);
 
-            await sut.HandleAsync(connection, Cts.Token);
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => sut.HandleAsync(connection, Cts.Token));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldAddClientToStore_WhenInitializedCorrectly(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            [Frozen]Mock<IConnectedClientStore> store,
+            ConnectedClient client,
+            ConnectionHandler sut)
+        {
+            var connection = new TestConnection();
+
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
+                .ReturnsAsync(client);
+
+            _ = sut.HandleAsync(connection, Cts.Token);
+            await Wait();
 
             store.Verify(x => x.Add(client));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldSendPendingUpdates_AfterConnection(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            [Frozen]Mock<IConnectedClientStore> store,
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            [Frozen]Mock<IUpdater> updater,
+            ConnectedClient client,
+            ConnectedClient anotherClient,
+            ConnectionHandler sut)
+        {
+            var connection = new TestConnection();
+
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
+                .ReturnsAsync(client);
+
+            var groups = new List<string>();
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
+                .Callback<string>(group => groups.Add(group));
+            updateDetector.Setup(x => x.PopMarked())
+                .Returns(groups);
+            store.Setup(x => x.FindInGroups(groups))
+                .Returns(new[] { client, anotherClient });
+
+            _ = sut.HandleAsync(connection, Cts.Token);
+            await Wait();
+
+            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token));
+            updater.Verify(x => x.SendUpdateAsync(anotherClient, Cts.Token));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldNotThrow_WhenSendingUpdateFails(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            [Frozen]Mock<IConnectedClientStore> store,
+            [Frozen]Mock<IUpdater> updater,
+            ConnectedClient client,
+            ConnectionHandler sut)
+        {
+            var connection = new TestConnection();
+
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
+                .ReturnsAsync(client);
+
+            updater.Setup(x => x.SendUpdateAsync(It.IsAny<ConnectedClient>(), Cts.Token))
+                .ThrowsAsync(Create<TestException>());
+
+            var result = sut.HandleAsync(connection, Cts.Token);
+            await Wait();
+
+            store.Setup(x => x.Find(client.ClientId))
+                .Returns<ConnectedClient?>(null);
+
+            connection.Received = Create<TestMessage>();
+
+            await result; // Completes without errors.
+            Assert.True(result.IsCompletedSuccessfully);
+        }
+
+
+        [Theory, AutoMoqData]
+        public async Task ShouldNotThrow_WhenMarkingForUpdateFails(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            [Frozen]Mock<IConnectedClientStore> store,
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            ConnectedClient client,
+            ConnectionHandler sut)
+        {
+            var connection = new TestConnection();
+
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
+                .ReturnsAsync(client);
+
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
+                .Throws(Create<TestException>());
+
+            var result = sut.HandleAsync(connection, Cts.Token);
+            await Wait();
+
+            store.Setup(x => x.Find(client.ClientId))
+                .Returns<ConnectedClient?>(null);
+
+            connection.Received = Create<TestMessage>();
+
+            await result; // Completes without errors.
+            Assert.True(result.IsCompletedSuccessfully);
         }
 
         [Theory, AutoMoqData]
         public async Task ShouldReturnWithoutListening_WhenNotConnected(
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnectedClientStore> store,
-            Mock<IConnection> connection,
             ConnectedClient client,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection.Object, Cts.Token))
+            var connection = new TestConnection();
+
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
                 .ReturnsAsync(client);
 
+            var result = sut.HandleAsync(connection, Cts.Token);
+            await Wait();
+
             store.Setup(x => x.Find(client.ClientId))
-                .Returns<ConnectedClient>(null);
+                .Returns<ConnectedClient?>(null);
 
-            await sut.HandleAsync(connection.Object, Cts.Token);
+            connection.Received = Create<TestMessage>();
 
-            connection.Verify(x => x.ReceiveAsync(It.IsAny<CancellationToken>()), Times.Never);
-            connection.Verify(x => x.SendAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Never);
+            await result; // Completes without errors.
+            Assert.True(result.IsCompletedSuccessfully);
         }
 
         [Theory, AutoMoqData]
@@ -352,30 +460,6 @@ namespace TypingRealm.Messaging.Tests.Handling
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldThrowException_WhenUpdateDetectorThrows(
-            [Frozen]Mock<IUpdateDetector> updateDetector,
-            ConnectionHandler sut)
-        {
-            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
-                .Throws<TestException>();
-
-            await Assert.ThrowsAsync<TestException>(
-                () => sut.HandleAsync(Create<IConnection>(), Cts.Token));
-        }
-
-        [Theory, AutoMoqData]
-        public async Task ShouldThrowException_WhenUpdaterThrows(
-            [Frozen]Mock<IUpdater> updater,
-            ConnectionHandler sut)
-        {
-            updater.Setup(x => x.SendUpdateAsync(It.IsAny<ConnectedClient>(), Cts.Token))
-                .ThrowsAsync(Create<TestException>());
-
-            await Assert.ThrowsAsync<TestException>(
-                () => sut.HandleAsync(Create<IConnection>(), Cts.Token));
-        }
-
-        [Theory, AutoMoqData]
         public async Task ShouldHandleFullIntegrationScenario(
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnectedClientStore> store,
@@ -416,19 +500,21 @@ namespace TypingRealm.Messaging.Tests.Handling
                         client.Group = newGroup;
                     });
 
-            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Once);
-            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Once);
+            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Exactly(2));
+            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(2));
 
+            var currentGroup = client.Group;
             connection.Received = message;
             await Wait();
 
-            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Exactly(2));
+            // After the group has changed, previous group should be marked by Setter.
+            updateDetector.Verify(x => x.MarkForUpdate(currentGroup), Times.Exactly(3));
 
             // One time from ConnectedClient.Group setter, another one from ConnectionHandler.
             // Consider changing this logic.
             updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Exactly(2));
 
-            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(2));
+            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(3));
         }
     }
 }
