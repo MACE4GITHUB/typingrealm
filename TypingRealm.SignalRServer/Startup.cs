@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Domain;
+using TypingRealm.Domain.Infrastructure;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Handling;
 using TypingRealm.Messaging.Serialization;
@@ -22,7 +23,8 @@ namespace TypingRealm.SignalRServer
                 .Services
                 .AddJson()
                 .RegisterMessaging()
-                .AddDomain();
+                .AddDomain()
+                .AddDomainInfrastructure();
 
             // When we use Startup.ConfigureServices, we need to register
             // service locator as singleton if it uses IServiceProvider as a

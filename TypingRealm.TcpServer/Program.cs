@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Domain;
+using TypingRealm.Domain.Infrastructure;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Protobuf;
@@ -22,6 +23,7 @@ namespace TypingRealm.TcpServer
                 .AddProtobuf()
                 .RegisterMessaging()
                 .AddDomain()
+                .AddDomainInfrastructure()
                 .AddLogging(builder => builder.AddConsole())
                 .Configure<LoggerFilterOptions>(options => options.MinLevel = LogLevel.Trace)
                 .AddTcpServer(Port)
