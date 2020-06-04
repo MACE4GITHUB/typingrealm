@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Domain.Movement;
 
 namespace TypingRealm.Domain.Infrastructure
 {
@@ -7,6 +8,7 @@ namespace TypingRealm.Domain.Infrastructure
         public static IServiceCollection AddDomainInfrastructure(this IServiceCollection services)
         {
             services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
+            services.AddSingleton<ILocationStore, InMemoryLocationStore>();
 
             return services;
         }

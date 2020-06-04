@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using TypingRealm.Domain.Movement;
 
-namespace TypingRealm.Domain.Movement
+namespace TypingRealm.Domain.Infrastructure
 {
     public sealed class InMemoryLocationStore : ILocationStore
     {

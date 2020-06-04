@@ -19,6 +19,7 @@ namespace TypingRealm.Domain.Tests
             _provider = new ServiceCollection()
                 .AddSingleton(Create<IUpdateDetector>())
                 .AddSingleton(Create<IPlayerRepository>())
+                .AddSingleton(Create<ILocationStore>())
                 .AddSingleton(Create<IConnectedClientStore>())
                 .AddDomain()
                 .BuildServiceProvider();
@@ -33,13 +34,6 @@ namespace TypingRealm.Domain.Tests
         public void ShouldRegisterTransientTypes(Type interfaceType, Type implementationType)
         {
             _provider.AssertRegisteredTransient(interfaceType, implementationType);
-        }
-
-        [Theory]
-        [InlineData(typeof(ILocationStore), typeof(InMemoryLocationStore))]
-        public void ShouldRegisterSingletonTypes(Type interfaceType, Type implementationType)
-        {
-            _provider.AssertRegisteredSingleton(interfaceType, implementationType);
         }
     }
 }
