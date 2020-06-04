@@ -29,6 +29,9 @@ namespace TypingRealm.Domain
             if (currentLocation == null)
                 throw new InvalidOperationException($"The player {PlayerId} is currently at invalid location {LocationId}. Cannot move to location {locationId}.");
 
+            if (_locationStore.Find(locationId) == null)
+                throw new InvalidOperationException($"Location {locationId} doesn't exist.");
+
             if (!currentLocation.Locations.Contains(locationId))
                 throw new InvalidOperationException($"Cannot move the player {PlayerId} from {LocationId} to {locationId}.");
 
