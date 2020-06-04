@@ -19,6 +19,7 @@ namespace TypingRealm.Domain
         public PlayerId PlayerId { get; }
         public PlayerName Name { get; }
         public LocationId LocationId { get; private set; }
+        public PlayerId? CombatEnemyId { get; private set; }
 
         public void MoveToLocation(LocationId locationId)
         {
@@ -36,6 +37,14 @@ namespace TypingRealm.Domain
                 throw new InvalidOperationException($"Cannot move the player {PlayerId} from {LocationId} to {locationId}.");
 
             LocationId = locationId;
+        }
+
+        public void Attack(Player player)
+        {
+            // TODO: Check that both players are not in combat currently.
+
+            CombatEnemyId = player.PlayerId;
+            player.CombatEnemyId = PlayerId;
         }
 
         public string GetUniquePlayerPosition()

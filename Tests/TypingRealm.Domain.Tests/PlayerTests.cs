@@ -23,6 +23,9 @@ namespace TypingRealm.Domain.Tests
             Assert.Equal(name, player.Name);
             Assert.Equal(locationId, player.LocationId);
             Assert.Equal(locationStore, GetPrivateField(player, "_locationStore"));
+
+            // Should have null CombatEnemyId by default.
+            Assert.Null(player.CombatEnemyId);
         }
 
         [Theory, AutoDomainData]
@@ -100,6 +103,17 @@ namespace TypingRealm.Domain.Tests
         {
             Assert.Throws<InvalidOperationException>(
                 () => player.MoveToLocation(locationId));
+        }
+
+        [Theory, AutoDomainData]
+        public void Attack_ShouldSetCombatEnemyIdToBothPlayers(
+            Player enemy,
+            Player sut)
+        {
+            sut.Attack(enemy);
+
+            Assert.Equal(enemy.PlayerId, sut.CombatEnemyId);
+            Assert.Equal(sut.PlayerId, enemy.CombatEnemyId);
         }
     }
 }
