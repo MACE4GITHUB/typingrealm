@@ -11,12 +11,12 @@ namespace TypingRealm.Domain
         public static IServiceCollection AddDomain(this IServiceCollection services)
         {
             services.AddSingleton<ILocationStore, InMemoryLocationStore>();
+
+            services.AddTransient<IConnectionInitializer, ConnectionInitializer>();
             services.AddTransient<IPlayerFactory, PlayerFactory>();
+            services.UseUpdateFactory<UpdateFactory>();
 
             services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
-
-            services.UseUpdateFactory<UpdateFactory>();
-            services.AddTransient<IConnectionInitializer, ConnectionInitializer>();
 
             return services;
         }
