@@ -132,5 +132,18 @@ namespace TypingRealm.Domain.Tests.Common
             Assert.Equal(stringSut.Value, stringValue);
             Assert.Equal(intSut.Value, intValue);
         }
+
+        [Fact]
+        public void EqualityShouldBeSealed()
+        {
+            Assert.True(typeof(Primitive<>).GetMethod(nameof(Primitive<int>.Equals))?.IsFinal);
+            Assert.True(typeof(Primitive<>).GetMethod(nameof(Primitive<int>.GetHashCode))?.IsFinal);
+        }
+
+        [Fact]
+        public void ToStringShouldBeSealed()
+        {
+            Assert.True(typeof(Primitive<>).GetMethod(nameof(Identity.ToString))?.IsFinal);
+        }
     }
 }

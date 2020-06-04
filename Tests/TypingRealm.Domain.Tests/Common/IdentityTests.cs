@@ -13,6 +13,12 @@ namespace TypingRealm.Domain.Tests.Common
             }
         }
 
+        [Theory, AutoDomainData]
+        public void ShouldBePrimitive(Identity identity)
+        {
+            Assert.IsAssignableFrom<Primitive<string>>(identity);
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData(" ")]

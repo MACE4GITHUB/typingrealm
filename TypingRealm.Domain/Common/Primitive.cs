@@ -27,7 +27,7 @@ namespace TypingRealm.Domain.Common
             return Value!.GetHashCode();
         }
 
-        public override string? ToString()
+        public sealed override string? ToString()
         {
             return Value!.ToString();
         }
