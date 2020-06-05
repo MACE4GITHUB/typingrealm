@@ -8,12 +8,13 @@ namespace TypingRealm.Domain
     {
         private readonly ILocationStore _locationStore;
 
-        public Player(PlayerId playerId, PlayerName name, LocationId locationId, ILocationStore locationStore)
+        public Player(PlayerId playerId, PlayerName name, LocationId locationId, ILocationStore locationStore, PlayerId? combatEnemyId)
         {
             PlayerId = playerId;
             Name = name;
             LocationId = locationId;
             _locationStore = locationStore;
+            CombatEnemyId = combatEnemyId;
         }
 
         public PlayerId PlayerId { get; }
@@ -41,7 +42,11 @@ namespace TypingRealm.Domain
 
         public void Attack(Player player)
         {
-            // TODO: Check that both players are not in combat currently.
+            if (CombatEnemyId != null)
+                throw new InvalidOperationException("Attacker is already in battle.");
+
+            if (player.CombatEnemyId != null)
+                throw new InvalidOperationException("Enemy is already in battle.");
 
             CombatEnemyId = player.PlayerId;
             player.CombatEnemyId = PlayerId;

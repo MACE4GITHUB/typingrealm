@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoFixture;
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Domain.Movement;
@@ -10,21 +11,29 @@ namespace TypingRealm.Domain.Tests
 {
     public class PlayerTests : TestsBase
     {
+        public PlayerTests()
+        {
+            Fixture.Customize(new DomainCustomization());
+        }
+
         [Theory, AutoDomainData]
         public void ShouldSetFields(
             PlayerId playerId,
             PlayerName name,
             LocationId locationId,
-            ILocationStore locationStore)
+            ILocationStore locationStore,
+            PlayerId combatEnemyId)
         {
-            var player = new Player(playerId, name, locationId, locationStore);
+            var player = new Player(playerId, name, locationId, locationStore, combatEnemyId);
 
             Assert.Equal(playerId, player.PlayerId);
             Assert.Equal(name, player.Name);
             Assert.Equal(locationId, player.LocationId);
             Assert.Equal(locationStore, GetPrivateField(player, "_locationStore"));
+            Assert.Equal(combatEnemyId, player.CombatEnemyId);
 
-            // Should have null CombatEnemyId by default.
+            // Should allow null CombatEnemyId.
+            player = new Player(playerId, name, locationId, locationStore, null);
             Assert.Null(player.CombatEnemyId);
         }
 
@@ -114,6 +123,22 @@ namespace TypingRealm.Domain.Tests
 
             Assert.Equal(enemy.PlayerId, sut.CombatEnemyId);
             Assert.Equal(sut.PlayerId, enemy.CombatEnemyId);
+        }
+
+        [Theory, InBattleAutoDomainData]
+        public void Attack_ShouldThrow_WhenAttackerAlreadyInBattle(Player sut)
+        {
+            var enemy = Create<Player>(new PlayerNotInBattle());
+
+            Assert.Throws<InvalidOperationException>(() => sut.Attack(enemy));
+        }
+
+        [Theory, InBattleAutoDomainData]
+        public void Attack_ShouldThrow_WhenEnemyAlreadyInBattle(Player enemy)
+        {
+            var sut = Create<Player>(new PlayerNotInBattle());
+
+            Assert.Throws<InvalidOperationException>(() => sut.Attack(enemy));
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Domain.Messages;
+using TypingRealm.Domain.Tests.Customizations;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
-using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Domain.Tests
