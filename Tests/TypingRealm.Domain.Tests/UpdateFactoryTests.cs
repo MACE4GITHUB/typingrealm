@@ -4,6 +4,7 @@ using System.Linq;
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Domain.Messages;
+using TypingRealm.Domain.Tests.Customizations;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using Xunit;
@@ -73,6 +74,22 @@ namespace TypingRealm.Domain.Tests
             {
                 Assert.Contains(client.ClientId, update.VisiblePlayers);
             }
+        }
+
+        [Theory, AutoDomainData]
+        public void ShouldSendCombatUpdate_WhenInCombat(
+            Player player,
+            Player enemy,
+            [Frozen]Mock<IPlayerRepository> playerRepository,
+            UpdateFactory updateFactory)
+        {
+            playerRepository.Setup(x => x.Find(player.PlayerId))
+                .Returns(player);
+
+            player.Attack(enemy);
+
+            var update = (CombatUpdate)updateFactory.GetUpdateFor(player.PlayerId);
+            Assert.Equal(enemy.PlayerId, update.EnemyId);
         }
     }
 }

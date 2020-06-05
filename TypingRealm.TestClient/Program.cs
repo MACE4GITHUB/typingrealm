@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Domain;
-using TypingRealm.Domain.Messages;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
@@ -165,16 +164,13 @@ namespace TypingRealm.TestClient
                     case Disconnected disconnected:
                         Console.WriteLine($"Disconnected with reason: {disconnected.Reason}");
                         return; // Return after server tells us that he's disconnecting us. Or socket exception will be thrown on the next WaitAsync operation.
-                    case Update update:
-                        var serializedUpdate = JsonSerializer.Serialize(update, options: new JsonSerializerOptions
+                    default:
+                        Console.WriteLine($"Received {message.GetType()} message:");
+                        var json = JsonSerializer.Serialize(message, options: new JsonSerializerOptions
                         {
                             WriteIndented = true
                         });
-                        Console.WriteLine($"Update:");
-                        Console.WriteLine(serializedUpdate);
-                        break;
-                    default:
-                        Console.WriteLine($"Received unknown {message.GetType()} message.");
+                        Console.WriteLine(json);
                         break;
                 }
             }

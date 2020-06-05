@@ -5,7 +5,7 @@ namespace TypingRealm.Domain
     public interface IPlayerFactory
     {
         Player CreateNew(PlayerId playerId, PlayerName name);
-        Player Create(PlayerId playerId, PlayerName name, LocationId locationId);
+        Player Create(PlayerId playerId, PlayerName name, LocationId locationId, PlayerId? combatEnemyId);
     }
 
     public sealed class PlayerFactory : IPlayerFactory
@@ -17,16 +17,16 @@ namespace TypingRealm.Domain
             _locationStore = locationStore;
         }
 
-        public Player Create(PlayerId playerId, PlayerName name, LocationId locationId)
+        public Player Create(PlayerId playerId, PlayerName name, LocationId locationId, PlayerId? combatEnemyId)
         {
-            return new Player(playerId, name, locationId, _locationStore);
+            return new Player(playerId, name, locationId, _locationStore, combatEnemyId);
         }
 
         public Player CreateNew(PlayerId playerId, PlayerName name)
         {
             var startingLocationId = _locationStore.GetStartingLocationId();
 
-            return new Player(playerId, name, startingLocationId, _locationStore);
+            return new Player(playerId, name, startingLocationId, _locationStore, null);
         }
     }
 }

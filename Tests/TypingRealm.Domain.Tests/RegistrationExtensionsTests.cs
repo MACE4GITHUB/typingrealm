@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Domain.Combat;
 using TypingRealm.Domain.Messages;
 using TypingRealm.Domain.Movement;
 using TypingRealm.Messaging;
@@ -31,6 +32,8 @@ namespace TypingRealm.Domain.Tests
         [InlineData(typeof(IUpdater), typeof(Updater))] // UseUpdateFactory.
         [InlineData(typeof(IUpdateFactory), typeof(UpdateFactory))]
         [InlineData(typeof(IMessageHandler<MoveToLocation>), typeof(MoveToLocationHandler))]
+        [InlineData(typeof(IMessageHandler<Attack>), typeof(AttackHandler))]
+        [InlineData(typeof(IMessageHandler<Surrender>), typeof(SurrenderHandler))]
         public void ShouldRegisterTransientTypes(Type interfaceType, Type implementationType)
         {
             _provider.AssertRegisteredTransient(interfaceType, implementationType);
