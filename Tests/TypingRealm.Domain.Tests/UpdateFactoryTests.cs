@@ -37,7 +37,7 @@ namespace TypingRealm.Domain.Tests
                 () => sut.GetUpdateFor(playerId));
         }
 
-        [Theory, AutoDomainData]
+        [Theory, RoamingAutoDomainData]
         public void ShouldCreateUpdate_WithCurrentLocation(
             [Frozen]Mock<IPlayerRepository> playerRepository,
             Player player,
@@ -51,7 +51,7 @@ namespace TypingRealm.Domain.Tests
             Assert.Equal(player.LocationId, update.LocationId);
         }
 
-        [Theory, AutoDomainData]
+        [Theory, RoamingAutoDomainData]
         public void ShouldCreateUpdate_WithVisiblePlayers_FromConnection(
             [Frozen]Mock<IPlayerRepository> playerRepository,
             [Frozen]Mock<IConnectedClientStore> store,
@@ -76,7 +76,7 @@ namespace TypingRealm.Domain.Tests
             }
         }
 
-        [Theory, AutoDomainData]
+        [Theory, RoamingAutoDomainData]
         public void ShouldSendCombatUpdate_WhenInCombat(
             Player player,
             Player enemy,
