@@ -136,7 +136,8 @@ namespace TypingRealm.TestClient
                     Console.Write($"[{property.PropertyType.Name}] {property.Name} = ");
                     var value = Console.ReadLine();
 
-                    property.SetValue(message, value);
+                    // A hack to support int for now.
+                    property.SetValue(message, property.PropertyType == typeof(string) ? (object)value : (object)Convert.ToInt32(value));
                 }
 
                 var json = JsonSerializer.Serialize(message);

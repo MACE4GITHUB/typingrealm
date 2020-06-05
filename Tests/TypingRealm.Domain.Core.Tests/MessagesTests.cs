@@ -13,7 +13,7 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(6, typeof(Join).Assembly.GetTypes().Count(
+            Assert.Equal(8, typeof(Join).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -101,6 +101,36 @@ namespace TypingRealm.Domain.Tests
         public void SurrenderMessage()
         {
             AssertSerializable<Surrender>();
+        }
+
+        [Theory, AutoMoqData]
+        public void EnterRoadMessage(string roadId)
+        {
+            AssertSerializable<EnterRoad>();
+
+            var sut = new EnterRoad
+            {
+                RoadId = roadId
+            };
+            Assert.Equal(roadId, sut.RoadId);
+
+            sut = new EnterRoad(roadId);
+            Assert.Equal(roadId, sut.RoadId);
+        }
+
+        [Theory, AutoMoqData]
+        public void MoveMessage(int distance)
+        {
+            AssertSerializable<Move>();
+
+            var sut = new Move
+            {
+                Distance = distance
+            };
+            Assert.Equal(distance, sut.Distance);
+
+            sut = new Move(distance);
+            Assert.Equal(distance, sut.Distance);
         }
     }
 }

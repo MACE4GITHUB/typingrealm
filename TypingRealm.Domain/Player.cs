@@ -7,20 +7,38 @@ namespace TypingRealm.Domain
     public sealed class Player
     {
         private readonly ILocationStore _locationStore;
+        private readonly IRoadStore _roadStore;
 
-        public Player(PlayerId playerId, PlayerName name, LocationId locationId, ILocationStore locationStore, PlayerId? combatEnemyId)
+        public Player(
+            PlayerId playerId,
+            PlayerName name,
+            LocationId locationId,
+            ILocationStore locationStore,
+            RoadId? roadId,
+            int? distance,
+            IRoadStore roadStore,
+            PlayerId? combatEnemyId)
         {
             PlayerId = playerId;
             Name = name;
             LocationId = locationId;
             _locationStore = locationStore;
+            RoadId = roadId;
+            Distance = distance;
+            _roadStore = roadStore;
             CombatEnemyId = combatEnemyId;
         }
 
         public PlayerId PlayerId { get; }
         public PlayerName Name { get; }
         public LocationId LocationId { get; private set; }
+
+        // Combat.
         public PlayerId? CombatEnemyId { get; private set; }
+
+        // Movement.
+        public RoadId? RoadId { get; private set; }
+        public int? Distance { get; private set; }
 
         public void MoveToLocation(LocationId locationId)
         {
@@ -38,6 +56,45 @@ namespace TypingRealm.Domain
                 throw new InvalidOperationException($"Cannot move the player {PlayerId} from {LocationId} to {locationId}.");
 
             LocationId = locationId;
+        }
+
+        public void EnterRoad(RoadId roadId)
+        {
+            if (RoadId != null)
+                throw new InvalidOperationException("Already at road.");
+
+            var road = _roadStore.Find(roadId);
+            if (road == null)
+                throw new InvalidOperationException("Road does not exist.");
+
+            if (road.FromLocationId != LocationId)
+                throw new InvalidOperationException("Cannot move to this road from this location.");
+
+            RoadId = roadId;
+            Distance = 0;
+        }
+
+        public void Move(int distance)
+        {
+            if (RoadId == null)
+                throw new InvalidOperationException("Not at road.");
+
+            var road = _roadStore.Find(RoadId);
+            if (road == null)
+                throw new InvalidOperationException("Road does not exist.");
+
+            if (Distance + distance > road.Distance)
+                throw new InvalidOperationException("Can't move so much.");
+
+            Distance += distance;
+
+            if (Distance == road.Distance)
+            {
+                // Arrive.
+                Distance = null;
+                RoadId = null;
+                LocationId = road.ToLocationId;
+            }
         }
 
         public void Attack(Player player)

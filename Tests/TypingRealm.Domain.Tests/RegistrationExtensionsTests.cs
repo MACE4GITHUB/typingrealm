@@ -21,6 +21,7 @@ namespace TypingRealm.Domain.Tests
                 .AddSingleton(Create<IUpdateDetector>())
                 .AddSingleton(Create<IPlayerRepository>())
                 .AddSingleton(Create<ILocationStore>())
+                .AddSingleton(Create<IRoadStore>())
                 .AddSingleton(Create<IConnectedClientStore>())
                 .AddDomain()
                 .BuildServiceProvider();

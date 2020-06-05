@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TypingRealm.Domain.Movement;
 
 namespace TypingRealm.Domain.Infrastructure
@@ -20,7 +21,8 @@ namespace TypingRealm.Domain.Infrastructure
                 [new LocationId("marketplace")] = new Location(new[]
                 {
                     new LocationId("village")
-                })
+                }),
+                [new LocationId("forest")] = new Location(Array.Empty<LocationId>())
             };
 
         public Location? Find(LocationId locationId)

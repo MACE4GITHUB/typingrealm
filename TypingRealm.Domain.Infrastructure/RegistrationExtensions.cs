@@ -9,6 +9,7 @@ namespace TypingRealm.Domain.Infrastructure
         {
             services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
             services.AddSingleton<ILocationStore, InMemoryLocationStore>();
+            services.AddSingleton<IRoadStore, InMemoryRoadStore>();
 
             return services;
         }

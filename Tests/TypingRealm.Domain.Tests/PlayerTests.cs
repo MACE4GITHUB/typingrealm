@@ -24,7 +24,7 @@ namespace TypingRealm.Domain.Tests
             ILocationStore locationStore,
             PlayerId combatEnemyId)
         {
-            var player = new Player(playerId, name, locationId, locationStore, combatEnemyId);
+            var player = new Player(playerId, name, locationId, locationStore, null, null, null!, combatEnemyId);
 
             Assert.Equal(playerId, player.PlayerId);
             Assert.Equal(name, player.Name);
@@ -33,7 +33,7 @@ namespace TypingRealm.Domain.Tests
             Assert.Equal(combatEnemyId, player.CombatEnemyId);
 
             // Should allow null CombatEnemyId.
-            player = new Player(playerId, name, locationId, locationStore, null);
+            player = new Player(playerId, name, locationId, locationStore, null, null, null!, null);
             Assert.Null(player.CombatEnemyId);
         }
 
@@ -177,6 +177,5 @@ namespace TypingRealm.Domain.Tests
             Assert.Throws<InvalidOperationException>(
                 () => sut.Surrender(playerRepository));
         }
-
     }
 }

@@ -15,12 +15,16 @@ namespace TypingRealm.Domain.Infrastructure
                 new PlayerId("ivan-id"),
                 new PlayerName("ivan"),
                 new LocationId("village"),
+                null,
+                null,
                 null));
 
             _playerIdToPlayer.Add(new PlayerId("john-id"), playerFactory.Create(
                 new PlayerId("john-id"),
                 new PlayerName("john"),
                 new LocationId("village"),
+                null,
+                null,
                 null));
         }
 
