@@ -17,6 +17,7 @@ namespace TypingRealm.Domain
 
             services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
             services.RegisterHandler<Attack, AttackHandler>();
+            services.RegisterHandler<Surrender, SurrenderHandler>();
 
             return services;
         }

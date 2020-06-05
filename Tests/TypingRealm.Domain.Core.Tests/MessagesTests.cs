@@ -13,7 +13,7 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(5, typeof(Join).Assembly.GetTypes().Count(
+            Assert.Equal(6, typeof(Join).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -95,6 +95,12 @@ namespace TypingRealm.Domain.Tests
 
             sut = new Attack(playerId);
             Assert.Equal(playerId, sut.PlayerId);
+        }
+
+        [Fact]
+        public void SurrenderMessage()
+        {
+            AssertSerializable<Surrender>();
         }
     }
 }

@@ -52,6 +52,22 @@ namespace TypingRealm.Domain
             player.CombatEnemyId = PlayerId;
         }
 
+        public void Surrender(IPlayerRepository playerRepository)
+        {
+            if (CombatEnemyId == null)
+                throw new InvalidOperationException("Can't surrender: not in battle.");
+
+            var enemy = playerRepository.Find(CombatEnemyId);
+            if (enemy == null)
+                throw new InvalidOperationException("Enemy is not found.");
+
+            CombatEnemyId = null;
+            enemy.CombatEnemyId = null;
+
+            playerRepository.Save(this);
+            playerRepository.Save(enemy);
+        }
+
         public string GetUniquePlayerPosition()
         {
             return $"l_{LocationId}";

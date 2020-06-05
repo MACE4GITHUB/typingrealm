@@ -33,6 +33,7 @@ namespace TypingRealm.Domain.Tests
         [InlineData(typeof(IUpdateFactory), typeof(UpdateFactory))]
         [InlineData(typeof(IMessageHandler<MoveToLocation>), typeof(MoveToLocationHandler))]
         [InlineData(typeof(IMessageHandler<Attack>), typeof(AttackHandler))]
+        [InlineData(typeof(IMessageHandler<Surrender>), typeof(SurrenderHandler))]
         public void ShouldRegisterTransientTypes(Type interfaceType, Type implementationType)
         {
             _provider.AssertRegisteredTransient(interfaceType, implementationType);
