@@ -78,6 +78,42 @@ namespace TypingRealm.Messaging.Tests.Handling
         }
 
         [Theory, AutoMoqData]
+        public async Task ShouldSendDisconnectedMessage_WhenInitializerFailed(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            IConnection connection,
+            ConnectionHandler sut)
+        {
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
+                .ThrowsAsync(Create<TestException>());
+
+            await SwallowAnyAsync(
+                sut.HandleAsync(connection, Cts.Token));
+
+            Mock.Get(connection).Verify(x => x.SendAsync(It.IsAny<Disconnected>(), Cts.Token));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldNotSwallowException_WhenInitializerFailed_AndSendingDisconnectedFailed(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            IConnection connection,
+            TestException exception,
+            ConnectionHandler sut)
+        {
+            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
+                .ThrowsAsync(exception);
+
+            Mock.Get(connection).Setup(x => x.SendAsync(It.IsAny<Disconnected>(), Cts.Token))
+                .ThrowsAsync(Create<Exception>());
+
+            await SwallowAnyAsync(
+                sut.HandleAsync(connection, Cts.Token));
+
+            Mock.Get(connection).Verify(x => x.SendAsync(It.IsAny<Disconnected>(), Cts.Token));
+            await AssertThrowsAsync(
+                () => sut.HandleAsync(connection, Cts.Token), exception);
+        }
+
+        [Theory, AutoMoqData]
         public async Task ShouldThrow_WhenStoreThrows(
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnectedClientStore> store,

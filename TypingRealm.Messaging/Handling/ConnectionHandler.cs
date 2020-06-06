@@ -36,7 +36,22 @@ namespace TypingRealm.Messaging.Handling
 
         public async Task HandleAsync(IConnection connection, CancellationToken cancellationToken)
         {
-            var connectedClient = await _connectionInitializer.ConnectAsync(connection, cancellationToken).ConfigureAwait(false);
+            ConnectedClient connectedClient;
+            try
+            {
+                connectedClient = await _connectionInitializer.ConnectAsync(connection, cancellationToken).ConfigureAwait(false);
+            }
+            catch
+            {
+                try
+                {
+                    await connection.SendAsync(new Disconnected($"Error during connection initialization."), cancellationToken)
+                        .ConfigureAwait(false);
+                } catch { }
+
+                throw;
+            }
+
             _connectedClients.Add(connectedClient);
 
             if (!_connectedClients.IsClientConnected(connectedClient.ClientId))
