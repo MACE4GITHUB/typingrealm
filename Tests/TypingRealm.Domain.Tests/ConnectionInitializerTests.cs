@@ -104,7 +104,7 @@ namespace TypingRealm.Domain.Tests
 
             var client = await sut.ConnectAsync(connection, Cts.Token);
 
-            Assert.Equal(player.GetUniquePlayerPosition(), client.Group);
+            Assert.Equal(player.LocationId, client.Group);
         }
     }
 }

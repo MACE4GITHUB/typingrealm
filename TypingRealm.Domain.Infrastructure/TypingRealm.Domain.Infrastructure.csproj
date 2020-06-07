@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Domain\TypingRealm.Domain.csproj" />
+    <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

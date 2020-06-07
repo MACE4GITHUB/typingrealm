@@ -35,7 +35,7 @@ namespace TypingRealm.Domain
             if (player == null)
                 throw new InvalidOperationException($"Could not connect: could not find player {playerId}.");
 
-            var group = player.GetUniquePlayerPosition();
+            var group = player.MovementComponent?.Road.RoadId.Value ?? player.LocationId.Value;
             return new ConnectedClient(playerId, connection, group, _updateDetector);
         }
     }

@@ -23,10 +23,8 @@ namespace TypingRealm.Domain.Movement
                 throw new InvalidOperationException("Player is not found.");
 
             var locationId = new LocationId(message.LocationId);
-            player.MoveToLocation(locationId);
+            player.MoveToLocation(locationId); // Messaging group will be updated by player itself.
             _players.Save(player);
-
-            sender.Group = player.GetUniquePlayerPosition();
 
             return default;
         }

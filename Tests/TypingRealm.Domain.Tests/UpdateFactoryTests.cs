@@ -63,7 +63,7 @@ namespace TypingRealm.Domain.Tests
                 .Returns(player);
 
             store.Setup(x => x.FindInGroups(It.Is<IEnumerable<string>>(
-                en => en.Single() == player.GetUniquePlayerPosition())))
+                en => en.Single() == player.LocationId)))
                 .Returns(connectedClients);
 
             var update = (Update)sut.GetUpdateFor(player.PlayerId);

@@ -19,12 +19,6 @@ namespace TypingRealm.Domain.Tests
         // TODO: Test constructor and setting all fields properly.
 
         [Theory, RoamingAutoDomainData]
-        public void ShouldGetUniquePlayerPosition(Player player)
-        {
-            Assert.Equal($"l_{player.LocationId}", player.GetUniquePlayerPosition());
-        }
-
-        [Theory, RoamingAutoDomainData]
         public void MoveToLocation_ShouldChangeLocation(
             [Frozen]Mock<ILocationStore> store,
             LocationId locationId,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TypingRealm.Domain.Movement;
+using TypingRealm.Messaging.Connecting;
 
 namespace TypingRealm.Domain.Infrastructure
 {
@@ -10,6 +11,7 @@ namespace TypingRealm.Domain.Infrastructure
             = new Dictionary<PlayerId, Player>();
 
         public InMemoryPlayerRepository(
+            IConnectedClientStore connectedClients,
             ILocationStore locationStore,
             IRoadStore roadStore)
         {
@@ -19,7 +21,8 @@ namespace TypingRealm.Domain.Infrastructure
                 new LocationId("village"),
                 locationStore,
                 roadStore,
-                null));
+                null,
+                group => connectedClients.Find("ivan-id")!.Group = group));
 
             _playerIdToPlayer.Add(new PlayerId("john-id"), new Player(
                 new PlayerId("john-id"),
@@ -27,7 +30,8 @@ namespace TypingRealm.Domain.Infrastructure
                 new LocationId("village"),
                 locationStore,
                 roadStore,
-                null));
+                null,
+                group => connectedClients.Find("john-id")!.Group = group));
         }
 
         public Player? Find(PlayerId playerId)

@@ -6,6 +6,7 @@ namespace TypingRealm.Domain
 {
     public sealed class Player
     {
+        private readonly Action<string> _updateMessagingGroup;
         private readonly ILocationStore _locationStore;
         private readonly IRoadStore _roadStore;
 
@@ -15,25 +16,48 @@ namespace TypingRealm.Domain
             LocationId locationId,
             ILocationStore locationStore,
             IRoadStore roadStore,
-            PlayerId? combatEnemyId)
+            PlayerId? combatEnemyId,
+            Action<string> updateMessagingGroup)
         {
             PlayerId = playerId;
             Name = name;
-            LocationId = locationId;
+            _locationId = locationId;
             _locationStore = locationStore;
             _roadStore = roadStore;
             CombatEnemyId = combatEnemyId;
+            _updateMessagingGroup = updateMessagingGroup;
         }
 
         public PlayerId PlayerId { get; }
         public PlayerName Name { get; }
-        public LocationId LocationId { get; private set; }
+
+        private LocationId _locationId;
+        public LocationId LocationId
+        {
+            get => _locationId;
+            private set
+            {
+                _locationId = value;
+                _updateMessagingGroup(PlayerUniquePosition);
+            }
+        }
 
         // Combat.
         public PlayerId? CombatEnemyId { get; private set; }
 
         // Movement.
-        public MovementComponent? MovementComponent { get; private set; }
+        private MovementComponent? _movementComponent;
+        public MovementComponent? MovementComponent
+        {
+            get => _movementComponent;
+            private set
+            {
+                _movementComponent = value;
+
+                // RoadId if not null, LocationId if null.
+                _updateMessagingGroup(PlayerUniquePosition);
+            }
+        }
 
         public void MoveToLocation(LocationId locationId)
         {
@@ -121,9 +145,6 @@ namespace TypingRealm.Domain
             playerRepository.Save(enemy);
         }
 
-        public string GetUniquePlayerPosition()
-        {
-            return $"l_{LocationId}";
-        }
+        private string PlayerUniquePosition => MovementComponent?.Road.RoadId.Value ?? LocationId.Value;
     }
 }
