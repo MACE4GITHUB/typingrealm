@@ -29,7 +29,6 @@ namespace TypingRealm.Domain.Tests
 
         [Theory]
         [InlineData(typeof(IConnectionInitializer), typeof(ConnectionInitializer))]
-        [InlineData(typeof(IPlayerFactory), typeof(PlayerFactory))]
         [InlineData(typeof(IUpdater), typeof(Updater))] // UseUpdateFactory.
         [InlineData(typeof(IUpdateFactory), typeof(UpdateFactory))]
         [InlineData(typeof(IMessageHandler<MoveToLocation>), typeof(MoveToLocationHandler))]

@@ -7,7 +7,8 @@ namespace TypingRealm.Domain.Movement
 {
     public sealed class MovementHandler
         : IMessageHandler<EnterRoad>,
-        IMessageHandler<Move>
+        IMessageHandler<Move>,
+        IMessageHandler<TurnAround>
     {
         private readonly IPlayerRepository _playerRepository;
 
@@ -30,7 +31,17 @@ namespace TypingRealm.Domain.Movement
         {
             var player = _playerRepository.Find(new PlayerId(sender.ClientId));
 
-            player!.Move(message.Distance);
+            player!.Move(new Distance(message.Distance));
+
+            _playerRepository.Save(player);
+            return default;
+        }
+
+        public ValueTask HandleAsync(ConnectedClient sender, TurnAround message, CancellationToken cancellationToken)
+        {
+            var player = _playerRepository.Find(new PlayerId(sender.ClientId));
+
+            player!.TurnAround();
 
             _playerRepository.Save(player);
             return default;

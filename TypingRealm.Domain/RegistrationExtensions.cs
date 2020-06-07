@@ -12,7 +12,6 @@ namespace TypingRealm.Domain
         public static IServiceCollection AddDomain(this IServiceCollection services)
         {
             services.AddTransient<IConnectionInitializer, ConnectionInitializer>();
-            services.AddTransient<IPlayerFactory, PlayerFactory>();
             services.UseUpdateFactory<UpdateFactory>();
 
             services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
@@ -21,6 +20,7 @@ namespace TypingRealm.Domain
 
             services.RegisterHandler<EnterRoad, MovementHandler>();
             services.RegisterHandler<Move, MovementHandler>();
+            services.RegisterHandler<TurnAround, MovementHandler>();
 
             return services;
         }

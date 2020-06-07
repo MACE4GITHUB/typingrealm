@@ -2,18 +2,15 @@
 {
     public sealed class Road
     {
-        public Road(
-            LocationId fromLocationId,
-            LocationId toLocationId,
-            int distance)
+        public Road(RoadId roadId, RoadPoint fromPoint, RoadPoint toPoint)
         {
-            FromLocationId = fromLocationId;
-            ToLocationId = toLocationId;
-            Distance = distance;
+            RoadId = roadId;
+            FromPoint = fromPoint;
+            ToPoint = toPoint;
         }
 
-        public LocationId FromLocationId { get; }
-        public LocationId ToLocationId { get; }
-        public int Distance { get; }
+        public RoadId RoadId { get; }
+        public RoadPoint FromPoint { get; }
+        public RoadPoint ToPoint { get; }
     }
 }

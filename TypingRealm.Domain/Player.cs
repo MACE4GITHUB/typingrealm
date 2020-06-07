@@ -14,8 +14,6 @@ namespace TypingRealm.Domain
             PlayerName name,
             LocationId locationId,
             ILocationStore locationStore,
-            RoadId? roadId,
-            int? distance,
             IRoadStore roadStore,
             PlayerId? combatEnemyId)
         {
@@ -23,8 +21,6 @@ namespace TypingRealm.Domain
             Name = name;
             LocationId = locationId;
             _locationStore = locationStore;
-            RoadId = roadId;
-            Distance = distance;
             _roadStore = roadStore;
             CombatEnemyId = combatEnemyId;
         }
@@ -37,8 +33,7 @@ namespace TypingRealm.Domain
         public PlayerId? CombatEnemyId { get; private set; }
 
         // Movement.
-        public RoadId? RoadId { get; private set; }
-        public int? Distance { get; private set; }
+        public MovementComponent? MovementComponent { get; private set; }
 
         public void MoveToLocation(LocationId locationId)
         {
@@ -60,40 +55,41 @@ namespace TypingRealm.Domain
 
         public void EnterRoad(RoadId roadId)
         {
-            if (RoadId != null)
+            if (MovementComponent != null)
                 throw new InvalidOperationException("Already at road.");
 
             var road = _roadStore.Find(roadId);
             if (road == null)
                 throw new InvalidOperationException("Road does not exist.");
 
-            if (road.FromLocationId != LocationId)
-                throw new InvalidOperationException("Cannot move to this road from this location.");
-
-            RoadId = roadId;
-            Distance = 0;
+            MovementComponent = MovementComponent.EnterRoadFrom(road, LocationId);
         }
 
-        public void Move(int distance)
+        public void Move(Distance distance)
         {
-            if (RoadId == null)
+            if (MovementComponent == null)
                 throw new InvalidOperationException("Not at road.");
 
-            var road = _roadStore.Find(RoadId);
-            if (road == null)
-                throw new InvalidOperationException("Road does not exist.");
+            MovementComponent = MovementComponent.Move(distance);
 
-            if (Distance + distance > road.Distance)
-                throw new InvalidOperationException("Can't move so much.");
-
-            Distance += distance;
-
-            if (Distance == road.Distance)
+            if (MovementComponent.HasArrived)
             {
-                // Arrive.
-                Distance = null;
-                RoadId = null;
-                LocationId = road.ToLocationId;
+                LocationId = MovementComponent.ArrivalLocationId;
+                MovementComponent = null;
+            }
+        }
+
+        public void TurnAround()
+        {
+            if (MovementComponent == null)
+                throw new InvalidOperationException("Not at road.");
+
+            MovementComponent = MovementComponent.TurnAround();
+
+            if (MovementComponent.HasArrived)
+            {
+                LocationId = MovementComponent.ArrivalLocationId;
+                MovementComponent = null;
             }
         }
 

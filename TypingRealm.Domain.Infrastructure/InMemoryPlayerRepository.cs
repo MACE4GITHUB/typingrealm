@@ -9,22 +9,24 @@ namespace TypingRealm.Domain.Infrastructure
         private readonly Dictionary<PlayerId, Player> _playerIdToPlayer
             = new Dictionary<PlayerId, Player>();
 
-        public InMemoryPlayerRepository(IPlayerFactory playerFactory)
+        public InMemoryPlayerRepository(
+            ILocationStore locationStore,
+            IRoadStore roadStore)
         {
-            _playerIdToPlayer.Add(new PlayerId("ivan-id"), playerFactory.Create(
+            _playerIdToPlayer.Add(new PlayerId("ivan-id"), new Player(
                 new PlayerId("ivan-id"),
                 new PlayerName("ivan"),
                 new LocationId("village"),
-                null,
-                null,
+                locationStore,
+                roadStore,
                 null));
 
-            _playerIdToPlayer.Add(new PlayerId("john-id"), playerFactory.Create(
+            _playerIdToPlayer.Add(new PlayerId("john-id"), new Player(
                 new PlayerId("john-id"),
                 new PlayerName("john"),
                 new LocationId("village"),
-                null,
-                null,
+                locationStore,
+                roadStore,
                 null));
         }
 

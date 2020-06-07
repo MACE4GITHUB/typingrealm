@@ -9,13 +9,13 @@ namespace TypingRealm.Domain.Infrastructure
             = new Dictionary<RoadId, Road>
             {
                 [new RoadId("village-to-forest")] = new Road(
-                    new LocationId("village"),
-                    new LocationId("forest"),
-                    100),
-                [new RoadId("forest-to-village")] = new Road(
-                    new LocationId("forest"),
-                    new LocationId("village"),
-                    50)
+                    new RoadId("village-to-forest"),
+                    new RoadPoint(
+                        new LocationId("village"),
+                        new Distance(100)),
+                    new RoadPoint(
+                        new LocationId("forest"),
+                        new Distance(50)))
             };
 
         public Road? Find(RoadId roadId)

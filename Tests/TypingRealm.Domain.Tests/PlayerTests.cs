@@ -16,26 +16,7 @@ namespace TypingRealm.Domain.Tests
             Fixture.Customize(new DomainCustomization());
         }
 
-        [Theory, InBattleAutoDomainData]
-        public void ShouldSetFields(
-            PlayerId playerId,
-            PlayerName name,
-            LocationId locationId,
-            ILocationStore locationStore,
-            PlayerId combatEnemyId)
-        {
-            var player = new Player(playerId, name, locationId, locationStore, null, null, null!, combatEnemyId);
-
-            Assert.Equal(playerId, player.PlayerId);
-            Assert.Equal(name, player.Name);
-            Assert.Equal(locationId, player.LocationId);
-            Assert.Equal(locationStore, GetPrivateField(player, "_locationStore"));
-            Assert.Equal(combatEnemyId, player.CombatEnemyId);
-
-            // Should allow null CombatEnemyId.
-            player = new Player(playerId, name, locationId, locationStore, null, null, null!, null);
-            Assert.Null(player.CombatEnemyId);
-        }
+        // TODO: Test constructor and setting all fields properly.
 
         [Theory, RoamingAutoDomainData]
         public void ShouldGetUniquePlayerPosition(Player player)

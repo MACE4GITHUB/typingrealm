@@ -13,7 +13,7 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(8, typeof(Join).Assembly.GetTypes().Count(
+            Assert.Equal(9, typeof(Join).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -101,6 +101,12 @@ namespace TypingRealm.Domain.Tests
         public void SurrenderMessage()
         {
             AssertSerializable<Surrender>();
+        }
+
+        [Fact]
+        public void TurnAroundMessage()
+        {
+            AssertSerializable<TurnAround>();
         }
 
         [Theory, AutoMoqData]
