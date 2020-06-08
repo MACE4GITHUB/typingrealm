@@ -26,6 +26,7 @@ namespace TypingRealm.Domain.Tests
             var asmMessages = typeof(Join).Assembly
                 .GetTypes()
                 .Where(x => x.GetCustomAttribute<MessageAttribute>() != null)
+                .OrderBy(x => x.FullName)
                 .ToList();
 
             Assert.Equal(asmMessages, messages);

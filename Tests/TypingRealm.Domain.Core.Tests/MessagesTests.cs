@@ -138,5 +138,7 @@ namespace TypingRealm.Domain.Tests
             sut = new Move(distance);
             Assert.Equal(distance, sut.Distance);
         }
+
+        // TODO: Write tests for MovementUpdate and PlayerPosition messages.
     }
 }
