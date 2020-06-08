@@ -4,6 +4,13 @@ using TypingRealm.Domain.Movement;
 
 namespace TypingRealm.Domain
 {
+    public enum PlayerState
+    {
+        AtLocation = 1,
+        MovingOnRoad = 2,
+        InCombat = 3
+    }
+
     public sealed class Player
     {
         private readonly Action<string> _updateMessagingGroup;
@@ -26,7 +33,13 @@ namespace TypingRealm.Domain
             _roadStore = roadStore;
             CombatEnemyId = combatEnemyId;
             _updateMessagingGroup = updateMessagingGroup;
+
+            State = PlayerState.AtLocation;
+            if (CombatEnemyId != null)
+                State = PlayerState.InCombat;
         }
+
+        public PlayerState State { get; private set; }
 
         public PlayerId PlayerId { get; }
         public PlayerName Name { get; }
@@ -61,6 +74,9 @@ namespace TypingRealm.Domain
 
         public void MoveToLocation(LocationId locationId)
         {
+            if (State != PlayerState.AtLocation)
+                throw new InvalidOperationException("Player is not in AtLocation state.");
+
             if (LocationId == locationId)
                 throw new InvalidOperationException($"Player {PlayerId} is already at location {LocationId}. Cannot move to the same location.");
 
@@ -79,6 +95,9 @@ namespace TypingRealm.Domain
 
         public void EnterRoad(RoadId roadId)
         {
+            if (State != PlayerState.AtLocation)
+                throw new InvalidOperationException("Player can enter road only from location.");
+
             if (MovementComponent != null)
                 throw new InvalidOperationException("Already at road.");
 
@@ -87,10 +106,15 @@ namespace TypingRealm.Domain
                 throw new InvalidOperationException("Road does not exist.");
 
             MovementComponent = MovementComponent.EnterRoadFrom(road, LocationId);
+
+            State = PlayerState.MovingOnRoad;
         }
 
         public void Move(Distance distance)
         {
+            if (State != PlayerState.MovingOnRoad)
+                throw new InvalidOperationException("Not at road.");
+
             if (MovementComponent == null)
                 throw new InvalidOperationException("Not at road.");
 
@@ -100,11 +124,16 @@ namespace TypingRealm.Domain
             {
                 LocationId = MovementComponent.ArrivalLocationId;
                 MovementComponent = null;
+
+                State = PlayerState.AtLocation;
             }
         }
 
         public void TurnAround()
         {
+            if (State != PlayerState.MovingOnRoad)
+                throw new InvalidOperationException("Not at road.");
+
             if (MovementComponent == null)
                 throw new InvalidOperationException("Not at road.");
 
@@ -114,11 +143,18 @@ namespace TypingRealm.Domain
             {
                 LocationId = MovementComponent.ArrivalLocationId;
                 MovementComponent = null;
+
+                State = PlayerState.AtLocation;
             }
         }
 
         public void Attack(Player player)
         {
+            // Allows attacking from road as well.
+            // TODO: Check that attacked player is in the same vicinity.
+            if (State != PlayerState.AtLocation && State != PlayerState.MovingOnRoad)
+                throw new InvalidOperationException("Can attack another player only from location.");
+
             if (CombatEnemyId != null)
                 throw new InvalidOperationException("Attacker is already in battle.");
 
@@ -127,10 +163,15 @@ namespace TypingRealm.Domain
 
             CombatEnemyId = player.PlayerId;
             player.CombatEnemyId = PlayerId;
+
+            State = PlayerState.InCombat;
         }
 
         public void Surrender(IPlayerRepository playerRepository)
         {
+            if (State != PlayerState.InCombat)
+                throw new InvalidOperationException("Not in combat.");
+
             if (CombatEnemyId == null)
                 throw new InvalidOperationException("Can't surrender: not in battle.");
 
@@ -143,6 +184,9 @@ namespace TypingRealm.Domain
 
             playerRepository.Save(this);
             playerRepository.Save(enemy);
+
+            // TODO: Return to road if state was road prior to initiating combat.
+            State = PlayerState.AtLocation;
         }
 
         private string PlayerUniquePosition => MovementComponent?.Road.RoadId.Value ?? LocationId.Value;
