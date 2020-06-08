@@ -6,14 +6,11 @@ namespace TypingRealm
     /// <summary>
     /// Helper class for easier implementation of Disposable classes that
     /// contain only managed resources.
-    /// Override <see cref="DisposeManagedResources"/> method and clear all
-    /// managed resources inside it.
-    /// If you want to have a custom <see cref="DisposeAsync"/> implementation -
-    /// override <see cref="DisposeManagedResourcesAsync"/> method as well and
-    /// do NOT call "base.DisposeManagedResourcesAsync" inside it as the default
-    /// implementation calls synchronous version.
+    /// Override <see cref="DisposeManagedResources"/> and
+    /// <see cref="DisposeManagedResourcesAsync"/> methods and clear all managed
+    /// resources inside it.
     /// Use <see cref="ThrowIfDisposed"/> method on all methods that shouldn't
-    /// work when the object is already disposed.
+    /// work when the object has already been disposed.
     /// </summary>
 #pragma warning disable S3881, CA1063, CA1816 // Disposable pattern.
     public abstract class ManagedDisposable : IDisposable, IAsyncDisposable
@@ -49,6 +46,9 @@ namespace TypingRealm
     }
 #pragma warning restore S3881, CA1063, CA1816
 
+    /// <summary>
+    /// Use this class when resources are disposed synchronously.
+    /// </summary>
     public abstract class SyncManagedDisposable : ManagedDisposable
     {
         protected override ValueTask DisposeManagedResourcesAsync()
@@ -58,6 +58,9 @@ namespace TypingRealm
         }
     }
 
+    /// <summary>
+    /// Use this class when resources are disposed asynchronously.
+    /// </summary>
     public abstract class AsyncManagedDisposable : ManagedDisposable
     {
         protected override void DisposeManagedResources()
