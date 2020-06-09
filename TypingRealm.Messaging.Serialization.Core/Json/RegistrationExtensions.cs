@@ -9,9 +9,12 @@ namespace TypingRealm.Messaging.Serialization.Json
         /// <see cref="IMessageTypeCache"/>. <see cref="Serialization.RegistrationExtensions.AddSerializationCore(IServiceCollection)"/>
         /// should be called first.
         /// </summary>
-        public static IServiceCollection AddJson(this IServiceCollection services)
+        public static MessageTypeCacheBuilder AddJson(this MessageTypeCacheBuilder builder)
         {
-            return services.AddTransient<IJsonConnectionFactory, JsonConnectionFactory>();
+            builder.Services.AddTransient<IJsonConnectionFactory, JsonConnectionFactory>();
+            builder.AddMessageType(typeof(JsonSerializedMessage));
+
+            return builder;
         }
     }
 }

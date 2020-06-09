@@ -35,6 +35,7 @@ namespace TypingRealm.TestClient
             var provider = new ServiceCollection()
                 .AddSerializationCore()
                 .AddDomainCore()
+                .AddJson()
                 .Services
                 .AddProtobuf()
                 .BuildServiceProvider();
@@ -52,10 +53,13 @@ namespace TypingRealm.TestClient
             using var client = new TcpClient();
             await client.ConnectAsync("127.0.0.1", 30100).ConfigureAwait(false);
 
+            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
+
             using var stream = client.GetStream();
             using var sendLock = new SemaphoreSlimLock();
             using var receiveLock = new SemaphoreSlimLock();
             var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
+                .WithJson(jsonConnectionFactory)
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
@@ -66,8 +70,8 @@ namespace TypingRealm.TestClient
             var provider = new ServiceCollection()
                 .AddSerializationCore()
                 .AddDomainCore()
-                .Services
                 .AddJson()
+                .Services
                 .BuildServiceProvider();
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()

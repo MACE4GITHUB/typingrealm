@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
+using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
 namespace TypingRealm.TcpServer
@@ -16,6 +17,7 @@ namespace TypingRealm.TcpServer
         private readonly ILogger<TcpServer> _logger;
         private readonly IConnectionHandler _connectionHandler;
         private readonly IProtobufConnectionFactory _protobufConnectionFactory;
+        private readonly IJsonConnectionFactory _jsonConnectionFactory;
         private readonly TcpListener _tcpListener;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private readonly List<Task> _connectionProcessors = new List<Task>();
@@ -26,11 +28,13 @@ namespace TypingRealm.TcpServer
             int port,
             ILogger<TcpServer> logger,
             IConnectionHandler connectionHandler,
-            IProtobufConnectionFactory protobufConnectionFactory)
+            IProtobufConnectionFactory protobufConnectionFactory,
+            IJsonConnectionFactory jsonConnectionFactory)
         {
             _logger = logger;
             _connectionHandler = connectionHandler;
             _protobufConnectionFactory = protobufConnectionFactory;
+            _jsonConnectionFactory = jsonConnectionFactory;
             _tcpListener = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
         }
 
@@ -118,6 +122,7 @@ namespace TypingRealm.TcpServer
                 using var sendLock = new SemaphoreSlimLock();
                 using var receiveLock = new SemaphoreSlimLock();
                 var connection = _protobufConnectionFactory.CreateProtobufConnection(stream)
+                    .WithJson(_jsonConnectionFactory)
                     .WithLocking(sendLock, receiveLock);
 
                 await _connectionHandler

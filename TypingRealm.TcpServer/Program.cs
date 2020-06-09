@@ -6,6 +6,7 @@ using TypingRealm.Domain;
 using TypingRealm.Domain.Infrastructure;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
+using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
 namespace TypingRealm.TcpServer
@@ -19,6 +20,7 @@ namespace TypingRealm.TcpServer
             var provider = new ServiceCollection()
                 .AddSerializationCore()
                 .AddDomainCore()
+                .AddJson()
                 .Services
                 .AddProtobuf()
                 .RegisterMessaging()
@@ -50,6 +52,7 @@ namespace TypingRealm.TcpServer
                 port,
                 provider.GetRequiredService<ILogger<TcpServer>>(),
                 provider.GetRequiredService<IConnectionHandler>(),
-                provider.GetRequiredService<IProtobufConnectionFactory>()));
+                provider.GetRequiredService<IProtobufConnectionFactory>(),
+                provider.GetRequiredService<IJsonConnectionFactory>()));
     }
 }

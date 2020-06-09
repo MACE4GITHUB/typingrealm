@@ -8,14 +8,27 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
     public class RegistrationExtensionsTests : TestsBase
     {
         [Fact]
-        public void ShouldRegisterJsonConnectionFactory()
+        public void AddJson_ShouldRegisterJsonConnectionFactory()
         {
             var provider = new ServiceCollection()
-                .AddSerializationCore().Services
+                .AddSerializationCore()
                 .AddJson()
-                .BuildServiceProvider();
+                .Services.BuildServiceProvider();
 
             provider.AssertRegisteredTransient<IJsonConnectionFactory, JsonConnectionFactory>();
+        }
+
+        [Fact]
+        public void AddJson_ShouldAddJsonSerializedMessageToCache()
+        {
+            var provider = new ServiceCollection()
+                .AddSerializationCore()
+                .AddJson()
+                .Services.BuildServiceProvider();
+
+            var cache = provider.GetRequiredService<IMessageTypeCache>();
+
+            Assert.NotNull(cache.GetTypeId(typeof(JsonSerializedMessage)));
         }
     }
 }

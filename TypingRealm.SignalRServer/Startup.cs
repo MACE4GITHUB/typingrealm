@@ -20,8 +20,8 @@ namespace TypingRealm.SignalRServer
 
             services.AddSerializationCore()
                 .AddDomainCore()
-                .Services
                 .AddJson()
+                .Services
                 .RegisterMessaging()
                 .AddDomain()
                 .AddDomainInfrastructure();
