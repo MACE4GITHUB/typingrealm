@@ -11,7 +11,8 @@ namespace TypingRealm.Messaging.Serialization
         /// </summary>
         /// <param name="builder">Cache builder where to add message types.</param>
         /// <param name="assembly">Assembly to scan for message types.</param>
-        public static MessageTypeCacheBuilder AddMessageTypesFromAssembly(this MessageTypeCacheBuilder builder, Assembly assembly)
+        public static MessageTypeCacheBuilder AddMessageTypesFromAssembly(
+            this MessageTypeCacheBuilder builder, Assembly assembly)
         {
             foreach (var type in assembly.GetTypes().Where(t => t.GetCustomAttribute<MessageAttribute>() != null))
             {
