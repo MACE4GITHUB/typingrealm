@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Kernel;
+using TypingRealm.Messaging;
 using Xunit;
 
 namespace TypingRealm.Testing
@@ -40,13 +41,28 @@ namespace TypingRealm.Testing
 
         protected void AssertSerializable<T>()
         {
+            // This will use default parameterless constructor and assign all properties.
             var message = Create<T>();
+
+            // This will throw if there's no default parameterless constructor.
             var result = JsonSerializer.Deserialize<T>(
                 JsonSerializer.Serialize(message));
 
-            foreach (var property in typeof(T).GetProperties())
+            AssertRecursivePropertiesEqual(message!, result!);
+        }
+
+        private void AssertRecursivePropertiesEqual(object expectedMessage, object actualMessage)
+        {
+            foreach (var property in expectedMessage.GetType().GetProperties())
             {
-                Assert.Equal(property.GetValue(message), property.GetValue(result));
+                var propertyType = property.PropertyType;
+
+                if (propertyType.GetCustomAttribute<MessageAttribute>() != null)
+                {
+                    AssertRecursivePropertiesEqual(
+                        property.GetValue(expectedMessage)!,
+                        property.GetValue(actualMessage)!);
+                }
             }
         }
 

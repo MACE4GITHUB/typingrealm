@@ -15,65 +15,48 @@ namespace TypingRealm.Messaging.Tests
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
-        [Fact]
-        public void AnnounceMessage()
+        [Theory, AutoMoqData]
+        public void AnnounceMessage(string message)
         {
             AssertSerializable<Announce>();
 
-            var sut = new Announce
-            {
-                Message = "message"
-            };
-            Assert.Equal("message", sut.Message);
-
-            sut = new Announce("message");
-            Assert.Equal("message", sut.Message);
+            var sut = new Announce(message);
+            Assert.Equal(message, sut.Message);
         }
 
-        [Fact]
-        public void DisconnectedMessage()
+        [Theory, AutoMoqData]
+        public void DisconnectedMessage(string reason)
         {
             AssertSerializable<Disconnected>();
 
-            var sut = new Disconnected
-            {
-                Reason = "reason"
-            };
-            Assert.Equal("reason", sut.Reason);
-
-            sut = new Disconnected("reason");
-            Assert.Equal("reason", sut.Reason);
+            var sut = new Disconnected(reason);
+            Assert.Equal(reason, sut.Reason);
         }
 
         [Fact]
         public void DisconnectMessage()
         {
             AssertSerializable<Disconnect>();
-
-            _ = new Disconnect();
         }
 
-        [Fact]
-        public void ConnectMessage()
+        [Theory, AutoMoqData]
+        public void ConnectMessage(
+            string clientId,
+            string group)
         {
             Assert.NotNull(Connect.DefaultGroup);
             AssertSerializable<Connect>();
 
-            var sut = new Connect
-            {
-                ClientId = "clientId",
-                Group = "group"
-            };
-            Assert.Equal("clientId", sut.ClientId);
-            Assert.Equal("group", sut.Group);
-
-            sut = new Connect("clientId");
-            Assert.Equal("clientId", sut.ClientId);
+            var sut = new Connect(clientId);
+            Assert.Equal(clientId, sut.ClientId);
             Assert.Equal(Connect.DefaultGroup, sut.Group);
 
-            sut = new Connect("clientId", "group");
-            Assert.Equal("clientId", sut.ClientId);
-            Assert.Equal("group", sut.Group);
+            sut = new Connect(clientId, group);
+            Assert.Equal(clientId, sut.ClientId);
+            Assert.Equal(group, sut.Group);
+
+            sut = new Connect();
+            Assert.Equal(Connect.DefaultGroup, sut.Group);
         }
     }
 }
