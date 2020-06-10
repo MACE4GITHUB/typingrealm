@@ -13,7 +13,7 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(11, typeof(Join).Assembly.GetTypes().Count(
+            Assert.Equal(12, typeof(Join).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
