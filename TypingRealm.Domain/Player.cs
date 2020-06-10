@@ -112,6 +112,14 @@ namespace TypingRealm.Domain
             if (road == null)
                 throw new InvalidOperationException("Road does not exist.");
 
+            // Check that current location allows movement to this road.
+            var location = _locationStore.Find(LocationId);
+            if (location == null)
+                throw new InvalidOperationException("Current location does not exist.");
+
+            if (!location.Roads.Contains(roadId))
+                throw new InvalidOperationException("Cannot move to this road from the current location.");
+
             MovementComponent = MovementComponent.EnterRoadFrom(road, LocationId);
 
             State = PlayerState.MovingOnRoad;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TypingRealm.Domain.Movement;
 
 namespace TypingRealm.Domain.Infrastructure
@@ -13,16 +14,21 @@ namespace TypingRealm.Domain.Infrastructure
                 {
                     new LocationId("old house"),
                     new LocationId("marketplace")
+                }, new[]
+                {
+                    new RoadId("village-to-forest")
                 }),
                 [new LocationId("old house")] = new Location(new[]
                 {
                     new LocationId("village")
-                }),
+                }, Enumerable.Empty<RoadId>()),
                 [new LocationId("marketplace")] = new Location(new[]
                 {
                     new LocationId("village")
-                }),
-                [new LocationId("forest")] = new Location(Array.Empty<LocationId>())
+                }, Enumerable.Empty<RoadId>()),
+                [new LocationId("forest")] = new Location(
+                    Array.Empty<LocationId>(),
+                    Enumerable.Empty<RoadId>())
             };
 
         public Location? Find(LocationId locationId)
