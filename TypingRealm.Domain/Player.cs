@@ -72,6 +72,13 @@ namespace TypingRealm.Domain
             }
         }
 
+        public void TeleportToLocation(LocationId locationId)
+        {
+            // Test method for TeleportPlayerToLocation message.
+            // TODO: Remove, refactor or protect this method validating invariants.
+            LocationId = locationId;
+        }
+
         public void MoveToLocation(LocationId locationId)
         {
             if (State != PlayerState.AtLocation)

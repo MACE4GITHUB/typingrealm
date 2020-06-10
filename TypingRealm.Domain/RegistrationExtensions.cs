@@ -22,6 +22,8 @@ namespace TypingRealm.Domain
             services.RegisterHandler<Move, MovementHandler>();
             services.RegisterHandler<TurnAround, MovementHandler>();
 
+            services.RegisterHandler<TeleportPlayerToLocation, TeleportPlayerToLocationHandler>();
+
             return services;
         }
     }

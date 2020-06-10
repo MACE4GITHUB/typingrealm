@@ -122,5 +122,17 @@ namespace TypingRealm.Domain.Tests
             Assert.Equal(progress, sut.Progress);
             Assert.Equal(isMovingForward, sut.IsMovingForward);
         }
+
+        [Theory, AutoMoqData]
+        public void TeleportPlayerToLocationMessage(
+            string playerId,
+            string locationId)
+        {
+            AssertSerializable<TeleportPlayerToLocation>();
+
+            var sut = new TeleportPlayerToLocation(playerId, locationId);
+            Assert.Equal(playerId, sut.PlayerId);
+            Assert.Equal(locationId, sut.LocationId);
+        }
     }
 }
