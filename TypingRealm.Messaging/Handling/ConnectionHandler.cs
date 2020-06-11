@@ -55,16 +55,21 @@ namespace TypingRealm.Messaging.Handling
             _connectedClients.Add(connectedClient);
 
             if (!_connectedClients.IsClientConnected(connectedClient.ClientId))
-                throw new InvalidOperationException("Client already connected.");
+                throw new InvalidOperationException("Client was not added correctly.");
 
             await TrySendPendingUpdates(connectedClient.Group, cancellationToken).ConfigureAwait(false);
             while (_connectedClients.IsClientConnected(connectedClient.ClientId))
             {
-                var message = await connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
-
                 try
                 {
+                    var message = await connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
+
                     await DispatchMessageAsync(connectedClient, message, cancellationToken).ConfigureAwait(false);
+                }
+                catch
+                {
+                    _connectedClients.Remove(connectedClient.ClientId);
+                    throw;
                 }
                 finally
                 {

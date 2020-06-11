@@ -133,7 +133,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldThrow_WhenClientAlreadyConnected(
+        public async Task ShouldThrow_WhenClientWasNotAdded(
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnectedClientStore> store,
             IConnection connection,
@@ -296,6 +296,61 @@ namespace TypingRealm.Messaging.Tests.Handling
 
             Cts.Cancel();
             await Assert.ThrowsAsync<OperationCanceledException>(() => result);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldSendUpdateToGroup_WhenClientConnectionDiesUnexpectedly(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            [Frozen]Mock<IConnection> connection,
+            [Frozen]Mock<IConnectedClientStore> store,
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            [Frozen]Mock<IUpdater> updater,
+            ConnectedClient client,
+            ConnectedClient anotherClient,
+            ConnectionHandler sut)
+        {
+            connection.Setup(x => x.ReceiveAsync(Cts.Token))
+                .ThrowsAsync(Create<Exception>());
+
+            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), Cts.Token))
+                .ReturnsAsync(client);
+
+            var anotherGroup = Create<string>();
+            var popGroups = new HashSet<string> { anotherGroup };
+            store.Setup(x => x.FindInGroups(It.Is<IEnumerable<string>>(
+                y => y.Count() == 2
+                && y.Contains(anotherGroup)
+                && y.Contains(client.Group))))
+                .Returns(new[] { client, anotherClient });
+
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
+                .Callback<string>(group => popGroups.Add(group));
+            updateDetector.Setup(x => x.PopMarked())
+                .Returns(popGroups);
+
+            try { await sut.HandleAsync(connection.Object, Cts.Token); } catch { }
+
+            updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(2));
+            updater.Verify(x => x.SendUpdateAsync(anotherClient, Cts.Token), Times.Exactly(2));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldRemoveClientFromClientStore_WhenClientConnectionDiesUnexpectedly(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            [Frozen]Mock<IConnection> connection,
+            [Frozen]Mock<IConnectedClientStore> store,
+            ConnectedClient client,
+            ConnectionHandler sut)
+        {
+            connection.Setup(x => x.ReceiveAsync(Cts.Token))
+                .ThrowsAsync(Create<Exception>());
+
+            initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), Cts.Token))
+                .ReturnsAsync(client);
+
+            try { await sut.HandleAsync(connection.Object, Cts.Token); } catch { }
+
+            store.Verify(x => x.Remove(client.ClientId));
         }
 
         [Theory, AutoMoqData]
