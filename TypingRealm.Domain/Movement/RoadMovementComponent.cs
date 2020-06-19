@@ -2,9 +2,9 @@
 
 namespace TypingRealm.Domain.Movement
 {
-    public sealed class MovementComponent
+    public sealed class RoadMovementComponent
     {
-        private MovementComponent(Road road, Distance progress, RoadDirection direction)
+        private RoadMovementComponent(Road road, Distance progress, RoadDirection direction)
         {
             Road = road;
             Progress = progress;
@@ -19,7 +19,7 @@ namespace TypingRealm.Domain.Movement
         public Distance Distance => Road.GetDistanceFor(Direction);
         public bool HasArrived => Progress == Distance;
 
-        public MovementComponent Move(Distance progress)
+        public RoadMovementComponent Move(Distance progress)
         {
             var newProgress = Progress + progress;
             var distance = Road.GetDistanceFor(Direction);
@@ -27,18 +27,18 @@ namespace TypingRealm.Domain.Movement
             if (newProgress > distance)
                 throw new InvalidOperationException("Can't progress beyond distance.");
 
-            return new MovementComponent(
+            return new RoadMovementComponent(
                 Road, newProgress, Direction);
         }
 
-        public MovementComponent TurnAround()
+        public RoadMovementComponent TurnAround()
         {
             var newDirection = Direction.Flip();
 
             if (Progress.IsZero)
             {
                 var newDistance = Road.GetDistanceFor(newDirection);
-                return new MovementComponent(Road, newDistance, newDirection);
+                return new RoadMovementComponent(Road, newDistance, newDirection);
             }
 
             // Math.
@@ -53,17 +53,17 @@ namespace TypingRealm.Domain.Movement
                 var newProgressValue = newDistanceValue * newProgressPercentage / 100d;
                 var newProgress = new Distance(Round(newProgressValue));
 
-                return new MovementComponent(Road, newProgress, newDirection);
+                return new RoadMovementComponent(Road, newProgress, newDirection);
             }
         }
 
-        public static MovementComponent EnterRoadFrom(Road road, LocationId locationId)
+        public static RoadMovementComponent EnterRoadFrom(Road road, LocationId locationId)
         {
             if (road.FromPoint.LocationId == locationId)
-                return new MovementComponent(road, Distance.Zero, RoadDirection.Forward);
+                return new RoadMovementComponent(road, Distance.Zero, RoadDirection.Forward);
 
             if (road.ToPoint.LocationId == locationId)
-                return new MovementComponent(road, Distance.Zero, RoadDirection.Backward);
+                return new RoadMovementComponent(road, Distance.Zero, RoadDirection.Backward);
 
             throw new InvalidOperationException($"Can't enter road {road.RoadId} from location {locationId}.");
         }

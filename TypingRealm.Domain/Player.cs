@@ -56,8 +56,8 @@ namespace TypingRealm.Domain
         public PlayerId? CombatEnemyId { get; private set; }
 
         // Movement.
-        private MovementComponent? _movementComponent;
-        public MovementComponent? MovementComponent
+        private RoadMovementComponent? _movementComponent;
+        public RoadMovementComponent? MovementComponent
         {
             get => _movementComponent;
             private set
@@ -117,7 +117,7 @@ namespace TypingRealm.Domain
             if (!location.Roads.Contains(roadId))
                 throw new InvalidOperationException("Cannot move to this road from the current location.");
 
-            MovementComponent = MovementComponent.EnterRoadFrom(road, LocationId);
+            MovementComponent = RoadMovementComponent.EnterRoadFrom(road, LocationId);
 
             State = PlayerState.MovingOnRoad;
         }
