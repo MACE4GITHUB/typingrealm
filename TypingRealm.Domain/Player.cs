@@ -19,7 +19,6 @@ namespace TypingRealm.Domain
 
         public Player(
             PlayerId playerId,
-            PlayerName name,
             LocationId locationId,
             ILocationStore locationStore,
             IRoadStore roadStore,
@@ -27,7 +26,6 @@ namespace TypingRealm.Domain
             Action<string> updateMessagingGroup)
         {
             PlayerId = playerId;
-            Name = name;
             _locationId = locationId;
             _locationStore = locationStore;
             _roadStore = roadStore;
@@ -42,7 +40,6 @@ namespace TypingRealm.Domain
         public PlayerState State { get; private set; }
 
         public PlayerId PlayerId { get; }
-        public PlayerName Name { get; }
 
         private LocationId _locationId;
         public LocationId LocationId

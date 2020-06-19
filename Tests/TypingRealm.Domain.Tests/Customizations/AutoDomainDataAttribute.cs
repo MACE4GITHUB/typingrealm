@@ -41,12 +41,8 @@ namespace TypingRealm.Domain.Tests.Customizations
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Register(() => new PlayerName(CreateValidPlayerName(fixture)));
-        }
-
-        private string CreateValidPlayerName(IFixture fixture)
-        {
-            return fixture.Create<string>().Remove(15);
+            // Previously we set PlayerName constraints here.
+            // No specific domain customizations needed for now.
         }
     }
 
@@ -54,13 +50,7 @@ namespace TypingRealm.Domain.Tests.Customizations
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Register(() => new PlayerName(CreateValidPlayerName(fixture)));
             fixture.Customizations.Add(new PlayerNotInBattle());
-        }
-
-        private string CreateValidPlayerName(IFixture fixture)
-        {
-            return fixture.Create<string>().Remove(15);
         }
     }
 
@@ -69,12 +59,6 @@ namespace TypingRealm.Domain.Tests.Customizations
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Register(() => new PlayerName(CreateValidPlayerName(fixture)));
-        }
-
-        private string CreateValidPlayerName(IFixture fixture)
-        {
-            return fixture.Create<string>().Remove(15);
         }
     }
 }

@@ -17,7 +17,6 @@ namespace TypingRealm.Domain.Infrastructure
         {
             _playerIdToPlayer.Add(new PlayerId("ivan-id"), new Player(
                 new PlayerId("ivan-id"),
-                new PlayerName("ivan"),
                 new LocationId("village"),
                 locationStore,
                 roadStore,
@@ -26,7 +25,6 @@ namespace TypingRealm.Domain.Infrastructure
 
             _playerIdToPlayer.Add(new PlayerId("john-id"), new Player(
                 new PlayerId("john-id"),
-                new PlayerName("john"),
                 new LocationId("village"),
                 locationStore,
                 roadStore,
