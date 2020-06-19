@@ -5,14 +5,14 @@ using TypingRealm.Messaging;
 
 namespace TypingRealm.Domain.Movement
 {
-    public sealed class MovementHandler
+    public sealed class RoadMovementHandler
         : IMessageHandler<EnterRoad>,
         IMessageHandler<Move>,
         IMessageHandler<TurnAround>
     {
         private readonly IPlayerRepository _playerRepository;
 
-        public MovementHandler(IPlayerRepository playerRepository)
+        public RoadMovementHandler(IPlayerRepository playerRepository)
         {
             _playerRepository = playerRepository;
         }

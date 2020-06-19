@@ -18,9 +18,9 @@ namespace TypingRealm.Domain
             services.RegisterHandler<Attack, AttackHandler>();
             services.RegisterHandler<Surrender, SurrenderHandler>();
 
-            services.RegisterHandler<EnterRoad, MovementHandler>();
-            services.RegisterHandler<Move, MovementHandler>();
-            services.RegisterHandler<TurnAround, MovementHandler>();
+            services.RegisterHandler<EnterRoad, RoadMovementHandler>();
+            services.RegisterHandler<Move, RoadMovementHandler>();
+            services.RegisterHandler<TurnAround, RoadMovementHandler>();
 
             services.RegisterHandler<TeleportPlayerToLocation, TeleportPlayerToLocationHandler>();
 
