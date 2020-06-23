@@ -20,7 +20,6 @@ namespace TypingRealm.Domain.Infrastructure
                 new LocationId("village"),
                 locationStore,
                 roadStore,
-                null,
                 group => connectedClients.Find("ivan-id")!.Group = group));
 
             _playerIdToPlayer.Add(new PlayerId("john-id"), new Player(
@@ -28,7 +27,6 @@ namespace TypingRealm.Domain.Infrastructure
                 new LocationId("village"),
                 locationStore,
                 roadStore,
-                null,
                 group => connectedClients.Find("john-id")!.Group = group));
         }
 

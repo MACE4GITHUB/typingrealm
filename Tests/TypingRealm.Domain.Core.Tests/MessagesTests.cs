@@ -13,7 +13,7 @@ namespace TypingRealm.Domain.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(12, typeof(Join).Assembly.GetTypes().Count(
+            Assert.Equal(9, typeof(Join).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -45,30 +45,6 @@ namespace TypingRealm.Domain.Tests
             var sut = new Update(locationId, visiblePlayers);
             Assert.Equal(locationId, sut.LocationId);
             Assert.Equal(visiblePlayers, sut.VisiblePlayers);
-        }
-
-        [Theory, AutoMoqData]
-        public void CombatUpdateMessage(string enemyId)
-        {
-            AssertSerializable<CombatUpdate>();
-
-            var sut = new CombatUpdate(enemyId);
-            Assert.Equal(enemyId, sut.EnemyId);
-        }
-
-        [Theory, AutoMoqData]
-        public void AttackMessage(string playerId)
-        {
-            AssertSerializable<Attack>();
-
-            var sut = new Attack(playerId);
-            Assert.Equal(playerId, sut.PlayerId);
-        }
-
-        [Fact]
-        public void SurrenderMessage()
-        {
-            AssertSerializable<Surrender>();
         }
 
         [Fact]

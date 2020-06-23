@@ -7,8 +7,7 @@ namespace TypingRealm.Domain
     public enum PlayerState
     {
         AtLocation = 1,
-        MovingOnRoad = 2,
-        InCombat = 3
+        MovingOnRoad = 2
     }
 
     public sealed class Player
@@ -22,19 +21,15 @@ namespace TypingRealm.Domain
             LocationId locationId,
             ILocationStore locationStore,
             IRoadStore roadStore,
-            PlayerId? combatEnemyId,
             Action<string> updateMessagingGroup)
         {
             PlayerId = playerId;
             _locationId = locationId;
             _locationStore = locationStore;
             _roadStore = roadStore;
-            CombatEnemyId = combatEnemyId;
             _updateMessagingGroup = updateMessagingGroup;
 
             State = PlayerState.AtLocation;
-            if (CombatEnemyId != null)
-                State = PlayerState.InCombat;
         }
 
         public PlayerState State { get; private set; }
@@ -158,47 +153,6 @@ namespace TypingRealm.Domain
 
                 State = PlayerState.AtLocation;
             }
-        }
-
-        public void Attack(Player player)
-        {
-            // Allows attacking from road as well.
-            // TODO: Check that attacked player is in the same vicinity.
-            if (State != PlayerState.AtLocation && State != PlayerState.MovingOnRoad)
-                throw new InvalidOperationException("Can attack another player only from location.");
-
-            if (CombatEnemyId != null)
-                throw new InvalidOperationException("Attacker is already in battle.");
-
-            if (player.CombatEnemyId != null)
-                throw new InvalidOperationException("Enemy is already in battle.");
-
-            CombatEnemyId = player.PlayerId;
-            player.CombatEnemyId = PlayerId;
-
-            State = PlayerState.InCombat;
-        }
-
-        public void Surrender(IPlayerRepository playerRepository)
-        {
-            if (State != PlayerState.InCombat)
-                throw new InvalidOperationException("Not in combat.");
-
-            if (CombatEnemyId == null)
-                throw new InvalidOperationException("Can't surrender: not in battle.");
-
-            var enemy = playerRepository.Find(CombatEnemyId);
-            if (enemy == null)
-                throw new InvalidOperationException("Enemy is not found.");
-
-            CombatEnemyId = null;
-            enemy.CombatEnemyId = null;
-
-            playerRepository.Save(this);
-            playerRepository.Save(enemy);
-
-            // TODO: Return to road if state was road prior to initiating combat.
-            State = PlayerState.AtLocation;
         }
 
         private string PlayerUniquePosition => MovementComponent?.Road.RoadId.Value ?? LocationId.Value;

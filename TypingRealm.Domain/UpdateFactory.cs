@@ -27,9 +27,6 @@ namespace TypingRealm.Domain
             if (player == null)
                 throw new InvalidOperationException("Player is not found.");
 
-            if (player.CombatEnemyId != null)
-                return new CombatUpdate(player.CombatEnemyId);
-
             if (player.MovementComponent != null)
             {
                 var playerPositions = _connectedClients.FindInGroups(player.MovementComponent!.Road.RoadId)

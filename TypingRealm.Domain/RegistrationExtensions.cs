@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TypingRealm.Domain.Combat;
 using TypingRealm.Domain.Messages;
 using TypingRealm.Domain.Movement;
 using TypingRealm.Messaging;
@@ -15,8 +14,6 @@ namespace TypingRealm.Domain
             services.UseUpdateFactory<UpdateFactory>();
 
             services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
-            services.RegisterHandler<Attack, AttackHandler>();
-            services.RegisterHandler<Surrender, SurrenderHandler>();
 
             services.RegisterHandler<EnterRoad, RoadMovementHandler>();
             services.RegisterHandler<Move, RoadMovementHandler>();
