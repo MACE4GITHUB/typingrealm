@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using AutoFixture;
 using AutoFixture.Kernel;
 using TypingRealm.Domain.Movement;
 
@@ -15,7 +16,7 @@ namespace TypingRealm.Domain.Tests.Customizations
 
         public object Create(object request, ISpecimenContext context)
         {
-            return new Location(new[] { _locationId }, Enumerable.Empty<RoadId>());
+            return new Location(_locationId, new[] { _locationId }, Enumerable.Empty<RoadId>());
         }
     }
 }

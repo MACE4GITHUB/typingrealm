@@ -21,6 +21,8 @@ namespace TypingRealm.Domain
 
             services.RegisterHandler<TeleportPlayerToLocation, TeleportPlayerToLocationHandler>();
 
+            services.AddTransient<IPlayerPersistenceFactory, PlayerPersistenceFactory>();
+
             return services;
         }
     }

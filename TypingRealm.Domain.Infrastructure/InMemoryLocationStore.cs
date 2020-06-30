@@ -10,7 +10,9 @@ namespace TypingRealm.Domain.Infrastructure
         private readonly Dictionary<LocationId, Location> _locations
             = new Dictionary<LocationId, Location>
             {
-                [new LocationId("village")] = new Location(new[]
+                [new LocationId("village")] = new Location(
+                new LocationId("village"),
+                new[]
                 {
                     new LocationId("old house"),
                     new LocationId("marketplace")
@@ -18,15 +20,20 @@ namespace TypingRealm.Domain.Infrastructure
                 {
                     new RoadId("village-to-forest")
                 }),
-                [new LocationId("old house")] = new Location(new[]
+                [new LocationId("old house")] = new Location(
+                new LocationId("old house"),
+                new[]
                 {
                     new LocationId("village")
                 }, Enumerable.Empty<RoadId>()),
-                [new LocationId("marketplace")] = new Location(new[]
+                [new LocationId("marketplace")] = new Location(
+                new LocationId("marketplace"),
+                new[]
                 {
                     new LocationId("village")
                 }, Enumerable.Empty<RoadId>()),
                 [new LocationId("forest")] = new Location(
+                    new LocationId("forest"),
                     Array.Empty<LocationId>(),
                     Enumerable.Empty<RoadId>())
             };

@@ -4,7 +4,8 @@ namespace TypingRealm.Domain.Movement
 {
     public sealed class RoadMovementComponent
     {
-        private RoadMovementComponent(Road road, Distance progress, RoadDirection direction)
+        // HACK: This is internal and not private for Player to be able to reconstruct it from state.
+        public RoadMovementComponent(Road road, Distance progress, MovementDirection direction)
         {
             Road = road;
             Progress = progress;
@@ -13,7 +14,7 @@ namespace TypingRealm.Domain.Movement
 
         public Road Road { get; }
         public Distance Progress { get; }
-        public RoadDirection Direction { get; }
+        public MovementDirection Direction { get; }
 
         public LocationId ArrivalLocationId => Road.GetArrivalLocationId(Direction);
         public Distance Distance => Road.GetDistanceFor(Direction);
@@ -60,10 +61,10 @@ namespace TypingRealm.Domain.Movement
         public static RoadMovementComponent EnterRoadFrom(Road road, LocationId locationId)
         {
             if (road.FromPoint.LocationId == locationId)
-                return new RoadMovementComponent(road, Distance.Zero, RoadDirection.Forward);
+                return new RoadMovementComponent(road, Distance.Zero, MovementDirection.Forward);
 
             if (road.ToPoint.LocationId == locationId)
-                return new RoadMovementComponent(road, Distance.Zero, RoadDirection.Backward);
+                return new RoadMovementComponent(road, Distance.Zero, MovementDirection.Backward);
 
             throw new InvalidOperationException($"Can't enter road {road.RoadId} from location {locationId}.");
         }

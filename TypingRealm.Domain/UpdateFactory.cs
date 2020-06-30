@@ -25,30 +25,40 @@ namespace TypingRealm.Domain
             var playerId = new PlayerId(clientId);
             var player = _playerRepository.Find(playerId);
             if (player == null)
-                throw new InvalidOperationException("Player is not found.");
+                throw new InvalidOperationException($"Player {playerId} is not found.");
 
-            if (player.MovementComponent != null)
+            var state = player.GetState();
+
+            if (state.RoadMovementState != null)
             {
-                var playerPositions = _connectedClients.FindInGroups(player.MovementComponent!.Road.RoadId)
-                    .Select(client => _playerRepository.Find(new PlayerId(client.ClientId)))
-                    .Select(p => ToPlayerPosition(p!, player.MovementComponent.Direction));
+                var playerPositions = _connectedClients.FindInGroups(player.MessagingGroup)
+                    .Select(client =>
+                    {
+                        var playerId = new PlayerId(client.ClientId);
+                        var player = _playerRepository.Find(playerId);
+                        if (player == null)
+                            throw new InvalidOperationException($"Player {playerId} is not found.");
+
+                        return player;
+                    })
+                    .Select(p => ToPlayerPosition(p, state.RoadMovementState.MovementDirection));
 
                 return new MovementUpdate(
-                    player.MovementComponent.Road.RoadId,
-                    playerPositions.Single(p => p.PlayerId == player.PlayerId),
+                    state.RoadMovementState.RoadId,
+                    playerPositions.Single(p => p.PlayerId == state.PlayerId),
                     playerPositions.ToList());
             }
 
-            var visiblePlayerIds = _connectedClients.FindInGroups(player.LocationId)
+            var visiblePlayerIds = _connectedClients.FindInGroups(player.MessagingGroup)
                 .Select(client => client.ClientId)
                 .ToList();
 
-            return new Update(player.LocationId, visiblePlayerIds);
+            return new Update(player.MessagingGroup, visiblePlayerIds);
         }
 
-        private PlayerPosition ToPlayerPosition(Player player, RoadDirection currentDirection)
+        private PlayerPosition ToPlayerPosition(Player player, MovementDirection currentDirection)
         {
-            var movement = player.MovementComponent;
+            var movement = player.RoadMovementComponent;
             if (movement == null)
                 throw new InvalidOperationException("Player is not moving.");
 
@@ -58,7 +68,7 @@ namespace TypingRealm.Domain
             if (movement.Direction != currentDirection)
                 progress = movement.Road.GetDistanceFor(currentDirection) - new Distance((int)Math.Floor((double)progress.Value * movement.Road.GetDistanceFor(movement.Direction.Flip()).Value / distance.Value));
 
-            return new PlayerPosition(player.PlayerId, progress, movement.Direction == RoadDirection.Forward);
+            return new PlayerPosition(player.GetState().PlayerId, progress, movement.Direction == MovementDirection.Forward);
         }
     }
 }

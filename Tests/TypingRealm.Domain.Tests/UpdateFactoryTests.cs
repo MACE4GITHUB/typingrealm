@@ -43,12 +43,14 @@ namespace TypingRealm.Domain.Tests
             Player player,
             UpdateFactory sut)
         {
-            playerRepository.Setup(x => x.Find(player.PlayerId))
+            var state = player.GetState();
+
+            playerRepository.Setup(x => x.Find(state.PlayerId))
                 .Returns(player);
 
-            var update = (Update)sut.GetUpdateFor(player.PlayerId);
+            var update = (Update)sut.GetUpdateFor(state.PlayerId);
 
-            Assert.Equal(player.LocationId, update.LocationId);
+            Assert.Equal($"location_{state.LocationId}", update.LocationId);
         }
 
         [Theory, AutoDomainData]
@@ -59,14 +61,16 @@ namespace TypingRealm.Domain.Tests
             Player player,
             UpdateFactory sut)
         {
-            playerRepository.Setup(x => x.Find(player.PlayerId))
+            var state = player.GetState();
+
+            playerRepository.Setup(x => x.Find(state.PlayerId))
                 .Returns(player);
 
             store.Setup(x => x.FindInGroups(It.Is<IEnumerable<string>>(
-                en => en.Single() == player.LocationId)))
+                en => en.Single() == $"location_{state.LocationId}")))
                 .Returns(connectedClients);
 
-            var update = (Update)sut.GetUpdateFor(player.PlayerId);
+            var update = (Update)sut.GetUpdateFor(state.PlayerId);
 
             Assert.NotEmpty(connectedClients);
             Assert.Equal(connectedClients.Count, update.VisiblePlayers.Count());

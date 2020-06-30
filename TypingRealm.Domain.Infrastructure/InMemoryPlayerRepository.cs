@@ -1,33 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TypingRealm.Domain.Movement;
-using TypingRealm.Messaging.Connecting;
 
 namespace TypingRealm.Domain.Infrastructure
 {
     public sealed class InMemoryPlayerRepository : IPlayerRepository
     {
-        private readonly Dictionary<PlayerId, Player> _playerIdToPlayer
-            = new Dictionary<PlayerId, Player>();
+        private readonly IPlayerPersistenceFactory _playerPersistenceFactory;
+        private readonly Dictionary<PlayerId, PlayerState> _playerIdToPlayer
+            = new Dictionary<PlayerId, PlayerState>();
 
-        public InMemoryPlayerRepository(
-            IConnectedClientStore connectedClients,
-            ILocationStore locationStore,
-            IRoadStore roadStore)
+        public InMemoryPlayerRepository(IPlayerPersistenceFactory playerPersistenceFactory)
         {
-            _playerIdToPlayer.Add(new PlayerId("ivan-id"), new Player(
-                new PlayerId("ivan-id"),
-                new LocationId("village"),
-                locationStore,
-                roadStore,
-                group => connectedClients.Find("ivan-id")!.Group = group));
+            _playerPersistenceFactory = playerPersistenceFactory;
 
-            _playerIdToPlayer.Add(new PlayerId("john-id"), new Player(
-                new PlayerId("john-id"),
-                new LocationId("village"),
-                locationStore,
-                roadStore,
-                group => connectedClients.Find("john-id")!.Group = group));
+            _playerIdToPlayer.Add(new PlayerId("ivan-id"), new PlayerState
+            {
+                PlayerId = new PlayerId("ivan-id"),
+                LocationId = new LocationId("village"),
+                RoadMovementState = null
+            });
+
+            _playerIdToPlayer.Add(new PlayerId("john-id"), new PlayerState
+            {
+                PlayerId = new PlayerId("john-id"),
+                LocationId = new LocationId("village"),
+                RoadMovementState = null
+            });
         }
 
         public Player? Find(PlayerId playerId)
@@ -35,23 +33,22 @@ namespace TypingRealm.Domain.Infrastructure
             if (!_playerIdToPlayer.ContainsKey(playerId))
                 return null;
 
-            return _playerIdToPlayer[playerId];
+            var state = _playerIdToPlayer[playerId];
+
+            return _playerPersistenceFactory.FromState(state);
         }
 
         public void Save(Player player)
         {
-            if (_playerIdToPlayer.ContainsKey(player.PlayerId))
+            var state = player.GetState();
+
+            if (_playerIdToPlayer.ContainsKey(state.PlayerId))
             {
-                _playerIdToPlayer[player.PlayerId] = player;
+                _playerIdToPlayer[state.PlayerId] = state;
                 return;
             }
 
-            _playerIdToPlayer.Add(player.PlayerId, player);
-        }
-
-        public PlayerId NextId()
-        {
-            return new PlayerId(Guid.NewGuid().ToString());
+            _playerIdToPlayer.Add(state.PlayerId, state);
         }
     }
 }

@@ -4,7 +4,5 @@
     {
         Player? Find(PlayerId playerId);
         void Save(Player player);
-
-        PlayerId NextId();
     }
 }

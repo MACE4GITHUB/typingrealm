@@ -92,19 +92,21 @@ namespace TypingRealm.Domain.Tests
             [Frozen]Mock<IPlayerRepository> playerRepository,
             ConnectionInitializer sut)
         {
+            var state = player.GetState();
+
             var joinMessage = Fixture.Build<Join>()
-                .With(x => x.PlayerId, player.PlayerId)
+                .With(x => x.PlayerId, state.PlayerId)
                 .Create();
 
             Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(joinMessage);
 
-            playerRepository.Setup(x => x.Find(player.PlayerId))
+            playerRepository.Setup(x => x.Find(state.PlayerId))
                 .Returns(player);
 
             var client = await sut.ConnectAsync(connection, Cts.Token);
 
-            Assert.Equal(player.LocationId, client.Group);
+            Assert.Equal($"location_{state.LocationId}", client.Group);
         }
     }
 }

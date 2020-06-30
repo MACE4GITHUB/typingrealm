@@ -1,6 +1,6 @@
 ﻿namespace TypingRealm.Domain.Movement
 {
-    public enum RoadDirection
+    public enum MovementDirection
     {
         Forward = 1,
         Backward = 2

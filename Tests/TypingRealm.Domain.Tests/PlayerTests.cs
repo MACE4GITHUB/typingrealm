@@ -27,11 +27,13 @@ namespace TypingRealm.Domain.Tests
             var location = Create<Location>(
                 new LocationWithAnotherLocation(locationId));
 
-            store.Setup(x => x.Find(player.LocationId))
+            var state = player.GetState();
+
+            store.Setup(x => x.Find(state.LocationId))
                 .Returns(location);
 
             player.MoveToLocation(locationId);
-            Assert.Equal(locationId, player.LocationId);
+            Assert.Equal(locationId, player.GetState().LocationId);
         }
 
         [Theory, AutoDomainData]
@@ -39,14 +41,16 @@ namespace TypingRealm.Domain.Tests
             [Frozen]Mock<ILocationStore> store,
             Player player)
         {
-            var location = Create<Location>(
-                new LocationWithAnotherLocation(player.LocationId));
+            var state = player.GetState();
 
-            store.Setup(x => x.Find(player.LocationId))
+            var location = Create<Location>(
+                new LocationWithAnotherLocation(state.LocationId));
+
+            store.Setup(x => x.Find(state.LocationId))
                 .Returns(location);
 
             Assert.Throws<InvalidOperationException>(
-                () => player.MoveToLocation(player.LocationId));
+                () => player.MoveToLocation(state.LocationId));
         }
 
         [Theory, AutoDomainData]
@@ -54,7 +58,9 @@ namespace TypingRealm.Domain.Tests
             [Frozen]Mock<ILocationStore> store,
             Player player)
         {
-            store.Setup(x => x.Find(player.LocationId))
+            var state = player.GetState();
+
+            store.Setup(x => x.Find(state.LocationId))
                 .Returns<Location>(null);
 
             Assert.Throws<InvalidOperationException>(
@@ -67,10 +73,12 @@ namespace TypingRealm.Domain.Tests
             Player player,
             LocationId locationId)
         {
+            var state = player.GetState();
+
             var location = Create<Location>(
                 new LocationWithAnotherLocation(locationId));
 
-            store.Setup(x => x.Find(player.LocationId))
+            store.Setup(x => x.Find(state.LocationId))
                 .Returns(location);
 
             store.Setup(x => x.Find(locationId))
