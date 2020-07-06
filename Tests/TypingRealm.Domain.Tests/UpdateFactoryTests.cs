@@ -50,7 +50,7 @@ namespace TypingRealm.Domain.Tests
 
             var update = (Update)sut.GetUpdateFor(state.PlayerId);
 
-            Assert.Equal($"location_{state.LocationId}", update.LocationId);
+            Assert.Equal(state.LocationId, update.LocationId);
         }
 
         [Theory, AutoDomainData]

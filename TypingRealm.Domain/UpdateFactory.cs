@@ -53,7 +53,7 @@ namespace TypingRealm.Domain
                 .Select(client => client.ClientId)
                 .ToList();
 
-            return new Update(player.MessagingGroup, visiblePlayerIds);
+            return new Update(state.LocationId, visiblePlayerIds);
         }
 
         private PlayerPosition ToPlayerPosition(Player player, MovementDirection currentDirection)
