@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using AutoFixture;
 using AutoFixture.Kernel;
 using TypingRealm.Domain.Movement;
 
