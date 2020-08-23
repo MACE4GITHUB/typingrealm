@@ -32,6 +32,7 @@ namespace TypingRealm.SignalRServer
             services.RegisterHandler<Attacked, BroadcastMessageHandler>();
             services.RegisterHandler<Attacked, AttackedHandler>();
             services.AddTransient<IConnectionInitializer, EngageConnectionInitializer>();
+            services.UseUpdateFactory<UpdateFactory>();
 
             services.AddSingleton<ActiveConnectionCache>();
         }
