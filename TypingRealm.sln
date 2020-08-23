@@ -51,7 +51,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain", "Typin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain.Tests", "Tests\TypingRealm.Domain.Tests\TypingRealm.Domain.Tests.csproj", "{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Domain.Infrastructure", "TypingRealm.Domain.Infrastructure\TypingRealm.Domain.Infrastructure.csproj", "{438F5D5A-F37B-4703-BAF1-9B96873B8D64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain.Infrastructure", "TypingRealm.Domain.Infrastructure\TypingRealm.Domain.Infrastructure.csproj", "{438F5D5A-F37B-4703-BAF1-9B96873B8D64}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Combat", "Combat", "{95D3DDD2-2892-4202-B6DF-A5D96A586511}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Combat", "TypingRealm.Combat\TypingRealm.Combat.csproj", "{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Combat.Server", "TypingRealm.Combat.Server\TypingRealm.Combat.Server.csproj", "{F36C9640-6D2E-4347-9318-6A90C6488290}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -135,6 +141,14 @@ Global
 		{438F5D5A-F37B-4703-BAF1-9B96873B8D64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{438F5D5A-F37B-4703-BAF1-9B96873B8D64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{438F5D5A-F37B-4703-BAF1-9B96873B8D64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F36C9640-6D2E-4347-9318-6A90C6488290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F36C9640-6D2E-4347-9318-6A90C6488290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F36C9640-6D2E-4347-9318-6A90C6488290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F36C9640-6D2E-4347-9318-6A90C6488290}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,6 +167,8 @@ Global
 		{593125D6-0157-4303-8642-51E92A8EB2F0} = {792AC347-74FB-4A4E-AD3B-D78B344D17BB}
 		{F9AF8743-12AA-4E79-B88F-84DA43AC723D} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
 		{C9F81E39-4AA8-49AA-93E3-12AAF10CB58A} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
+		{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2} = {95D3DDD2-2892-4202-B6DF-A5D96A586511}
+		{F36C9640-6D2E-4347-9318-6A90C6488290} = {95D3DDD2-2892-4202-B6DF-A5D96A586511}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}
