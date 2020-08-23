@@ -43,7 +43,8 @@ namespace TypingRealm.Messaging.Tests
 
         [Theory]
         [InlineData(typeof(IConnectionInitializer), typeof(AnonymousConnectionInitializer))]
-        [InlineData(typeof(IConnectionHandler), typeof(ConnectionHandler))]
+        [InlineData(typeof(ConnectionHandler), typeof(ConnectionHandler))]
+        [InlineData(typeof(IConnectionHandler), typeof(ScopedConnectionHandler))]
         [InlineData(typeof(IMessageDispatcher), typeof(MessageDispatcher))]
         [InlineData(typeof(IMessageHandlerFactory), typeof(MessageHandlerFactory))]
         [InlineData(typeof(IUpdater), typeof(AnnouncingUpdater))]

@@ -8,7 +8,6 @@ using TypingRealm.Combat.Messages;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Handlers;
-using TypingRealm.Messaging.Handling;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 
@@ -33,11 +32,6 @@ namespace TypingRealm.SignalRServer
             services.RegisterHandler<Attacked, BroadcastMessageHandler>();
             services.RegisterHandler<Attacked, AttackedHandler>();
             services.AddTransient<IConnectionInitializer, EngageConnectionInitializer>();
-
-            // When we use Startup.ConfigureServices, we need to register
-            // service locator as singleton if it uses IServiceProvider as a
-            // dependency, or IServiceProvider will get disposed.
-            services.AddSingleton<IMessageHandlerFactory, MessageHandlerFactory>();
 
             services.AddSingleton<ActiveConnectionCache>();
         }

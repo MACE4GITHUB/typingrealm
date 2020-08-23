@@ -16,13 +16,19 @@ namespace TypingRealm.Messaging
         /// </summary>
         public static IServiceCollection RegisterMessaging(this IServiceCollection services)
         {
+            // Connection handling. Entry point.
+            services.AddTransient<ConnectionHandler>();
+            services.AddTransient<IConnectionHandler, ScopedConnectionHandler>();
+
+            // Shared between all connections.
+            services.AddSingleton<IConnectedClientStore, ConnectedClientStore>();
+            services.AddSingleton<IUpdateDetector, UpdateDetector>();
+
             // Connecting.
             // By default accept all connections without validation.
             services.AddTransient<IConnectionInitializer, AnonymousConnectionInitializer>();
-            services.AddSingleton<IConnectedClientStore, ConnectedClientStore>();
 
             // Message dispatching and handling.
-            services.AddTransient<IConnectionHandler, ConnectionHandler>();
             services.AddTransient<IMessageDispatcher, MessageDispatcher>();
             services.AddTransient<IMessageHandlerFactory, MessageHandlerFactory>();
 
@@ -33,7 +39,6 @@ namespace TypingRealm.Messaging
             // Updating.
             // By default announce update (for testing purposes).
             services.AddTransient<IUpdater, AnnouncingUpdater>();
-            services.AddSingleton<IUpdateDetector, UpdateDetector>();
 
             return services;
         }
