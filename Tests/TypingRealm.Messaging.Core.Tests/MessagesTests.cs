@@ -8,10 +8,21 @@ namespace TypingRealm.Messaging.Tests
 {
     public class MessagesTests : TestsBase
     {
+        public class TestBroadcastMessage : BroadcastMessage
+        {
+            public TestBroadcastMessage() : base()
+            {
+            }
+
+            public TestBroadcastMessage(string senderId) : base(senderId)
+            {
+            }
+        }
+
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(4, typeof(Announce).Assembly.GetTypes().Count(
+            Assert.Equal(5, typeof(Announce).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -57,6 +68,15 @@ namespace TypingRealm.Messaging.Tests
 
             sut = new Connect();
             Assert.Equal(Connect.DefaultGroup, sut.Group);
+        }
+
+        [Theory, AutoMoqData]
+        public void BroadcastMessage(string senderId)
+        {
+            AssertSerializable<TestBroadcastMessage>();
+
+            var sut = new TestBroadcastMessage(senderId);
+            Assert.Equal(senderId, sut.SenderId);
         }
     }
 }
