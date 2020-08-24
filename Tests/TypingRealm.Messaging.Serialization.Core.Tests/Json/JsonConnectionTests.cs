@@ -20,7 +20,7 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
     public class JsonConnectionTests : TestsBase
     {
         [Theory, AutoMoqData]
-        public async Task ShouldSerializeAndSend(
+        public async Task ShouldSerializeAndSend_InCamelCase(
             [Frozen]Mock<IMessageTypeCache> cache,
             [Frozen]Mock<IConnection> connection,
             string typeId,
@@ -36,18 +36,29 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
 
             await sut.SendAsync(message, Cts.Token);
             Assert.Equal(typeId, sent.TypeId);
-            Assert.Equal(JsonSerializer.Serialize(message), sent.Json);
+            Assert.Equal(
+                JsonSerializer.Serialize(
+                    message,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    }),
+                sent.Json);
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldReceiveAndDeserialize(
+        public async Task ShouldReceiveAndDeserialize_InCamelCase(
             [Frozen]Mock<IMessageTypeCache> cache,
             [Frozen]Mock<IConnection> connection,
             MyMessage message,
             JsonSerializedMessage jsonMessage,
             JsonConnection sut)
         {
-            jsonMessage.Json = JsonSerializer.Serialize(message);
+            jsonMessage.Json = JsonSerializer.Serialize(message, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(jsonMessage);
             cache.Setup(x => x.GetTypeById(jsonMessage.TypeId))

@@ -13,6 +13,7 @@ namespace TypingRealm.Messaging.Serialization.Json
     {
         private readonly IConnection _connection;
         private readonly IMessageTypeCache _messageTypes;
+        private readonly JsonSerializerOptions _options;
 
         public JsonConnection(
             IConnection connection,
@@ -20,12 +21,16 @@ namespace TypingRealm.Messaging.Serialization.Json
         {
             _connection = connection;
             _messageTypes = messageTypes;
+            _options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
         }
 
         public ValueTask SendAsync(object message, CancellationToken cancellationToken)
         {
             var typeId = _messageTypes.GetTypeId(message.GetType());
-            var json = JsonSerializer.Serialize(message);
+            var json = JsonSerializer.Serialize(message, _options);
             var jsonSerializedMessage = new JsonSerializedMessage(typeId, json);
 
             return _connection.SendAsync(jsonSerializedMessage, cancellationToken);
@@ -38,7 +43,7 @@ namespace TypingRealm.Messaging.Serialization.Json
                 .ConfigureAwait(false);
 
             var type = _messageTypes.GetTypeById(message.TypeId);
-            return JsonSerializer.Deserialize(message.Json, type);
+            return JsonSerializer.Deserialize(message.Json, type, _options);
         }
     }
 }
