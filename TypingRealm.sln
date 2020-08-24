@@ -55,9 +55,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain.Infrastr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Combat", "Combat", "{95D3DDD2-2892-4202-B6DF-A5D96A586511}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Combat", "TypingRealm.Combat\TypingRealm.Combat.csproj", "{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Combat", "TypingRealm.Combat\TypingRealm.Combat.csproj", "{D6181EDB-623A-4F38-B4F8-CD6CB7311FD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Combat.Server", "TypingRealm.Combat.Server\TypingRealm.Combat.Server.csproj", "{F36C9640-6D2E-4347-9318-6A90C6488290}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Combat.Server", "TypingRealm.Combat.Server\TypingRealm.Combat.Server.csproj", "{F36C9640-6D2E-4347-9318-6A90C6488290}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.SignalR", "TypingRealm.SignalR\TypingRealm.SignalR.csproj", "{53C8B788-7000-4BB7-8181-70B509B4AEAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,6 +151,10 @@ Global
 		{F36C9640-6D2E-4347-9318-6A90C6488290}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F36C9640-6D2E-4347-9318-6A90C6488290}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F36C9640-6D2E-4347-9318-6A90C6488290}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53C8B788-7000-4BB7-8181-70B509B4AEAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53C8B788-7000-4BB7-8181-70B509B4AEAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53C8B788-7000-4BB7-8181-70B509B4AEAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53C8B788-7000-4BB7-8181-70B509B4AEAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

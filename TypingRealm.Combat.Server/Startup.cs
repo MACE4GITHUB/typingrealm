@@ -10,6 +10,7 @@ using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Handlers;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
+using TypingRealm.SignalR;
 
 namespace TypingRealm.SignalRServer
 {
@@ -23,7 +24,8 @@ namespace TypingRealm.SignalRServer
                 .AddMessageTypesFromAssembly(typeof(Attacked).Assembly)
                 .AddJson()
                 .Services
-                .RegisterMessaging();
+                .RegisterMessaging()
+                .RegisterMessageHub();
 
             services.AddSingleton<ICombatRoomStore, CombatRoomStore>();
             services.RegisterHandler<TargetingPlayer, BroadcastMessageHandler>();
@@ -33,8 +35,6 @@ namespace TypingRealm.SignalRServer
             services.RegisterHandler<Attacked, AttackedHandler>();
             services.AddTransient<IConnectionInitializer, EngageConnectionInitializer>();
             services.UseUpdateFactory<UpdateFactory>();
-
-            services.AddSingleton<ActiveConnectionCache>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -51,7 +51,7 @@ namespace TypingRealm.SignalRServer
                     await context.Response.WriteAsync("=== TypingRealm server ===").ConfigureAwait(false);
                 });
 
-                endpoints.MapHub<JsonSerializedMessageHub>("/hub");
+                endpoints.MapHub<MessageHub>("/hub");
             });
         }
     }

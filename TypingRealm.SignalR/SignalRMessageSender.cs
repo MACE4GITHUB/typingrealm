@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.SignalRServer
+namespace TypingRealm.SignalR
 {
-    public sealed class SignalRConnection : IMessageSender
+    public sealed class SignalRMessageSender : IMessageSender
     {
         private readonly IClientProxy _clientProxy;
 
-        public SignalRConnection(IClientProxy clientProxy)
+        public SignalRMessageSender(IClientProxy clientProxy)
         {
             _clientProxy = clientProxy;
         }
