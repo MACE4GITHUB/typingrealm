@@ -28,6 +28,9 @@ namespace TypingRealm.RopeWar
                     c => c.Contestants.Values.Any(
                         x => x.Contains(contestantId)));
 
+                if (data == null)
+                    return null;
+
                 return Contest.FromData(data);
             }
         }
