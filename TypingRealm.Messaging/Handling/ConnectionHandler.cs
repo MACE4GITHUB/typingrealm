@@ -53,7 +53,6 @@ namespace TypingRealm.Messaging.Handling
             }
 
             _connectedClients.Add(connectedClient);
-
             if (!_connectedClients.IsClientConnected(connectedClient.ClientId))
                 throw new InvalidOperationException("Client was not added correctly.");
 
@@ -69,7 +68,7 @@ namespace TypingRealm.Messaging.Handling
                 catch
                 {
                     _connectedClients.Remove(connectedClient.ClientId);
-                    throw;
+                    throw; // If you delete this line and have ncrunch, your PC will die.
                 }
                 finally
                 {

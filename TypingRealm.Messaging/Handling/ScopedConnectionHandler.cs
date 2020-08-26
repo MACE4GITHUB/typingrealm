@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace TypingRealm.Messaging.Handling
 {
-    public class ScopedConnectionHandler : IConnectionHandler
+    public class ScopedConnectionHandler : IScopedConnectionHandler
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
@@ -17,10 +17,7 @@ namespace TypingRealm.Messaging.Handling
         {
             using var scope = _serviceScopeFactory.CreateScope();
 
-            // TODO: Use interface IConnectionHandler and Decorate it, instead of concrete class.
-            // TODO: Test this class.
-            // This class is not tested, it is difficult due to concrete ConnectionHandler class.
-            await scope.ServiceProvider.GetRequiredService<ConnectionHandler>()
+            await scope.ServiceProvider.GetRequiredService<IConnectionHandler>()
                 .HandleAsync(connection, cancellationToken)
                 .ConfigureAwait(false);
         }

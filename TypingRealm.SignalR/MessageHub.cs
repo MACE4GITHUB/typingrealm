@@ -12,12 +12,12 @@ namespace TypingRealm.SignalR
     public sealed class MessageHub : Hub
     {
         private readonly ConcurrentDictionary<string, SignalRConnectionResource> _cache;
-        private readonly IConnectionHandler _connectionHandler;
+        private readonly IScopedConnectionHandler _connectionHandler;
         private readonly IJsonConnectionFactory _jsonConnectionFactory;
 
         public MessageHub(
             ConcurrentDictionary<string, SignalRConnectionResource> cache,
-            IConnectionHandler connectionHandler,
+            IScopedConnectionHandler connectionHandler,
             IJsonConnectionFactory jsonConnectionFactory)
         {
             _cache = cache;
