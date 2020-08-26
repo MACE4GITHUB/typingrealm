@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using Moq;
+using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Connecting.Initializers;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Updating;
@@ -81,6 +82,31 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
 
             client.Group = "new";
             Mock.Get(updateDetector).Verify(x => x.MarkForUpdate("new"));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldCallConnectHook(
+            [Frozen]Mock<IConnectHook> connectHook,
+            ConnectInitializer sut)
+        {
+            await sut.ConnectAsync(_validConnection, Cts.Token);
+
+            connectHook.Verify(x => x.HandleAsync(_connectMessage, Cts.Token));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldThrow_WhenConnectHookThrows(
+            Exception exception,
+            [Frozen]Mock<IConnectHook> connectHook,
+            ConnectInitializer sut)
+        {
+            connectHook.Setup(x => x.HandleAsync(_connectMessage, Cts.Token))
+                .ThrowsAsync(exception);
+
+            var thrown = await Assert.ThrowsAsync<Exception>(
+                async () => await sut.ConnectAsync(_validConnection, Cts.Token));
+
+            Assert.Equal(exception, thrown);
         }
     }
 }

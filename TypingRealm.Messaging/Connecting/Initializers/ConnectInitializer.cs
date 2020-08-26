@@ -13,10 +13,14 @@ namespace TypingRealm.Messaging.Connecting.Initializers
     public sealed class ConnectInitializer : IConnectionInitializer
     {
         private readonly IUpdateDetector _updateDetector;
+        private readonly IConnectHook _connectHook;
 
-        public ConnectInitializer(IUpdateDetector updateDetector)
+        public ConnectInitializer(
+            IUpdateDetector updateDetector,
+            IConnectHook connectHook)
         {
             _updateDetector = updateDetector;
+            _connectHook = connectHook;
         }
 
         /// <summary>
@@ -29,6 +33,8 @@ namespace TypingRealm.Messaging.Connecting.Initializers
                 await connection.SendAsync(new Disconnected("First message is not a valid Connect message."), cancellationToken).ConfigureAwait(false);
                 throw new InvalidOperationException("First message is not a valid Connect message.");
             }
+
+            await _connectHook.HandleAsync(connect, cancellationToken).ConfigureAwait(false);
 
             return new ConnectedClient(connect.ClientId, connection, connect.Group, _updateDetector);
         }
