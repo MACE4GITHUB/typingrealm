@@ -129,6 +129,7 @@ namespace TypingRealm.Messaging.Handling
             }
             catch (Exception exception)
             {
+                // TODO: Disconnect player if update was unsuccessful. Currently it silently continues working (investigate).
                 _logger.LogError(exception, $"Error during sending pending updates.");
             }
         }
