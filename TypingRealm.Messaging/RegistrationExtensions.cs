@@ -25,8 +25,8 @@ namespace TypingRealm.Messaging
             services.AddSingleton<IUpdateDetector, UpdateDetector>();
 
             // Connecting.
-            // By default accept all connections without validation.
-            services.AddTransient<IConnectionInitializer, AnonymousConnectionInitializer>();
+            services.AddTransient<IConnectHook, EmptyConnectHook>();
+            services.AddTransient<IConnectionInitializer, ConnectInitializer>();
 
             // Message dispatching and handling.
             services.AddTransient<IMessageDispatcher, MessageDispatcher>();
