@@ -17,6 +17,17 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
         public List<int>? List { get; set; }
     }
 
+    public enum TestEnum
+    {
+        One = 1,
+        Two = 2
+    }
+
+    public class TestEnumMessage
+    {
+        public TestEnum TestEnum { get; set; }
+    }
+
     public class JsonConnectionTests : TestsBase
     {
         [Theory, AutoMoqData]
@@ -68,6 +79,61 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             Assert.Equal(message.Age, result.Age);
             Assert.Equal(message.LastName, result.LastName);
             Assert.Equal(message.List, result.List);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldDeserializeEnum_FromNumber(
+            [Frozen]Mock<IMessageTypeCache> cache,
+            [Frozen]Mock<IConnection> connection,
+            JsonSerializedMessage jsonMessage,
+            JsonConnection sut)
+        {
+            jsonMessage.Json = "{\"testEnum\":2}";
+
+            connection.Setup(x => x.ReceiveAsync(Cts.Token))
+                .ReturnsAsync(jsonMessage);
+            cache.Setup(x => x.GetTypeById(jsonMessage.TypeId))
+                .Returns(typeof(TestEnumMessage));
+
+            var result = (TestEnumMessage)await sut.ReceiveAsync(Cts.Token);
+            Assert.Equal(TestEnum.Two, result.TestEnum);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldDeserializeEnum_FromString(
+            [Frozen]Mock<IMessageTypeCache> cache,
+            [Frozen]Mock<IConnection> connection,
+            JsonSerializedMessage jsonMessage,
+            JsonConnection sut)
+        {
+            jsonMessage.Json = "{\"testEnum\":\"Two\"}";
+
+            connection.Setup(x => x.ReceiveAsync(Cts.Token))
+                .ReturnsAsync(jsonMessage);
+            cache.Setup(x => x.GetTypeById(jsonMessage.TypeId))
+                .Returns(typeof(TestEnumMessage));
+
+            var result = (TestEnumMessage)await sut.ReceiveAsync(Cts.Token);
+            Assert.Equal(TestEnum.Two, result.TestEnum);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldSerializeEnum_ToString(
+            [Frozen]Mock<IMessageTypeCache> cache,
+            [Frozen]Mock<IConnection> connection,
+            string typeId,
+            JsonConnection sut)
+        {
+            cache.Setup(x => x.GetTypeId(typeof(TestEnumMessage)))
+                .Returns(typeId);
+
+            JsonSerializedMessage sent = null!;
+            connection.Setup(x => x.SendAsync(It.IsAny<object>(), Cts.Token))
+                .Callback<object, CancellationToken>((message, ct) => sent = (JsonSerializedMessage)message);
+
+            await sut.SendAsync(new TestEnumMessage { TestEnum = TestEnum.Two }, Cts.Token);
+            Assert.Equal(typeId, sent.TypeId);
+            Assert.Equal("{\"testEnum\":\"Two\"}", sent.Json);
         }
     }
 }

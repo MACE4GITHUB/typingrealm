@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,11 +26,13 @@ namespace TypingRealm.Messaging.Serialization.Json
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
+            _options.Converters.Add(new JsonStringEnumConverter());
         }
 
         public ValueTask SendAsync(object message, CancellationToken cancellationToken)
         {
             var typeId = _messageTypes.GetTypeId(message.GetType());
+            // TODO: Put logging here and investigate. It silently fails when serialization fails.
             var json = JsonSerializer.Serialize(message, _options);
             var jsonSerializedMessage = new JsonSerializedMessage(typeId, json);
 
@@ -43,6 +46,7 @@ namespace TypingRealm.Messaging.Serialization.Json
                 .ConfigureAwait(false);
 
             var type = _messageTypes.GetTypeById(message.TypeId);
+            // TODO: Put logging here and investigate. It silently fails when deserialization fails.
             return JsonSerializer.Deserialize(message.Json, type, _options);
         }
     }
