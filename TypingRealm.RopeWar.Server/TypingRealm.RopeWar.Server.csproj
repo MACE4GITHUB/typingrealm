@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- SignalR uses older version so we need to explicitely specify it here. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
+    <ProjectReference Include="..\TypingRealm.RopeWar\TypingRealm.RopeWar.csproj" />
+    <ProjectReference Include="..\TypingRealm.SignalR\TypingRealm.SignalR.csproj" />
+  </ItemGroup>
+
+</Project>

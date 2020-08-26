@@ -14,6 +14,7 @@ using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
+using TypingRealm.RopeWar;
 
 namespace TypingRealm.TestClient
 {
@@ -22,12 +23,13 @@ namespace TypingRealm.TestClient
         public static async Task Main()
         {
             Console.WriteLine("=== TypingRealm test client ===");
-            Console.Write("Type of connection (s - SignalR, cs - Combat SignalR, default - TCP): ");
+            Console.Write("Type of connection (s - SignalR, cs - Combat SignalR, rw - RopeWar, default - TCP): ");
 
             await (Console.ReadLine() switch
             {
                 "s" => MainSignalR(),
                 "cs" => CombatSignalR(),
+                "rw" => RopeWarSignalR(),
                 _ => MainTpc()
             }).ConfigureAwait(false);
         }
@@ -65,6 +67,44 @@ namespace TypingRealm.TestClient
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
+        }
+
+        public static async Task RopeWarSignalR()
+        {
+            var provider = new ServiceCollection()
+                .AddSerializationCore()
+                .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
+                .AddJson()
+                .Services
+                .BuildServiceProvider();
+
+            var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
+                .GetAllTypes()
+                .Select(idToType => idToType.Value)
+                .ToList();
+
+            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
+
+            Console.WriteLine("Press enter to connect.");
+            Console.ReadLine();
+
+            var hub = new HubConnectionBuilder()
+                .WithUrl("http://localhost:30102/hub")
+                .Build();
+
+            var notificator = new Notificator();
+            hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
+
+            await hub.StartAsync(default).ConfigureAwait(false);
+
+            using var sendLock = new SemaphoreSlimLock();
+            using var receiveLock = new SemaphoreSlimLock();
+            var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
+                .WithJson(jsonConnectionFactory)
+                .WithLocking(sendLock, receiveLock);
+
+            await Handle(connection, messageTypes).ConfigureAwait(false);
+
         }
 
         public static async Task CombatSignalR()
