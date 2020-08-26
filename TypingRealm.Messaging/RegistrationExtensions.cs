@@ -51,6 +51,12 @@ namespace TypingRealm.Messaging
             return services;
         }
 
+        public static IServiceCollection UseConnectionInitializer<TConnectionInitializer>(this IServiceCollection services)
+            where TConnectionInitializer : class, IConnectionInitializer
+        {
+            return services.AddTransient<IConnectionInitializer, TConnectionInitializer>();
+        }
+
         public static IServiceCollection UseUpdateFactory<TUpdateFactory>(this IServiceCollection services)
             where TUpdateFactory : class, IUpdateFactory
         {

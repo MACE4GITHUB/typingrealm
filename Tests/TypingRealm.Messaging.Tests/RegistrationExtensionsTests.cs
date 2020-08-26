@@ -29,6 +29,14 @@ namespace TypingRealm.Messaging.Tests
         }
     }
 
+    public class TestConnectionInitializer : IConnectionInitializer
+    {
+        public ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class RegistrationExtensionsTests
     {
         private readonly IServiceProvider _provider;
@@ -82,6 +90,16 @@ namespace TypingRealm.Messaging.Tests
 
             provider.AssertRegisteredTransient<IUpdater, Updater>();
             provider.AssertRegisteredTransient<IUpdateFactory, TestUpdateFactory>();
+        }
+
+        [Fact]
+        public void UseConnectionInitializer_ShouldRegisterCustomConnectionInitializerTransient()
+        {
+            var provider = new ServiceCollection()
+                .UseConnectionInitializer<TestConnectionInitializer>()
+                .BuildServiceProvider();
+
+            provider.AssertRegisteredTransient<IConnectionInitializer, TestConnectionInitializer>();
         }
     }
 }
