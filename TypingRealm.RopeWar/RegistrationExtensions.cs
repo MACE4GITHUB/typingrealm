@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Connecting;
 using TypingRealm.RopeWar.Handlers;
 
 namespace TypingRealm.RopeWar
@@ -11,8 +12,9 @@ namespace TypingRealm.RopeWar
             services.AddSingleton<IContestStore, InMemoryContestStore>();
 
             return services
-                .UseConnectionInitializer<JoinContestInitializer>()
+                .AddTransient<IConnectHook, ConnectHook>()
                 .UseUpdateFactory<ContestUpdateFactory>()
+                .RegisterHandler<JoinContest, JoinContestHandler>()
                 .RegisterHandler<StartContest, StartContestHandler>()
                 .RegisterHandler<PullRope, PullRopeHandler>();
         }

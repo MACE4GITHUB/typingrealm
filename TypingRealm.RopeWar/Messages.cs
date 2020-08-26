@@ -7,8 +7,6 @@ namespace TypingRealm.RopeWar
     [Message]
     public sealed class JoinContest
     {
-        public string ContestId { get; set; }
-        public string ContestantId { get; set; }
         public Side Side { get; set; }
     }
 
@@ -29,10 +27,16 @@ namespace TypingRealm.RopeWar
         // If progress is 0 - left team has won.
         // If progress is 100 - right team has won.
         public int Progress { get; set; }
-        public List<string> LeftSide { get; set; }
-        public List<string> RightSide { get; set; }
+        public List<ContestantUpdate> Contestants { get; set; }
         public bool HasStarted { get; set; }
         public bool HasEnded { get; set; }
+    }
+
+    // Dictionary serialization is not supported, so this crutch for now.
+    public sealed class ContestantUpdate
+    {
+        public string ContestantId { get; set; }
+        public Side Side { get; set; }
     }
 #pragma warning restore CS8618
 }

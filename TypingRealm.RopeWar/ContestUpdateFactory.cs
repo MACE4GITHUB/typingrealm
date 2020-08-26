@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TypingRealm.Messaging.Updating;
 
 namespace TypingRealm.RopeWar
@@ -15,6 +16,8 @@ namespace TypingRealm.RopeWar
         public object GetUpdateFor(string clientId)
         {
             var contest = _contestStore.FindByContestantId(clientId);
+
+            // TODO: Return spectator update here, do not throw an exception. The client connected but did not join the contest.
             if (contest == null)
                 throw new InvalidOperationException($"Contest is not found for contestant {clientId}.");
 
@@ -23,8 +26,13 @@ namespace TypingRealm.RopeWar
             return new ContestUpdate
             {
                 Progress = data.Progress,
-                LeftSide = data.Contestants[Side.Left],
-                RightSide = data.Contestants[Side.Right],
+                Contestants = data.Contestants.SelectMany(
+                    x => x.Value.Select(
+                        contestantId => new ContestantUpdate
+                        {
+                            ContestantId = contestantId,
+                            Side = x.Key
+                        })).ToList(),
                 HasStarted = data.HasStarted,
                 HasEnded = data.HasEnded
             };

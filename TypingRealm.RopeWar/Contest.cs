@@ -17,7 +17,6 @@ namespace TypingRealm.RopeWar
         }
 #pragma warning restore CS8618
 
-        private readonly string _contestId;
         private readonly Dictionary<Side, List<string>> _contestants = new Dictionary<Side, List<string>>
         {
             [Side.Left] = new List<string>(),
@@ -27,10 +26,11 @@ namespace TypingRealm.RopeWar
         private int _progress;
         private bool _hasStarted;
         private bool _hasEnded;
+        public string ContestId { get; }
 
         private Contest(Data data)
         {
-            _contestId = data.ContestId;
+            ContestId = data.ContestId;
             _contestants[Side.Left] = data.Contestants[Side.Left].ToList();
             _contestants[Side.Right] = data.Contestants[Side.Right].ToList();
             _progress = data.Progress;
@@ -40,7 +40,7 @@ namespace TypingRealm.RopeWar
 
         public Contest(string contestId)
         {
-            _contestId = contestId;
+            ContestId = contestId;
             _contestants = new Dictionary<Side, List<string>>
             {
                 [Side.Left] = new List<string>(),
@@ -57,7 +57,7 @@ namespace TypingRealm.RopeWar
         {
             return new Data
             {
-                ContestId = _contestId,
+                ContestId = ContestId,
                 Contestants = _contestants.ToDictionary(x => x.Key, x => x.Value.ToList()),
                 Progress = _progress,
                 HasStarted = _hasStarted,
@@ -68,7 +68,7 @@ namespace TypingRealm.RopeWar
         public void Join(string contestantId, Side side)
         {
             if (_hasStarted)
-                throw new InvalidOperationException($"Contest {_contestId} has already started. Cannot join or change side.");
+                throw new InvalidOperationException($"Contest {ContestId} has already started. Cannot join or change side.");
 
             if (_contestants[side].Contains(contestantId))
                 throw new InvalidOperationException($"Contestant {contestantId} has already joined this contest to {side} side. Cannot join the same side again.");
@@ -84,10 +84,10 @@ namespace TypingRealm.RopeWar
         public void Start()
         {
             if (_hasStarted)
-                throw new InvalidOperationException($"Contest {_contestId} has already started.");
+                throw new InvalidOperationException($"Contest {ContestId} has already started.");
 
             if (_contestants.Any(x => x.Value.Count == 0))
-                throw new InvalidOperationException($"Cannot start the contest {_contestId}. One or more sides don't have contestants.");
+                throw new InvalidOperationException($"Cannot start the contest {ContestId}. One or more sides don't have contestants.");
 
             _hasStarted = true;
         }
@@ -95,13 +95,13 @@ namespace TypingRealm.RopeWar
         public void PullRope(string contestantId, int distance)
         {
             if (!_hasStarted)
-                throw new InvalidOperationException($"Cannot pull rope until contest {_contestId} has started.");
+                throw new InvalidOperationException($"Cannot pull rope until contest {ContestId} has started.");
 
             if (_hasEnded)
-                throw new InvalidOperationException($"Cannot pull rope after contest {_contestId} has ended.");
+                throw new InvalidOperationException($"Cannot pull rope after contest {ContestId} has ended.");
 
             if (!_contestants.Values.Any(x => x.Contains(contestantId)))
-                throw new InvalidOperationException($"Contestant {contestantId} is not participating in contest {_contestId}.");
+                throw new InvalidOperationException($"Contestant {contestantId} is not participating in contest {ContestId}.");
 
             if (_contestants[Side.Left].Contains(contestantId))
                 _progress -= distance;
