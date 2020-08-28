@@ -1,11 +1,17 @@
-﻿{
+{
   "profiles": {
     "TypingRealm.RopeWar.Server": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:30102"
+      "applicationUrl": "http://0.0.0.0:30102"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "publishAllPorts": true,
+      "httpPort": 30102
     }
   }
 }
