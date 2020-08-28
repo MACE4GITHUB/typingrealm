@@ -12,9 +12,26 @@ namespace TypingRealm.RopeWar.Server
 {
     public sealed class Startup
     {
+        private const string CorsPolicyName = "CorsPolicy";
+        private static readonly string[] _corsAllowedOrigins = new[]
+        {
+            "http://localhost:4200",
+            "https://localhost:4200",
+            "http://typingrealm.com:4200",
+            "https://typingrealm.com:4200"
+        };
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSignalR();
+
+            services.AddCors(options => options.AddPolicy(
+                CorsPolicyName,
+                builder => builder
+                    .WithOrigins(_corsAllowedOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()));
 
             services.AddSerializationCore()
                 .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
@@ -31,6 +48,7 @@ namespace TypingRealm.RopeWar.Server
                 app.UseDeveloperExceptionPage();
 
             app.UseRouting();
+            app.UseCors(CorsPolicyName);
 
             app.UseEndpoints(endpoints =>
             {
