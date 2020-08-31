@@ -16,7 +16,7 @@ namespace TypingRealm.RopeWar.Handlers
 
         public ValueTask HandleAsync(Connect connect, CancellationToken cancellationToken)
         {
-            var contest = _contestStore.FindByContestantId(connect.ClientId);
+            var contest = _contestStore.FindActiveByContestantId(connect.ClientId);
             if (contest == null)
                 return default;
 

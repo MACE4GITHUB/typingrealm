@@ -18,7 +18,7 @@ namespace TypingRealm.RopeWar.Handlers
         {
             var contestantId = sender.ClientId;
 
-            var contest = _contestStore.FindByContestantId(contestantId);
+            var contest = _contestStore.FindActiveByContestantId(contestantId);
             if (contest == null)
                 throw new InvalidOperationException($"Contest is not found for contestant {contestantId}.");
 

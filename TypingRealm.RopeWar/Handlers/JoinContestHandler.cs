@@ -16,7 +16,7 @@ namespace TypingRealm.RopeWar.Handlers
 
         public ValueTask HandleAsync(ConnectedClient sender, JoinContest message, CancellationToken cancellationToken)
         {
-            var existingContest = _contestStore.FindByContestantId(sender.ClientId);
+            var existingContest = _contestStore.FindActiveByContestantId(sender.ClientId);
             if (existingContest != null)
                 throw new InvalidOperationException($"Already in contest {existingContest.ContestId}");
 

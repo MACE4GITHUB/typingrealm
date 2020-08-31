@@ -3,7 +3,7 @@
     public interface IContestStore
     {
         Contest? Find(string contestId);
-        Contest? FindByContestantId(string contestantId);
+        Contest? FindActiveByContestantId(string contestantId);
         void Save(Contest contest);
     }
 }

@@ -20,7 +20,7 @@ namespace TypingRealm.RopeWar
 
         public object GetUpdateFor(string clientId)
         {
-            var contest = _contestStore.FindByContestantId(clientId);
+            var contest = _contestStore.FindActiveByContestantId(clientId);
 
             if (contest == null)
             {

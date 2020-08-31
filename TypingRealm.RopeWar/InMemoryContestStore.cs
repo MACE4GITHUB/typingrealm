@@ -20,12 +20,12 @@ namespace TypingRealm.RopeWar
             }
         }
 
-        public Contest? FindByContestantId(string contestantId)
+        public Contest? FindActiveByContestantId(string contestantId)
         {
             lock (_lock)
             {
                 var data = _cache.Values.FirstOrDefault(
-                    c => c.Contestants.Values.Any(
+                    c => !c.HasEnded && c.Contestants.Values.Any(
                         x => x.Contains(contestantId)));
 
                 if (data == null)
