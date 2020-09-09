@@ -260,3 +260,10 @@ dotnet_diagnostic.CA2007.severity = none
 
 # CA1707: Underscores in method names
 dotnet_diagnostic.CA1707.severity = none
+
+# === .NET Core API ===
+[*.Api/**]
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none
+
