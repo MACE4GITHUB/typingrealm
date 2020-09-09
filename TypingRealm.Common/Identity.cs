@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TypingRealm.Domain.Common
+namespace TypingRealm.Common
 {
     /// <summary>
     /// String identity.

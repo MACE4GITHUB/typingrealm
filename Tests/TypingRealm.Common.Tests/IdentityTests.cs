@@ -1,9 +1,8 @@
 ﻿using System;
-using TypingRealm.Domain.Common;
-using TypingRealm.Domain.Tests.Customizations;
+using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Domain.Tests.Common
+namespace TypingRealm.Common.Tests
 {
     public class IdentityTests
     {
@@ -14,7 +13,7 @@ namespace TypingRealm.Domain.Tests.Common
             }
         }
 
-        [Theory, AutoDomainData]
+        [Theory, AutoMoqData]
         public void ShouldBePrimitive(Identity identity)
         {
             Assert.IsAssignableFrom<Primitive<string>>(identity);

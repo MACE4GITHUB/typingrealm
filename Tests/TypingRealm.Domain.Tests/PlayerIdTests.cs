@@ -1,4 +1,4 @@
-﻿using TypingRealm.Domain.Common;
+﻿using TypingRealm.Common;
 using TypingRealm.Domain.Tests.Customizations;
 using Xunit;
 

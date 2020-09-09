@@ -1,5 +1,5 @@
 ﻿using System;
-using TypingRealm.Domain.Common;
+using TypingRealm.Common;
 
 namespace TypingRealm.Domain.Movement
 {
