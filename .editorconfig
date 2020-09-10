@@ -246,6 +246,7 @@ dotnet_diagnostic.S1128.severity = error
 # Use localized ToString().
 dotnet_diagnostic.CA1303.severity = silent
 dotnet_diagnostic.CA1305.severity = silent
+dotnet_diagnostic.CA1307.severity = silent
 
 # We use strict NullableReferenceTypes: don't check for nulls.
 dotnet_diagnostic.CA1062.severity = silent
