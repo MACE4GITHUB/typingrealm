@@ -97,5 +97,35 @@ namespace TypingRealm.Profiles.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpGet]
+        [Route("{characterId}/belongsToCurrentProfile")]
+        public async ValueTask<ActionResult<bool>> BelongsToCurrentProfile(string characterId)
+        {
+            var character = await _characterRepository.FindAsync(new CharacterId(characterId));
+            if (character == null)
+                return NotFound();
+
+            return IsOwner(character);
+        }
+
+        // TODO: Move to different, "world character status" API.
+        [HttpGet]
+        [Route("{characterId}/rope-war/{contestId}")]
+        public async ValueTask<ActionResult<bool>> CanJoinRopeWarContest(string characterId, string contestId)
+        {
+            var character = await _characterRepository.FindAsync(new CharacterId(characterId));
+            if (character == null)
+                return NotFound();
+
+            if (!IsOwner(character))
+                return Forbid();
+
+            // We are the owner of the character.
+            // Check if the character has access to given contest.
+            _ = contestId;
+
+            return true;
+        }
     }
 }
