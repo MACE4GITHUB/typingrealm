@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TypingRealm.Authentication;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
@@ -33,6 +34,8 @@ namespace TypingRealm.RopeWar.Server
                     .AllowAnyMethod()
                     .AllowCredentials()));
 
+            services.AddTypingRealmAuthentication();
+
             services.AddSerializationCore()
                 .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
                 .AddJson()
@@ -49,6 +52,8 @@ namespace TypingRealm.RopeWar.Server
 
             app.UseRouting();
             app.UseCors(CorsPolicyName);
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -57,7 +62,7 @@ namespace TypingRealm.RopeWar.Server
                     await context.Response.WriteAsync("=== TypingRealm server ===").ConfigureAwait(false);
                 });
 
-                endpoints.MapHub<MessageHub>("/hub");
+                endpoints.MapHub<MessageHub>("/hub").RequireAuthorization();
             });
         }
     }
