@@ -1,9 +1,8 @@
 ﻿using System;
-using TypingRealm.Domain.Common;
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Domain.Tests.Common
+namespace TypingRealm.Common.Tests
 {
     public class PrimitiveTests : TestsBase
     {

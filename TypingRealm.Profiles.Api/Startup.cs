@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Authentication;
-using TypingRealm.Messaging;
-using TypingRealm.Messaging.Serialization;
-using TypingRealm.Messaging.Serialization.Json;
-using TypingRealm.SignalR;
+using TypingRealm.Profiles.Infrastructure;
 
-namespace TypingRealm.RopeWar.Server
+[assembly: ApiController]
+namespace TypingRealm.Profiles.Api
 {
     public sealed class Startup
     {
@@ -24,8 +23,6 @@ namespace TypingRealm.RopeWar.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSignalR();
-
             services.AddCors(options => options.AddPolicy(
                 CorsPolicyName,
                 builder => builder
@@ -35,14 +32,9 @@ namespace TypingRealm.RopeWar.Server
                     .AllowCredentials()));
 
             services.AddTypingRealmAuthentication();
+            services.AddControllers();
 
-            services.AddSerializationCore()
-                .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
-                .AddJson()
-                .Services
-                .RegisterMessaging()
-                .RegisterMessageHub()
-                .RegisterRopeWar();
+            services.RegisterProfilesApi();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -59,10 +51,10 @@ namespace TypingRealm.RopeWar.Server
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("=== TypingRealm server ===").ConfigureAwait(false);
+                    await context.Response.WriteAsync("=== TypingRealm Profiles API ===").ConfigureAwait(false);
                 });
 
-                endpoints.MapHub<MessageHub>("/hub").RequireAuthorization();
+                endpoints.MapControllers().RequireAuthorization();
             });
         }
     }

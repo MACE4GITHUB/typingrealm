@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
+using TypingRealm.RopeWar.Adapters;
 using TypingRealm.RopeWar.Handlers;
 
 namespace TypingRealm.RopeWar
@@ -10,6 +11,8 @@ namespace TypingRealm.RopeWar
         public static IServiceCollection RegisterRopeWar(this IServiceCollection services)
         {
             services.AddSingleton<IContestStore, InMemoryContestStore>();
+
+            services.AddTransient<ICharacterStateService, CharacterStateServiceAdapter>();
 
             return services
                 .AddTransient<IConnectHook, ConnectHook>()

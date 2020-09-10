@@ -9,9 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
-    <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
-    <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
+    <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles.Api.Resources\TypingRealm.Profiles.Api.Resources.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles\TypingRealm.Profiles.csproj" />
   </ItemGroup>
 
 </Project>

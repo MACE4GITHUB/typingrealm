@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging.Messages;
@@ -13,14 +14,14 @@ namespace TypingRealm.Messaging.Connecting.Initializers
     public sealed class ConnectInitializer : IConnectionInitializer
     {
         private readonly IUpdateDetector _updateDetector;
-        private readonly IConnectHook _connectHook;
+        private readonly IEnumerable<IConnectHook> _connectHooks;
 
         public ConnectInitializer(
             IUpdateDetector updateDetector,
-            IConnectHook connectHook)
+            IEnumerable<IConnectHook> connectHooks)
         {
             _updateDetector = updateDetector;
-            _connectHook = connectHook;
+            _connectHooks = connectHooks;
         }
 
         /// <summary>
@@ -34,7 +35,10 @@ namespace TypingRealm.Messaging.Connecting.Initializers
                 throw new InvalidOperationException("First message is not a valid Connect message.");
             }
 
-            await _connectHook.HandleAsync(connect, cancellationToken).ConfigureAwait(false);
+            foreach (var connectHook in _connectHooks)
+            {
+                await connectHook.HandleAsync(connect, cancellationToken).ConfigureAwait(false);
+            }
 
             return new ConnectedClient(connect.ClientId, connection, connect.Group, _updateDetector);
         }
