@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TypingRealm.Authentication;
 using TypingRealm.Profiles.Infrastructure;
 
 [assembly: ApiController]
@@ -30,11 +31,7 @@ namespace TypingRealm.Profiles.Api
                     .AllowAnyMethod()
                     .AllowCredentials()));
 
-            // Slash at the end is mandatory - scopes issued by Auth0 have this authority.
-            var authority = "https://typingrealm.us.auth0.com/";
-            var audience = "https://api.typingrealm.com";
-
-            services.AddTypingRealmAuthentication(authority, audience);
+            services.AddTypingRealmAuthentication();
             services.AddControllers();
 
             services.RegisterProfilesApi();
