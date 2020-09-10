@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Connecting.Initializers;
@@ -92,6 +95,59 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
             await sut.ConnectAsync(_validConnection, Cts.Token);
 
             connectHook.Verify(x => x.HandleAsync(_connectMessage, Cts.Token));
+        }
+
+        [Theory, AutoMoqData]
+        public void ShouldRegisterConnectHooksInOrder(
+            IConnectHook ch1, EmptyConnectHook ch2)
+        {
+            var provider = new ServiceCollection()
+                .AddTransient(sp => ch1)
+                .AddTransient<IConnectHook>(sp => ch2)
+                .BuildServiceProvider();
+
+            Assert.Equal(2, provider.GetServices<IConnectHook>().Count());
+            Assert.Equal(ch1, provider.GetServices<IConnectHook>().First());
+            Assert.Equal(ch2, provider.GetServices<IConnectHook>().ToList()[1]);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldCallManyConnectHooksInOrder(
+            [Frozen]IEnumerable<IConnectHook> connectHooks,
+            ConnectInitializer sut)
+        {
+            var hooks = connectHooks.ToList();
+            var count = 0;
+
+            Mock.Get(hooks[0]).Setup(x => x.HandleAsync(It.IsAny<Connect>(), Cts.Token))
+                .Callback(() =>
+                {
+                    if (count == 0)
+                        count++;
+                });
+
+            Mock.Get(hooks[1]).Setup(x => x.HandleAsync(It.IsAny<Connect>(), Cts.Token))
+                .Callback(() =>
+                {
+                    if (count == 1)
+                        count++;
+                });
+
+            Mock.Get(hooks[2]).Setup(x => x.HandleAsync(It.IsAny<Connect>(), Cts.Token))
+                .Callback(() =>
+                {
+                    if (count == 2)
+                        count++;
+                });
+
+            await sut.ConnectAsync(_validConnection, Cts.Token);
+
+            foreach (var connectHook in connectHooks)
+            {
+                Mock.Get(connectHook).Verify(x => x.HandleAsync(_connectMessage, Cts.Token));
+            }
+
+            Assert.Equal(3, count);
         }
 
         [Theory, AutoMoqData]
