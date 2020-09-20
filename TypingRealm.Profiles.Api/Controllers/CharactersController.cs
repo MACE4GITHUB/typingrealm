@@ -47,6 +47,17 @@ namespace TypingRealm.Profiles.Api.Controllers
             return characterResource;
         }
 
+        [HttpGet]
+        [Route("{characterId}/info")]
+        public async ValueTask<ActionResult<CharacterInfo>> GetCharacterInfo(string characterId)
+        {
+            var characterResource = await _characterResourceQuery.FindByCharacterIdAsync(characterId);
+            if (characterResource == null)
+                return NotFound();
+
+            return new CharacterInfo(characterResource.Name);
+        }
+
         [HttpPost]
         public async ValueTask<ActionResult> Create(CreateCharacterDto dto)
         {
