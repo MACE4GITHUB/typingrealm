@@ -34,7 +34,7 @@ namespace TypingRealm.RopeWar.Server
                     .AllowAnyMethod()
                     .AllowCredentials()));
 
-            services.AddTypingRealmAuthentication();
+            services.AddLocalTypingRealmAuthentication();
 
             services.AddSerializationCore()
                 .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
