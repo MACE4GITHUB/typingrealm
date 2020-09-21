@@ -9,9 +9,11 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
     <PackageReference Include="protobuf-net" Version="2.4.6" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
     <ProjectReference Include="..\TypingRealm.Combat\TypingRealm.Combat.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Domain.Core\TypingRealm.Domain.Core.csproj" />

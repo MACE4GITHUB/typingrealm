@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Authentication;
 using TypingRealm.Combat.Messages;
 using TypingRealm.Domain;
 using TypingRealm.Messaging;
@@ -88,8 +89,14 @@ namespace TypingRealm.TestClient
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
 
+            Console.Write("Profile ID: ");
+            var profile = Console.ReadLine();
+
             var hub = new HubConnectionBuilder()
-                .WithUrl("http://localhost:30102/hub")
+                .WithUrl($"http://localhost:30102/hub", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(LocalAuthentication.GenerateJwtAccessToken(profile));
+                })
                 .Build();
 
             var notificator = new Notificator();
