@@ -22,7 +22,6 @@ namespace TypingRealm.RopeWar.TcpServer
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices(services =>
                 {
-                    // TODO: Move it to separate assembly, not related to AspNet.
                     services.AddTyrServiceWithoutAspNetAuthentication()
                         .UseLocalProvider();
 

@@ -25,6 +25,7 @@ namespace TypingRealm.Authentication
                 .UseCharacterAuthorizationOnConnect();
         }
 
+        // TODO: Move it to separate assembly, not related to AspNet.
         public static TyrAuthenticationBuilder AddTyrServiceWithoutAspNetAuthentication(this IServiceCollection services)
         {
             return services.AddTypingRealmAuthentication()
