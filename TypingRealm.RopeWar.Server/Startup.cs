@@ -57,11 +57,6 @@ namespace TypingRealm.RopeWar.Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("=== TypingRealm server ===").ConfigureAwait(false);
-                });
-
                 endpoints.MapHub<MessageHub>("/hub").RequireAuthorization();
             });
         }
