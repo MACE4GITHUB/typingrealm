@@ -31,7 +31,9 @@ namespace TypingRealm.Profiles.Api
                     .AllowAnyMethod()
                     .AllowCredentials()));
 
-            services.AddLocalTypingRealmAuthentication();
+            services.AddTyrApiAuthentication()
+                .UseLocalProvider();
+
             services.AddControllers();
 
             services.RegisterProfilesApi();

@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using TypingRealm.Authentication;
 using TypingRealm.Combat.Messages;
 using TypingRealm.Domain;
 using TypingRealm.Messaging;
@@ -31,6 +30,7 @@ namespace TypingRealm.TestClient
                 "s" => MainSignalR(),
                 "cs" => CombatSignalR(),
                 "rw" => RopeWarSignalR(),
+                "rwt" => RopeWarTcp(),
                 _ => MainTpc()
             }).ConfigureAwait(false);
         }
@@ -70,6 +70,41 @@ namespace TypingRealm.TestClient
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }
 
+        public static async Task RopeWarTcp()
+        {
+            var provider = new ServiceCollection()
+                .AddSerializationCore()
+                .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
+                .AddJson()
+                .Services
+                .AddProtobuf()
+                .BuildServiceProvider();
+
+            var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
+                .GetAllTypes()
+                .Select(idToType => idToType.Value)
+                .ToList();
+
+            var protobufConnectionFactory = provider.GetRequiredService<IProtobufConnectionFactory>();
+
+            Console.WriteLine("Press enter to connect.");
+            Console.ReadLine();
+
+            using var client = new TcpClient();
+            await client.ConnectAsync("127.0.0.1", 30102).ConfigureAwait(false);
+
+            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
+
+            using var stream = client.GetStream();
+            using var sendLock = new SemaphoreSlimLock();
+            using var receiveLock = new SemaphoreSlimLock();
+            var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
+                .WithJson(jsonConnectionFactory)
+                .WithLocking(sendLock, receiveLock);
+
+            await Handle(connection, messageTypes).ConfigureAwait(false);
+        }
+
         public static async Task RopeWarSignalR()
         {
             var provider = new ServiceCollection()
@@ -89,13 +124,13 @@ namespace TypingRealm.TestClient
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
 
-            Console.Write("Profile ID: ");
-            var profile = Console.ReadLine();
+            Console.Write("Access token: ");
+            var accessToken = Console.ReadLine();
 
             var hub = new HubConnectionBuilder()
                 .WithUrl($"http://localhost:30102/hub", options =>
                 {
-                    options.AccessTokenProvider = () => Task.FromResult(LocalAuthentication.GenerateJwtAccessToken(profile));
+                    options.AccessTokenProvider = () => Task.FromResult(accessToken);
                 })
                 .Build();
 
@@ -111,7 +146,6 @@ namespace TypingRealm.TestClient
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
-
         }
 
         public static async Task CombatSignalR()

@@ -1,23 +1,20 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 
 namespace TypingRealm.Authentication
 {
     public sealed class ProfileTokenService : IProfileTokenService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IProfileContext _profileContext;
 
-        public ProfileTokenService(IHttpContextAccessor httpContextAccessor)
+        public ProfileTokenService(IProfileContext profileContext)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _profileContext = profileContext;
         }
 
-        public async ValueTask<string> GetProfileAccessTokenAsync(CancellationToken cancellationToken)
+        public ValueTask<string> GetProfileAccessTokenAsync(CancellationToken cancellationToken)
         {
-            return await _httpContextAccessor.HttpContext.GetTokenAsync("access_token")
-                .ConfigureAwait(false);
+            return new ValueTask<string>(_profileContext.GetAccessToken());
         }
     }
 }
