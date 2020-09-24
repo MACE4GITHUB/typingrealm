@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Authentication;
+using TypingRealm.Communication;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
@@ -22,6 +23,7 @@ namespace TypingRealm.RopeWar.TcpServer
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices(services =>
                 {
+                    services.AddCommunication();
                     services.AddTyrServiceWithoutAspNetAuthentication()
                         .UseLocalProvider();
 

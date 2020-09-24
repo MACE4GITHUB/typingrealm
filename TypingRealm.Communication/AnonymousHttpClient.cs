@@ -4,26 +4,15 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using TypingRealm.Communication;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Communication
 {
-    public sealed class AuthenticatedHttpClient : IHttpClient
+    // TODO: Unite common logit between two HTTP client implementations.
+    public sealed class AnonymousHttpClient : IHttpClient
     {
-        private readonly IProfileTokenService _profileTokenService;
-
-        public AuthenticatedHttpClient(IProfileTokenService profileTokenService)
-        {
-            _profileTokenService = profileTokenService;
-        }
-
         public async ValueTask<T> GetAsync<T>(string uri, CancellationToken cancellationToken)
         {
-            var token = await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken)
-                .ConfigureAwait(false);
-
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
             var response = await client.GetAsync(new Uri(uri), cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();

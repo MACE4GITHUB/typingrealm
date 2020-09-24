@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Authentication;
+using TypingRealm.Communication;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
@@ -33,6 +34,7 @@ namespace TypingRealm.RopeWar.Server
                     .AllowAnyMethod()
                     .AllowCredentials()));
 
+            services.AddCommunication();
             services.AddTyrWebServiceAuthentication()
                 .UseLocalProvider();
 

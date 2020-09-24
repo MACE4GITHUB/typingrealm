@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
+    <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
     <ProjectReference Include="..\TypingRealm.RopeWar\TypingRealm.RopeWar.csproj" />

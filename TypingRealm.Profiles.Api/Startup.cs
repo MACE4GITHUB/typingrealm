@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Authentication;
+using TypingRealm.Communication;
 using TypingRealm.Profiles.Infrastructure;
 
 [assembly: ApiController]
@@ -30,6 +31,7 @@ namespace TypingRealm.Profiles.Api
                     .AllowAnyMethod()
                     .AllowCredentials()));
 
+            services.AddCommunication();
             services.AddTyrApiAuthentication()
                 .UseLocalProvider();
 

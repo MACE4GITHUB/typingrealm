@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using TypingRealm.Communication;
 
 namespace TypingRealm.Authentication
 {
