@@ -16,20 +16,17 @@ namespace TypingRealm.Authentication
     {
         public static TyrAuthenticationBuilder UseAuth0Provider(this TyrAuthenticationBuilder builder)
         {
-            static async Task<IEnumerable<SecurityKey>> GetIssuerSigningKeysAsync()
-            {
-                var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>($"{AuthenticationConfiguration.Issuer}.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
-                var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None)
-                    .ConfigureAwait(false);
-
-                return openIdConfig.SigningKeys;
-            }
-
             var parameters = builder.TokenValidationParameters;
 
             parameters.ValidIssuer = AuthenticationConfiguration.Issuer;
             parameters.IssuerSigningKey = null;
-            parameters.IssuerSigningKeys = GetIssuerSigningKeysAsync().GetAwaiter().GetResult();
+            parameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+            {
+                var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>($"{parameters.ValidIssuer}.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
+                var openIdConfig = configurationManager.GetConfigurationAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+                return openIdConfig.SigningKeys;
+            };
 
             return builder;
         }
@@ -39,7 +36,7 @@ namespace TypingRealm.Authentication
             var parameters = builder.TokenValidationParameters;
 
             parameters.ValidIssuer = LocalAuthentication.Issuer;
-            parameters.IssuerSigningKeys = null;
+            parameters.IssuerSigningKeyResolver = null;
             parameters.IssuerSigningKey = LocalAuthentication.SecurityKey;
 
             return builder;
