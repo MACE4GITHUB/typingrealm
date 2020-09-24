@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Authentication;
 using TypingRealm.Combat.Messages;
 using TypingRealm.Domain;
 using TypingRealm.Messaging;
@@ -124,8 +125,14 @@ namespace TypingRealm.TestClient
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
 
-            Console.Write("Access token: ");
+            Console.Write("Access token: (l = use local)");
             var accessToken = Console.ReadLine();
+            if (accessToken == "l")
+            {
+                Console.Write("Profile: ");
+                var profileId = Console.ReadLine();
+                accessToken = LocalAuthentication.GenerateJwtAccessToken(profileId);
+            }
 
             var hub = new HubConnectionBuilder()
                 .WithUrl($"http://localhost:30102/hub", options =>
@@ -231,6 +238,24 @@ namespace TypingRealm.TestClient
             Console.WriteLine("messages - show list of available messages");
             Console.WriteLine("<some-message> - initiate process of sending message to server");
             Console.WriteLine("exit - quit the application");
+
+            Console.WriteLine("Connect with local token? (y)");
+            if (Console.ReadLine() == "y")
+            {
+                Console.Write("ProfileId: ");
+                var profileId = Console.ReadLine();
+
+                Console.Write("ClientId: ");
+                var clientId = Console.ReadLine();
+
+                Console.Write("Group: ");
+                var group = Console.ReadLine();
+
+                var token = LocalAuthentication.GenerateJwtAccessToken(profileId);
+
+                await connection.SendAsync(new Connect($"{token},{clientId}", group), default)
+                    .ConfigureAwait(false);
+            }
 
             while (true)
             {
