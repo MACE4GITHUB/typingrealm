@@ -65,9 +65,19 @@ namespace TypingRealm.Authentication
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                options.Authority = AuthenticationConfiguration.Issuer;
                 options.Audience = AuthenticationConfiguration.Audience;
                 options.TokenValidationParameters = builder.TokenValidationParameters;
+                options.Authority = options.TokenValidationParameters.ValidIssuer;
+
+                // HACK: Avoid getting .well-known when using local tokens.
+                if (options.Authority == LocalAuthentication.Issuer)
+                {
+                    options.Configuration = new OpenIdConnectConfiguration
+                    {
+                        Issuer = options.Authority
+                    };
+                    options.Configuration.SigningKeys.Add(options.TokenValidationParameters.IssuerSigningKey);
+                }
 
                 // For SignalR hubs.
                 options.Events = new JwtBearerEvents
