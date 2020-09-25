@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
-using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
 namespace TypingRealm.RopeWar.TcpServer
@@ -13,7 +12,6 @@ namespace TypingRealm.RopeWar.TcpServer
                 port,
                 provider.GetRequiredService<ILogger<TcpServer>>(),
                 provider.GetRequiredService<IConnectionHandler>(),
-                provider.GetRequiredService<IProtobufConnectionFactory>(),
-                provider.GetRequiredService<IJsonConnectionFactory>()));
+                provider.GetRequiredService<IProtobufConnectionFactory>()));
     }
 }

@@ -33,6 +33,7 @@ namespace TypingRealm.RopeWar
     }
 
     // Dictionary serialization is not supported, so this crutch for now.
+    [Message] // This is another crutch: internal classes for protobuf serialization.
     public sealed class ContestantUpdate
     {
         public string ContestantId { get; set; }

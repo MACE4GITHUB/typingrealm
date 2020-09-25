@@ -94,13 +94,10 @@ namespace TypingRealm.TestClient
             using var client = new TcpClient();
             await client.ConnectAsync("127.0.0.1", 30102).ConfigureAwait(false);
 
-            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
-
             using var stream = client.GetStream();
             using var sendLock = new SemaphoreSlimLock();
             using var receiveLock = new SemaphoreSlimLock();
             var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
-                .WithJson(jsonConnectionFactory)
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
