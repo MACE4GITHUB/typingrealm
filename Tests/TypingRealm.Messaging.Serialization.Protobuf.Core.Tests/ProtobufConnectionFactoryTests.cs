@@ -10,14 +10,14 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
     {
         [Theory, AutoMoqData]
         public async Task ShouldCreateWithStreamAndCache(
-            [Frozen]IMessageTypeCache cache,
+            [Frozen]IProtobufFieldNumberCache cache,
             [Frozen]IProtobuf protobuf,
             Stream stream,
             ProtobufConnectionFactory sut)
         {
             var connection = sut.CreateProtobufConnection(stream);
 
-            Assert.Equal(cache, GetPrivateField(connection, "_messageTypes"));
+            Assert.Equal(cache, GetPrivateField(connection, "_fieldNumberCache"));
             Assert.Equal(stream, GetPrivateField(connection, "_stream"));
             Assert.Equal(protobuf, GetPrivateField(connection, "_protobuf"));
         }

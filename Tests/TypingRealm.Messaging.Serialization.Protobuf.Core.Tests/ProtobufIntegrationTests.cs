@@ -16,19 +16,19 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         public async Task ShouldWork(
             [Frozen(Matching.ImplementedInterfaces)]Protobuf protobuf,
             [Frozen]Stream stream,
-            [Frozen]Mock<IMessageTypeCache> cache,
+            [Frozen]Mock<IProtobufFieldNumberCache> cache,
             TestMessage message,
             List<string> list,
             ProtobufConnection sut)
         {
             _ = protobuf;
 
-            cache.Setup(x => x.GetTypeId(typeof(TestMessage)))
-                .Returns("2");
+            cache.Setup(x => x.GetFieldNumber(typeof(TestMessage)))
+                .Returns(2);
 
-            cache.Setup(x => x.GetTypeId(typeof(List<string>)))
-                .Returns("3");
-            cache.Setup(x => x.GetTypeById("3"))
+            cache.Setup(x => x.GetFieldNumber(typeof(List<string>)))
+                .Returns(3);
+            cache.Setup(x => x.GetTypeByFieldNumber(3))
                 .Returns(typeof(List<string>));
 
             // Should throw when message not registered.

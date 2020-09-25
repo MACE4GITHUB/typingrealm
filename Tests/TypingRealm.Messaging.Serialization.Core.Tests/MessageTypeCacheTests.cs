@@ -7,12 +7,12 @@ namespace TypingRealm.Messaging.Serialization.Tests
     namespace A
     {
         [Message]
-        public class ATestMessage
+        public class BTestMessage
         {
         }
 
         [Message]
-        public class BTestMessage
+        public class DTestMessage
         {
         }
     }
@@ -25,7 +25,7 @@ namespace TypingRealm.Messaging.Serialization.Tests
         }
 
         [Message]
-        public class BTestMessage
+        public class CTestMessage
         {
         }
     }
@@ -38,8 +38,8 @@ namespace TypingRealm.Messaging.Serialization.Tests
             Assert.Throws<ArgumentException>(
                 () => new MessageTypeCache(new[]
                 {
-                    typeof(A.ATestMessage),
-                    typeof(A.ATestMessage)
+                    typeof(A.BTestMessage),
+                    typeof(A.BTestMessage)
                 }));
         }
 
@@ -51,52 +51,52 @@ namespace TypingRealm.Messaging.Serialization.Tests
         }
 
         [Fact]
-        public void ShouldSortByTypeFullNameAndAssignNumberStartingFrom1()
+        public void ShouldSortByTypeFullNameAndAssignShortNameAsTypeid()
         {
             var sut = new MessageTypeCache(new[]
             {
-                typeof(A.BTestMessage),
-                typeof(B.BTestMessage),
+                typeof(A.DTestMessage),
+                typeof(B.CTestMessage),
                 typeof(B.ATestMessage),
-                typeof(A.ATestMessage)
+                typeof(A.BTestMessage)
             });
 
             var all = sut.GetAllTypes().ToDictionary(x => x.Key, x => x.Value);
             Assert.Equal(4, all.Count);
-            Assert.Equal(typeof(A.ATestMessage), all["1"]);
-            Assert.Equal(typeof(A.BTestMessage), all["2"]);
-            Assert.Equal(typeof(B.ATestMessage), all["3"]);
-            Assert.Equal(typeof(B.BTestMessage), all["4"]);
+            Assert.Equal(typeof(A.BTestMessage), all[nameof(A.BTestMessage)]);
+            Assert.Equal(typeof(A.DTestMessage), all[nameof(A.DTestMessage)]);
+            Assert.Equal(typeof(B.ATestMessage), all[nameof(B.ATestMessage)]);
+            Assert.Equal(typeof(B.CTestMessage), all[nameof(B.CTestMessage)]);
         }
 
         [Fact]
         public void ShouldGetTypeById()
         {
-            var sut = new MessageTypeCache(new[] { typeof(A.ATestMessage) });
-            Assert.Equal(typeof(A.ATestMessage), sut.GetTypeById("1"));
+            var sut = new MessageTypeCache(new[] { typeof(A.BTestMessage) });
+            Assert.Equal(typeof(A.BTestMessage), sut.GetTypeById(nameof(A.BTestMessage)));
         }
 
         [Fact]
         public void ShouldGetIdByType()
         {
-            var sut = new MessageTypeCache(new[] { typeof(A.ATestMessage) });
-            Assert.Equal("1", sut.GetTypeId(typeof(A.ATestMessage)));
+            var sut = new MessageTypeCache(new[] { typeof(A.BTestMessage) });
+            Assert.Equal(nameof(A.BTestMessage), sut.GetTypeId(typeof(A.BTestMessage)));
         }
 
         [Fact]
         public void GetTypeById_ShouldThrowWhenTypeIsNotInCache()
         {
-            var sut = new MessageTypeCache(new[] { typeof(A.ATestMessage) });
+            var sut = new MessageTypeCache(new[] { typeof(A.BTestMessage) });
             Assert.Throws<InvalidOperationException>(
-                () => sut.GetTypeById("2"));
+                () => sut.GetTypeById(nameof(B.CTestMessage)));
         }
 
         [Fact]
         public void GetTypeId_ShouldThrowWhenTypeIsNotInCache()
         {
-            var sut = new MessageTypeCache(new[] { typeof(A.ATestMessage) });
+            var sut = new MessageTypeCache(new[] { typeof(A.BTestMessage) });
             Assert.Throws<InvalidOperationException>(
-                () => sut.GetTypeId(typeof(B.BTestMessage)));
+                () => sut.GetTypeId(typeof(B.CTestMessage)));
         }
     }
 }

@@ -11,6 +11,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
         public static IServiceCollection AddProtobuf(this IServiceCollection services)
         {
             services.AddTransient<IProtobufConnectionFactory, ProtobufConnectionFactory>();
+            services.AddSingleton<IProtobufFieldNumberCache, ProtobufFieldNumberCache>();
             services.AddSingleton<IProtobuf>(provider =>
             {
                 var messageTypeCache = provider.GetRequiredService<IMessageTypeCache>();

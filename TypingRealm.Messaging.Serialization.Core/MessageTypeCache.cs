@@ -45,7 +45,7 @@ namespace TypingRealm.Messaging.Serialization
                 .OrderBy(type => type.FullName)
                 .Select((type, index) => new
                 {
-                    TypeId = (index + 1).ToString(),
+                    TypeId = type.Name,
                     Type = type
                 })
                 .ToDictionary(x => x.TypeId, x => x.Type);

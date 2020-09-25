@@ -11,16 +11,16 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
     public sealed class ProtobufConnection : IConnection
     {
         private readonly Stream _stream;
-        private readonly IMessageTypeCache _messageTypes;
+        private readonly IProtobufFieldNumberCache _fieldNumberCache;
         private readonly IProtobuf _protobuf;
 
         public ProtobufConnection(
             Stream stream,
-            IMessageTypeCache messageTypes,
+            IProtobufFieldNumberCache fieldNumberCache,
             IProtobuf protobuf)
         {
             _stream = stream;
-            _messageTypes = messageTypes;
+            _fieldNumberCache = fieldNumberCache;
             _protobuf = protobuf;
         }
 
@@ -32,7 +32,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
 
             return _protobuf.Deserialize(
                 _stream,
-                fieldNumber => _messageTypes.GetTypeById(fieldNumber.ToString()));
+                fieldNumber => _fieldNumberCache.GetTypeByFieldNumber(fieldNumber));
         }
 
         public async ValueTask SendAsync(object message, CancellationToken cancellationToken)
@@ -40,7 +40,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
             using var memoryStream = new MemoryStream();
 
             var fieldNumber = Convert.ToInt32(
-                _messageTypes.GetTypeId(message.GetType()));
+                _fieldNumberCache.GetFieldNumber(message.GetType()));
 
             _protobuf.Serialize(memoryStream, message, fieldNumber);
 

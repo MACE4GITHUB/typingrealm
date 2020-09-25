@@ -14,11 +14,11 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         public async Task ShouldReceive(
             [Frozen]Stream stream,
             [Frozen]Mock<IProtobuf> protobuf,
-            [Frozen]Mock<IMessageTypeCache> cache,
+            [Frozen]Mock<IProtobufFieldNumberCache> cache,
             TestMessage message,
             ProtobufConnection sut)
         {
-            cache.Setup(x => x.GetTypeById("5")).Returns(typeof(TestMessage));
+            cache.Setup(x => x.GetTypeByFieldNumber(5)).Returns(typeof(TestMessage));
 
             protobuf.Setup(x => x.Deserialize(stream, It.Is<Func<int, Type>>(
                 func => func.Invoke(5) == typeof(TestMessage))))
@@ -33,13 +33,13 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         public async Task ShouldSend(
             [Frozen]Stream stream,
             [Frozen]Mock<IProtobuf> protobuf,
-            [Frozen]Mock<IMessageTypeCache> cache,
+            [Frozen]Mock<IProtobufFieldNumberCache> cache,
             byte[] writtenBytes,
             TestMessage message,
             ProtobufConnection sut)
         {
-            cache.Setup(x => x.GetTypeId(typeof(TestMessage)))
-                .Returns("5");
+            cache.Setup(x => x.GetFieldNumber(typeof(TestMessage)))
+                .Returns(5);
 
             Stream writeStream = null!;
             protobuf.Setup(x => x.Serialize(It.IsAny<MemoryStream>(), message, 5))
