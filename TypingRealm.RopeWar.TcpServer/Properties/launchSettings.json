@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "TypingRealm.RopeWar.TcpServer": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "commandLineArgs": "-p 30102:30102"
+    }
+  }
+}
