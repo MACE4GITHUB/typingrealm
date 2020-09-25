@@ -23,6 +23,4 @@ RUN dotnet publish "TypingRealm.RopeWar.TcpServer.csproj" -c Release -o /app/pub
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-EXPOSE 30102
 ENTRYPOINT ["dotnet", "TypingRealm.RopeWar.TcpServer.dll"]
