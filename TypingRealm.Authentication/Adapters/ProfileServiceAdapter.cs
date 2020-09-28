@@ -6,16 +6,16 @@ namespace TypingRealm.Authentication.Adapters
 {
     public sealed class ProfileServiceAdapter : IProfileService
     {
-        private readonly IHttpClient _httpClient;
+        private readonly IServiceClient _serviceClient;
 
-        public ProfileServiceAdapter(IHttpClient httpClient)
+        public ProfileServiceAdapter(IServiceClient serviceClient)
         {
-            _httpClient = httpClient;
+            _serviceClient = serviceClient;
         }
 
         public ValueTask<bool> CharacterBelongsToCurrentProfileAsync(string characterId, CancellationToken cancellationToken)
         {
-            return _httpClient.GetAsync<bool>($"http://host.docker.internal:30103/api/characters/{characterId}/belongsToCurrentProfile", cancellationToken);
+            return _serviceClient.GetAsync<bool>("profile", $"characters/{characterId}/belongsToCurrentProfile", cancellationToken);
         }
     }
 }

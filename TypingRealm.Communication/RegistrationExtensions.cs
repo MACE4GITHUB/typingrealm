@@ -6,7 +6,9 @@ namespace TypingRealm.Communication
     {
         public static IServiceCollection AddCommunication(this IServiceCollection services)
         {
-            return services.AddTransient<IHttpClient, AnonymousHttpClient>();
+            return services
+                .AddTransient<IHttpClient, AnonymousHttpClient>()
+                .AddTransient<IServiceClient, InMemoryServiceClient>();
         }
     }
 }

@@ -6,16 +6,16 @@ namespace TypingRealm.RopeWar.Adapters
 {
     public sealed class CharacterStateServiceAdapter : ICharacterStateService
     {
-        private readonly IHttpClient _httpClient;
+        private readonly IServiceClient _serviceClient;
 
-        public CharacterStateServiceAdapter(IHttpClient httpClient)
+        public CharacterStateServiceAdapter(IServiceClient serviceClient)
         {
-            _httpClient = httpClient;
+            _serviceClient = serviceClient;
         }
 
         public ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken)
         {
-            return _httpClient.GetAsync<bool>($"http://host.docker.internal:30103/api/characters/{characterId}/rope-war/{contestId}", cancellationToken);
+            return _serviceClient.GetAsync<bool>("profile", $"characters/{characterId}/rope-war/{contestId}", cancellationToken);
         }
     }
 }
