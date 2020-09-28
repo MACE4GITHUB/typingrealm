@@ -1,21 +1,22 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using TypingRealm.Communication;
+using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.RopeWar.Adapters
 {
+    // TODO: Consider getting rid of this adapter now that we have ICharactersClient.
     public sealed class CharacterStateServiceAdapter : ICharacterStateService
     {
-        private readonly IServiceClient _serviceClient;
+        private readonly ICharactersClient _charactersClient;
 
-        public CharacterStateServiceAdapter(IServiceClient serviceClient)
+        public CharacterStateServiceAdapter(ICharactersClient charactersClient)
         {
-            _serviceClient = serviceClient;
+            _charactersClient = charactersClient;
         }
 
         public ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken)
         {
-            return _serviceClient.GetAsync<bool>("profile", $"characters/{characterId}/rope-war/{contestId}", cancellationToken);
+            return _charactersClient.CanJoinRopeWarContest(characterId, contestId, cancellationToken);
         }
     }
 }

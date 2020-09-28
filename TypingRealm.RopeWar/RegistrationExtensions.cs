@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
+using TypingRealm.Profiles.Api.Client;
 using TypingRealm.RopeWar.Adapters;
 using TypingRealm.RopeWar.Handlers;
 
@@ -13,6 +14,8 @@ namespace TypingRealm.RopeWar
             services.AddSingleton<IContestStore, InMemoryContestStore>();
 
             services.AddTransient<ICharacterStateService, CharacterStateServiceAdapter>();
+
+            services.AddProfileApiClients();
 
             return services
                 .AddTransient<IConnectHook, ConnectHook>()

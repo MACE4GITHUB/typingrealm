@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using TypingRealm.Communication;
+using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Authentication
 {
@@ -22,6 +23,7 @@ namespace TypingRealm.Authentication
             services.AddSingleton(TokenValidationParameters);
 
             services.AddTransient<IHttpClient, AuthenticatedHttpClient>();
+            services.AddProfileApiClients();
         }
 
         internal IServiceCollection Services { get; }
