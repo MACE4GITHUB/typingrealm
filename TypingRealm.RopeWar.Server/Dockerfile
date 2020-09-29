@@ -11,6 +11,7 @@ COPY ["TypingRealm.Messaging.Core/TypingRealm.Messaging.Core.csproj", "TypingRea
 COPY ["TypingRealm.Common/TypingRealm.Common.csproj", "TypingRealm.Common/"]
 COPY ["TypingRealm.Messaging/TypingRealm.Messaging.csproj", "TypingRealm.Messaging/"]
 COPY ["TypingRealm.Authentication/TypingRealm.Authentication.csproj", "TypingRealm.Authentication/"]
+COPY ["TypingRealm.Profiles.Api.Client/TypingRealm.Profiles.Api.Client.csproj", "TypingRealm.Profiles.Api.Client/"]
 COPY ["TypingRealm.RopeWar/TypingRealm.RopeWar.csproj", "TypingRealm.RopeWar/"]
 COPY ["TypingRealm.SignalR/TypingRealm.SignalR.csproj", "TypingRealm.SignalR/"]
 RUN dotnet restore "TypingRealm.RopeWar.Server/TypingRealm.RopeWar.Server.csproj"

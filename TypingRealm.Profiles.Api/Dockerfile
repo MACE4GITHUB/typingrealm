@@ -13,6 +13,7 @@ COPY ["TypingRealm.Communication/TypingRealm.Communication.csproj", "TypingRealm
 COPY ["TypingRealm.Authentication/TypingRealm.Authentication.csproj", "TypingRealm.Authentication/"]
 COPY ["TypingRealm.Messaging.Core/TypingRealm.Messaging.Core.csproj", "TypingRealm.Messaging.Core/"]
 COPY ["TypingRealm.Messaging/TypingRealm.Messaging.csproj", "TypingRealm.Messaging/"]
+COPY ["TypingRealm.Profiles.Api.Client/TypingRealm.Profiles.Api.Client.csproj", "TypingRealm.Profiles.Api.Client/"]
 RUN dotnet restore "TypingRealm.Profiles.Api/TypingRealm.Profiles.Api.csproj"
 COPY . .
 WORKDIR "/src/TypingRealm.Profiles.Api"
