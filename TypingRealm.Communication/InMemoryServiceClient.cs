@@ -10,7 +10,7 @@ namespace TypingRealm.Communication
         private readonly Dictionary<string, string> _serviceAddresses
             = new Dictionary<string, string>
             {
-                ["profile"] = "http://localhost:30103/api"
+                ["profile"] = "http://localhost:30103"
             };
 
         private readonly IHttpClient _httpClient;
