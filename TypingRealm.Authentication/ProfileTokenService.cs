@@ -5,16 +5,16 @@ namespace TypingRealm.Authentication
 {
     public sealed class ProfileTokenService : IProfileTokenService
     {
-        private readonly IProfileContext _profileContext;
+        private readonly IConnectedClientContext _connectedClientContext;
 
-        public ProfileTokenService(IProfileContext profileContext)
+        public ProfileTokenService(IConnectedClientContext connectedClientContext)
         {
-            _profileContext = profileContext;
+            _connectedClientContext = connectedClientContext;
         }
 
         public ValueTask<string> GetProfileAccessTokenAsync(CancellationToken cancellationToken)
         {
-            return new ValueTask<string>(_profileContext.GetAccessToken());
+            return new ValueTask<string>(_connectedClientContext.GetAccessToken());
         }
     }
 }

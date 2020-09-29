@@ -35,16 +35,17 @@ namespace TypingRealm.RopeWar.Server
                     .AllowCredentials()));
 
             services.AddCommunication();
-            services.AddTyrWebServiceAuthentication()
-                .UseLocalProvider();
-
             services.AddSerializationCore()
                 .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
+                .AddMessageTypesFromAssembly(typeof(Authenticate).Assembly)
                 .AddJson()
                 .Services
                 .RegisterMessaging()
                 .RegisterMessageHub()
                 .RegisterRopeWar();
+
+            services.AddTyrWebServiceAuthentication()
+                .UseLocalProvider();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using TypingRealm.Messaging;
 
 namespace TypingRealm.Authentication
 {
-    public sealed class ProfileContext : IProfileContext
+    public sealed class ConnectedClientContext : IConnectedClientContext
     {
+        private ConnectedClient? _connectedClient;
         private ClaimsPrincipal? _claimsPrincipal;
         private JwtSecurityToken? _securityToken;
 
@@ -21,6 +23,14 @@ namespace TypingRealm.Authentication
 
             _claimsPrincipal = claimsPrincipal;
             _securityToken = securityToken;
+        }
+
+        public void SetConnectedClient(ConnectedClient connectedClient)
+        {
+            if (connectedClient == null)
+                throw new ArgumentNullException(nameof(connectedClient));
+
+            _connectedClient = connectedClient;
         }
     }
 }

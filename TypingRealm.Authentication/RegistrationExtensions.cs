@@ -21,7 +21,7 @@ namespace TypingRealm.Authentication
             return services.AddTypingRealmAuthentication()
                 .UseAuth0Provider()
                 .UseAspNetAuthentication()
-                .UseConnectMessageAuthentication()
+                .UseConnectedClientContextAuthentication()
                 .UseCharacterAuthorizationOnConnect();
         }
 
@@ -30,7 +30,7 @@ namespace TypingRealm.Authentication
         {
             return services.AddTypingRealmAuthentication()
                 .UseAuth0Provider()
-                .UseConnectMessageAuthentication()
+                .UseConnectedClientContextAuthentication()
                 .UseCharacterAuthorizationOnConnect();
         }
     }

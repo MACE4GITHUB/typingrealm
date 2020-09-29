@@ -1,11 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using TypingRealm.Messaging;
 
 namespace TypingRealm.Authentication
 {
-    public interface IProfileContext
+    public interface IConnectedClientContext
     {
         string GetAccessToken();
         void SetAuthenticatedContext(ClaimsPrincipal claimsPrincipal, JwtSecurityToken securityToken);
+        void SetConnectedClient(ConnectedClient connectedClient);
     }
 }

@@ -40,15 +40,16 @@ namespace TypingRealm.Authentication
             return builder;
         }
 
-        public static TyrAuthenticationBuilder UseConnectMessageAuthentication(this TyrAuthenticationBuilder builder)
+        public static TyrAuthenticationBuilder UseConnectedClientContextAuthentication(this TyrAuthenticationBuilder builder)
         {
             var services = builder.Services;
 
             services.AddTransient<IProfileTokenService, ProfileTokenService>();
-            services.AddTransient<IConnectHook, AuthenticateConnectHook>();
+            services.AddTransient<ITokenAuthenticationService, TokenAuthenticationService>();
+            services.Decorate<IConnectionInitializer, AuthenticateConnectionInitializer>();
 
             // Scope is created per user connection, managed by Messaging project.
-            services.AddScoped<IProfileContext, ProfileContext>();
+            services.AddScoped<IConnectedClientContext, ConnectedClientContext>();
 
             return builder;
         }

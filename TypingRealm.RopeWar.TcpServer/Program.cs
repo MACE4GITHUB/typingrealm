@@ -24,17 +24,18 @@ namespace TypingRealm.RopeWar.TcpServer
                 .ConfigureServices(services =>
                 {
                     services.AddCommunication();
-                    services.AddTyrServiceWithoutAspNetAuthentication()
-                        .UseLocalProvider();
-
                     services.AddSerializationCore()
                         .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly) // TODO: Move to RegisterRopeWar?
+                        .AddMessageTypesFromAssembly(typeof(Authenticate).Assembly)
                         .AddJson()
                         .Services
                         .AddProtobuf()
                         .RegisterMessaging()
                         .RegisterRopeWar()
                         .AddTcpServer(Port);
+
+                    services.AddTyrServiceWithoutAspNetAuthentication()
+                        .UseLocalProvider();
 
                     services.AddHostedService<RopeWarHostedService>();
                 });
