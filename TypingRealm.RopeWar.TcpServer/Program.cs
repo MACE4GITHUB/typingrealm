@@ -36,7 +36,7 @@ namespace TypingRealm.RopeWar.TcpServer
                         .RegisterRopeWar()
                         .AddTcpServer(Port);
 
-                    services.AddHostedService<RopeWarTcpServer>();
+                    services.AddHostedService<RopeWarHostedService>();
                 });
     }
 }

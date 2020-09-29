@@ -4,11 +4,11 @@ using Microsoft.Extensions.Hosting;
 
 namespace TypingRealm.RopeWar.TcpServer
 {
-    public sealed class RopeWarTcpServer : IHostedService
+    public sealed class RopeWarHostedService : IHostedService
     {
         private readonly TcpServer _tcpServer;
 
-        public RopeWarTcpServer(TcpServer tcpServer)
+        public RopeWarHostedService(TcpServer tcpServer)
         {
             _tcpServer = tcpServer;
         }
