@@ -8,9 +8,10 @@ using TypingRealm.Communication;
 
 namespace TypingRealm.Authentication
 {
-    public sealed class AuthenticatedHttpClient : IHttpClient
+    public sealed class AuthenticatedHttpClient : SyncManagedDisposable, IHttpClient
     {
         private readonly IProfileTokenService _profileTokenService;
+        private readonly HttpClient _httpClient = new HttpClient();
 
         public AuthenticatedHttpClient(IProfileTokenService profileTokenService)
         {
@@ -19,13 +20,14 @@ namespace TypingRealm.Authentication
 
         public async ValueTask<T> GetAsync<T>(string uri, CancellationToken cancellationToken)
         {
+            // TODO: Consider updating token only when it's updated in ConnectedClientContext.
             var token = await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _httpClient.DefaultRequestHeaders.Remove("Authorization");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            var response = await client.GetAsync(new Uri(uri), cancellationToken).ConfigureAwait(false);
+            var response = await _httpClient.GetAsync(new Uri(uri), cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -41,6 +43,11 @@ namespace TypingRealm.Authentication
             options.Converters.Add(new JsonStringEnumConverter());
 
             return JsonSerializer.Deserialize<T>(content, options);
+        }
+
+        protected override void DisposeManagedResources()
+        {
+            _httpClient.Dispose();
         }
     }
 }
