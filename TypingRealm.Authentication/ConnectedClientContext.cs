@@ -55,12 +55,12 @@ namespace TypingRealm.Authentication
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(1000).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
                 if (_connectedClient == null || _securityToken == null)
                     continue;
 
-                if (DateTime.UtcNow > _securityToken.ValidTo - TimeSpan.FromSeconds(40))
+                if (DateTime.UtcNow > _securityToken.ValidTo - TimeSpan.FromMinutes(1))
                 {
                     await _connectedClient.Connection.SendAsync(new TokenExpired(), cancellationToken)
                         .ConfigureAwait(false);
