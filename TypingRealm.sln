@@ -33,15 +33,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Messaging", "Ty
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Messaging.Tests", "Tests\TypingRealm.Messaging.Tests\TypingRealm.Messaging.Tests.csproj", "{05FC5614-30E5-49BA-AC0A-CADECEB425E1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.TcpServer", "TypingRealm.TcpServer\TypingRealm.TcpServer.csproj", "{30C75ECD-BB54-4B6A-AB28-5C896CD701E1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Common", "TypingRealm.Common\TypingRealm.Common.csproj", "{3B28B6C1-9055-4440-83F9-0986C3DC4A9F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Common.Tests", "Tests\TypingRealm.Common.Tests\TypingRealm.Common.Tests.csproj", "{2999E361-CE1D-4773-B933-D2AC764AF4D7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.TestClient", "TypingRealm.TestClient\TypingRealm.TestClient.csproj", "{1A860EE6-65E3-477E-BC5B-A8C125B4671C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.SignalRServer", "TypingRealm.SignalRServer\TypingRealm.SignalRServer.csproj", "{56BA27A4-7D22-49BC-874D-AEF306324EFB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Domain.Core", "TypingRealm.Domain.Core\TypingRealm.Domain.Core.csproj", "{593125D6-0157-4303-8642-51E92A8EB2F0}"
 EndProject
@@ -131,10 +127,6 @@ Global
 		{05FC5614-30E5-49BA-AC0A-CADECEB425E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05FC5614-30E5-49BA-AC0A-CADECEB425E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05FC5614-30E5-49BA-AC0A-CADECEB425E1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30C75ECD-BB54-4B6A-AB28-5C896CD701E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30C75ECD-BB54-4B6A-AB28-5C896CD701E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30C75ECD-BB54-4B6A-AB28-5C896CD701E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30C75ECD-BB54-4B6A-AB28-5C896CD701E1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3B28B6C1-9055-4440-83F9-0986C3DC4A9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3B28B6C1-9055-4440-83F9-0986C3DC4A9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B28B6C1-9055-4440-83F9-0986C3DC4A9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -147,10 +139,6 @@ Global
 		{1A860EE6-65E3-477E-BC5B-A8C125B4671C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A860EE6-65E3-477E-BC5B-A8C125B4671C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A860EE6-65E3-477E-BC5B-A8C125B4671C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56BA27A4-7D22-49BC-874D-AEF306324EFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{593125D6-0157-4303-8642-51E92A8EB2F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{593125D6-0157-4303-8642-51E92A8EB2F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{593125D6-0157-4303-8642-51E92A8EB2F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
