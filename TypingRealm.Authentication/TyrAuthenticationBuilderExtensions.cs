@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TypingRealm.Authentication.Adapters;
+using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 
 namespace TypingRealm.Authentication
@@ -47,6 +48,7 @@ namespace TypingRealm.Authentication
             services.AddTransient<IProfileTokenService, ProfileTokenService>();
             services.AddTransient<ITokenAuthenticationService, TokenAuthenticationService>();
             services.Decorate<IConnectionInitializer, AuthenticateConnectionInitializer>();
+            services.RegisterHandler<Authenticate, AuthenticateHandler>();
 
             // Scope is created per user connection, managed by Messaging project.
             services.AddScoped<IConnectedClientContext, ConnectedClientContext>();
