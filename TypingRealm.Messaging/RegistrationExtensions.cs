@@ -17,8 +17,7 @@ namespace TypingRealm.Messaging
         public static IServiceCollection RegisterMessaging(this IServiceCollection services)
         {
             // Connection handling. Entry point.
-            services.AddTransient<IConnectionHandler, ConnectionHandler>()
-                .Decorate<IConnectionHandler, ExceptionlessConnectionHandler>();
+            services.AddTransient<IConnectionHandler, ConnectionHandler>();
             services.AddTransient<IScopedConnectionHandler, ScopedConnectionHandler>();
 
             // Shared between all connections.

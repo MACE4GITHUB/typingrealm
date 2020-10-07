@@ -49,23 +49,11 @@ namespace TypingRealm.Messaging.Tests
                 .BuildServiceProvider();
         }
 
-        [Fact]
-        public void ShouldRegisterConnectionHandlerDecorated()
-        {
-            _provider.AssertRegisteredTransient(typeof(IConnectionHandler), typeof(ExceptionlessConnectionHandler));
-
-            var innerConnectionHandler = GetPrivateField(
-                _provider.GetRequiredService<IConnectionHandler>(),
-                "_connectionHandler");
-
-            // TODO: there is no way currently to test if ConnectionHandler was registered as transient.
-            Assert.IsType<ConnectionHandler>(innerConnectionHandler);
-        }
-
         [Theory]
         [InlineData(typeof(IConnectHook), typeof(EmptyConnectHook))]
         [InlineData(typeof(IConnectionInitializer), typeof(ConnectInitializer))]
         [InlineData(typeof(IScopedConnectionHandler), typeof(ScopedConnectionHandler))]
+        [InlineData(typeof(IConnectionHandler), typeof(ConnectionHandler))]
         [InlineData(typeof(IMessageDispatcher), typeof(MessageDispatcher))]
         [InlineData(typeof(IMessageHandlerFactory), typeof(MessageHandlerFactory))]
         [InlineData(typeof(IUpdater), typeof(AnnouncingUpdater))]
