@@ -5,13 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
-    <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Protobuf.Core\TypingRealm.Messaging.Serialization.Protobuf.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
   </ItemGroup>
 

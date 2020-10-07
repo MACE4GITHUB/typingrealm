@@ -8,10 +8,10 @@ namespace TypingRealm.RopeWar.TcpServer
     public static class RegistrationExtensions
     {
         public static IServiceCollection AddTcpServer(this IServiceCollection services, int port)
-            => services.AddTransient(provider => new TcpServer(
+            => services.AddTransient(provider => new Tcp.TcpServer(
                 port,
-                provider.GetRequiredService<ILogger<TcpServer>>(),
-                provider.GetRequiredService<IConnectionHandler>(),
+                provider.GetRequiredService<ILogger<Tcp.TcpServer>>(),
+                provider.GetRequiredService<IScopedConnectionHandler>(),
                 provider.GetRequiredService<IProtobufConnectionFactory>()));
     }
 }

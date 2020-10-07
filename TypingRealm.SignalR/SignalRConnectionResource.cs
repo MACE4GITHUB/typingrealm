@@ -6,15 +6,18 @@ namespace TypingRealm.SignalR
 {
     public sealed class SignalRConnectionResource
     {
+        private readonly Func<Task> _cancel;
+
         public SignalRConnectionResource(
             Notificator notificator,
-            Func<Task> releaseResources)
+            Func<Task> cancel)
         {
             Notificator = notificator;
-            ReleaseResources = releaseResources;
+            _cancel = cancel;
         }
 
         public Notificator Notificator { get; }
-        public Func<Task> ReleaseResources { get; }
+
+        public Task Cancel() => _cancel();
     }
 }

@@ -6,9 +6,9 @@ namespace TypingRealm.RopeWar.TcpServer
 {
     public sealed class RopeWarHostedService : IHostedService
     {
-        private readonly TcpServer _tcpServer;
+        private readonly Tcp.TcpServer _tcpServer;
 
-        public RopeWarHostedService(TcpServer tcpServer)
+        public RopeWarHostedService(Tcp.TcpServer tcpServer)
         {
             _tcpServer = tcpServer;
         }

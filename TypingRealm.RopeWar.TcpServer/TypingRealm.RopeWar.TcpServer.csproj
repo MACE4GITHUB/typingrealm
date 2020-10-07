@@ -24,6 +24,7 @@
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Protobuf.Core\TypingRealm.Messaging.Serialization.Protobuf.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
     <ProjectReference Include="..\TypingRealm.RopeWar\TypingRealm.RopeWar.csproj" />
+    <ProjectReference Include="..\TypingRealm.Tcp\TypingRealm.Tcp.csproj" />
   </ItemGroup>
 
 </Project>

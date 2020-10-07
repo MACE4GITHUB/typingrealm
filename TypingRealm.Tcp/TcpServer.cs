@@ -9,12 +9,12 @@ using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
-namespace TypingRealm.RopeWar.TcpServer
+namespace TypingRealm.Tcp
 {
     public sealed class TcpServer : AsyncManagedDisposable
     {
         private readonly ILogger<TcpServer> _logger;
-        private readonly IConnectionHandler _connectionHandler;
+        private readonly IScopedConnectionHandler _connectionHandler;
         private readonly IProtobufConnectionFactory _protobufConnectionFactory;
         private readonly TcpListener _tcpListener;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
@@ -25,7 +25,7 @@ namespace TypingRealm.RopeWar.TcpServer
         public TcpServer(
             int port,
             ILogger<TcpServer> logger,
-            IConnectionHandler connectionHandler,
+            IScopedConnectionHandler connectionHandler,
             IProtobufConnectionFactory protobufConnectionFactory)
         {
             _logger = logger;
@@ -100,39 +100,56 @@ namespace TypingRealm.RopeWar.TcpServer
 
                 _cts.Token.ThrowIfCancellationRequested();
 
-                var task = Handle(tcpClient);
-                _connectionProcessors.Add(task);
-                _connectionProcessors.RemoveAll(t => t.IsCompleted);
+                StartHandling(tcpClient);
             }
         }
 
-        private async Task Handle(TcpClient tcpClient)
+        private void StartHandling(TcpClient tcpClient)
+            => _ = HandleAsync(tcpClient);
+
+        private async Task HandleAsync(TcpClient tcpClient)
         {
-            var connectionDetails = string.Empty;
+            string connectionDetails;
 
             try
             {
                 connectionDetails = tcpClient.Client.RemoteEndPoint.ToString() ?? "No details";
+            }
+            catch (Exception exception)
+            {
+                connectionDetails = "Failed to get details";
+                _logger.LogError(exception, "Failed to get connection details.");
+            }
 
+            try
+            {
                 using var stream = tcpClient.GetStream();
                 using var sendLock = new SemaphoreSlimLock();
                 using var receiveLock = new SemaphoreSlimLock();
                 var connection = _protobufConnectionFactory.CreateProtobufConnection(stream)
                     .WithLocking(sendLock, receiveLock);
 
-                await _connectionHandler
+                var task = _connectionHandler
                     .HandleAsync(connection, _cts.Token)
                     .HandleCancellationAsync(exception =>
                     {
-                        _logger.LogDebug($"Cancellation request received for client: {connectionDetails}");
+                        _logger.LogDebug(exception, $"Cancellation request received for client: {connectionDetails}");
                     })
-                    .ConfigureAwait(false);
+                    .HandleExceptionAsync<Exception>(exception =>
+                    {
+                        _logger.LogError(exception, $"Error happened while handling TCP connection: {connectionDetails}");
+                    });
+
+                _connectionProcessors.Add(task);
+                _connectionProcessors.RemoveAll(t => t.IsCompleted);
+
+                await task.ConfigureAwait(false);
             }
 #pragma warning disable CA1031 // This method should not throw ANY exceptions, it is a top-level handler.
             catch (Exception exception)
 #pragma warning restore CA1031
             {
-                _logger.LogError(exception, $"Error happened while handling TCP connection, connection details: {connectionDetails}");
+                _logger.LogError(exception, $"Error happened while creating TCP connection: {connectionDetails}");
             }
             finally
             {
