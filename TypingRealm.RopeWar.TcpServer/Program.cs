@@ -1,43 +1,21 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TypingRealm.Authentication;
-using TypingRealm.Communication;
-using TypingRealm.Messaging;
-using TypingRealm.Messaging.Serialization;
-using TypingRealm.Messaging.Serialization.Json;
-using TypingRealm.Messaging.Serialization.Protobuf;
+using TypingRealm.Hosting;
 
 namespace TypingRealm.RopeWar.TcpServer
 {
     public static class Program
     {
-        private const int Port = 30102;
+        private const int Port = 30112;
 
-        public static Task Main(string[] args)
+        public static async Task Main()
         {
-            return CreateHostBuilder(args).Build().RunAsync();
+            using var host = HostFactory.CreateTcpHostBuilder(Port, builder =>
+            {
+                builder.AddRopeWar();
+            }).Build();
+
+            await host.RunAsync().ConfigureAwait(false);
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureServices(services =>
-                {
-                    services.AddCommunication();
-                    services.AddSerializationCore()
-                        .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly) // TODO: Move to RegisterRopeWar?
-                        .AddMessageTypesFromAssembly(typeof(Authenticate).Assembly)
-                        .AddJson()
-                        .Services
-                        .AddProtobuf()
-                        .RegisterMessaging()
-                        .RegisterRopeWar()
-                        .AddTcpServer(Port);
-
-                    services.AddTyrServiceWithoutAspNetAuthentication()
-                        .UseLocalProvider();
-
-                    services.AddHostedService<RopeWarHostedService>();
-                });
     }
 }

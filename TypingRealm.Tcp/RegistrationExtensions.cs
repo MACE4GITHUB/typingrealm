@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
-namespace TypingRealm.RopeWar.TcpServer
+namespace TypingRealm.Tcp
 {
     public static class RegistrationExtensions
     {

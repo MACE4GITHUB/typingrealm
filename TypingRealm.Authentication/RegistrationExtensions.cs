@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Messaging.Serialization;
 
 namespace TypingRealm.Authentication
 {
@@ -9,6 +10,13 @@ namespace TypingRealm.Authentication
             return new TyrAuthenticationBuilder(services);
         }
 
+        public static TyrAuthenticationBuilder AddTypingRealmAuthentication(this MessageTypeCacheBuilder builder)
+        {
+            builder.AddTyrAuthenticationMessages();
+
+            return builder.Services.AddTypingRealmAuthentication();
+        }
+
         public static TyrAuthenticationBuilder AddTyrApiAuthentication(this IServiceCollection services)
         {
             return services.AddTypingRealmAuthentication()
@@ -16,9 +24,9 @@ namespace TypingRealm.Authentication
                 .UseAspNetAuthentication();
         }
 
-        public static TyrAuthenticationBuilder AddTyrWebServiceAuthentication(this IServiceCollection services)
+        public static TyrAuthenticationBuilder AddTyrWebServiceAuthentication(this MessageTypeCacheBuilder builder)
         {
-            return services.AddTypingRealmAuthentication()
+            return builder.AddTypingRealmAuthentication()
                 .UseAuth0Provider()
                 .UseAspNetAuthentication()
                 .UseConnectedClientContextAuthentication()
@@ -26,12 +34,17 @@ namespace TypingRealm.Authentication
         }
 
         // TODO: Move it to separate assembly, not related to AspNet.
-        public static TyrAuthenticationBuilder AddTyrServiceWithoutAspNetAuthentication(this IServiceCollection services)
+        public static TyrAuthenticationBuilder AddTyrServiceWithoutAspNetAuthentication(this MessageTypeCacheBuilder builder)
         {
-            return services.AddTypingRealmAuthentication()
+            return builder.AddTypingRealmAuthentication()
                 .UseAuth0Provider()
                 .UseConnectedClientContextAuthentication()
                 .UseCharacterAuthorizationOnConnect();
+        }
+
+        public static MessageTypeCacheBuilder AddTyrAuthenticationMessages(this MessageTypeCacheBuilder builder)
+        {
+            return builder.AddMessageTypesFromAssembly(typeof(Authenticate).Assembly);
         }
     }
 }

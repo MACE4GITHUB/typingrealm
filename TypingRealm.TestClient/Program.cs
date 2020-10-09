@@ -75,8 +75,8 @@ namespace TypingRealm.TestClient
         {
             var provider = new ServiceCollection()
                 .AddSerializationCore()
-                .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
-                .AddJson()
+                .AddTyrAuthenticationMessages()
+                .AddRopeWarMessages()
                 .Services
                 .AddProtobuf()
                 .BuildServiceProvider();
@@ -92,7 +92,7 @@ namespace TypingRealm.TestClient
             Console.ReadLine();
 
             using var client = new TcpClient();
-            await client.ConnectAsync("127.0.0.1", 30102).ConfigureAwait(false);
+            await client.ConnectAsync("127.0.0.1", 30112).ConfigureAwait(false);
 
             using var stream = client.GetStream();
             using var sendLock = new SemaphoreSlimLock();
@@ -107,7 +107,8 @@ namespace TypingRealm.TestClient
         {
             var provider = new ServiceCollection()
                 .AddSerializationCore()
-                .AddMessageTypesFromAssembly(typeof(JoinContest).Assembly)
+                .AddTyrAuthenticationMessages()
+                .AddRopeWarMessages()
                 .AddJson()
                 .Services
                 .BuildServiceProvider();
@@ -143,11 +144,8 @@ namespace TypingRealm.TestClient
 
             await hub.StartAsync(default).ConfigureAwait(false);
 
-            using var sendLock = new SemaphoreSlimLock();
-            using var receiveLock = new SemaphoreSlimLock();
             var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
-                .WithJson(jsonConnectionFactory)
-                .WithLocking(sendLock, receiveLock);
+                .WithJson(jsonConnectionFactory);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }
@@ -187,7 +185,6 @@ namespace TypingRealm.TestClient
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
-
         }
 
         public static async Task MainSignalR()
@@ -227,20 +224,21 @@ namespace TypingRealm.TestClient
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }
 
+        private static string _profileId = string.Empty;
         private static async Task Handle(IConnection connection, IEnumerable<Type> messageTypes)
         {
             _ = ListenForMessagesFromServer(connection);
-
             Console.WriteLine("Connected.");
             Console.WriteLine("messages - show list of available messages");
             Console.WriteLine("<some-message> - initiate process of sending message to server");
             Console.WriteLine("exit - quit the application");
 
             Console.WriteLine("Connect with local token? (y)");
+
             if (Console.ReadLine() == "y")
             {
                 Console.Write("ProfileId: ");
-                var profileId = Console.ReadLine();
+                _profileId = Console.ReadLine();
 
                 Console.Write("ClientId: ");
                 var clientId = Console.ReadLine();
@@ -248,9 +246,15 @@ namespace TypingRealm.TestClient
                 Console.Write("Group: ");
                 var group = Console.ReadLine();
 
-                var token = LocalAuthentication.GenerateJwtAccessToken(profileId);
+                var token = LocalAuthentication.GenerateJwtAccessToken(_profileId);
 
-                await connection.SendAsync(new Connect($"{token},{clientId}", group), default)
+                await connection.SendAsync(new Authenticate(token), default)
+                    .ConfigureAwait(false);
+
+                // TODO: how to wait between Authenticate and Connect?? so they are in correct order.
+                // Maybe consider using a single message after all.
+
+                await connection.SendAsync(new Connect(clientId, group), default)
                     .ConfigureAwait(false);
             }
 
@@ -312,6 +316,11 @@ namespace TypingRealm.TestClient
                     case Disconnected disconnected:
                         Console.WriteLine($"Disconnected with reason: {disconnected.Reason}");
                         return; // Return after server tells us that he's disconnecting us. Or socket exception will be thrown on the next WaitAsync operation.
+                    case TokenExpired _:
+                        Console.WriteLine($"Received TokenExpired message. Re-sending token.");
+                        var token = LocalAuthentication.GenerateJwtAccessToken(_profileId);
+                        await connection.SendAsync(new Authenticate(token), default).ConfigureAwait(false);
+                        break;
                     default:
                         Console.WriteLine($"Received {message.GetType()} message:");
                         var json = JsonSerializer.Serialize(message, options: new JsonSerializerOptions

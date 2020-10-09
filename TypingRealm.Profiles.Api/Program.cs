@@ -1,21 +1,23 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using TypingRealm.Hosting;
+using TypingRealm.Profiles.Api.Controllers;
+using TypingRealm.Profiles.Infrastructure;
 
+[assembly: ApiController]
 namespace TypingRealm.Profiles.Api
 {
     public static class Program
     {
-        public static Task Main(string[] args)
+        public static async Task Main()
         {
-            return CreateHostBuilder(args).Build().RunAsync();
-        }
+            using var host = HostFactory.CreateWebApiHostBuilder(typeof(CharactersController).Assembly, services =>
+            {
+                services.RegisterProfilesApi();
+            }).Build();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+            await host.RunAsync();
+        }
     }
 }

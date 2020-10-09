@@ -1,14 +1,15 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using TypingRealm.Tcp;
 
-namespace TypingRealm.RopeWar.TcpServer
+namespace TypingRealm.Hosting
 {
-    public sealed class RopeWarHostedService : IHostedService
+    public sealed class TcpServerHostedService : IHostedService
     {
-        private readonly Tcp.TcpServer _tcpServer;
+        private readonly TcpServer _tcpServer;
 
-        public RopeWarHostedService(Tcp.TcpServer tcpServer)
+        public TcpServerHostedService(TcpServer tcpServer)
         {
             _tcpServer = tcpServer;
         }
@@ -24,4 +25,5 @@ namespace TypingRealm.RopeWar.TcpServer
             await _tcpServer.StopAsync().ConfigureAwait(false);
         }
     }
+
 }

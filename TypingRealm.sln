@@ -85,7 +85,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Profiles.Api.Cl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Movement", "Movement", "{D4B7D0F0-50E3-42D3-BF63-9283FA6B7690}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Tcp", "TypingRealm.Tcp\TypingRealm.Tcp.csproj", "{3CA9C529-8B22-499A-9F36-F2CAA26C7D65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Tcp", "TypingRealm.Tcp\TypingRealm.Tcp.csproj", "{3CA9C529-8B22-499A-9F36-F2CAA26C7D65}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Hosting", "TypingRealm.Hosting\TypingRealm.Hosting.csproj", "{AB388D12-E5EF-47AD-B0DA-74F642C35854}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -217,6 +219,10 @@ Global
 		{3CA9C529-8B22-499A-9F36-F2CAA26C7D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CA9C529-8B22-499A-9F36-F2CAA26C7D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CA9C529-8B22-499A-9F36-F2CAA26C7D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB388D12-E5EF-47AD-B0DA-74F642C35854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB388D12-E5EF-47AD-B0DA-74F642C35854}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB388D12-E5EF-47AD-B0DA-74F642C35854}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB388D12-E5EF-47AD-B0DA-74F642C35854}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -252,6 +258,7 @@ Global
 		{DDB65076-5728-421B-87EB-FCA54A904F02} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
 		{60109B25-829C-4D52-B158-5B063AAFE71E} = {5878711F-092A-4204-A260-F3C9D4576A63}
 		{3CA9C529-8B22-499A-9F36-F2CAA26C7D65} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
+		{AB388D12-E5EF-47AD-B0DA-74F642C35854} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

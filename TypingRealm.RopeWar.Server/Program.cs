@@ -1,21 +1,19 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using TypingRealm.Hosting;
 
 namespace TypingRealm.RopeWar.Server
 {
     public static class Program
     {
-        public static Task Main(string[] args)
+        public static async Task Main()
         {
-            return CreateHostBuilder(args).Build().RunAsync();
-        }
+            using var host = HostFactory.CreateSignalRHostBuilder(builder =>
+            {
+                builder.AddRopeWar();
+            }).Build();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+            await host.RunAsync().ConfigureAwait(false);
+        }
     }
 }
