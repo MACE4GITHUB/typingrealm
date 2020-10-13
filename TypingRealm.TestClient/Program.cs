@@ -248,11 +248,8 @@ namespace TypingRealm.TestClient
 
                 var token = LocalAuthentication.GenerateJwtAccessToken(_profileId);
 
-                await connection.SendAsync(new Authenticate(token), default)
+                await _listener!.SendRpcAsync(new Authenticate(token))
                     .ConfigureAwait(false);
-
-                // TODO: how to wait between Authenticate and Connect?? so they are in correct order.
-                // Maybe consider using a single message after all.
 
                 await connection.SendAsync(new Connect(clientId, group), default)
                     .ConfigureAwait(false);
@@ -302,12 +299,12 @@ namespace TypingRealm.TestClient
             }
         }
 
+        private static MessageListener? _listener;
         private static async Task ListenForMessagesFromServer(IConnection connection)
         {
-            while (true)
+            _listener = new MessageListener(connection);
+            _listener.Subscribe<object>(async message =>
             {
-                var message = await connection.ReceiveAsync(default).ConfigureAwait(false);
-
                 switch (message)
                 {
                     case Announce say:
@@ -330,6 +327,85 @@ namespace TypingRealm.TestClient
                         Console.WriteLine(json);
                         break;
                 }
+            });
+        }
+    }
+
+    public sealed class MessageListener
+    {
+        private readonly IConnection _connection;
+        private readonly Dictionary<string, Func<object, ValueTask>> _handlers
+            = new Dictionary<string, Func<object, ValueTask>>();
+
+        public MessageListener(IConnection connection)
+        {
+            _connection = connection;
+            _ = ListenForMessagesFromServer();
+        }
+
+        public async Task ListenForMessagesFromServer()
+        {
+            while (true)
+            {
+                var message = await _connection.ReceiveAsync(default).ConfigureAwait(false);
+
+                await AsyncHelpers.WhenAll(_handlers.Values.Select(handler => handler(message)))
+                    .ConfigureAwait(false);
+            }
+        }
+
+        public string Subscribe<TMessage>(Func<TMessage, ValueTask> handler)
+        {
+            var subscriptionId = Guid.NewGuid().ToString();
+
+            _handlers.Add(subscriptionId, message =>
+            {
+                if (message is TMessage tMessage)
+                    return handler(tMessage);
+
+                return default;
+            });
+
+            return subscriptionId;
+        }
+
+        public void Unsubscribe(string subscriptionId)
+        {
+            _handlers.Remove(subscriptionId);
+        }
+
+        public async ValueTask SendRpcAsync(Message message)
+        {
+            var isAcknowledged = false;
+            message.MessageId = Guid.NewGuid().ToString();
+
+            ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
+            {
+                if (acknowledgeReceived.MessageId == message.MessageId)
+                    isAcknowledged = true;
+
+                return default;
+            }
+
+            var subscriptionId = Subscribe<AcknowledgeReceived>(Handler);
+
+            try
+            {
+                await _connection.SendAsync(message, default).ConfigureAwait(false);
+
+                var i = 0;
+                while (!isAcknowledged)
+                {
+                    await Task.Delay(10).ConfigureAwait(false);
+                    i++;
+
+                    if (i > 300)
+                        throw new InvalidOperationException("Acknowledgement is not received.");
+                }
+            }
+            finally
+            {
+                Unsubscribe(subscriptionId);
             }
         }
     }
