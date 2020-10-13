@@ -1,9 +1,9 @@
-﻿using TypingRealm.Messaging;
+﻿using System;
+using TypingRealm.Messaging;
 
 namespace TypingRealm.Authentication
 {
-    [Message]
-    public sealed class Authenticate
+    public sealed class Authenticate : Message
     {
 #pragma warning disable CS8618
         public Authenticate() { }
@@ -11,6 +11,7 @@ namespace TypingRealm.Authentication
         public Authenticate(string accessToken)
         {
             AccessToken = accessToken;
+            MessageId = Guid.NewGuid().ToString();
         }
 
         public string AccessToken { get; set; }

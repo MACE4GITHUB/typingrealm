@@ -127,7 +127,8 @@ namespace TypingRealm.Tcp
                 using var sendLock = new SemaphoreSlimLock();
                 using var receiveLock = new SemaphoreSlimLock();
                 var connection = _protobufConnectionFactory.CreateProtobufConnection(stream)
-                    .WithLocking(sendLock, receiveLock);
+                    .WithLocking(sendLock, receiveLock)
+                    .WithReceiveAcknowledgement();
 
                 var task = _connectionHandler
                     .HandleAsync(connection, _cts.Token)

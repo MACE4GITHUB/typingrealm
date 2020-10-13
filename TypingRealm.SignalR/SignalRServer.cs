@@ -72,7 +72,8 @@ namespace TypingRealm.SignalR
                 var notificator = new Notificator();
                 var connection = new SignalRMessageSender(caller)
                     .WithNotificator(notificator)
-                    .WithJson(_jsonConnectionFactory);
+                    .WithJson(_jsonConnectionFactory)
+                    .WithReceiveAcknowledgement();
 
                 var task = _connectionHandler
                     .HandleAsync(connection, combinedCts.Token)
