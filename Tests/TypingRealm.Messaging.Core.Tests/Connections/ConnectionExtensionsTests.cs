@@ -35,5 +35,15 @@ namespace TypingRealm.Messaging.Tests.Connections
 
             Assert.Equal(sut, GetPrivateField(connection, "_messageSender"));
         }
+
+        [Theory, AutoMoqData]
+        public void WithReceiveAcknowledgement_ShouldWrapConnection(
+            IConnection connection)
+        {
+            var sut = connection.WithReceiveAcknowledgement();
+
+            Assert.IsType<AcknowledgingConnection>(sut);
+            Assert.Equal(connection, GetPrivateField(sut, "_connection"));
+        }
     }
 }

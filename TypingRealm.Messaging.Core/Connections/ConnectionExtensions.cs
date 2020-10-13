@@ -21,5 +21,11 @@
         {
             return new NotificatorConnection(messageSender, notificator);
         }
+
+        public static AcknowledgingConnection WithReceiveAcknowledgement(
+            this IConnection connection)
+        {
+            return new AcknowledgingConnection(connection);
+        }
     }
 }

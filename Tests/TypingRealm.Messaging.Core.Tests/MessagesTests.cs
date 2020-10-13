@@ -19,10 +19,14 @@ namespace TypingRealm.Messaging.Tests
             }
         }
 
+        public class TestAbstractMessage : Message
+        {
+        }
+
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(5, typeof(Announce).Assembly.GetTypes().Count(
+            Assert.Equal(7, typeof(Announce).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -77,6 +81,29 @@ namespace TypingRealm.Messaging.Tests
 
             var sut = new TestBroadcastMessage(senderId);
             Assert.Equal(senderId, sut.SenderId);
+        }
+
+        [Theory, AutoMoqData]
+        public void AbstractMessage(string messageId)
+        {
+            AssertSerializable<TestAbstractMessage>();
+
+            var sut = new TestAbstractMessage();
+            Assert.Null(sut.MessageId);
+
+            sut.MessageId = messageId;
+            Assert.Equal(messageId, sut.MessageId);
+
+            sut.MessageId = null;
+            Assert.Null(sut.MessageId);
+        }
+
+        [Theory, AutoMoqData]
+        public void AcknowledgeReceived(AcknowledgeReceived sut)
+        {
+            AssertSerializable<AcknowledgeReceived>();
+
+            Assert.IsAssignableFrom<Message>(sut);
         }
     }
 }
