@@ -16,7 +16,7 @@ namespace TypingRealm.Profiles.Api.Controllers
             _entityResourceToOwnerId = entityResourceToOwnerId;
         }
 
-        private ProfileId ProfileId => new ProfileId(User.Identity.Name!);
+        private ProfileId ProfileId => new ProfileId(User.Identity?.Name!);
 
         protected bool IsOwner(TEntity resource)
         {

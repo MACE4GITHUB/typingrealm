@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TypingRealm.Combat
@@ -10,7 +11,8 @@ namespace TypingRealm.Combat
 
         public CombatRoom FindInBattle(string playerId)
         {
-            return _cache.Values.FirstOrDefault(x => x.Players.Any(p => p.PlayerId == playerId));
+            return _cache.Values.FirstOrDefault(x => x.Players.Any(p => p.PlayerId == playerId))
+                ?? throw new InvalidOperationException("Player does not exist");
         }
 
         public CombatRoom FindOrCreate(string combatRoomId, string playerId)

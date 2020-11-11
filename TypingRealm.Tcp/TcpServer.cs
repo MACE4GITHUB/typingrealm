@@ -113,7 +113,7 @@ namespace TypingRealm.Tcp
 
             try
             {
-                connectionDetails = tcpClient.Client.RemoteEndPoint.ToString() ?? "No details";
+                connectionDetails = tcpClient.Client.RemoteEndPoint?.ToString() ?? "No details";
             }
             catch (Exception exception)
             {

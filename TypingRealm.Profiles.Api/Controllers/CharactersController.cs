@@ -25,7 +25,7 @@ namespace TypingRealm.Profiles.Api.Controllers
             _characterRepository = characterRepository;
         }
 
-        private ProfileId ProfileId => new ProfileId(User.Identity.Name!);
+        private ProfileId ProfileId => new ProfileId(User.Identity?.Name!);
 
         [HttpGet]
         public ValueTask<IEnumerable<CharacterResource>> GetAllByProfileId()
