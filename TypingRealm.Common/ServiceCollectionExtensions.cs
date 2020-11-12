@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace TypingRealm
 {
+    // Not tested.
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection Decorate<TInterface, TDecorator>(this IServiceCollection services)

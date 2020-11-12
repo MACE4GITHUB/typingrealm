@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -134,6 +135,24 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             await sut.SendAsync(new TestEnumMessage { TestEnum = TestEnum.Two }, Cts.Token);
             Assert.Equal(typeId, sent.TypeId);
             Assert.Equal("{\"testEnum\":\"Two\"}", sent.Json);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldThrow_WhenDeserializationReturnsNull(
+            [Frozen]Mock<IMessageTypeCache> cache,
+            [Frozen]Mock<IConnection> connection,
+            JsonSerializedMessage jsonMessage,
+            JsonConnection sut)
+        {
+            jsonMessage.Json = "null";
+
+            connection.Setup(x => x.ReceiveAsync(Cts.Token))
+                .ReturnsAsync(jsonMessage);
+            cache.Setup(x => x.GetTypeById(jsonMessage.TypeId))
+                .Returns(typeof(MyMessage));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                async () => await sut.ReceiveAsync(Cts.Token));
         }
     }
 }
