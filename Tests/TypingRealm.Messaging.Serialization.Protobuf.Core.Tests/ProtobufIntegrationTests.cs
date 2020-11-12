@@ -14,14 +14,14 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
     {
         [Theory, AutoMoqData]
         public async Task ShouldWork(
-            [Frozen(Matching.ImplementedInterfaces)]Protobuf protobuf,
             [Frozen]Stream stream,
             [Frozen]Mock<IProtobufFieldNumberCache> cache,
             TestMessage message,
-            List<string> list,
-            ProtobufConnection sut)
+            List<string> list)
         {
-            _ = protobuf;
+            var protobuf = new Protobuf(Array.Empty<Type>());
+
+            var sut = new ProtobufConnection(stream, cache.Object, protobuf);
 
             cache.Setup(x => x.GetFieldNumber(typeof(TestMessage)))
                 .Returns(2);
