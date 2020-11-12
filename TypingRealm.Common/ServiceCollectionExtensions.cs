@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace TypingRealm
 {
+    // Not tested.
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection Decorate<TInterface, TDecorator>(this IServiceCollection services)
@@ -35,6 +36,9 @@ namespace TypingRealm
 
             if (descriptor.ImplementationFactory != null)
                 return descriptor.ImplementationFactory(services);
+
+            if (descriptor.ImplementationType == null)
+                throw new InvalidOperationException("Implementation type is null, cannot decorate.");
 
             return ActivatorUtilities.GetServiceOrCreateInstance(services, descriptor.ImplementationType);
         }

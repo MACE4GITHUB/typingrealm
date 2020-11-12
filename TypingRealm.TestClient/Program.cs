@@ -128,7 +128,7 @@ namespace TypingRealm.TestClient
             if (accessToken == "l")
             {
                 Console.Write("Profile: ");
-                var profileId = Console.ReadLine();
+                var profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
                 accessToken = LocalAuthentication.GenerateJwtAccessToken(profileId);
             }
 
@@ -238,13 +238,13 @@ namespace TypingRealm.TestClient
             if (Console.ReadLine() == "y")
             {
                 Console.Write("ProfileId: ");
-                _profileId = Console.ReadLine();
+                _profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
 
                 Console.Write("ClientId: ");
-                var clientId = Console.ReadLine();
+                var clientId = Console.ReadLine() ?? throw new InvalidOperationException("Client is not supplied.");
 
                 Console.Write("Group: ");
-                var group = Console.ReadLine();
+                var group = Console.ReadLine() ?? throw new InvalidOperationException("Group is not supplied.");
 
                 var token = LocalAuthentication.GenerateJwtAccessToken(_profileId);
 
@@ -258,6 +258,9 @@ namespace TypingRealm.TestClient
             while (true)
             {
                 var input = Console.ReadLine();
+                if (input == null)
+                    continue;
+
                 if (input == "exit")
                     return;
 
@@ -282,7 +285,7 @@ namespace TypingRealm.TestClient
                 foreach (var property in properties)
                 {
                     Console.Write($"[{property.PropertyType.Name}] {property.Name} = ");
-                    var value = Console.ReadLine();
+                    var value = Console.ReadLine() ?? throw new InvalidOperationException("Value is not supplied.");
 
                     // A hack to support int for now.
                     property.SetValue(message, property.PropertyType == typeof(string) ? (object)value : (object)Convert.ToInt32(value));

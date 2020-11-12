@@ -29,7 +29,11 @@ namespace TypingRealm.Communication
             };
             options.Converters.Add(new JsonStringEnumConverter());
 
-            return JsonSerializer.Deserialize<T>(content, options);
+            var deserialized = JsonSerializer.Deserialize<T>(content, options);
+            if (deserialized == null)
+                throw new InvalidOperationException("Could not deserialize response from API.");
+
+            return deserialized;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,11 @@ namespace TypingRealm.Messaging.Serialization.Json
 
             var type = _messageTypes.GetTypeById(message.TypeId);
             // TODO: Put logging here and investigate. It silently fails when deserialization fails.
-            return JsonSerializer.Deserialize(message.Json, type, _options);
+            var deserialized = JsonSerializer.Deserialize(message.Json, type, _options);
+            if (deserialized == null)
+                throw new InvalidOperationException($"Could not deserialize an object of type {type.Name}.");
+
+            return deserialized;
         }
     }
 }

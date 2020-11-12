@@ -11,7 +11,7 @@ namespace TypingRealm.Testing
             Type interfaceType,
             Type implementationType)
         {
-            var implementation = provider.GetService(interfaceType);
+            var implementation = provider.GetRequiredService(interfaceType);
             Assert.NotNull(implementation);
             Assert.IsType(implementationType, implementation);
 

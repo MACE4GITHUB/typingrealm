@@ -55,7 +55,7 @@ namespace TypingRealm.SignalR
 
             try
             {
-                connectionDetails = $"{context.ConnectionId}, {context.UserIdentifier}, {context.User.Identity.Name}";
+                connectionDetails = $"{context.ConnectionId}, {context.UserIdentifier}, {context.User.Identity?.Name}";
             }
             catch (Exception exception)
             {
