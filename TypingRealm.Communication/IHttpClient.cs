@@ -5,6 +5,6 @@ namespace TypingRealm.Communication
 {
     public interface IHttpClient
     {
-        ValueTask<T> GetAsync<T>(string uri, CancellationToken cancellationToken);
+        ValueTask<T> GetAsync<T>(string uri, string? accessToken, CancellationToken cancellationToken);
     }
 }

@@ -21,9 +21,8 @@ namespace TypingRealm.Authentication
             };
 
             services.AddSingleton(TokenValidationParameters);
+            services.AddTransient<IAccessTokenProvider, AccessTokenProvider>();
 
-            // One http client per connection.
-            services.AddScoped<IHttpClient, AuthenticatedHttpClient>();
             services.AddProfileApiClients();
         }
 

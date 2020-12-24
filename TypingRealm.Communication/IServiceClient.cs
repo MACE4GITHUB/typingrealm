@@ -5,6 +5,10 @@ namespace TypingRealm.Communication
 {
     public interface IServiceClient
     {
-        ValueTask<T> GetAsync<T>(string serviceName, string endpoint, CancellationToken cancellationToken);
+        ValueTask<T> GetAsync<T>(
+            string serviceName,
+            string endpoint,
+            EndpointAuthenticationType endpointAuthenticationType,
+            CancellationToken cancellationToken);
     }
 }
