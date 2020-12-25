@@ -31,7 +31,7 @@ namespace TypingRealm.Authentication
                 new Claim("sub", subClaimValue)
             };
 
-            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, AuthenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
+            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, Auth0AuthenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
         }
     }
 }

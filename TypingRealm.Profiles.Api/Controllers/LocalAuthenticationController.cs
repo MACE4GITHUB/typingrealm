@@ -8,10 +8,13 @@ namespace TypingRealm.Profiles.Api.Controllers
     [Route("api/local-token")]
     public sealed class LocalAuthenticationController : ControllerBase
     {
-        [HttpGet]
-        public string GenerateToken(string sub)
+        [HttpPost]
+        public TokenResponse GenerateToken(string sub)
         {
-            return LocalAuthentication.GenerateJwtAccessToken(sub);
+            return new TokenResponse
+            {
+                access_token = LocalAuthentication.GenerateJwtAccessToken(sub)
+            };
         }
     }
 }

@@ -17,7 +17,10 @@ namespace TypingRealm.Authentication
         {
             var parameters = builder.TokenValidationParameters;
 
-            parameters.ValidIssuer = AuthenticationConfiguration.Issuer;
+            builder.AuthenticationInformation.AuthorizationEndpoint = Auth0AuthenticationConfiguration.AuthorizationEndpoint;
+            builder.AuthenticationInformation.TokenEndpoint = Auth0AuthenticationConfiguration.TokenEndpoint;
+
+            parameters.ValidIssuer = Auth0AuthenticationConfiguration.Issuer;
             parameters.IssuerSigningKey = null;
             parameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
             {
@@ -34,7 +37,10 @@ namespace TypingRealm.Authentication
         {
             var parameters = builder.TokenValidationParameters;
 
-            parameters.ValidIssuer = LocalAuthentication.Issuer;
+            builder.AuthenticationInformation.AuthorizationEndpoint = LocalAuthenticationConfiguration.AuthorizationEndpoint;
+            builder.AuthenticationInformation.TokenEndpoint = LocalAuthenticationConfiguration.TokenEndpoint;
+
+            parameters.ValidIssuer = LocalAuthenticationConfiguration.Issuer;
             parameters.IssuerSigningKeyResolver = null;
             parameters.IssuerSigningKey = LocalAuthentication.SecurityKey;
 
@@ -66,7 +72,7 @@ namespace TypingRealm.Authentication
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                options.Audience = AuthenticationConfiguration.Audience;
+                options.Audience = Auth0AuthenticationConfiguration.Audience;
                 options.TokenValidationParameters = builder.TokenValidationParameters;
                 options.Authority = options.TokenValidationParameters.ValidIssuer;
 

@@ -28,7 +28,7 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.GetAsync<bool>(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}/{characterId}/rope-war/{contestId}",
-                EndpointAuthenticationType.Profile,
+                EndpointAuthenticationType.Service,
                 cancellationToken);
         }
     }
