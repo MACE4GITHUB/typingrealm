@@ -129,7 +129,7 @@ namespace TypingRealm.TestClient
             {
                 Console.Write("Profile: ");
                 var profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
-                accessToken = LocalAuthentication.GenerateJwtAccessToken(profileId);
+                accessToken = LocalAuthentication.GenerateProfileAccessToken(profileId);
             }
 
             var hub = new HubConnectionBuilder()
@@ -246,7 +246,7 @@ namespace TypingRealm.TestClient
                 Console.Write("Group: ");
                 var group = Console.ReadLine() ?? throw new InvalidOperationException("Group is not supplied.");
 
-                var token = LocalAuthentication.GenerateJwtAccessToken(_profileId);
+                var token = LocalAuthentication.GenerateProfileAccessToken(_profileId);
 
                 await _listener!.SendRpcAsync(new Authenticate(token))
                     .ConfigureAwait(false);
@@ -318,7 +318,7 @@ namespace TypingRealm.TestClient
                         return; // Return after server tells us that he's disconnecting us. Or socket exception will be thrown on the next WaitAsync operation.
                     case TokenExpired _:
                         Console.WriteLine($"Received TokenExpired message. Re-sending token.");
-                        var token = LocalAuthentication.GenerateJwtAccessToken(_profileId);
+                        var token = LocalAuthentication.GenerateProfileAccessToken(_profileId);
                         await connection.SendAsync(new Authenticate(token), default).ConfigureAwait(false);
                         break;
                     default:

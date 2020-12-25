@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
@@ -24,11 +25,22 @@ namespace TypingRealm.Authentication
         internal static readonly string Issuer = "https://local-authority";
         internal static SecurityKey SecurityKey { get; }
 
-        public static string GenerateJwtAccessToken(string subClaimValue)
+        public static string GenerateProfileAccessToken(string subClaimValue)
         {
-            var claims = new Claim[]
+            var claims = new List<Claim>
             {
                 new Claim("sub", subClaimValue)
+            };
+
+            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, Auth0AuthenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
+        }
+
+        public static string GenerateServiceAccessToken(string subClaimValue)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("sub", subClaimValue),
+                new Claim("scope", "service m2m")
             };
 
             return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, Auth0AuthenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));

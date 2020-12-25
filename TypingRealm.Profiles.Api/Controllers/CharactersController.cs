@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using TypingRealm.Profiles.Api.Data;
 using TypingRealm.Profiles.Api.Resources;
 
@@ -123,20 +125,55 @@ namespace TypingRealm.Profiles.Api.Controllers
         // TODO: Move to different, "world character status" API.
         [HttpGet]
         [Route("{characterId}/rope-war/{contestId}")]
+        [TyrAuthorize("service")]
         public async ValueTask<ActionResult<bool>> CanJoinRopeWarContest(string characterId, string contestId)
         {
             var character = await _characterRepository.FindAsync(new CharacterId(characterId));
             if (character == null)
                 return NotFound();
 
-            if (!IsOwner(character))
-                return Forbid();
+            // We are checking scope now, so only backend services are able to call it.
+            /*if (!IsOwner(character))
+                return Forbid();*/
 
             // We are the owner of the character.
             // Check if the character has access to given contest.
             _ = contestId;
 
             return true;
+        }
+    }
+
+    public class TyrAuthorizeAttribute : TypeFilterAttribute
+    {
+        public TyrAuthorizeAttribute(string scope) : base(typeof(ScopeAuthorizationFilter))
+        {
+            Arguments = new object[] { scope };
+        }
+    }
+
+    public class ScopeAuthorizationFilter : IAuthorizationFilter
+    {
+        private readonly string _scope;
+
+        public ScopeAuthorizationFilter(string scope)
+        {
+            _scope = scope;
+        }
+
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
+            var scopeClaim = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "scope");
+
+            if (scopeClaim == null)
+            {
+                context.Result = new ForbidResult();
+                return;
+            }
+
+            var hasScope = scopeClaim.Value.Split(' ').Any(scope => scope == _scope);
+            if (!hasScope)
+                context.Result = new ForbidResult();
         }
     }
 }
