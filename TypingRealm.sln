@@ -64,6 +64,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.RopeWar.Server", "TypingRealm.RopeWar.Server\TypingRealm.RopeWar.Server.csproj", "{0F99DAF4-0283-4A5C-9310-8737CC1D9F98}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{C00AAAEB-23DF-4B66-9326-E73C29F075D5}"
+	ProjectSection(SolutionItems) = preProject
+		TypingRealm.Authentication\Auth0AuthenticationConfiguration.cs = TypingRealm.Authentication\Auth0AuthenticationConfiguration.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Profiles", "Profiles", "{5878711F-092A-4204-A260-F3C9D4576A63}"
 EndProject
@@ -90,6 +93,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Hosting", "TypingRealm.Hosting\TypingRealm.Hosting.csproj", "{AB388D12-E5EF-47AD-B0DA-74F642C35854}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Old", "Old", "{BC27E087-5CF8-4B05-BDC3-C6621BED5921}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IdentityServer", "IdentityServer", "{8745E1B4-A211-43CC-B024-C785AE3BD089}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.IdentityServer.Host", "TypingRealm.IdentityServer.Host\TypingRealm.IdentityServer.Host.csproj", "{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -225,6 +232,10 @@ Global
 		{AB388D12-E5EF-47AD-B0DA-74F642C35854}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB388D12-E5EF-47AD-B0DA-74F642C35854}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB388D12-E5EF-47AD-B0DA-74F642C35854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -263,6 +274,7 @@ Global
 		{D4B7D0F0-50E3-42D3-BF63-9283FA6B7690} = {BC27E087-5CF8-4B05-BDC3-C6621BED5921}
 		{3CA9C529-8B22-499A-9F36-F2CAA26C7D65} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
 		{AB388D12-E5EF-47AD-B0DA-74F642C35854} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
+		{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F} = {8745E1B4-A211-43CC-B024-C785AE3BD089}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

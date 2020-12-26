@@ -20,14 +20,16 @@ namespace TypingRealm.Authentication
         public static TyrAuthenticationBuilder AddTyrApiAuthentication(this IServiceCollection services)
         {
             return services.AddTypingRealmAuthentication()
-                .UseAuth0Provider()
+                //.UseAuth0Provider()
+                .UseIdentityServerProvider()
                 .UseAspNetAuthentication();
         }
 
         public static TyrAuthenticationBuilder AddTyrWebServiceAuthentication(this MessageTypeCacheBuilder builder)
         {
             return builder.AddTypingRealmAuthentication()
-                .UseAuth0Provider()
+                //.UseAuth0Provider()
+                .UseIdentityServerProvider()
                 .UseAspNetAuthentication()
                 .UseConnectedClientContextAuthentication()
                 .UseCharacterAuthorizationOnConnect();
@@ -37,7 +39,8 @@ namespace TypingRealm.Authentication
         public static TyrAuthenticationBuilder AddTyrServiceWithoutAspNetAuthentication(this MessageTypeCacheBuilder builder)
         {
             return builder.AddTypingRealmAuthentication()
-                .UseAuth0Provider()
+                //.UseAuth0Provider()
+                .UseIdentityServerProvider()
                 .UseConnectedClientContextAuthentication()
                 .UseCharacterAuthorizationOnConnect();
         }

@@ -27,8 +27,6 @@ namespace TypingRealm.Profiles.Api.Controllers
             _characterRepository = characterRepository;
         }
 
-        private ProfileId ProfileId => new ProfileId(User.Identity?.Name!);
-
         [HttpGet]
         public ValueTask<IEnumerable<CharacterResource>> GetAllByProfileId()
         {
@@ -163,15 +161,11 @@ namespace TypingRealm.Profiles.Api.Controllers
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var scopeClaim = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "scope");
+            var scopes = context.HttpContext.User.Claims
+                .Where(claim => claim.Type == "scope") // IdentityServer has multiple claims with type 'scope'.
+                .SelectMany(claim => claim.Value.Split(' ')); // Auth0 has one claim 'scope' with all scopes delimited by space.
 
-            if (scopeClaim == null)
-            {
-                context.Result = new ForbidResult();
-                return;
-            }
-
-            var hasScope = scopeClaim.Value.Split(' ').Any(scope => scope == _scope);
+            var hasScope = scopes.Any(scope => scope == _scope);
             if (!hasScope)
                 context.Result = new ForbidResult();
         }

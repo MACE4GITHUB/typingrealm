@@ -36,8 +36,8 @@ namespace TypingRealm.Hosting
             var builder = services.AddSerializationCore();
 
             builder
-                .AddTyrServiceWithoutAspNetAuthentication()
-                .UseLocalProvider();
+                .AddTyrServiceWithoutAspNetAuthentication();
+                //.UseLocalProvider();
 
             services.AddHostedService<TcpServerHostedService>();
 
@@ -65,8 +65,8 @@ namespace TypingRealm.Hosting
             var builder = services.AddSerializationCore();
             builder
                 .AddJson()
-                .AddTyrWebServiceAuthentication()
-                .UseLocalProvider();
+                .AddTyrWebServiceAuthentication();
+                //.UseLocalProvider();
 
             services.AddTransient<IStartupFilter, SignalRStartupFilter>();
 
@@ -84,8 +84,8 @@ namespace TypingRealm.Hosting
                     .AllowCredentials()));
 
             services.AddCommunication();
-            services.AddTyrApiAuthentication()
-                .UseLocalProvider();
+            services.AddTyrApiAuthentication();
+                //.UseLocalProvider();
 
             services.AddControllers()
                 .PartManager.ApplicationParts.Add(new AssemblyPart(controllersAssembly));

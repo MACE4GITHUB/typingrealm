@@ -1,0 +1,12 @@
+﻿{
+  "profiles": {
+    "TypingRealm.IdentityServer.Host": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:30000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

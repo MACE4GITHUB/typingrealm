@@ -3,6 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TypingRealm.Profiles.Api.Controllers
 {
+    public static class Profile
+    {
+        public const string Anonymous = "Anonymous";
+    }
+
     public abstract class OwnerResourceControllerBase<TEntity, TEntityResource> : ControllerBase
     {
         private readonly Func<TEntity, string> _entityToOwnerId;
@@ -16,7 +21,7 @@ namespace TypingRealm.Profiles.Api.Controllers
             _entityResourceToOwnerId = entityResourceToOwnerId;
         }
 
-        private ProfileId ProfileId => new ProfileId(User.Identity?.Name!);
+        protected ProfileId ProfileId => new ProfileId(User.Identity?.Name ?? Profile.Anonymous);
 
         protected bool IsOwner(TEntity resource)
         {

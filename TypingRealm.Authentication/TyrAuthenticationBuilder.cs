@@ -15,7 +15,6 @@ namespace TypingRealm.Authentication
 
             TokenValidationParameters = new TokenValidationParameters
             {
-                ValidAudiences = new[] { Auth0AuthenticationConfiguration.Audience },
                 NameClaimType = ClaimTypes.NameIdentifier,
                 ClockSkew = TimeSpan.Zero
             };
