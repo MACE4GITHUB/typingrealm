@@ -40,7 +40,7 @@ namespace TypingRealm.Authentication
             var claims = new List<Claim>
             {
                 new Claim("sub", subClaimValue),
-                new Claim("scope", "service m2m")
+                new Claim("scope", "service")
             };
 
             return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, LocalAuthenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));

@@ -14,8 +14,7 @@ namespace TypingRealm.IdentityServer.Host
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
             {
-                new ApiScope("service", "TypingRealm internal service-to-service communication."),
-                new ApiScope("m2m", "Obsolete scope")
+                new ApiScope("service", "TypingRealm internal service-to-service communication.")
             };
 
         public static IEnumerable<Client> Clients =>
@@ -31,8 +30,7 @@ namespace TypingRealm.IdentityServer.Host
                     },
                     AllowedScopes =
                     {
-                        "service",
-                        "m2m"
+                        "service"
                     },
                     AccessTokenLifetime = 90
                 }
