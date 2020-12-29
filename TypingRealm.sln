@@ -96,7 +96,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Old", "Old", "{BC27E087-5CF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IdentityServer", "IdentityServer", "{8745E1B4-A211-43CC-B024-C785AE3BD089}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.IdentityServer.Host", "TypingRealm.IdentityServer.Host\TypingRealm.IdentityServer.Host.csproj", "{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.IdentityServer.Host", "TypingRealm.IdentityServer.Host\TypingRealm.IdentityServer.Host.csproj", "{9F35B4BB-B5D3-4CDB-B2A3-3E4A210BD74F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

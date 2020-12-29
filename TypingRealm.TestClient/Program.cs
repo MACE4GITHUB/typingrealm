@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Sockets;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -19,8 +21,17 @@ using TypingRealm.RopeWar;
 
 namespace TypingRealm.TestClient
 {
+    public sealed class Character
+    {
+        public string? profileId { get; set; }
+        public string? characterId { get; set; }
+        public string? name { get; set; }
+    }
+
     public static class Program
     {
+        private static PkceClient? _profileTokenClient;
+
         public static async Task Main()
         {
             Console.WriteLine("=== TypingRealm test client ===");
@@ -123,13 +134,25 @@ namespace TypingRealm.TestClient
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
 
-            Console.Write("Access token: (l = use local)");
+            Console.Write("Access token: (l = use local, aa = web Auth0 authentication, ai = web IdentityServer authentication)");
             var accessToken = Console.ReadLine();
             if (accessToken == "l")
             {
                 Console.Write("Profile: ");
                 var profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
                 accessToken = LocalAuthentication.GenerateProfileAccessToken(profileId);
+            }
+
+            if (accessToken == "aa")
+            {
+                _profileTokenClient = new PkceClient(Auth0AuthenticationConfiguration.Issuer, "usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck");
+                accessToken = await _profileTokenClient.SignInAsync().ConfigureAwait(false);
+            }
+
+            if (accessToken == "ai")
+            {
+                _profileTokenClient = new PkceClient(IdentityServerAuthenticationConfiguration.Issuer, string.Empty);
+                accessToken = await _profileTokenClient.SignInAsync().ConfigureAwait(false);
             }
 
             var hub = new HubConnectionBuilder()
@@ -233,25 +256,54 @@ namespace TypingRealm.TestClient
             Console.WriteLine("<some-message> - initiate process of sending message to server");
             Console.WriteLine("exit - quit the application");
 
-            Console.WriteLine("Connect with local token? (y)");
+            Console.WriteLine("Connect automatically and create a character? (y) (uses local token if not authenticated)");
+
+            string? token = null;
+            if (_profileTokenClient != null)
+            {
+                token = await _profileTokenClient.SignInAsync().ConfigureAwait(false);
+            }
 
             if (Console.ReadLine() == "y")
             {
-                Console.Write("ProfileId: ");
-                _profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
+                string? clientId = null;
+                if (_profileTokenClient != null)
+                {
+                    Console.WriteLine($"Access token: {await _profileTokenClient.SignInAsync().ConfigureAwait(false)}");
+                    Console.Write("Character name: ");
+                    var characterName = Console.ReadLine();
 
-                Console.Write("ClientId: ");
-                var clientId = Console.ReadLine() ?? throw new InvalidOperationException("Client is not supplied.");
+                    using var httpClient = new HttpClient();
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var response = httpClient.PostAsync("http://localhost:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
+                    {
+                        name = characterName
+                    }), Encoding.UTF8, "application/json"));
+
+                    var character = JsonSerializer.Deserialize<Character>(await response.Result.Content.ReadAsStringAsync().ConfigureAwait(false));
+                    clientId = character?.characterId;
+                }
+
+                if (_profileTokenClient == null)
+                {
+                    Console.Write("ProfileId: ");
+                    _profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
+
+                    Console.Write("ClientId: ");
+                    clientId = Console.ReadLine() ?? throw new InvalidOperationException("Client is not supplied.");
+                }
 
                 Console.Write("Group: ");
                 var group = Console.ReadLine() ?? throw new InvalidOperationException("Group is not supplied.");
 
-                var token = LocalAuthentication.GenerateProfileAccessToken(_profileId);
+                token = _profileTokenClient == null
+                    ? LocalAuthentication.GenerateProfileAccessToken(_profileId)
+                    : await _profileTokenClient.SignInAsync().ConfigureAwait(false);
 
                 await _listener!.SendRpcAsync(new Authenticate(token))
                     .ConfigureAwait(false);
 
-                await connection.SendAsync(new Connect(clientId, group), default)
+                await connection.SendAsync(new Connect(clientId!, group), default)
                     .ConfigureAwait(false);
             }
 
@@ -318,7 +370,9 @@ namespace TypingRealm.TestClient
                         return; // Return after server tells us that he's disconnecting us. Or socket exception will be thrown on the next WaitAsync operation.
                     case TokenExpired _:
                         Console.WriteLine($"Received TokenExpired message. Re-sending token.");
-                        var token = LocalAuthentication.GenerateProfileAccessToken(_profileId);
+                        var token = _profileTokenClient == null
+                            ? LocalAuthentication.GenerateProfileAccessToken(_profileId)
+                            : await _profileTokenClient.SignInAsync().ConfigureAwait(false);
                         await connection.SendAsync(new Authenticate(token), default).ConfigureAwait(false);
                         break;
                     default:
