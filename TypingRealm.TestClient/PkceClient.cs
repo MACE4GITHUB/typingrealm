@@ -1,11 +1,32 @@
 ﻿using System;
 using System.Threading.Tasks;
 using IdentityModel.OidcClient;
+using TypingRealm.Authentication;
 using TypingRealm.Messaging.Connections;
 
 namespace TypingRealm.TestClient
 {
-    public sealed class PkceClient : SyncManagedDisposable
+    public interface IProfileTokenProvider
+    {
+        ValueTask<string> SignInAsync();
+    }
+
+    public sealed class LocalProfileTokenProvider : IProfileTokenProvider
+    {
+        private readonly string _profile;
+
+        public LocalProfileTokenProvider(string profile)
+        {
+            _profile = profile;
+        }
+
+        public ValueTask<string> SignInAsync()
+        {
+            return new ValueTask<string>(LocalAuthentication.GenerateProfileAccessToken(_profile));
+        }
+    }
+
+    public sealed class PkceClient : SyncManagedDisposable, IProfileTokenProvider
     {
         private readonly OidcClient _oidcClient;
         private readonly SemaphoreSlimLock _lock = new SemaphoreSlimLock();
@@ -35,7 +56,7 @@ namespace TypingRealm.TestClient
             _oidcClient = new OidcClient(options);
         }
 
-        public async Task<string> SignInAsync()
+        public async ValueTask<string> SignInAsync()
         {
             await using var @lock = await _lock.UseWaitAsync(default).ConfigureAwait(false);
 

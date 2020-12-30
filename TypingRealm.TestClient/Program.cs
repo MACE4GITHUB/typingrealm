@@ -2,25 +2,52 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
-using TypingRealm.Combat.Messages;
-using TypingRealm.Domain;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
-using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.RopeWar;
 
 namespace TypingRealm.TestClient
 {
+    public enum AuthenticationProviderType
+    {
+        Local = 1,
+        Auth0 = 2,
+        IdentityServer = 3
+    }
+
+    public static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddProfileTokenProvider(this IServiceCollection services, AuthenticationProviderType authenticationProviderType, string profile = "ivan")
+        {
+            switch (authenticationProviderType)
+            {
+                case AuthenticationProviderType.Local:
+                    services.AddTransient<IProfileTokenProvider>(
+                        _ => new LocalProfileTokenProvider(profile));
+                    break;
+                case AuthenticationProviderType.Auth0:
+                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(Auth0AuthenticationConfiguration.Issuer, Auth0AuthenticationConfiguration.PkceClientId));
+                    break;
+                case AuthenticationProviderType.IdentityServer:
+                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(IdentityServerAuthenticationConfiguration.Issuer, IdentityServerAuthenticationConfiguration.PkceClientId));
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown authentication provider type.");
+            }
+
+            return services;
+        }
+    }
+
     public sealed class Character
     {
         public string? profileId { get; set; }
@@ -30,8 +57,6 @@ namespace TypingRealm.TestClient
 
     public static class Program
     {
-        private static PkceClient? _profileTokenClient;
-
         public static async Task Main()
         {
             Console.WriteLine("=== TypingRealm test client ===");
@@ -39,15 +64,15 @@ namespace TypingRealm.TestClient
 
             await (Console.ReadLine() switch
             {
-                "s" => MainSignalR(),
-                "cs" => CombatSignalR(),
+                /*"s" => MainSignalR(),
+                "cs" => CombatSignalR(),*/
                 "rw" => RopeWarSignalR(),
-                "rwt" => RopeWarTcp(),
-                _ => MainTpc()
+                /*"rwt" => RopeWarTcp(),
+                _ => MainTpc()*/
             }).ConfigureAwait(false);
         }
 
-        public static async Task MainTpc()
+        /*public static async Task MainTpc()
         {
             var provider = new ServiceCollection()
                 .AddSerializationCore()
@@ -80,9 +105,9 @@ namespace TypingRealm.TestClient
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
-        }
+        }*/
 
-        public static async Task RopeWarTcp()
+        /*public static async Task RopeWarTcp()
         {
             var provider = new ServiceCollection()
                 .AddSerializationCore()
@@ -112,16 +137,35 @@ namespace TypingRealm.TestClient
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
-        }
+        }*/
 
         public static async Task RopeWarSignalR()
         {
+            Console.Write("Authentication type (a - auth0, i - identityserver, l - local token): ");
+            var authenticationType = Console.ReadLine()?.ToLowerInvariant() switch
+            {
+                "a" => AuthenticationProviderType.Auth0,
+                "i" => AuthenticationProviderType.IdentityServer,
+                "l" => AuthenticationProviderType.Local,
+                _ => throw new InvalidOperationException("Invalid type.")
+            };
+
+            var profile = "ivan";
+            if (authenticationType == AuthenticationProviderType.Local)
+            {
+                Console.Write("Profile for local token (default = 'ivan'): ");
+                profile = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(profile))
+                    profile = "ivan";
+            }
+
             var provider = new ServiceCollection()
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
                 .AddRopeWarMessages()
                 .AddJson()
                 .Services
+                .AddProfileTokenProvider(authenticationType, profile)
                 .BuildServiceProvider();
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
@@ -134,26 +178,8 @@ namespace TypingRealm.TestClient
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
 
-            Console.Write("Access token: (l = use local, aa = web Auth0 authentication, ai = web IdentityServer authentication)");
-            var accessToken = Console.ReadLine();
-            if (accessToken == "l")
-            {
-                Console.Write("Profile: ");
-                var profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
-                accessToken = LocalAuthentication.GenerateProfileAccessToken(profileId);
-            }
-
-            if (accessToken == "aa")
-            {
-                _profileTokenClient = new PkceClient(Auth0AuthenticationConfiguration.Issuer, "usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck");
-                accessToken = await _profileTokenClient.SignInAsync().ConfigureAwait(false);
-            }
-
-            if (accessToken == "ai")
-            {
-                _profileTokenClient = new PkceClient(IdentityServerAuthenticationConfiguration.Issuer, string.Empty);
-                accessToken = await _profileTokenClient.SignInAsync().ConfigureAwait(false);
-            }
+            var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
+            var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
             var hub = new HubConnectionBuilder()
                 .WithUrl($"http://localhost:30102/hub", options =>
@@ -170,10 +196,10 @@ namespace TypingRealm.TestClient
             var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
                 .WithJson(jsonConnectionFactory);
 
-            await Handle(connection, messageTypes).ConfigureAwait(false);
+            await Handle(connection, messageTypes, tokenProvider).ConfigureAwait(false);
         }
 
-        public static async Task CombatSignalR()
+        /*public static async Task CombatSignalR()
         {
             var provider = new ServiceCollection()
                 .AddSerializationCore()
@@ -208,9 +234,9 @@ namespace TypingRealm.TestClient
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
-        }
+        }*/
 
-        public static async Task MainSignalR()
+        /*public static async Task MainSignalR()
         {
             var provider = new ServiceCollection()
                 .AddSerializationCore()
@@ -245,12 +271,11 @@ namespace TypingRealm.TestClient
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes).ConfigureAwait(false);
-        }
+        }*/
 
-        private static string _profileId = string.Empty;
-        private static async Task Handle(IConnection connection, IEnumerable<Type> messageTypes)
+        private static async Task Handle(IConnection connection, IEnumerable<Type> messageTypes, IProfileTokenProvider tokenProvider)
         {
-            _ = ListenForMessagesFromServer(connection);
+            _ = ListenForMessagesFromServer(connection, tokenProvider);
             Console.WriteLine("Connected.");
             Console.WriteLine("messages - show list of available messages");
             Console.WriteLine("<some-message> - initiate process of sending message to server");
@@ -258,47 +283,28 @@ namespace TypingRealm.TestClient
 
             Console.WriteLine("Connect automatically and create a character? (y) (uses local token if not authenticated)");
 
-            string? token = null;
-            if (_profileTokenClient != null)
-            {
-                token = await _profileTokenClient.SignInAsync().ConfigureAwait(false);
-            }
+            var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
             if (Console.ReadLine() == "y")
             {
                 string? clientId = null;
-                if (_profileTokenClient != null)
+
+                Console.WriteLine($"Access token: {token}");
+                Console.Write("Character name: ");
+                var characterName = Console.ReadLine();
+
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                var response = httpClient.PostAsync("http://localhost:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
                 {
-                    Console.WriteLine($"Access token: {await _profileTokenClient.SignInAsync().ConfigureAwait(false)}");
-                    Console.Write("Character name: ");
-                    var characterName = Console.ReadLine();
+                    name = characterName
+                }), Encoding.UTF8, "application/json"));
 
-                    using var httpClient = new HttpClient();
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var response = httpClient.PostAsync("http://localhost:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
-                    {
-                        name = characterName
-                    }), Encoding.UTF8, "application/json"));
-
-                    var character = JsonSerializer.Deserialize<Character>(await response.Result.Content.ReadAsStringAsync().ConfigureAwait(false));
-                    clientId = character?.characterId;
-                }
-
-                if (_profileTokenClient == null)
-                {
-                    Console.Write("ProfileId: ");
-                    _profileId = Console.ReadLine() ?? throw new InvalidOperationException("Profile is not supplied.");
-
-                    Console.Write("ClientId: ");
-                    clientId = Console.ReadLine() ?? throw new InvalidOperationException("Client is not supplied.");
-                }
+                var character = JsonSerializer.Deserialize<Character>(await response.Result.Content.ReadAsStringAsync().ConfigureAwait(false));
+                clientId = character?.characterId;
 
                 Console.Write("Group: ");
                 var group = Console.ReadLine() ?? throw new InvalidOperationException("Group is not supplied.");
-
-                token = _profileTokenClient == null
-                    ? LocalAuthentication.GenerateProfileAccessToken(_profileId)
-                    : await _profileTokenClient.SignInAsync().ConfigureAwait(false);
 
                 await _listener!.SendRpcAsync(new Authenticate(token))
                     .ConfigureAwait(false);
@@ -355,7 +361,7 @@ namespace TypingRealm.TestClient
         }
 
         private static MessageListener? _listener;
-        private static async Task ListenForMessagesFromServer(IConnection connection)
+        private static async Task ListenForMessagesFromServer(IConnection connection, IProfileTokenProvider tokenProvider)
         {
             _listener = new MessageListener(connection);
             _listener.Subscribe<object>(async message =>
@@ -370,9 +376,7 @@ namespace TypingRealm.TestClient
                         return; // Return after server tells us that he's disconnecting us. Or socket exception will be thrown on the next WaitAsync operation.
                     case TokenExpired _:
                         Console.WriteLine($"Received TokenExpired message. Re-sending token.");
-                        var token = _profileTokenClient == null
-                            ? LocalAuthentication.GenerateProfileAccessToken(_profileId)
-                            : await _profileTokenClient.SignInAsync().ConfigureAwait(false);
+                        var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
                         await connection.SendAsync(new Authenticate(token), default).ConfigureAwait(false);
                         break;
                     default:
