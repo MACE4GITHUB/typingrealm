@@ -22,8 +22,8 @@ namespace TypingRealm.Authentication
             builder.AuthenticationInformation.AuthorizationEndpoint = Auth0AuthenticationConfiguration.AuthorizationEndpoint;
             builder.AuthenticationInformation.TokenEndpoint = Auth0AuthenticationConfiguration.TokenEndpoint;
 
-            builder.AuthenticationInformation.ServiceClientId = "QEYu5cQ7etxQyUARibsLFJwh5HBNOcjv";
-            builder.AuthenticationInformation.ServiceClientSecret = "uFj6pnafZFYZbabfub_5fdSZC2aQ-Sgw4VP7jsEWgWZQjv4OVMvkFqk25BBpC1Me";
+            builder.AuthenticationInformation.ServiceClientId = Auth0AuthenticationConfiguration.ServiceClientId;
+            builder.AuthenticationInformation.ServiceClientSecret = Auth0AuthenticationConfiguration.ServiceClientSecret;
 
             parameters.ValidAudiences = new[] { Auth0AuthenticationConfiguration.Audience };
             parameters.ValidIssuer = Auth0AuthenticationConfiguration.Issuer;
@@ -46,8 +46,8 @@ namespace TypingRealm.Authentication
             builder.AuthenticationInformation.AuthorizationEndpoint = IdentityServerAuthenticationConfiguration.AuthorizationEndpoint;
             builder.AuthenticationInformation.TokenEndpoint = IdentityServerAuthenticationConfiguration.TokenEndpoint;
 
-            builder.AuthenticationInformation.ServiceClientId = "service";
-            builder.AuthenticationInformation.ServiceClientSecret = "secret";
+            builder.AuthenticationInformation.ServiceClientId = IdentityServerAuthenticationConfiguration.ServiceClientId;
+            builder.AuthenticationInformation.ServiceClientSecret = IdentityServerAuthenticationConfiguration.ServiceClientSecret;
 
             parameters.ValidAudiences = new[] { IdentityServerAuthenticationConfiguration.Audience };
             parameters.ValidIssuer = IdentityServerAuthenticationConfiguration.Issuer;

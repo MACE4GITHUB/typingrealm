@@ -8,5 +8,7 @@
         public static readonly string AuthorizationEndpoint = $"{Issuer}/connect/authorize";
 
         public static readonly string PkceClientId = "webapp";
+        public static readonly string ServiceClientId = "service";
+        public static readonly string ServiceClientSecret = "secret";
     }
 }
