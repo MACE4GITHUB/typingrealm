@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using TypingRealm.Profiles.Api.Data;
 using TypingRealm.Profiles.Api.Resources;
 
@@ -123,7 +121,7 @@ namespace TypingRealm.Profiles.Api.Controllers
         // TODO: Move to different, "world character status" API.
         [HttpGet]
         [Route("{characterId}/rope-war/{contestId}")]
-        [TyrAuthorize("service")]
+        [ServiceScoped]
         public async ValueTask<ActionResult<bool>> CanJoinRopeWarContest(string characterId, string contestId)
         {
             var character = await _characterRepository.FindAsync(new CharacterId(characterId));
@@ -139,35 +137,6 @@ namespace TypingRealm.Profiles.Api.Controllers
             _ = contestId;
 
             return true;
-        }
-    }
-
-    public class TyrAuthorizeAttribute : TypeFilterAttribute
-    {
-        public TyrAuthorizeAttribute(string scope) : base(typeof(ScopeAuthorizationFilter))
-        {
-            Arguments = new object[] { scope };
-        }
-    }
-
-    public class ScopeAuthorizationFilter : IAuthorizationFilter
-    {
-        private readonly string _scope;
-
-        public ScopeAuthorizationFilter(string scope)
-        {
-            _scope = scope;
-        }
-
-        public void OnAuthorization(AuthorizationFilterContext context)
-        {
-            var scopes = context.HttpContext.User.Claims
-                .Where(claim => claim.Type == "scope") // IdentityServer has multiple claims with type 'scope'.
-                .SelectMany(claim => claim.Value.Split(' ')); // Auth0 has one claim 'scope' with all scopes delimited by space.
-
-            var hasScope = scopes.Any(scope => scope == _scope);
-            if (!hasScope)
-                context.Result = new ForbidResult();
         }
     }
 }

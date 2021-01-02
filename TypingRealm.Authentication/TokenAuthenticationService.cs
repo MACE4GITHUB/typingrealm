@@ -2,23 +2,24 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
 
 namespace TypingRealm.Authentication
 {
     public sealed class TokenAuthenticationService : ITokenAuthenticationService
     {
-        private readonly TokenValidationParameters _validationParameters;
+        private readonly IAuthenticationInformationProvider _authenticationInformationProvider;
 
-        public TokenAuthenticationService(TokenValidationParameters validationParameters)
+        public TokenAuthenticationService(IAuthenticationInformationProvider authenticationInformationProvider)
         {
-            _validationParameters = validationParameters;
+            _authenticationInformationProvider = authenticationInformationProvider;
         }
 
         public ValueTask<AuthenticationResult> AuthenticateAsync(string accessToken, CancellationToken cancellationToken)
         {
+            var validationParameters = _authenticationInformationProvider.GetProfileAuthenticationInformation().TokenValidationParameters;
+
             var handler = new JwtSecurityTokenHandler();
-            var user = handler.ValidateToken(accessToken, _validationParameters, out var validatedToken);
+            var user = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
             if (!(validatedToken is JwtSecurityToken jwtSecurityToken))
                 throw new NotSupportedException("Security token is not a valid JWT token.");
 

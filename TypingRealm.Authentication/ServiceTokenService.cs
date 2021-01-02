@@ -9,25 +9,27 @@ namespace TypingRealm.Authentication
 {
     public sealed class ServiceTokenService : IServiceTokenService
     {
-        private readonly AuthenticationInformation _authenticationInformation;
+        private readonly IAuthenticationInformationProvider _authenticationInformationProvider;
 
-        public ServiceTokenService(AuthenticationInformation authenticationInformation)
+        public ServiceTokenService(IAuthenticationInformationProvider authenticationInformationProvider)
         {
-            _authenticationInformation = authenticationInformation;
+            _authenticationInformationProvider = authenticationInformationProvider;
         }
 
         public async ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken)
         {
+            var authenticationInformation = _authenticationInformationProvider.GetServiceAuthenticationInformation();
+
             using var httpClient = new HttpClient();
             using var content = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string?, string?>("client_id", _authenticationInformation.ServiceClientId),
-                new KeyValuePair<string?, string?>("client_secret", _authenticationInformation.ServiceClientSecret),
+                new KeyValuePair<string?, string?>("client_id", authenticationInformation.ServiceClientId),
+                new KeyValuePair<string?, string?>("client_secret", authenticationInformation.ServiceClientSecret),
                 new KeyValuePair<string?, string?>("audience", "https://api.typingrealm.com"),
                 new KeyValuePair<string?, string?>("grant_type", "client_credentials")
             });
 
-            var response = await httpClient.PostAsync(_authenticationInformation.TokenEndpoint, content)
+            var response = await httpClient.PostAsync(authenticationInformation.TokenEndpoint, content)
                 .ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
