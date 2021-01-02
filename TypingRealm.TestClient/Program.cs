@@ -35,10 +35,12 @@ namespace TypingRealm.TestClient
                         _ => new LocalProfileTokenProvider(profile));
                     break;
                 case AuthenticationProviderType.Auth0:
-                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(Auth0AuthenticationConfiguration.Issuer, Auth0AuthenticationConfiguration.PkceClientId));
+                    var auth0Config = new Auth0AuthenticationConfiguration();
+                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(auth0Config.Issuer, auth0Config.PkceClientId));
                     break;
                 case AuthenticationProviderType.IdentityServer:
-                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(IdentityServerAuthenticationConfiguration.Issuer, IdentityServerAuthenticationConfiguration.PkceClientId));
+                    var idsConfig = new IdentityServerAuthenticationConfiguration();
+                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(idsConfig.Issuer, idsConfig.PkceClientId));
                     break;
                 default:
                     throw new InvalidOperationException("Unknown authentication provider type.");

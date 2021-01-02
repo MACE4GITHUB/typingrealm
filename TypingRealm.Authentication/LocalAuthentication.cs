@@ -10,6 +10,8 @@ namespace TypingRealm.Authentication
     {
         private static readonly JwtSecurityTokenHandler _tokenHandler;
         private static readonly SigningCredentials _signingCredentials;
+        private static readonly LocalAuthenticationConfiguration _authenticationConfiguration
+            = new LocalAuthenticationConfiguration();
 
 #pragma warning disable S3963, CA1810
         static LocalAuthentication()
@@ -22,7 +24,7 @@ namespace TypingRealm.Authentication
         }
 #pragma warning restore S3963, CA1810
 
-        internal static readonly string Issuer = "https://local-authority";
+        internal static string Issuer => _authenticationConfiguration.Issuer;
         internal static SecurityKey SecurityKey { get; }
 
         public static string GenerateProfileAccessToken(string subClaimValue)
@@ -32,7 +34,7 @@ namespace TypingRealm.Authentication
                 new Claim("sub", subClaimValue)
             };
 
-            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, LocalAuthenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
+            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
         }
 
         public static string GenerateServiceAccessToken(string subClaimValue)
@@ -40,10 +42,10 @@ namespace TypingRealm.Authentication
             var claims = new List<Claim>
             {
                 new Claim("sub", subClaimValue),
-                new Claim("scope", "service")
+                new Claim("scope", TyrScopes.Service)
             };
 
-            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, LocalAuthenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
+            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
         }
     }
 }

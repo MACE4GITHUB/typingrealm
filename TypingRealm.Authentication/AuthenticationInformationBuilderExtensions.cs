@@ -4,27 +4,23 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace TypingRealm.Authentication
 {
-    public static class TyrAuthenticationSchemes
-    {
-        public static readonly string ProfileAuthenticationScheme = "ProfileAuthenticationScheme";
-        public static readonly string ServiceAuthenticationScheme = "ServiceAuthenticationScheme";
-    }
-
     public static class AuthenticationInformationBuilderExtensions
     {
-        public static AuthenticationInformationBuilder UseAuth0Provider(this AuthenticationInformationBuilder builder)
+        public static AuthenticationInformationBuilder UseAuthenticationProvider(
+            this AuthenticationInformationBuilder builder,
+            AuthenticationProviderConfiguration configuration)
         {
             var parameters = builder.AuthenticationInformation.TokenValidationParameters;
 
-            builder.AuthenticationInformation.Issuer = Auth0AuthenticationConfiguration.Issuer;
-            builder.AuthenticationInformation.AuthorizationEndpoint = Auth0AuthenticationConfiguration.AuthorizationEndpoint;
-            builder.AuthenticationInformation.TokenEndpoint = Auth0AuthenticationConfiguration.TokenEndpoint;
+            builder.AuthenticationInformation.Issuer = configuration.Issuer;
+            builder.AuthenticationInformation.AuthorizationEndpoint = configuration.AuthorizationEndpoint;
+            builder.AuthenticationInformation.TokenEndpoint = configuration.TokenEndpoint;
 
-            builder.AuthenticationInformation.ServiceClientId = Auth0AuthenticationConfiguration.ServiceClientId;
-            builder.AuthenticationInformation.ServiceClientSecret = Auth0AuthenticationConfiguration.ServiceClientSecret;
+            builder.AuthenticationInformation.ServiceClientId = configuration.ServiceClientId;
+            builder.AuthenticationInformation.ServiceClientSecret = configuration.ServiceClientSecret;
 
-            parameters.ValidAudiences = new[] { Auth0AuthenticationConfiguration.Audience };
-            parameters.ValidIssuer = Auth0AuthenticationConfiguration.Issuer;
+            parameters.ValidAudiences = new[] { configuration.Audience };
+            parameters.ValidIssuer = configuration.Issuer;
             parameters.IssuerSigningKey = null;
             parameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
             {
@@ -37,43 +33,22 @@ namespace TypingRealm.Authentication
             return builder;
         }
 
+        public static AuthenticationInformationBuilder UseAuth0Provider(this AuthenticationInformationBuilder builder)
+        {
+            return builder.UseAuthenticationProvider(new Auth0AuthenticationConfiguration());
+        }
+
         public static AuthenticationInformationBuilder UseIdentityServerProvider(this AuthenticationInformationBuilder builder)
         {
-            var parameters = builder.AuthenticationInformation.TokenValidationParameters;
-
-            builder.AuthenticationInformation.Issuer = IdentityServerAuthenticationConfiguration.Issuer;
-            builder.AuthenticationInformation.AuthorizationEndpoint = IdentityServerAuthenticationConfiguration.AuthorizationEndpoint;
-            builder.AuthenticationInformation.TokenEndpoint = IdentityServerAuthenticationConfiguration.TokenEndpoint;
-
-            builder.AuthenticationInformation.ServiceClientId = IdentityServerAuthenticationConfiguration.ServiceClientId;
-            builder.AuthenticationInformation.ServiceClientSecret = IdentityServerAuthenticationConfiguration.ServiceClientSecret;
-
-            parameters.ValidAudiences = new[] { IdentityServerAuthenticationConfiguration.Audience };
-            parameters.ValidIssuer = IdentityServerAuthenticationConfiguration.Issuer;
-            parameters.IssuerSigningKey = null;
-            parameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
-            {
-                var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>($"{parameters.ValidIssuer}/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
-                var openIdConfig = configurationManager.GetConfigurationAsync(CancellationToken.None).GetAwaiter().GetResult();
-
-                return openIdConfig.SigningKeys;
-            };
-
-            return builder;
+            return builder.UseAuthenticationProvider(new IdentityServerAuthenticationConfiguration());
         }
 
         public static AuthenticationInformationBuilder UseLocalProvider(this AuthenticationInformationBuilder builder)
         {
+            builder.UseAuthenticationProvider(new LocalAuthenticationConfiguration());
+
             var parameters = builder.AuthenticationInformation.TokenValidationParameters;
 
-            builder.AuthenticationInformation.AuthorizationEndpoint = LocalAuthenticationConfiguration.AuthorizationEndpoint;
-            builder.AuthenticationInformation.TokenEndpoint = LocalAuthenticationConfiguration.TokenEndpoint;
-
-            builder.AuthenticationInformation.ServiceClientId = "local-service";
-            builder.AuthenticationInformation.ServiceClientSecret = "local-secret";
-
-            parameters.ValidAudiences = new[] { LocalAuthenticationConfiguration.Audience };
-            parameters.ValidIssuer = LocalAuthenticationConfiguration.Issuer;
             parameters.IssuerSigningKeyResolver = null;
             parameters.IssuerSigningKey = LocalAuthentication.SecurityKey;
 

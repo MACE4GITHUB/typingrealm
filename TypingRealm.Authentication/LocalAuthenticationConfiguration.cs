@@ -1,12 +1,16 @@
 ﻿namespace TypingRealm.Authentication
 {
-    public static class LocalAuthenticationConfiguration
+    public sealed record LocalAuthenticationConfiguration : AuthenticationProviderConfiguration
     {
-        public static readonly string Audience = "local-audience";
-        public static readonly string Issuer = "https://local-authority"; // This needs to be without slash at the end - or else it will try to query uri.
-        public static readonly string TokenEndpoint = $"http://localhost:30103/api/local-auth/token";
-
-        // TODO: Implement local auth code flow on this endpoint.
-        public static readonly string AuthorizationEndpoint = $"http://localhost:30103/api/local-auth/authorize";
+        public LocalAuthenticationConfiguration() : base(
+            Audience: "local-audience",
+            Issuer: "https://local-authority", // This needs to be without slash at the end - or it will try to query uri.
+            TokenEndpoint: "http://localhost:30103/api/local-auth/token",
+            AuthorizationEndpoint: "http://localhost:30103/api/local-auth/authorize", // TODO: Implement local auth code flow on this endpoint.
+            PkceClientId: "local-webapp",
+            ServiceClientId: "local-service",
+            ServiceClientSecret: "local-secret")
+        { }
     }
+
 }

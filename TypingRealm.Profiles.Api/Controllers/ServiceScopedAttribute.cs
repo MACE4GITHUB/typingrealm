@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.Profiles.Api.Controllers
+﻿using TypingRealm.Authentication;
+
+namespace TypingRealm.Profiles.Api.Controllers
 {
     public sealed class ServiceScopedAttribute : TyrAuthorizeAttribute
     {

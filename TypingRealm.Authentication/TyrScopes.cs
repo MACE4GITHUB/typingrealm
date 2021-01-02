@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.Profiles.Api.Controllers
+﻿namespace TypingRealm.Authentication
 {
     public static class TyrScopes
     {
