@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TypingRealm.Messaging.Serialization.Json;
 
 namespace TypingRealm.Messaging.Serialization
 {
@@ -41,11 +42,24 @@ namespace TypingRealm.Messaging.Serialization
 
         private static Dictionary<string, Type> ToDictionaryById(IEnumerable<Type> messageTypes)
         {
-            return messageTypes
+            var types = messageTypes
                 .OrderBy(type => type.FullName)
+                .ToList();
+
+            // This is a temporary hack so that protobuf works with multiple servers
+            // when Json is enabled. JsonSerializedMessage will always be the first message,
+            // hence protobuf field number for it will always be "1" for any servers.
+            var jsonSerializedMessage = types.SingleOrDefault(type => type == typeof(JsonSerializedMessage));
+            if (jsonSerializedMessage != null)
+            {
+                types.Remove(jsonSerializedMessage);
+                types = new[] { jsonSerializedMessage }.Concat(types).ToList();
+            }
+
+            return types
                 .Select((type, index) => new
                 {
-                    TypeId = type.Name,
+                    TypeId = type.FullName,
                     Type = type
                 })
                 .ToDictionary(x => x.TypeId, x => x.Type);

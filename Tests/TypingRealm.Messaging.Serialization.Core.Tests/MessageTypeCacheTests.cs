@@ -1,6 +1,15 @@
 ﻿using System;
 using System.Linq;
+using TypingRealm.Messaging.Serialization.Json;
 using Xunit;
+
+namespace TypingRealm.Messaging.Serialization.A
+{
+    [Message]
+    public class ATestMessageBeforeJsonSerializedMessage
+    {
+    }
+}
 
 namespace TypingRealm.Messaging.Serialization.Tests
 {
@@ -51,7 +60,7 @@ namespace TypingRealm.Messaging.Serialization.Tests
         }
 
         [Fact]
-        public void ShouldSortByTypeFullNameAndAssignShortNameAsTypeid()
+        public void ShouldSortByTypeFullNameAndAssignFullNameAsTypeId()
         {
             var sut = new MessageTypeCache(new[]
             {
@@ -63,24 +72,48 @@ namespace TypingRealm.Messaging.Serialization.Tests
 
             var all = sut.GetAllTypes().ToDictionary(x => x.Key, x => x.Value);
             Assert.Equal(4, all.Count);
-            Assert.Equal(typeof(A.BTestMessage), all[nameof(A.BTestMessage)]);
-            Assert.Equal(typeof(A.DTestMessage), all[nameof(A.DTestMessage)]);
-            Assert.Equal(typeof(B.ATestMessage), all[nameof(B.ATestMessage)]);
-            Assert.Equal(typeof(B.CTestMessage), all[nameof(B.CTestMessage)]);
+            Assert.Equal(typeof(A.BTestMessage), all[typeof(A.BTestMessage).FullName!]);
+            Assert.Equal(typeof(A.DTestMessage), all[typeof(A.DTestMessage).FullName!]);
+            Assert.Equal(typeof(B.ATestMessage), all[typeof(B.ATestMessage).FullName!]);
+            Assert.Equal(typeof(B.CTestMessage), all[typeof(B.CTestMessage).FullName!]);
+
+            var list = all.ToList();
+            Assert.Equal(typeof(A.BTestMessage), list[0].Value);
+            Assert.Equal(typeof(A.DTestMessage), list[1].Value);
+            Assert.Equal(typeof(B.ATestMessage), list[2].Value);
+            Assert.Equal(typeof(B.CTestMessage), list[3].Value);
+        }
+
+        [Fact]
+        public void ShouldPutJsonSerializedMessageAtFirstPlace()
+        {
+            var sut = new MessageTypeCache(new[]
+            {
+                typeof(A.DTestMessage),
+                typeof(JsonSerializedMessage),
+                typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage)
+            });
+
+            var list = sut.GetAllTypes().ToDictionary(x => x.Key, x => x.Value)
+                .ToList();
+
+            Assert.Equal(typeof(JsonSerializedMessage), list[0].Value);
+            Assert.Equal(typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage), list[1].Value);
+            Assert.Equal(typeof(A.DTestMessage), list[2].Value);
         }
 
         [Fact]
         public void ShouldGetTypeById()
         {
             var sut = new MessageTypeCache(new[] { typeof(A.BTestMessage) });
-            Assert.Equal(typeof(A.BTestMessage), sut.GetTypeById(nameof(A.BTestMessage)));
+            Assert.Equal(typeof(A.BTestMessage), sut.GetTypeById(typeof(A.BTestMessage).FullName!));
         }
 
         [Fact]
         public void ShouldGetIdByType()
         {
             var sut = new MessageTypeCache(new[] { typeof(A.BTestMessage) });
-            Assert.Equal(nameof(A.BTestMessage), sut.GetTypeId(typeof(A.BTestMessage)));
+            Assert.Equal(typeof(A.BTestMessage).FullName!, sut.GetTypeId(typeof(A.BTestMessage)));
         }
 
         [Fact]
