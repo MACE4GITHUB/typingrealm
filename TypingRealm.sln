@@ -64,9 +64,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.RopeWar.Server", "TypingRealm.RopeWar.Server\TypingRealm.RopeWar.Server.csproj", "{0F99DAF4-0283-4A5C-9310-8737CC1D9F98}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{C00AAAEB-23DF-4B66-9326-E73C29F075D5}"
-	ProjectSection(SolutionItems) = preProject
-		TypingRealm.Authentication\Auth0AuthenticationConfiguration.cs = TypingRealm.Authentication\Auth0AuthenticationConfiguration.cs
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Profiles", "Profiles", "{5878711F-092A-4204-A260-F3C9D4576A63}"
 EndProject
