@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -10,7 +11,7 @@ namespace TypingRealm.Communication
 {
     public sealed class HttpClient : SyncManagedDisposable, IHttpClient
     {
-        private readonly System.Net.Http.HttpClient _httpCLient = new System.Net.Http.HttpClient();
+        private readonly System.Net.Http.HttpClient _httpClient = new System.Net.Http.HttpClient();
 
         public async ValueTask<T> GetAsync<T>(string uri, string accessToken, CancellationToken cancellationToken)
         {
@@ -21,7 +22,7 @@ namespace TypingRealm.Communication
                 message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             }
 
-            var response = await _httpCLient.SendAsync(message, cancellationToken)
+            var response = await _httpClient.SendAsync(message, cancellationToken)
                 .ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
@@ -45,9 +46,32 @@ namespace TypingRealm.Communication
             return deserialized;
         }
 
+        public async ValueTask PostAsync<T>(string uri, string accessToken, T content, CancellationToken cancellationToken)
+        {
+            // TODO: Use serialization from Messaging.Serialization.Core, don't duplicate code.
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            using var message = new HttpRequestMessage(HttpMethod.Post, uri);
+            using var stringContent = new StringContent(JsonSerializer.Serialize(content, options: options), Encoding.UTF8, "application/json");
+
+            if (accessToken != null)
+            {
+                message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
+            var response = await _httpClient.SendAsync(message, cancellationToken)
+                .ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+        }
+
         protected override void DisposeManagedResources()
         {
-            _httpCLient.Dispose();
+            _httpClient.Dispose();
         }
     }
 }

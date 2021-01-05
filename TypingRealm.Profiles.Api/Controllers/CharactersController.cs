@@ -132,11 +132,21 @@ namespace TypingRealm.Profiles.Api.Controllers
             /*if (!IsOwner(character))
                 return Forbid();*/
 
-            // We are the owner of the character.
-            // Check if the character has access to given contest.
-            _ = contestId;
+            return character.ActivityId == contestId;
+        }
 
-            return true;
+        [HttpPost]
+        [Route("{characterId}/activity/{activityId}")]
+        [ServiceScoped]
+        public async ValueTask<ActionResult> EnterActivity(string characterId, string activityId)
+        {
+            var character = await _characterRepository.FindAsync(new CharacterId(characterId));
+            if (character == null)
+                return NotFound();
+
+            character.EnterActivity(activityId);
+            await _characterRepository.SaveAsync(character);
+            return NoContent();
         }
     }
 }

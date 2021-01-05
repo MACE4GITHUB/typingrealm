@@ -7,6 +7,8 @@ namespace TypingRealm.Profiles.Api.Client
     {
         ValueTask<bool> BelongsToCurrentProfileAsync(string characterId, CancellationToken cancellationToken);
 
-        ValueTask<bool> CanJoinRopeWarContest(string characterId, string contestId, CancellationToken cancellationToken);
+        ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken);
+
+        ValueTask EnterActivityAsync(string characterId, string activityId, CancellationToken cancellationToken);
     }
 }

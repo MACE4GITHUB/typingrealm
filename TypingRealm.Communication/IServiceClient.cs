@@ -10,5 +10,12 @@ namespace TypingRealm.Communication
             string endpoint,
             EndpointAuthenticationType endpointAuthenticationType,
             CancellationToken cancellationToken);
+
+        ValueTask PostAsync<T>(
+            string serviceName,
+            string endpoint,
+            EndpointAuthenticationType endpointAuthenticationType,
+            T content,
+            CancellationToken cancellationToken);
     }
 }

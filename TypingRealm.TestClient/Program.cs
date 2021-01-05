@@ -14,6 +14,7 @@ using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.RopeWar;
+using TypingRealm.World;
 
 namespace TypingRealm.TestClient
 {
@@ -69,6 +70,7 @@ namespace TypingRealm.TestClient
                 /*"s" => MainSignalR(),
                 "cs" => CombatSignalR(),*/
                 "rw" => RopeWarSignalR(),
+                "world" => WorldSignalR(),
                 /*"rwt" => RopeWarTcp(),
                 _ => MainTpc()*/
             }).ConfigureAwait(false);
@@ -198,8 +200,90 @@ namespace TypingRealm.TestClient
             var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
                 .WithJson(jsonConnectionFactory);
 
-            await Handle(connection, messageTypes, tokenProvider).ConfigureAwait(false);
+            await Handle(connection, messageTypes, tokenProvider, null!).ConfigureAwait(false);
         }
+
+        public static async Task WorldSignalR()
+        {
+            Console.Write("Authentication type (a - auth0, i - identityserver, l - local token): ");
+            var authenticationType = Console.ReadLine()?.ToLowerInvariant() switch
+            {
+                "a" => AuthenticationProviderType.Auth0,
+                "i" => AuthenticationProviderType.IdentityServer,
+                "l" => AuthenticationProviderType.Local,
+                _ => throw new InvalidOperationException("Invalid type.")
+            };
+
+            var profile = "ivan";
+            if (authenticationType == AuthenticationProviderType.Local)
+            {
+                Console.Write("Profile for local token (default = 'ivan'): ");
+                profile = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(profile))
+                    profile = "ivan";
+            }
+
+            var provider = new ServiceCollection()
+                .AddSerializationCore()
+                .AddTyrAuthenticationMessages()
+                .AddRopeWarMessages()
+                .AddWorldMessages()
+                .AddJson()
+                .Services
+                .AddProfileTokenProvider(authenticationType, profile)
+                .BuildServiceProvider();
+
+            var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
+                .GetAllTypes()
+                .Select(idToType => idToType.Value)
+                .ToList();
+
+            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
+
+            Console.WriteLine("Press enter to connect.");
+            Console.ReadLine();
+
+            var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
+            var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
+
+            var hub = new HubConnectionBuilder()
+                .WithUrl($"http://localhost:30111/hub", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(accessToken);
+                })
+                .Build();
+
+            var notificator = new Notificator();
+            hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
+
+            await hub.StartAsync(default).ConfigureAwait(false);
+
+            var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
+                .WithJson(jsonConnectionFactory);
+
+            async ValueTask<IConnection> ConnectToRw()
+            {
+                var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
+
+                var hub = new HubConnectionBuilder()
+                    .WithUrl($"http://localhost:30102/hub", options =>
+                    {
+                        options.AccessTokenProvider = () => Task.FromResult(accessToken);
+                    })
+                    .Build();
+
+                var notificator = new Notificator();
+                hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
+
+                await hub.StartAsync(default).ConfigureAwait(false);
+
+                return new SignalRMessageSender(hub).WithNotificator(notificator)
+                    .WithJson(jsonConnectionFactory);
+            }
+
+            await Handle(connection, messageTypes, tokenProvider, ConnectToRw).ConfigureAwait(false);
+        }
+
 
         /*public static async Task CombatSignalR()
         {
@@ -275,35 +359,43 @@ namespace TypingRealm.TestClient
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }*/
 
-        private static async Task Handle(IConnection connection, IEnumerable<Type> messageTypes, IProfileTokenProvider tokenProvider)
+        private static async Task Handle(IConnection connection, IEnumerable<Type> messageTypes, IProfileTokenProvider tokenProvider, Func<ValueTask<IConnection>> connectToRw, string? characterId = null)
         {
             _ = ListenForMessagesFromServer(connection, tokenProvider);
             Console.WriteLine("Connected.");
             Console.WriteLine("messages - show list of available messages");
             Console.WriteLine("<some-message> - initiate process of sending message to server");
             Console.WriteLine("exit - quit the application");
+            Console.WriteLine("connect-to-rw - connect to ropewar from world");
 
             Console.WriteLine("Connect automatically and create a character? (y) (uses local token if not authenticated)");
 
             var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
+            string? clientId = null;
             if (Console.ReadLine() == "y")
             {
-                string? clientId = null;
-
                 Console.WriteLine($"Access token: {token}");
-                Console.Write("Character name: ");
-                var characterName = Console.ReadLine();
 
-                using var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var response = httpClient.PostAsync("http://localhost:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
+                if (characterId == null)
                 {
-                    name = characterName
-                }), Encoding.UTF8, "application/json"));
+                    Console.Write("Character name: ");
+                    var characterName = Console.ReadLine();
 
-                var character = JsonSerializer.Deserialize<Character>(await response.Result.Content.ReadAsStringAsync().ConfigureAwait(false));
-                clientId = character?.characterId;
+                    using var httpClient = new HttpClient();
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    var response = httpClient.PostAsync("http://localhost:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
+                    {
+                        name = characterName
+                    }), Encoding.UTF8, "application/json"));
+
+                    var character = JsonSerializer.Deserialize<Character>(await response.Result.Content.ReadAsStringAsync().ConfigureAwait(false));
+                    clientId = character?.characterId;
+                }
+                else
+                {
+                    clientId = characterId;
+                }
 
                 Console.Write("Group: ");
                 var group = Console.ReadLine() ?? throw new InvalidOperationException("Group is not supplied.");
@@ -328,6 +420,11 @@ namespace TypingRealm.TestClient
                 {
                     Console.WriteLine(JsonSerializer.Serialize(messageTypes.Select(t => t.Name).ToList()));
                     continue;
+                }
+
+                if (input == "connect-to-rw")
+                {
+                    await Handle(await connectToRw().ConfigureAwait(false), messageTypes, tokenProvider, connectToRw, clientId).ConfigureAwait(false);
                 }
 
                 var messageType = messageTypes.FirstOrDefault(t => t.Name.ToUpperInvariant() == input.ToUpperInvariant());
