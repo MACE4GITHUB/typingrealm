@@ -26,6 +26,9 @@ namespace TypingRealm.Profiles
 
         public void EnterActivity(string activityId)
         {
+            if (ActivityId != null)
+                throw new InvalidOperationException("Character already participates in activity.");
+
             ActivityId = activityId;
         }
 
