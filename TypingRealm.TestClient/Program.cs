@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
@@ -189,6 +190,7 @@ namespace TypingRealm.TestClient
                 .WithUrl($"http://localhost:30102/hub", options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult(accessToken);
+                    options.Transports = HttpTransportType.WebSockets;
                 })
                 .Build();
 
