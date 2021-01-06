@@ -36,6 +36,7 @@ namespace TypingRealm.Hosting
             var builder = services.AddSerializationCore();
 
             builder
+                .AddJson() // Otherwise Protobuf won't work when client message index doesn't match server's.
                 .AddTyrServiceWithoutAspNetAuthentication();
                 //.UseLocalProvider();
 
