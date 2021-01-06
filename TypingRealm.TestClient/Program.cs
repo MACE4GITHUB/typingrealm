@@ -187,7 +187,7 @@ namespace TypingRealm.TestClient
             var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
             var hub = new HubConnectionBuilder()
-                .WithUrl($"http://localhost:30102/hub", options =>
+                .WithUrl($"http://127.0.0.1:30102/hub", options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult(accessToken);
                     options.Transports = HttpTransportType.WebSockets;
@@ -249,7 +249,7 @@ namespace TypingRealm.TestClient
             var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
             var hub = new HubConnectionBuilder()
-                .WithUrl($"http://localhost:30111/hub", options =>
+                .WithUrl($"http://127.0.0.1:30111/hub", options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult(accessToken);
                 })
@@ -268,7 +268,7 @@ namespace TypingRealm.TestClient
                 var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
                 var hub = new HubConnectionBuilder()
-                    .WithUrl($"http://localhost:30102/hub", options =>
+                    .WithUrl($"http://127.0.0.1:30102/hub", options =>
                     {
                         options.AccessTokenProvider = () => Task.FromResult(accessToken);
                     })
@@ -307,7 +307,7 @@ namespace TypingRealm.TestClient
             Console.ReadLine();
 
             var hub = new HubConnectionBuilder()
-                .WithUrl("http://localhost:30101/hub")
+                .WithUrl("http://127.0.0.1:30101/hub")
                 .Build();
 
             var notificator = new Notificator();
@@ -344,7 +344,7 @@ namespace TypingRealm.TestClient
             Console.ReadLine();
 
             var hub = new HubConnectionBuilder()
-                .WithUrl("http://localhost:30100/hub")
+                .WithUrl("http://127.0.0.1:30100/hub")
                 .Build();
 
             var notificator = new Notificator();
@@ -386,7 +386,7 @@ namespace TypingRealm.TestClient
 
                     using var httpClient = new HttpClient();
                     httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var response = httpClient.PostAsync("http://localhost:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
+                    var response = httpClient.PostAsync("http://127.0.0.1:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
                     {
                         name = characterName
                     }), Encoding.UTF8, "application/json"));
