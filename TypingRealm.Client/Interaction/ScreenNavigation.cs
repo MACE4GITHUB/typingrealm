@@ -20,7 +20,14 @@ namespace TypingRealm.Client.Interaction
             if (ActiveModalModule != ModalModule.None)
                 throw new InvalidOperationException();
 
-            _dialogModalScreenHandler.Initialize(text, ok, () => ActiveModalModule = ModalModule.None);
+            _dialogModalScreenHandler.Initialize(
+                text,
+                () =>
+                {
+                    ok();
+                    ActiveModalModule = ModalModule.None;
+                },
+                () => ActiveModalModule = ModalModule.None);
 
             ActiveModalModule = ModalModule.Dialog;
         }
