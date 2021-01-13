@@ -56,18 +56,30 @@ namespace TypingRealm.ConsoleApp
         private readonly IScreenHandler _mainMenuScreen;
         private readonly IScreenHandler _characterCreationScreen;
 
+        private readonly IScreenHandler _dialogModal;
+
         public ScreenHandlerProvider(
             IScreenNavigation screenNavigation,
             IScreenHandler mainMenuScreen,
-            IScreenHandler characterCreationScreen)
+            IScreenHandler characterCreationScreen,
+            IScreenHandler dialogModal)
         {
             _screenNavigation = screenNavigation;
             _mainMenuScreen = mainMenuScreen;
             _characterCreationScreen = characterCreationScreen;
+            _dialogModal = dialogModal;
         }
 
         public IScreenHandler GetCurrentScreenHandler()
         {
+            if (_screenNavigation.ActiveModalModule != ModalModule.None)
+            {
+                if (_screenNavigation.ActiveModalModule == ModalModule.Dialog)
+                    return _dialogModal;
+
+                throw new InvalidOperationException();
+            }
+
             if (_screenNavigation.Screen == GameScreen.MainMenu)
                 return _mainMenuScreen;
 
@@ -87,7 +99,8 @@ namespace TypingRealm.ConsoleApp
             var characterService = new CharacterService();
 
             var textGenerator = new TextGenerator();
-            var screenNavigation = new ScreenNavigation();
+            var dialogModalScreenHandler = new DialogModalScreenHandler(textGenerator, output);
+            var screenNavigation = new ScreenNavigation(dialogModalScreenHandler);
             var connectionManager = new ConnectionManager();
             var mainMenuHandler = new MainMenuHandler(screenNavigation, connectionManager);
             var mainMenuPrinter = new MainMenuPrinter(output, characterService);
@@ -96,7 +109,7 @@ namespace TypingRealm.ConsoleApp
             var characterCreationPrinter = new CharacterCreationPrinter(output, characterService);
             var characterCreationScreenHandler = new CharacterCreationScreenHandler(textGenerator, characterCreationHandler, characterCreationPrinter);
 
-            var screenProvider = new ScreenHandlerProvider(screenNavigation, mainMenuScreenHandler, characterCreationScreenHandler);
+            var screenProvider = new ScreenHandlerProvider(screenNavigation, mainMenuScreenHandler, characterCreationScreenHandler, dialogModalScreenHandler);
 
             // Authenticated and got list of characters from API.
             var characters = new[] { "1", "2", "ivan-id" };

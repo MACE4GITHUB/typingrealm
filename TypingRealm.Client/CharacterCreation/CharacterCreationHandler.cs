@@ -18,7 +18,9 @@ namespace TypingRealm.Client.CharacterCreation
 
         public void CloseAndReturnToMainMenu()
         {
-            _screenNavigation.Screen = GameScreen.MainMenu;
+            _screenNavigation.OpenModalDialog(
+                "Are you sure you want to exit to main menu?",
+                () => _screenNavigation.Screen = GameScreen.MainMenu);
         }
     }
 }

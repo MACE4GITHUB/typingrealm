@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.Client.Interaction
+﻿using System;
+
+namespace TypingRealm.Client.Interaction
 {
     public interface IScreenNavigation
     {
@@ -6,6 +8,7 @@
         ModalModule ActiveModalModule { get; set; }
         ModalModule BackgroundModalModule { get; set; }
 
+        void OpenModalDialog(string text, Action ok);
         void SwitchBetweenModalModules();
         void CloseActiveModalModule();
     }

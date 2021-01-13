@@ -5,6 +5,7 @@ using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.CharacterCreation
 {
+
     public sealed record CharacterCreationPrintableState(
         ITyperInformation ReturnBackToMainMenuTyper);
 
