@@ -59,7 +59,8 @@ namespace TypingRealm.Messaging.Serialization
             return types
                 .Select((type, index) => new
                 {
-                    TypeId = type.FullName,
+                    // TODO: Unit test this exception or change implementation.
+                    TypeId = type.FullName ?? throw new InvalidOperationException("Type doesn't have name."),
                     Type = type
                 })
                 .ToDictionary(x => x.TypeId, x => x.Type);
