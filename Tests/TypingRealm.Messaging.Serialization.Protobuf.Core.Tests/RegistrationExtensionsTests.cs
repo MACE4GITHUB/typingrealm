@@ -72,20 +72,14 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             cache.Setup(x => x.GetAllTypes())
                 .Returns(types);
 
-            var registeredTypes = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
-                .Select(t => t.Type)
-                .ToList();
-            Assert.DoesNotContain(typeof(AMessage), registeredTypes);
-            Assert.DoesNotContain(typeof(BMessage), registeredTypes);
-
-            _ = provider.GetRequiredService<IProtobuf>();
-            registeredTypes = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
+            var protobuf = provider.GetRequiredService<IProtobuf>();
+            var registeredTypes = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
                 .Select(t => t.Type)
                 .ToList();
             Assert.Contains(typeof(AMessage), registeredTypes);
             Assert.Contains(typeof(BMessage), registeredTypes);
 
-            var typeMembers = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
+            var typeMembers = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
                 .Single(x => x.Type == typeof(AMessage))
                 .GetFields()
                 .ToList();

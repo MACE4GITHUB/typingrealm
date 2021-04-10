@@ -10,17 +10,24 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
     // Not tested.
     public sealed class Protobuf : IProtobuf
     {
+        private readonly RuntimeTypeModel _model;
+
         public Protobuf(IEnumerable<Type> types)
         {
+            _model = RuntimeTypeModel.Create();
+
             foreach (var type in types)
             {
                 AddTypeToRuntimeTypeModel(type);
             }
+
+            // TODO: uncomment this for better performance.
+            //_model.Compile();
         }
 
         public object Deserialize(Stream source, Func<int, Type> typeResolver)
         {
-            if (Serializer.NonGeneric.TryDeserializeWithLengthPrefix(
+            if (TryDeserializeWithLengthPrefix(
                 source,
                 PrefixStyle.Base128,
                 fieldNumber => typeResolver(fieldNumber),
@@ -34,13 +41,22 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
 
         public void Serialize(Stream destination, object instance, int fieldNumber)
         {
-            Serializer.NonGeneric.SerializeWithLengthPrefix(
-                destination, instance, PrefixStyle.Base128, fieldNumber);
+            if (instance is null)
+                throw new ArgumentNullException(nameof(instance));
+
+            _model.SerializeWithLengthPrefix(
+                destination, instance, instance.GetType(), PrefixStyle.Base128, fieldNumber);
+        }
+
+        private bool TryDeserializeWithLengthPrefix(Stream source, PrefixStyle style, ProtoBuf.TypeResolver resolver, out object value)
+        {
+            value = _model.DeserializeWithLengthPrefix(source, null, null, style, 0, resolver);
+            return value is object;
         }
 
         private void AddTypeToRuntimeTypeModel(Type type)
         {
-            RuntimeTypeModel.Default.Add(type, false)
+            _model.Add(type, false)
                 .Add(type
                     .GetProperties()
                     .Select(property => property.Name)

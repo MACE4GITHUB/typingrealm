@@ -14,13 +14,8 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         [Fact]
         public void ShouldAddAllTypesToRuntimeTypeModel_WhenCreated()
         {
-            var typeMembers = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
-                .Select(x => x.Type);
-            Assert.DoesNotContain(typeof(AMessage), typeMembers);
-            Assert.DoesNotContain(typeof(BMessage), typeMembers);
-
-            _ = new Protobuf(new[] { typeof(AMessage), typeof(BMessage) });
-            typeMembers = RuntimeTypeModel.Default.GetTypes().Cast<MetaType>()
+            var sut = new Protobuf(new[] { typeof(AMessage), typeof(BMessage) });
+            var typeMembers = ((RuntimeTypeModel)GetPrivateField(sut, "_model")!).GetTypes().Cast<MetaType>()
                 .Select(x => x.Type);
 
             Assert.Contains(typeof(AMessage), typeMembers);
