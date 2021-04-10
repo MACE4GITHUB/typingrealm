@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
+using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.RopeWar;
 using TypingRealm.World;
 
@@ -72,7 +74,7 @@ namespace TypingRealm.TestClient
                 "cs" => CombatSignalR(),*/
                 "rw" => RopeWarSignalR(),
                 "world" => WorldSignalR(),
-                /*"rwt" => RopeWarTcp(),
+                "rwt" => RopeWarTcp()/*,
                 _ => MainTpc()*/
             }).ConfigureAwait(false);
         }
@@ -112,14 +114,34 @@ namespace TypingRealm.TestClient
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }*/
 
-        /*public static async Task RopeWarTcp()
+        public static async Task RopeWarTcp()
         {
+            Console.Write("Authentication type (a - auth0, i - identityserver, l - local token): ");
+            var authenticationType = Console.ReadLine()?.ToLowerInvariant() switch
+            {
+                "a" => AuthenticationProviderType.Auth0,
+                "i" => AuthenticationProviderType.IdentityServer,
+                "l" => AuthenticationProviderType.Local,
+                _ => throw new InvalidOperationException("Invalid type.")
+            };
+
+            var profile = "ivan";
+            if (authenticationType == AuthenticationProviderType.Local)
+            {
+                Console.Write("Profile for local token (default = 'ivan'): ");
+                profile = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(profile))
+                    profile = "ivan";
+            }
+
             var provider = new ServiceCollection()
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
                 .AddRopeWarMessages()
+                .AddJson()
                 .Services
                 .AddProtobuf()
+                .AddProfileTokenProvider(authenticationType, profile)
                 .BuildServiceProvider();
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
@@ -132,6 +154,8 @@ namespace TypingRealm.TestClient
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
 
+            var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
+
             using var client = new TcpClient();
             await client.ConnectAsync("127.0.0.1", 30112).ConfigureAwait(false);
 
@@ -141,8 +165,8 @@ namespace TypingRealm.TestClient
             var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
                 .WithLocking(sendLock, receiveLock);
 
-            await Handle(connection, messageTypes).ConfigureAwait(false);
-        }*/
+            await Handle(connection, messageTypes, tokenProvider, null!).ConfigureAwait(false);
+        }
 
         public static async Task RopeWarSignalR()
         {
