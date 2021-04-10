@@ -162,7 +162,7 @@ namespace TypingRealm.TestClient
             {
                 ctx.Response.StatusCode = 200;
                 ctx.Response.ContentType = "text/html";
-                ctx.Response.WriteAsync("<h1>You can now return to the application.</h1>");
+                //ctx.Response.WriteAsync("<h1>You can now return to the application.</h1>");
                 //ctx.Response.Body.Flush();
 
                 _source.TrySetResult(value);
