@@ -30,6 +30,9 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
             // This will throw OperationCanceledException if cancellation token signals for cancellation.
             await _stream.ReadAsync(Array.Empty<byte>(), 0, 0, cancellationToken).ConfigureAwait(false);
 
+            // TODO: Improve implementation to not (potentially) block the thread on I/O operation.
+            // Buffer the stream asynchronously until Base128 final marker is met.
+
             return _protobuf.Deserialize(
                 _stream,
                 fieldNumber => _fieldNumberCache.GetTypeByFieldNumber(fieldNumber));
