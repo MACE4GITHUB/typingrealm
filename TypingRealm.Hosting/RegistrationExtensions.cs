@@ -36,11 +36,11 @@ namespace TypingRealm.Hosting
             var builder = services.AddSerializationCore();
 
             builder
-                .AddJson() // Otherwise Protobuf won't work when client message index doesn't match server's.
                 .AddTyrServiceWithoutAspNetAuthentication();
                 //.UseLocalProvider();
 
             services.AddHostedService<TcpServerHostedService>();
+            services.AddJson(); // Use this to serialize/deserialize messages in JSON instead of protobuf base64 string.
 
             return builder;
         }
@@ -65,11 +65,13 @@ namespace TypingRealm.Hosting
                 .RegisterMessaging();
             var builder = services.AddSerializationCore();
             builder
-                .AddJson()
                 .AddTyrWebServiceAuthentication();
                 //.UseLocalProvider();
 
             services.AddTransient<IStartupFilter, SignalRStartupFilter>();
+
+            services.AddJson();
+            services.AddProtobufMessageSerializer(); // Use this to enable protobuf base64 string message serializer instead of json.
 
             return builder;
         }

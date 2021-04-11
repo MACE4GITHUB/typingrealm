@@ -4,6 +4,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
 {
     public interface IProtobufConnectionFactory
     {
-        ProtobufConnection CreateProtobufConnection(Stream stream);
+        IConnection CreateProtobufConnectionForClient(Stream stream);
+        IConnection CreateProtobufConnectionForServer(Stream stream);
     }
 }

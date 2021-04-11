@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
-using TypingRealm.Messaging.Serialization.Json;
 
 namespace TypingRealm.SignalR
 {
@@ -15,20 +14,20 @@ namespace TypingRealm.SignalR
     {
         private readonly ILogger<SignalRServer> _logger;
         private readonly IScopedConnectionHandler _connectionHandler;
-        private readonly IJsonConnectionFactory _jsonConnectionFactory;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private readonly List<Task> _connectionProcessors = new List<Task>();
+        private readonly ISignalRConnectionFactory _signalRConnectionFactory;
         private readonly ConcurrentDictionary<string, SignalRConnectionResource> _notificators
             = new ConcurrentDictionary<string, SignalRConnectionResource>();
 
         public SignalRServer(
             ILogger<SignalRServer> logger,
             IScopedConnectionHandler connectionHandler,
-            IJsonConnectionFactory jsonConnectionFactory)
+            ISignalRConnectionFactory signalRConnectionFactory)
         {
             _logger = logger;
             _connectionHandler = connectionHandler;
-            _jsonConnectionFactory = jsonConnectionFactory;
+            _signalRConnectionFactory = signalRConnectionFactory;
         }
 
         public void NotifyReceived(string connectionId, object message)
@@ -70,9 +69,7 @@ namespace TypingRealm.SignalR
                     _cts.Token, localCts.Token);
 
                 var notificator = new Notificator();
-                var connection = new SignalRMessageSender(caller)
-                    .WithNotificator(notificator)
-                    .WithJson(_jsonConnectionFactory)
+                var connection = _signalRConnectionFactory.CreateProtobufConnectionForServer(caller, notificator)
                     .WithReceiveAcknowledgement();
 
                 var task = _connectionHandler

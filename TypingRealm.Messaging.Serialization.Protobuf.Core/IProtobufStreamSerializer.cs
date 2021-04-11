@@ -4,9 +4,9 @@ using System.IO;
 namespace TypingRealm.Messaging.Serialization.Protobuf
 {
     /// <summary>
-    /// Wrapper around Protobuf implementation, typically static Serializer class.
+    /// Wrapper around Protobuf implementation.
     /// </summary>
-    public interface IProtobuf
+    public interface IProtobufStreamSerializer
     {
         object Deserialize(Stream source, Func<int, Type> typeResolver);
         void Serialize(Stream destination, object instance, int fieldNumber);

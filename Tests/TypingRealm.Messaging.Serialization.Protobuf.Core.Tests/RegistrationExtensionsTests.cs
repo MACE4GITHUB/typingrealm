@@ -15,8 +15,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         public void AddProtobuf_ShouldRegisterProtobufConnectionFactory()
         {
             var sut = new ServiceCollection();
-            sut.AddTransient<IMessageTypeCache, MessageTypeCache>();
-
+            sut.AddSerializationCore();
             sut.AddProtobuf();
 
             var provider = sut.BuildServiceProvider();
@@ -44,7 +43,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             sut.AddProtobuf();
 
             var provider = sut.BuildServiceProvider();
-            provider.AssertRegisteredSingleton<IProtobuf, Protobuf>();
+            provider.AssertRegisteredSingleton<IProtobufStreamSerializer, ProtobufStreamSerializer>();
         }
 
         private class AMessage
@@ -72,7 +71,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             cache.Setup(x => x.GetAllTypes())
                 .Returns(types);
 
-            var protobuf = provider.GetRequiredService<IProtobuf>();
+            var protobuf = provider.GetRequiredService<IProtobufStreamSerializer>();
             var registeredTypes = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
                 .Select(t => t.Type)
                 .ToList();

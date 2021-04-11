@@ -11,13 +11,13 @@ namespace TypingRealm.Messaging.Serialization.Json
     /// <see cref="JsonSerializedMessage.Json"/> property and assigns corresponding
     /// type id from <see cref="IMessageTypeCache"/>.
     /// </summary>
-    public sealed class JsonConnection : IConnection
+    public sealed class JsonConnectionDeprecated : IConnection
     {
         private readonly IConnection _connection;
         private readonly IMessageTypeCache _messageTypes;
         private readonly JsonSerializerOptions _options;
 
-        public JsonConnection(
+        public JsonConnectionDeprecated(
             IConnection connection,
             IMessageTypeCache messageTypes)
         {

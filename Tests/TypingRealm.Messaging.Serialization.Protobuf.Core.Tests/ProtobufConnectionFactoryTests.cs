@@ -11,11 +11,11 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         [Theory, AutoMoqData]
         public async Task ShouldCreateWithStreamAndCache(
             [Frozen]IProtobufFieldNumberCache cache,
-            [Frozen]IProtobuf protobuf,
+            [Frozen]IProtobufStreamSerializer protobuf,
             Stream stream,
             ProtobufConnectionFactory sut)
         {
-            var connection = sut.CreateProtobufConnection(stream);
+            var connection = sut.CreateProtobufConnectionForClient(stream);
 
             Assert.Equal(cache, GetPrivateField(connection, "_fieldNumberCache"));
             Assert.Equal(stream, GetPrivateField(connection, "_stream"));

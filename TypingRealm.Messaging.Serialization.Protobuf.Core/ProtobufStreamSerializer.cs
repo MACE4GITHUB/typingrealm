@@ -8,17 +8,22 @@ using ProtoBuf.Meta;
 namespace TypingRealm.Messaging.Serialization.Protobuf
 {
     // Not tested.
-    public sealed class Protobuf : IProtobuf
+    public sealed class ProtobufStreamSerializer : IProtobufStreamSerializer
     {
         private readonly RuntimeTypeModel _model;
 
-        public Protobuf(IEnumerable<Type> types)
+        public ProtobufStreamSerializer(IEnumerable<Type> types)
         {
             _model = RuntimeTypeModel.Create();
 
             foreach (var type in types)
             {
-                AddTypeToRuntimeTypeModel(type);
+                _model.Add(type, false)
+                    .Add(type
+                        .GetProperties()
+                        .Select(property => property.Name)
+                        .OrderBy(name => name)
+                        .ToArray());
             }
 
             // TODO: uncomment this for better performance.
@@ -52,16 +57,6 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
         {
             value = _model.DeserializeWithLengthPrefix(source, null, null, style, 0, resolver);
             return value is object;
-        }
-
-        private void AddTypeToRuntimeTypeModel(Type type)
-        {
-            _model.Add(type, false)
-                .Add(type
-                    .GetProperties()
-                    .Select(property => property.Name)
-                    .OrderBy(name => name)
-                    .ToArray());
         }
     }
 }

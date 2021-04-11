@@ -17,6 +17,7 @@ using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.RopeWar;
+using TypingRealm.SignalR;
 using TypingRealm.World;
 
 namespace TypingRealm.TestClient
@@ -138,9 +139,9 @@ namespace TypingRealm.TestClient
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
                 .AddRopeWarMessages()
-                .AddJson()
                 .Services
                 .AddProtobuf()
+                .AddJson()
                 .AddProfileTokenProvider(authenticationType, profile)
                 .BuildServiceProvider();
 
@@ -162,7 +163,7 @@ namespace TypingRealm.TestClient
             using var stream = client.GetStream();
             using var sendLock = new SemaphoreSlimLock();
             using var receiveLock = new SemaphoreSlimLock();
-            var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
+            var connection = protobufConnectionFactory.CreateProtobufConnectionForClient(stream)
                 .WithLocking(sendLock, receiveLock);
 
             await Handle(connection, messageTypes, tokenProvider, null!).ConfigureAwait(false);
@@ -192,8 +193,10 @@ namespace TypingRealm.TestClient
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
                 .AddRopeWarMessages()
-                .AddJson()
                 .Services
+                .AddJson()
+                .AddProtobufMessageSerializer() // Serialize messages with protobuf instead of json.
+                .AddSignalRConnectionFactory()
                 .AddProfileTokenProvider(authenticationType, profile)
                 .BuildServiceProvider();
 
@@ -201,8 +204,6 @@ namespace TypingRealm.TestClient
                 .GetAllTypes()
                 .Select(idToType => idToType.Value)
                 .ToList();
-
-            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
 
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
@@ -218,13 +219,10 @@ namespace TypingRealm.TestClient
                 })
                 .Build();
 
-            var notificator = new Notificator();
-            hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
-
+            var factory = provider.GetRequiredService<ISignalRConnectionFactory>();
             await hub.StartAsync(default).ConfigureAwait(false);
 
-            var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
-                .WithJson(jsonConnectionFactory);
+            var connection = factory.CreateProtobufConnectionForClient(hub);
 
             await Handle(connection, messageTypes, tokenProvider, null!).ConfigureAwait(false);
         }
@@ -254,8 +252,8 @@ namespace TypingRealm.TestClient
                 .AddTyrAuthenticationMessages()
                 .AddRopeWarMessages()
                 .AddWorldMessages()
-                .AddJson()
                 .Services
+                .AddJson()
                 .AddProfileTokenProvider(authenticationType, profile)
                 .BuildServiceProvider();
 
@@ -263,8 +261,6 @@ namespace TypingRealm.TestClient
                 .GetAllTypes()
                 .Select(idToType => idToType.Value)
                 .ToList();
-
-            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
 
             Console.WriteLine("Press enter to connect.");
             Console.ReadLine();
@@ -280,12 +276,11 @@ namespace TypingRealm.TestClient
                 .Build();
 
             var notificator = new Notificator();
-            hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
+            hub.On<ServerToClientMessageData>("Send", message => notificator.NotifyReceived(message));
 
             await hub.StartAsync(default).ConfigureAwait(false);
 
-            var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
-                .WithJson(jsonConnectionFactory);
+            var connection = new SignalRMessageSender(hub).WithNotificator(notificator);
 
             async ValueTask<IConnection> ConnectToRw()
             {
@@ -296,15 +291,15 @@ namespace TypingRealm.TestClient
                     {
                         options.AccessTokenProvider = () => Task.FromResult(accessToken);
                     })
+                    .WithAutomaticReconnect() // TODO: Test if this works as we expect.
                     .Build();
 
                 var notificator = new Notificator();
-                hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
+                hub.On<ServerToClientMessageData>("Send", message => notificator.NotifyReceived(message));
 
                 await hub.StartAsync(default).ConfigureAwait(false);
 
-                return new SignalRMessageSender(hub).WithNotificator(notificator)
-                    .WithJson(jsonConnectionFactory);
+                return new SignalRMessageSender(hub).WithNotificator(notificator);
             }
 
             await Handle(connection, messageTypes, tokenProvider, ConnectToRw).ConfigureAwait(false);
@@ -560,14 +555,16 @@ namespace TypingRealm.TestClient
             _handlers.Remove(subscriptionId);
         }
 
-        public async ValueTask SendRpcAsync(Message message)
+        public async ValueTask SendRpcAsync(object message)
         {
             var isAcknowledged = false;
-            message.MessageId = Guid.NewGuid().ToString();
+            var metadata = ClientToServerMessageMetadata.CreateEmpty();
+            metadata.EnableAcknowledgement(Guid.NewGuid().ToString());
+            // TODO: Think of a way to enable acknowledgement BUT still GET message id as INT from the factory.
 
             ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
             {
-                if (acknowledgeReceived.MessageId == message.MessageId)
+                if (acknowledgeReceived.MessageId == metadata.MessageId)
                     isAcknowledged = true;
 
                 return default;
@@ -577,7 +574,7 @@ namespace TypingRealm.TestClient
 
             try
             {
-                await _connection.SendAsync(message, default).ConfigureAwait(false);
+                await _connection.SendAsync(message, metadata, default).ConfigureAwait(false);
 
                 var i = 0;
                 while (!isAcknowledged)

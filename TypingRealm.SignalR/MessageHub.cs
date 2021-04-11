@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using TypingRealm.Messaging.Serialization.Json;
+using TypingRealm.Messaging;
 
 namespace TypingRealm.SignalR
 {
@@ -14,7 +14,7 @@ namespace TypingRealm.SignalR
             _server = server;
         }
 
-        public void Send(JsonSerializedMessage message)
+        public void Send(ClientToServerMessageData message)
         {
             _server.NotifyReceived(Context.ConnectionId, message);
         }

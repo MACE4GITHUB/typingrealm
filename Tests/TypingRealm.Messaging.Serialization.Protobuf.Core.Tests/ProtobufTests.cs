@@ -14,7 +14,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         [Fact]
         public void ShouldAddAllTypesToRuntimeTypeModel_WhenCreated()
         {
-            var sut = new Protobuf(new[] { typeof(AMessage), typeof(BMessage) });
+            var sut = new ProtobufStreamSerializer(new[] { typeof(AMessage), typeof(BMessage) });
             var typeMembers = ((RuntimeTypeModel)GetPrivateField(sut, "_model")!).GetTypes().Cast<MetaType>()
                 .Select(x => x.Type);
 
@@ -27,7 +27,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         public void ShouldSerializeAndDeserialize()
         {
             var message = Create<CMessage>();
-            var protobuf = new Protobuf(new[] { typeof(CMessage) });
+            var protobuf = new ProtobufStreamSerializer(new[] { typeof(CMessage) });
 
             using var stream = new MemoryStream();
             protobuf.Serialize(stream, message, 3);

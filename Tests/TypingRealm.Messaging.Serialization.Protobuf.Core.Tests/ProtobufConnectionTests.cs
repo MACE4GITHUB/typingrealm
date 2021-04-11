@@ -13,10 +13,10 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         [Theory, AutoMoqData]
         public async Task ShouldReceive(
             [Frozen]Stream stream,
-            [Frozen]Mock<IProtobuf> protobuf,
+            [Frozen]Mock<IProtobufStreamSerializer> protobuf,
             [Frozen]Mock<IProtobufFieldNumberCache> cache,
             TestMessage message,
-            ProtobufConnection sut)
+            ProtobufConnectionDeprecated sut)
         {
             cache.Setup(x => x.GetTypeByFieldNumber(5)).Returns(typeof(TestMessage));
 
@@ -32,11 +32,11 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         [Theory, AutoMoqData]
         public async Task ShouldSend(
             [Frozen]Stream stream,
-            [Frozen]Mock<IProtobuf> protobuf,
+            [Frozen]Mock<IProtobufStreamSerializer> protobuf,
             [Frozen]Mock<IProtobufFieldNumberCache> cache,
             byte[] writtenBytes,
             TestMessage message,
-            ProtobufConnection sut)
+            ProtobufConnectionDeprecated sut)
         {
             cache.Setup(x => x.GetFieldNumber(typeof(TestMessage)))
                 .Returns(5);

@@ -14,14 +14,14 @@ namespace TypingRealm.Messaging.Connections
 
         public async ValueTask<object> ReceiveAsync(CancellationToken cancellationToken)
         {
+            // TODO: Move this logic to ConnectionHandler so it's always executing on the server.
             var message = await _connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
 
-            if (message is Message messageWithId && messageWithId.MessageId != null)
+            var metadata = message.GetMetadataOrEmpty();
+            if (metadata.RequireAcknowledgement && metadata.MessageId != null)
             {
-                await _connection.SendAsync(new AcknowledgeReceived
-                {
-                    MessageId = messageWithId.MessageId
-                }, cancellationToken).ConfigureAwait(false);
+                await _connection.SendAsync(new AcknowledgeReceived(metadata.MessageId), cancellationToken)
+                    .ConfigureAwait(false);
             }
 
             return message;

@@ -8,13 +8,13 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
     /// <summary>
     /// Serializes messages using Protobuf protocol and sends them over stream.
     /// </summary>
-    public sealed class ProtobufConnection : IConnection
+    public sealed class ProtobufConnectionDeprecated : IConnection
     {
         private readonly Stream _stream;
         private readonly IProtobufFieldNumberCache _fieldNumberCache;
         private readonly IProtobufStreamSerializer _protobuf;
 
-        public ProtobufConnection(
+        public ProtobufConnectionDeprecated(
             Stream stream,
             IProtobufFieldNumberCache fieldNumberCache,
             IProtobufStreamSerializer protobuf)

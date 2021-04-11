@@ -6,7 +6,15 @@ namespace TypingRealm.SignalR
     {
         public static IServiceCollection RegisterMessageHub(this IServiceCollection services)
         {
-            return services.AddSingleton<ISignalRServer, SignalRServer>();
+            services.AddSingleton<ISignalRServer, SignalRServer>();
+            services.AddSignalRConnectionFactory();
+
+            return services;
+        }
+
+        public static IServiceCollection AddSignalRConnectionFactory(this IServiceCollection services)
+        {
+            return services.AddTransient<ISignalRConnectionFactory, SignalRConnectionFactory>();
         }
     }
 }

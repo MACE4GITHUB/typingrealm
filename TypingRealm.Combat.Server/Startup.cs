@@ -22,8 +22,8 @@ namespace TypingRealm.SignalRServer
 
             services.AddSerializationCore()
                 .AddMessageTypesFromAssembly(typeof(Attacked).Assembly)
-                .AddJson()
                 .Services
+                .AddJson()
                 .RegisterMessaging()
                 .RegisterMessageHub();
 

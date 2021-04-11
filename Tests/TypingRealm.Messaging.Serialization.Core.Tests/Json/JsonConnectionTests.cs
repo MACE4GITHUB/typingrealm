@@ -37,7 +37,7 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             [Frozen]Mock<IConnection> connection,
             string typeId,
             MyMessage message,
-            JsonConnection sut)
+            JsonConnectionDeprecated sut)
         {
             cache.Setup(x => x.GetTypeId(typeof(MyMessage)))
                 .Returns(typeId);
@@ -64,7 +64,7 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             [Frozen]Mock<IConnection> connection,
             MyMessage message,
             JsonSerializedMessage jsonMessage,
-            JsonConnection sut)
+            JsonConnectionDeprecated sut)
         {
             jsonMessage.Json = JsonSerializer.Serialize(message, new JsonSerializerOptions
             {
@@ -87,7 +87,7 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             [Frozen]Mock<IMessageTypeCache> cache,
             [Frozen]Mock<IConnection> connection,
             JsonSerializedMessage jsonMessage,
-            JsonConnection sut)
+            JsonConnectionDeprecated sut)
         {
             jsonMessage.Json = "{\"testEnum\":2}";
 
@@ -105,7 +105,7 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             [Frozen]Mock<IMessageTypeCache> cache,
             [Frozen]Mock<IConnection> connection,
             JsonSerializedMessage jsonMessage,
-            JsonConnection sut)
+            JsonConnectionDeprecated sut)
         {
             jsonMessage.Json = "{\"testEnum\":\"Two\"}";
 
@@ -123,7 +123,7 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             [Frozen]Mock<IMessageTypeCache> cache,
             [Frozen]Mock<IConnection> connection,
             string typeId,
-            JsonConnection sut)
+            JsonConnectionDeprecated sut)
         {
             cache.Setup(x => x.GetTypeId(typeof(TestEnumMessage)))
                 .Returns(typeId);
@@ -142,7 +142,7 @@ namespace TypingRealm.Messaging.Serialization.Tests.Json
             [Frozen]Mock<IMessageTypeCache> cache,
             [Frozen]Mock<IConnection> connection,
             JsonSerializedMessage jsonMessage,
-            JsonConnection sut)
+            JsonConnectionDeprecated sut)
         {
             jsonMessage.Json = "null";
 

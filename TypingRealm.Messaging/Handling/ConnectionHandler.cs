@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging.Connecting;
+using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Updating;
 
@@ -37,9 +38,12 @@ namespace TypingRealm.Messaging.Handling
         public async Task HandleAsync(IConnection connection, CancellationToken cancellationToken)
         {
             ConnectedClient connectedClient;
+
+            var unwrapperConnection = new ServerMessageUnwrapperConnection(connection);
+
             try
             {
-                connectedClient = await _connectionInitializer.ConnectAsync(connection, cancellationToken).ConfigureAwait(false);
+                connectedClient = await _connectionInitializer.ConnectAsync(unwrapperConnection, cancellationToken).ConfigureAwait(false);
             }
             catch
             {
@@ -63,7 +67,17 @@ namespace TypingRealm.Messaging.Handling
                 {
                     var message = await connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
 
-                    await DispatchMessageAsync(connectedClient, message, cancellationToken).ConfigureAwait(false);
+                    if (message is not ClientToServerMessageWithMetadata messageWithMetadata)
+                        throw new InvalidOperationException($"Message is not of {typeof(ClientToServerMessageWithMetadata).Name} type.");
+
+                    await DispatchMessageAsync(connectedClient, messageWithMetadata.Message, cancellationToken).ConfigureAwait(false);
+
+                    // If everything was dispatched successfully:
+                    if (messageWithMetadata.Metadata.RequireAcknowledgement)
+                    {
+                        // TODO: Send acknowledgement (it's already being sent, but in Connection decorator instead of after handling the code).
+                        // Send AcknowledgeHandled instead of AcknowledgeReceived (probably no need to send both, just rename this message).
+                    }
                 }
                 catch
                 {

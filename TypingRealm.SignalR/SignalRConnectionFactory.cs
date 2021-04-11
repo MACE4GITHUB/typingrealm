@@ -1,40 +1,38 @@
-﻿using System.IO;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
+using TypingRealm.Messaging;
+using TypingRealm.Messaging.Connections;
+using TypingRealm.Messaging.Serialization;
+using TypingRealm.SignalR.Connections;
 
-namespace TypingRealm.Messaging.Serialization.Protobuf
+namespace TypingRealm.SignalR
 {
-    public sealed class ProtobufConnectionFactory : IProtobufConnectionFactory
+    public sealed class SignalRConnectionFactory : ISignalRConnectionFactory
     {
-        private readonly IProtobufFieldNumberCache _fieldNumberCache;
-        private readonly IProtobufStreamSerializer _protobuf;
-
         private readonly IMessageSerializer _messageSerializer;
         private readonly IMessageTypeCache _messageTypeCache;
         private readonly IClientToServerMessageMetadataFactory _clientToServerMessageMetadataFactory;
 
-        public ProtobufConnectionFactory(
-            IProtobufFieldNumberCache fieldNumberCache,
-            IProtobufStreamSerializer protobuf,
+        public SignalRConnectionFactory(
             IMessageSerializer messageSerializer,
             IMessageTypeCache messageTypeCache,
             IClientToServerMessageMetadataFactory clientToServerMessageMetadataFactory)
         {
-            _fieldNumberCache = fieldNumberCache;
-            _protobuf = protobuf;
-
             _messageSerializer = messageSerializer;
             _messageTypeCache = messageTypeCache;
             _clientToServerMessageMetadataFactory = clientToServerMessageMetadataFactory;
         }
 
-        public IConnection CreateProtobufConnectionForClient(Stream stream)
+        public IConnection CreateProtobufConnectionForClient(HubConnection hub)
         {
-            return new ProtobufConnection(stream, _fieldNumberCache, _protobuf)
+            return ClientToServerSignalRMessageSender.Create(hub)
                 .ForClient(_messageSerializer, _messageTypeCache, _clientToServerMessageMetadataFactory);
         }
 
-        public IConnection CreateProtobufConnectionForServer(Stream stream)
+        public IConnection CreateProtobufConnectionForServer(IClientProxy clientProxy, Notificator notificator)
         {
-            return new ProtobufConnection(stream, _fieldNumberCache, _protobuf)
+            return new ServerToClientSignalRMessageSender(clientProxy)
+                .WithNotificator(notificator)
                 .ForServer(_messageSerializer, _messageTypeCache);
         }
     }

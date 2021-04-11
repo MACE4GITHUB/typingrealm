@@ -19,8 +19,9 @@ namespace TypingRealm.Messaging.Tests
             }
         }
 
-        public class TestAbstractMessage : Message
+        public class TestAbstractMessage
         {
+            public string? MessageId { get; set; }
         }
 
         [Fact]
@@ -98,12 +99,10 @@ namespace TypingRealm.Messaging.Tests
             Assert.Null(sut.MessageId);
         }
 
-        [Theory, AutoMoqData]
-        public void AcknowledgeReceived(AcknowledgeReceived sut)
+        [Fact]
+        public void AcknowledgeReceived()
         {
             AssertSerializable<AcknowledgeReceived>();
-
-            Assert.IsAssignableFrom<Message>(sut);
         }
     }
 }

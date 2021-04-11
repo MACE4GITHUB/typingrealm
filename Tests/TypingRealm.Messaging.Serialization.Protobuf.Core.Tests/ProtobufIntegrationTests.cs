@@ -19,9 +19,9 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             TestMessage message,
             List<string> list)
         {
-            var protobuf = new Protobuf(Array.Empty<Type>());
+            var protobuf = new ProtobufStreamSerializer(Array.Empty<Type>());
 
-            var sut = new ProtobufConnection(stream, cache.Object, protobuf);
+            var sut = new ProtobufConnectionDeprecated(stream, cache.Object, protobuf);
 
             cache.Setup(x => x.GetFieldNumber(typeof(TestMessage)))
                 .Returns(2);

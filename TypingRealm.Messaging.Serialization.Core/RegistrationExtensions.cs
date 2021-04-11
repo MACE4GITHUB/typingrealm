@@ -13,6 +13,14 @@ namespace TypingRealm.Messaging.Serialization
         /// </summary>
         public static MessageTypeCacheBuilder AddSerializationCore(this IServiceCollection services)
         {
+            // TODO: Register these only on client side. Server doesn't need generators of metadata.
+            // !!! but then we also need to split client and server versions of protobuf/signalr connection factories, so it's easier to just always register these types.
+            services.AddTransient<IClientToServerMessageMetadataFactory, ClientToServerMessageMetadataFactory>();
+
+            // This is message idempotency Id. Scope this to the connection.
+            // TODO: Test that it works as expected.
+            services.AddScoped<IMessageIdFactory, MessageIdFactory>();
+
             return new MessageTypeCacheBuilder(services)
                 .AddMessageTypesFromAssembly(typeof(Disconnect).Assembly);
         }

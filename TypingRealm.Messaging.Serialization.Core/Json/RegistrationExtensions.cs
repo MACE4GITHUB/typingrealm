@@ -1,20 +1,25 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TypingRealm.Messaging.Serialization.Json
 {
     public static class RegistrationExtensions
     {
-        /// <summary>
-        /// Registers <see cref="JsonConnectionFactory"/> that relies on
-        /// <see cref="IMessageTypeCache"/>. <see cref="Serialization.RegistrationExtensions.AddSerializationCore(IServiceCollection)"/>
-        /// should be called first.
-        /// </summary>
-        public static MessageTypeCacheBuilder AddJson(this MessageTypeCacheBuilder builder)
+        public static IServiceCollection AddJson(this IServiceCollection services)
         {
-            builder.Services.AddTransient<IJsonConnectionFactory, JsonConnectionFactory>();
-            builder.AddMessageType(typeof(JsonSerializedMessage));
+            services.AddTransient<IMessageSerializer>(_ =>
+            {
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+                options.Converters.Add(new JsonStringEnumConverter());
 
-            return builder;
+                return new JsonMessageSerializer(options);
+            });
+
+            return services;
         }
     }
 }
