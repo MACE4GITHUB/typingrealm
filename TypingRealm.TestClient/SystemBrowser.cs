@@ -108,8 +108,8 @@ namespace TypingRealm.TestClient
             Url = $"http://127.0.0.1:{port}/{path}";
 
             _host = new WebHostBuilder()
-                .UseKestrel()
                 .UseUrls(Url)
+                .UseKestrel()
                 .Configure(Configure)
                 .Build();
             _host.Start();
@@ -146,7 +146,7 @@ namespace TypingRealm.TestClient
                         using var sr = new StreamReader(ctx.Request.Body, Encoding.UTF8);
 
                         var body = await sr.ReadToEndAsync().ConfigureAwait(false);
-                        SetResult(body, ctx);
+                        await SetResult(body, ctx).ConfigureAwait(false);
                     }
                 }
                 else
@@ -156,14 +156,14 @@ namespace TypingRealm.TestClient
             });
         }
 
-        private void SetResult(string value, HttpContext ctx)
+        private async ValueTask SetResult(string value, HttpContext ctx)
         {
             try
             {
                 ctx.Response.StatusCode = 200;
                 ctx.Response.ContentType = "text/html";
-                //ctx.Response.WriteAsync("<h1>You can now return to the application.</h1>");
-                //ctx.Response.Body.Flush();
+                await ctx.Response.WriteAsync("<h1>You can now return to the application.</h1>").ConfigureAwait(false);
+                await ctx.Response.Body.FlushAsync().ConfigureAwait(false);
 
                 _source.TrySetResult(value);
             }
@@ -171,8 +171,8 @@ namespace TypingRealm.TestClient
             {
                 ctx.Response.StatusCode = 400;
                 ctx.Response.ContentType = "text/html";
-                ctx.Response.WriteAsync("<h1>Invalid request.</h1>");
-                ctx.Response.Body.Flush();
+                await ctx .Response.WriteAsync("<h1>Invalid request.</h1>").ConfigureAwait(false);
+                await ctx.Response.Body.FlushAsync().ConfigureAwait(false);
             }
         }
 

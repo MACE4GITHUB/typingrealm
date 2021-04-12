@@ -75,7 +75,7 @@ namespace TypingRealm.TestClient
                         _identityToken = refreshResult.IdentityToken;
 
                     _accessToken = refreshResult.AccessToken;
-                    _accessTokenExpiration = refreshResult.AccessTokenExpiration;
+                    _accessTokenExpiration = refreshResult.AccessTokenExpiration.UtcDateTime;
 
                     return _accessToken;
                 }
@@ -92,7 +92,7 @@ namespace TypingRealm.TestClient
                 _identityToken = loginResult.IdentityToken;
 
             _accessToken = loginResult.AccessToken;
-            _accessTokenExpiration = loginResult.AccessTokenExpiration;
+            _accessTokenExpiration = loginResult.AccessTokenExpiration.UtcDateTime;
 
             return _accessToken;
         }
