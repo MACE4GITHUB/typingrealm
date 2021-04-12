@@ -83,10 +83,13 @@ namespace TypingRealm.Messaging.Tests
             Assert.Equal(senderId, sut.SenderId);
         }
 
-        [Fact]
-        public void AcknowledgeReceived()
+        [Theory, AutoMoqData]
+        public void AcknowledgeReceived(string messageId)
         {
             AssertSerializable<AcknowledgeReceived>();
+
+            var sut = new AcknowledgeReceived(messageId);
+            Assert.Equal(messageId, sut.MessageId);
         }
 
         [Theory, AutoMoqData]

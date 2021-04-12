@@ -3,6 +3,7 @@ using System.Text.Json;
 
 namespace TypingRealm.Messaging.Serialization.Json
 {
+    // TODO: Unit test this class.
     public sealed class JsonMessageSerializer : IMessageSerializer
     {
         private readonly JsonSerializerOptions _options;

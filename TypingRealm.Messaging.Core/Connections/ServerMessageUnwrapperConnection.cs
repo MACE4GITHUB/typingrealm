@@ -8,6 +8,7 @@ namespace TypingRealm.Messaging.Connections
     /// Gets the actual message within <see cref="ClientToServerMessageWithMetadata"/>.
     /// </summary>
     // TODO: Consider moving this connection to server Messaging assembly. Only server needs it.
+    // TODO: Unit test this class.
     public sealed class ServerMessageUnwrapperConnection : IConnection
     {
         private readonly IConnection _connection;

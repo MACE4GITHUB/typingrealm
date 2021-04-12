@@ -8,7 +8,8 @@
         /// </summary>
         public static ClientToServerMessageMetadata GetMetadataOrEmpty(this object message)
         {
-            if (message is ClientToServerMessageWithMetadata messageWithMetadata)
+            if (message is ClientToServerMessageWithMetadata messageWithMetadata
+                && messageWithMetadata.Metadata != null)
                 return messageWithMetadata.Metadata;
 
             return ClientToServerMessageMetadata.CreateEmpty();

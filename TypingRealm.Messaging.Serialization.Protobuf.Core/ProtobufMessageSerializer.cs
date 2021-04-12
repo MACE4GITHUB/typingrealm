@@ -6,6 +6,7 @@ using ProtoBuf.Meta;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf
 {
+    // TODO: Unit test this class. Possibly together with ProtobufStreamSerializer.
     public sealed class ProtobufMessageSerializer : IMessageSerializer
     {
         private readonly RuntimeTypeModel _model;

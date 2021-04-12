@@ -614,6 +614,26 @@ namespace TypingRealm.Messaging.Tests.Handling
             updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(3));
         }
 
+        [Theory, AutoMoqData]
+        public async Task ShouldSendUnwrappedConnectionToInitializer(
+            [Frozen]Mock<IConnectionInitializer> initializer,
+            IConnection connection,
+            ConnectionHandler sut)
+        {
+            await SwallowAnyAsync(sut.HandleAsync(connection, Cts.Token));
+
+            initializer.Verify(x => x.ConnectAsync(It.Is<ServerMessageUnwrapperConnection>(
+                x => GetPrivateField(x, "_connection") == connection), Cts.Token));
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldThrow_WhenIncomingMessageIsNotMessageWithMetadata(
+            ConnectionHandler sut)
+        {
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => sut.HandleAsync(Create<IConnection>(), Cts.Token));
+        }
+
         private void SetupClientFromInitializer(
             Mock<IConnectionInitializer> initializer,
             IConnection connection,

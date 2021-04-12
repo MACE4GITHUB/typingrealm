@@ -21,7 +21,7 @@ namespace TypingRealm.Messaging.Tests.Connections
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldNotSendAcknowledgeReceived_WhenMessageIsNotOfMessageType(
+        public async Task ShouldNotSendAcknowledgeReceived_WhenMessageDoesNotHaveMetadata(
             [Frozen]Mock<IConnection> connection,
             AcknowledgingConnection sut)
         {
@@ -40,6 +40,7 @@ namespace TypingRealm.Messaging.Tests.Connections
                 .ReturnsAsync(message);
 
             message.Metadata.MessageId = null;
+            message.Metadata.RequireAcknowledgement = true;
 
             await sut.ReceiveAsync(Cts.Token);
 
@@ -47,13 +48,31 @@ namespace TypingRealm.Messaging.Tests.Connections
         }
 
         [Theory, AutoMoqData]
-        public async Task ShouldSendAcknowledgeReceived_WhenMessageHasId(
+        public async Task ShouldNotSendAcknowledgeReceived_WhenRequireAcknowledgementIsFalse(
             ClientToServerMessageWithMetadata message,
             [Frozen]Mock<IConnection> connection,
             AcknowledgingConnection sut)
         {
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(message);
+
+            message.Metadata.RequireAcknowledgement = false;
+
+            await sut.ReceiveAsync(Cts.Token);
+
+            connection.Verify(x => x.SendAsync(It.IsAny<object>(), Cts.Token), Times.Never);
+        }
+
+        [Theory, AutoMoqData]
+        public async Task ShouldSendAcknowledgeReceived_WhenMessageHasId_AndRequireAcknowledgementIsTrue(
+            ClientToServerMessageWithMetadata message,
+            [Frozen]Mock<IConnection> connection,
+            AcknowledgingConnection sut)
+        {
+            connection.Setup(x => x.ReceiveAsync(Cts.Token))
+                .ReturnsAsync(message);
+
+            message.Metadata.RequireAcknowledgement = true;
 
             await sut.ReceiveAsync(Cts.Token);
 

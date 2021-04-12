@@ -2,6 +2,13 @@
 
 namespace TypingRealm.Messaging.Serialization.Protobuf
 {
+    public sealed class Program
+    {
+        public static void Main()
+        {
+        }
+    }
+
     public sealed class ProtobufConnectionFactory : IProtobufConnectionFactory
     {
         private readonly IProtobufFieldNumberCache _fieldNumberCache;

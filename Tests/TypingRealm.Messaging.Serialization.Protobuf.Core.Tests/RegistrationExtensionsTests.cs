@@ -35,7 +35,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         }
 
         [Fact]
-        public void AddProtobuf_ShouldRegisterProtobufSingleton()
+        public void AddProtobuf_ShouldRegisterProtobufStreamSerializerAsTransientWith3Messages()
         {
             var sut = new ServiceCollection();
             sut.AddTransient<IMessageTypeCache, MessageTypeCache>();
@@ -43,7 +43,89 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             sut.AddProtobuf();
 
             var provider = sut.BuildServiceProvider();
-            provider.AssertRegisteredSingleton<IProtobufStreamSerializer, ProtobufStreamSerializer>();
+            provider.AssertRegisteredTransient<IProtobufStreamSerializer, ProtobufStreamSerializer>();
+
+            var serializer = provider.GetRequiredService<IProtobufStreamSerializer>();
+            var typeMembers = ((RuntimeTypeModel)GetPrivateField(serializer, "_model")!).GetTypes().Cast<MetaType>()
+                .Select(x => x.Type)
+                .ToList();
+
+            Assert.Equal(3, typeMembers.Count);
+            Assert.Contains(typeof(ClientToServerMessageData), typeMembers);
+            Assert.Contains(typeof(ClientToServerMessageMetadata), typeMembers);
+            Assert.Contains(typeof(ServerToClientMessageData), typeMembers);
+        }
+
+        [Fact]
+        public void AddProtobuf_ShouldRegisterMessageSerializerAsProtobuf()
+        {
+            var sut = new ServiceCollection();
+            sut.AddTransient<IMessageTypeCache, MessageTypeCache>();
+
+            sut.AddProtobuf();
+
+            var provider = sut.BuildServiceProvider();
+            provider.AssertRegisteredTransient<IMessageSerializer, ProtobufMessageSerializer>();
+        }
+
+        [Fact]
+        public void AddProtobuf_ShouldUseMessageTypeCacheForProtobufSerializer()
+        {
+            var messageTypes = new[]
+            {
+                typeof(HashSet<int>),
+                typeof(MessageAttribute),
+                typeof(List<string>)
+            };
+
+            var sut = new ServiceCollection();
+            sut.AddTransient<IMessageTypeCache>(_ => new MessageTypeCache(messageTypes));
+
+            sut.AddProtobuf();
+
+            var provider = sut.BuildServiceProvider();
+
+            var serializer = provider.GetRequiredService<IMessageSerializer>();
+
+            var registeredTypes = ((RuntimeTypeModel)GetPrivateField(serializer, "_model")!).GetTypes().Cast<MetaType>()
+                .Select(t => t.Type)
+                .ToList();
+
+            Assert.Equal(3, registeredTypes.Count);
+            foreach (var type in messageTypes)
+            {
+                Assert.Contains(type, registeredTypes);
+            }
+        }
+
+        [Fact]
+        public void AddProtobufMessageSerializer_ShouldUseMessageTypeCacheForProtobufSerializer()
+        {
+            var messageTypes = new[]
+            {
+                typeof(HashSet<int>),
+                typeof(MessageAttribute),
+                typeof(List<string>)
+            };
+
+            var sut = new ServiceCollection();
+            sut.AddTransient<IMessageTypeCache>(_ => new MessageTypeCache(messageTypes));
+
+            sut.AddProtobufMessageSerializer();
+
+            var provider = sut.BuildServiceProvider();
+
+            var serializer = provider.GetRequiredService<IMessageSerializer>();
+
+            var registeredTypes = ((RuntimeTypeModel)GetPrivateField(serializer, "_model")!).GetTypes().Cast<MetaType>()
+                .Select(t => t.Type)
+                .ToList();
+
+            Assert.Equal(3, registeredTypes.Count);
+            foreach (var type in messageTypes)
+            {
+                Assert.Contains(type, registeredTypes);
+            }
         }
 
         private class AMessage

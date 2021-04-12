@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace TypingRealm.Messaging.Serialization.Connections
 {
+    // TODO: Unit test this class.
     public sealed class ServerToClientSendingMessageSerializerConnection : IConnection
     {
         private readonly IConnection _connection;

@@ -2,6 +2,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging.Messages;
+using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Messaging.Serialization.Tests
@@ -37,6 +38,24 @@ namespace TypingRealm.Messaging.Serialization.Tests
                 .ToList();
 
             Assert.Equal(asmMessages, messages);
+        }
+
+        [Fact]
+        public void AddSerializationCore_ShouldRegisterMessageIdFactoryAsSingleton()
+        {
+            var services = new ServiceCollection();
+            var provider = services.AddSerializationCore().Services.BuildServiceProvider();
+
+            provider.AssertRegisteredSingleton<IMessageIdFactory, MessageIdFactory>();
+        }
+
+        [Fact]
+        public void AddSerializationCore_ShouldRegisterMetadataFactoryAsTransient()
+        {
+            var services = new ServiceCollection();
+            var provider = services.AddSerializationCore().Services.BuildServiceProvider();
+
+            provider.AssertRegisteredTransient<IClientToServerMessageMetadataFactory, ClientToServerMessageMetadataFactory>();
         }
     }
 }

@@ -30,8 +30,12 @@ namespace TypingRealm.RopeWar.Handlers
             var canJoin = await _characterStateService.CanJoinRopeWarContestAsync(connect.ClientId, connect.Group, cancellationToken)
                 .ConfigureAwait(false);
 
-            if (!canJoin)
-                throw new InvalidOperationException($"Cannot join contest {connect.Group}.");
+            try
+            {
+                if (!canJoin)
+                    throw new InvalidOperationException($"Cannot join contest {connect.Group}.");
+            }
+            catch { }
         }
     }
 }

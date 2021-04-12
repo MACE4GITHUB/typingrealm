@@ -13,9 +13,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
             services.AddTransient<IProtobufConnectionFactory, ProtobufConnectionFactory>();
             services.AddSingleton<IProtobufFieldNumberCache, ProtobufFieldNumberCache>();
 
-            services.AddTransient<IProtobufStreamSerializer, ProtobufStreamSerializer>();
-
-            services.AddSingleton<IProtobufStreamSerializer>(provider =>
+            services.AddTransient<IProtobufStreamSerializer>(provider =>
             {
                 return new ProtobufStreamSerializer(new[]
                 {

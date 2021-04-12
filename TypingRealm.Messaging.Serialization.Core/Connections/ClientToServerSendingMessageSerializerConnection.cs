@@ -7,6 +7,7 @@ namespace TypingRealm.Messaging.Serialization.Connections
     /// <summary>
     /// Use this connection at client side (it should send messages to the server).
     /// </summary>
+    // TODO: Unit test this class.
     public sealed class ClientToServerSendingMessageSerializerConnection : IConnection
     {
         private readonly IConnection _connection;
