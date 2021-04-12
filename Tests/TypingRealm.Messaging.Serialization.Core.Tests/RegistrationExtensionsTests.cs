@@ -27,11 +27,13 @@ namespace TypingRealm.Messaging.Serialization.Tests
                 .GetRequiredService<IMessageTypeCache>()
                 .GetAllTypes()
                 .Select(x => x.Value)
+                .OrderBy(x => x.Name)
                 .ToList();
 
             var asmMessages = typeof(Announce).Assembly
                 .GetTypes()
                 .Where(x => x.GetCustomAttribute<MessageAttribute>() != null)
+                .OrderBy(x => x.Name)
                 .ToList();
 
             Assert.Equal(asmMessages, messages);

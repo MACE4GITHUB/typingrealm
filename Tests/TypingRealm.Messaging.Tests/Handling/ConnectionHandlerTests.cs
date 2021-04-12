@@ -7,6 +7,7 @@ using AutoFixture;
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Messaging.Connecting;
+using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Handling;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Tests.SpecimenBuilders;
@@ -29,7 +30,7 @@ namespace TypingRealm.Messaging.Tests.Handling
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            var received = Received;
+            var received = ClientMessage(Received);
             Received = null;
 
             return received;
@@ -43,6 +44,15 @@ namespace TypingRealm.Messaging.Tests.Handling
                 cancellationToken.ThrowIfCancellationRequested();
             }
         }
+
+        private static ClientToServerMessageWithMetadata ClientMessage(object message)
+        {
+            return new ClientToServerMessageWithMetadata
+            {
+                Message = message,
+                Metadata = ClientToServerMessageMetadata.CreateEmpty()
+            };
+        }
     }
 
     public class ConnectionHandlerTests : TestsBase
@@ -54,8 +64,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             TestException exception,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ThrowsAsync(exception);
+            SetupInitializerThrows(initializer, connection, exception);
 
             await AssertThrowsAsync(
                 () => sut.HandleAsync(connection, Cts.Token), exception);
@@ -68,8 +77,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             IConnection connection,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ThrowsAsync(Create<TestException>());
+            SetupInitializerThrows(initializer, connection, Create<TestException>());
 
             await SwallowAnyAsync(
                 sut.HandleAsync(connection, Cts.Token));
@@ -83,8 +91,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             IConnection connection,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ThrowsAsync(Create<TestException>());
+            SetupInitializerThrows(initializer, connection, Create<TestException>());
 
             await SwallowAnyAsync(
                 sut.HandleAsync(connection, Cts.Token));
@@ -99,8 +106,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             TestException exception,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ThrowsAsync(exception);
+            SetupInitializerThrows(initializer, connection, exception);
 
             Mock.Get(connection).Setup(x => x.SendAsync(It.IsAny<Disconnected>(), Cts.Token))
                 .ThrowsAsync(Create<Exception>());
@@ -122,8 +128,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             TestException exception,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             store.Setup(x => x.Add(client))
                 .Throws(exception);
@@ -140,8 +145,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             ConnectedClient client,
             ConnectionHandler sut)
         {
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             // IsClientConnected returns false.
             store.Setup(x => x.Find(client.ClientId))
@@ -160,8 +164,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             _ = sut.HandleAsync(connection, Cts.Token);
             await Wait();
@@ -181,8 +184,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             var groups = new List<string>();
             updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
@@ -209,8 +211,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             updater.Setup(x => x.SendUpdateAsync(It.IsAny<ConnectedClient>(), Cts.Token))
                 .ThrowsAsync(Create<TestException>());
@@ -238,8 +239,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
                 .Throws(Create<TestException>());
@@ -265,8 +265,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             var result = sut.HandleAsync(connection, Cts.Token);
             await Wait();
@@ -286,9 +285,8 @@ namespace TypingRealm.Messaging.Tests.Handling
             ConnectionHandler sut)
         {
             var connection = new TestConnection();
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(Create<ConnectedClient>(
-                    new ClientWithConnectionBuilder(connection)));
+            SetupClientFromInitializer(initializer, connection, Create<ConnectedClient>(
+                new ClientWithConnectionBuilder(connection)));
 
             var result = sut.HandleAsync(connection, Cts.Token);
             await Wait();
@@ -361,8 +359,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
             var client = Create<ConnectedClient>(new ClientWithConnectionBuilder(connection));
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             var message = Create<TestMessage>();
             var result = sut.HandleAsync(connection, Cts.Token);
@@ -383,17 +380,18 @@ namespace TypingRealm.Messaging.Tests.Handling
         {
             var connection = new TestConnection();
             var client = Create<ConnectedClient>(new ClientWithConnectionBuilder(connection));
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             var messages = Fixture.CreateMany<TestMessage>(2).ToList();
             _ = sut.HandleAsync(connection, Cts.Token);
 
             connection.Received = messages[0];
+
             await Wait();
             dispatcher.Verify(x => x.DispatchAsync(client, messages[0], Cts.Token));
 
             connection.Received = messages[1];
+
             await Wait();
             dispatcher.Verify(x => x.DispatchAsync(client, messages[1], Cts.Token));
         }
@@ -418,8 +416,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             var client = Create<ConnectedClient>(
                 new ClientWithConnectionBuilder(connection));
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             if (dispatcherThrows)
                 dispatcher.Setup(x => x.DispatchAsync(client, message, Cts.Token))
@@ -485,8 +482,12 @@ namespace TypingRealm.Messaging.Tests.Handling
             dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))
                 .ThrowsAsync(exception);
 
+            var connection = Create<IConnection>();
+            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+                .ReturnsAsync(Create<ClientToServerMessageWithMetadata>());
+
             await AssertThrowsAsync(
-                () => sut.HandleAsync(Create<IConnection>(), Cts.Token),
+                () => sut.HandleAsync(connection, Cts.Token),
                 exception);
         }
 
@@ -503,8 +504,12 @@ namespace TypingRealm.Messaging.Tests.Handling
             updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
                 .Throws(Create<Exception>());
 
+            var connection = Create<IConnection>();
+            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+                .ReturnsAsync(Create<ClientToServerMessageWithMetadata>());
+
             await AssertThrowsAsync(
-                () => sut.HandleAsync(Create<IConnection>(), Cts.Token),
+                () => sut.HandleAsync(connection, Cts.Token),
                 exception);
         }
 
@@ -524,8 +529,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             dispatcher.Setup(x => x.DispatchAsync(client, It.IsAny<object>(), Cts.Token))
                 .ThrowsAsync(Create<Exception>());
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             await SwallowAnyAsync(sut.HandleAsync(connection, Cts.Token));
             store.Verify(x => x.Remove(clientId));
@@ -536,14 +540,17 @@ namespace TypingRealm.Messaging.Tests.Handling
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IMessageDispatcher> dispatcher,
             IConnection connection,
+            ClientToServerMessageWithMetadata clientMessage,
             ConnectionHandler sut)
         {
             dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))
                 .ThrowsAsync(Create<Exception>());
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(Create<ConnectedClient>(
-                    new ClientWithConnectionBuilder(connection)));
+            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+                .ReturnsAsync(clientMessage);
+
+            SetupClientFromInitializer(initializer, connection, Create<ConnectedClient>(
+                new ClientWithConnectionBuilder(connection)));
 
             await SwallowAnyAsync(sut.HandleAsync(connection, Cts.Token));
 
@@ -564,8 +571,7 @@ namespace TypingRealm.Messaging.Tests.Handling
                 new ClientWithConnectionBuilder(connection),
                 new ClientWithUpdateDetectorBuilder(updateDetector.Object));
 
-            initializer.Setup(x => x.ConnectAsync(connection, Cts.Token))
-                .ReturnsAsync(client);
+            SetupClientFromInitializer(initializer, connection, client);
 
             var groups = Fixture.CreateMany<string>();
             updateDetector.Setup(x => x.PopMarked())
@@ -606,6 +612,26 @@ namespace TypingRealm.Messaging.Tests.Handling
             updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Exactly(2));
 
             updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(3));
+        }
+
+        private void SetupClientFromInitializer(
+            Mock<IConnectionInitializer> initializer,
+            IConnection connection,
+            ConnectedClient client)
+        {
+            initializer.Setup(x => x.ConnectAsync(It.Is<ServerMessageUnwrapperConnection>(
+                x => GetPrivateField(x, "_connection") == connection), Cts.Token))
+                .ReturnsAsync(client);
+        }
+
+        private void SetupInitializerThrows(
+            Mock<IConnectionInitializer> initializer,
+            IConnection connection,
+            Exception exception)
+        {
+            initializer.Setup(x => x.ConnectAsync(It.Is<ServerMessageUnwrapperConnection>(
+                x => GetPrivateField(x, "_connection") == connection), Cts.Token))
+                .ThrowsAsync(exception);
         }
     }
 }

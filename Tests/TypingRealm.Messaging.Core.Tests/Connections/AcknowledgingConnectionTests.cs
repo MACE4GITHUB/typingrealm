@@ -32,14 +32,14 @@ namespace TypingRealm.Messaging.Tests.Connections
 
         [Theory, AutoMoqData]
         public async Task ShouldNotSendAcknowledgeReceived_WhenMessageIdIsNotSet(
-            MessagesTests.TestAbstractMessage message,
+            ClientToServerMessageWithMetadata message,
             [Frozen]Mock<IConnection> connection,
             AcknowledgingConnection sut)
         {
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(message);
 
-            message.MessageId = null;
+            message.Metadata.MessageId = null;
 
             await sut.ReceiveAsync(Cts.Token);
 
@@ -48,7 +48,7 @@ namespace TypingRealm.Messaging.Tests.Connections
 
         [Theory, AutoMoqData]
         public async Task ShouldSendAcknowledgeReceived_WhenMessageHasId(
-            MessagesTests.TestAbstractMessage message,
+            ClientToServerMessageWithMetadata message,
             [Frozen]Mock<IConnection> connection,
             AcknowledgingConnection sut)
         {
@@ -58,7 +58,7 @@ namespace TypingRealm.Messaging.Tests.Connections
             await sut.ReceiveAsync(Cts.Token);
 
             connection.Verify(x => x.SendAsync(
-                It.Is<AcknowledgeReceived>(y => y.MessageId == message.MessageId),
+                It.Is<AcknowledgeReceived>(y => y.MessageId == message.Metadata.MessageId),
                 Cts.Token));
         }
     }

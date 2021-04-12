@@ -54,7 +54,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
         public class BMessage { }
         // This test adds AMessage and BMessage to RuntimeTypeModel.
         [Theory, AutoMoqData]
-        public void AddProtobuf_ShouldCreateProtobufWithTypesFromMessageTypeCache(Mock<IMessageTypeCache> cache)
+        public void AddProtobuf_ShouldCreateProtobufStreamSerializerWithThreeRawTypes(Mock<IMessageTypeCache> cache)
         {
             var sut = new ServiceCollection();
             sut.AddSingleton(cache.Object);
@@ -75,21 +75,26 @@ namespace TypingRealm.Messaging.Serialization.Protobuf.Tests
             var registeredTypes = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
                 .Select(t => t.Type)
                 .ToList();
-            Assert.Contains(typeof(AMessage), registeredTypes);
-            Assert.Contains(typeof(BMessage), registeredTypes);
+            Assert.Equal(3, registeredTypes.Count);
+            Assert.Contains(typeof(ClientToServerMessageData), registeredTypes);
+            Assert.Contains(typeof(ClientToServerMessageMetadata), registeredTypes);
+            Assert.Contains(typeof(ServerToClientMessageData), registeredTypes);
 
             var typeMembers = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
-                .Single(x => x.Type == typeof(AMessage))
+                .Single(x => x.Type == typeof(ClientToServerMessageData))
                 .GetFields()
                 .ToList();
 
             var member1 = typeMembers.Single(t => t.FieldNumber == 1);
             var member2 = typeMembers.Single(t => t.FieldNumber == 2);
+            var member3 = typeMembers.Single(t => t.FieldNumber == 3);
 
-            Assert.Equal(typeof(int), member1.MemberType);
-            Assert.Equal(nameof(AMessage.Age), member1.Name);
-            Assert.Equal(typeof(string), member2.MemberType);
-            Assert.Equal(nameof(AMessage.Name), member2.Name);
+            Assert.Equal(typeof(string), member1.MemberType);
+            Assert.Equal(nameof(ClientToServerMessageData.Data), member1.Name);
+            Assert.Equal(typeof(ClientToServerMessageMetadata), member2.MemberType);
+            Assert.Equal(nameof(ClientToServerMessageData.Metadata), member2.Name);
+            Assert.Equal(typeof(string), member3.MemberType);
+            Assert.Equal(nameof(ClientToServerMessageData.TypeId), member3.Name);
         }
     }
 }

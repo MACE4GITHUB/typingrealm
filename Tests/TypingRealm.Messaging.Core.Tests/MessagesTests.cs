@@ -19,15 +19,14 @@ namespace TypingRealm.Messaging.Tests
             }
         }
 
-        public class TestAbstractMessage
+        public class TestAbstractMessageData : MessageData
         {
-            public string? MessageId { get; set; }
         }
 
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(7, typeof(Announce).Assembly.GetTypes().Count(
+            Assert.Equal(9, typeof(Announce).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -84,25 +83,46 @@ namespace TypingRealm.Messaging.Tests
             Assert.Equal(senderId, sut.SenderId);
         }
 
-        [Theory, AutoMoqData]
-        public void AbstractMessage(string messageId)
-        {
-            AssertSerializable<TestAbstractMessage>();
-
-            var sut = new TestAbstractMessage();
-            Assert.Null(sut.MessageId);
-
-            sut.MessageId = messageId;
-            Assert.Equal(messageId, sut.MessageId);
-
-            sut.MessageId = null;
-            Assert.Null(sut.MessageId);
-        }
-
         [Fact]
         public void AcknowledgeReceived()
         {
             AssertSerializable<AcknowledgeReceived>();
+        }
+
+        [Theory, AutoMoqData]
+        public void AbstractMessageData(
+            string data,
+            string typeId)
+        {
+            AssertSerializable<TestAbstractMessageData>();
+
+            var sut = new TestAbstractMessageData();
+            Assert.Null(sut.Data);
+            Assert.Null(sut.TypeId);
+
+            sut.Data = data;
+            sut.TypeId = typeId;
+            Assert.Equal(data, sut.Data);
+            Assert.Equal(typeId, sut.TypeId);
+
+            sut.Data = null!;
+            sut.TypeId = null!;
+            Assert.Null(sut.Data);
+            Assert.Null(sut.TypeId);
+        }
+
+        [Theory, AutoMoqData]
+        public void ClientToServerMessageData(ClientToServerMessageData sut)
+        {
+            AssertSerializable<ClientToServerMessageData>();
+            Assert.IsAssignableFrom<MessageData>(sut);
+        }
+
+        [Theory, AutoMoqData]
+        public void ServerToClientMessageData(ServerToClientMessageData sut)
+        {
+            AssertSerializable<ServerToClientMessageData>();
+            Assert.IsAssignableFrom<MessageData>(sut);
         }
     }
 }

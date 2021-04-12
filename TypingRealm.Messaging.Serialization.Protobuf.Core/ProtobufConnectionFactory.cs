@@ -26,6 +26,7 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
             _clientToServerMessageMetadataFactory = clientToServerMessageMetadataFactory;
         }
 
+        // TODO: Unit test this (possibly after we move ForClient / ForServer from here somehow).
         public IConnection CreateProtobufConnectionForClient(Stream stream)
         {
             return new ProtobufConnection(stream, _fieldNumberCache, _protobuf)
