@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,6 +61,9 @@ namespace TypingRealm.Messaging.Handling
             if (!_connectedClients.IsClientConnected(connectedClient.ClientId))
                 throw new InvalidOperationException("Client was not added correctly.");
 
+            // TODO: Unit test all the logic about idempotency.
+            var idempotencyKeys = new Dictionary<string, DateTime>();
+
             await TrySendPendingUpdates(connectedClient.Group, cancellationToken).ConfigureAwait(false);
             while (_connectedClients.IsClientConnected(connectedClient.ClientId))
             {
@@ -70,9 +74,23 @@ namespace TypingRealm.Messaging.Handling
                     if (message is not ClientToServerMessageWithMetadata messageWithMetadata)
                         throw new InvalidOperationException($"Message is not of {typeof(ClientToServerMessageWithMetadata).Name} type.");
 
+                    if (messageWithMetadata.Metadata.MessageId != null && idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
+                    {
+                        _logger.LogDebug($"Message with id {messageWithMetadata.Metadata.MessageId} has already been handled. Skipping duplicate (idempotency).");
+                        continue;
+                    }
+
                     await DispatchMessageAsync(connectedClient, messageWithMetadata.Message, cancellationToken).ConfigureAwait(false);
 
                     // If everything was dispatched successfully:
+                    if (messageWithMetadata.Metadata.MessageId != null && !idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
+                        idempotencyKeys.Add(messageWithMetadata.Metadata.MessageId, DateTime.UtcNow);
+
+                    foreach (var item in idempotencyKeys.Where(x => x.Value < DateTime.UtcNow - TimeSpan.FromMinutes(1)))
+                    {
+                        idempotencyKeys.Remove(item.Key);
+                    }
+
                     if (messageWithMetadata.Metadata.RequireAcknowledgement)
                     {
                         // TODO: Send acknowledgement (it's already being sent, but in Connection decorator instead of after handling the code).
