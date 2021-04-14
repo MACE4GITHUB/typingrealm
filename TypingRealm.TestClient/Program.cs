@@ -66,8 +66,7 @@ namespace TypingRealm.TestClient
                 .AddProtobuf() // Also adds Protobuf ConnectionFactory.
                 .AddJson() // Serialize messages with JSON instead of Protobuf.
                 .UseTcpProtobufClientConnectionFactory("127.0.0.1", 30112)
-                .RegisterClientMessaging()
-                .BuildServiceProvider();
+                .RegisterClientMessaging();
 
             var provider = services.BuildServiceProvider();
 
@@ -112,8 +111,7 @@ namespace TypingRealm.TestClient
                 .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
                 .AddSignalRConnectionFactory()
                 .UseSignalRClientConnectionFactory("http://127.0.0.1:30102/hub")
-                .RegisterClientMessaging()
-                .BuildServiceProvider();
+                .RegisterClientMessaging();
 
             var provider = services.BuildServiceProvider();
 

@@ -93,6 +93,8 @@ namespace TypingRealm.Messaging.Client
             }
             catch (Exception exception)
             {
+                // TODO: ReSend a message if reconnection was successful, otherwise throw an exception.
+                // Make sure you generate message ID here so that resending message is idempotent.
                 _logger.LogError(exception, "Error while trying to send a message.");
 
                 await ReconnectAsync(cancellationToken)
