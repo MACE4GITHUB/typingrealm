@@ -2,59 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
-using TypingRealm.Messaging;
-using TypingRealm.Messaging.Connections;
+using TypingRealm.Authentication.ConsoleClient;
+using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.RopeWar;
 using TypingRealm.SignalR;
-using TypingRealm.World;
+using TypingRealm.SignalR.Client;
+using TypingRealm.Tcp.Client;
 
 namespace TypingRealm.TestClient
 {
-    public enum AuthenticationProviderType
-    {
-        Local = 1,
-        Auth0 = 2,
-        IdentityServer = 3
-    }
-
-    public static class ServiceCollectionExtensions
-    {
-        public static IServiceCollection AddProfileTokenProvider(this IServiceCollection services, AuthenticationProviderType authenticationProviderType, string profile = "ivan")
-        {
-            switch (authenticationProviderType)
-            {
-                case AuthenticationProviderType.Local:
-                    services.AddTransient<IProfileTokenProvider>(
-                        _ => new LocalProfileTokenProvider(profile));
-                    break;
-                case AuthenticationProviderType.Auth0:
-                    var auth0Config = new Auth0AuthenticationConfiguration();
-                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(auth0Config.Issuer, auth0Config.PkceClientId));
-                    break;
-                case AuthenticationProviderType.IdentityServer:
-                    var idsConfig = new IdentityServerAuthenticationConfiguration();
-                    services.AddSingleton<IProfileTokenProvider>(new PkceClient(idsConfig.Issuer, idsConfig.PkceClientId));
-                    break;
-                default:
-                    throw new InvalidOperationException("Unknown authentication provider type.");
-            }
-
-            return services;
-        }
-    }
-
     public sealed class Character
     {
         public string? profileId { get; set; }
@@ -67,167 +33,108 @@ namespace TypingRealm.TestClient
         public static async Task Main()
         {
             Console.WriteLine("=== TypingRealm test client ===");
-            Console.Write("Type of connection (s - SignalR, cs - Combat SignalR, rw - RopeWar, default - TCP): ");
+            Console.Write("Type of connection (rw - RopeWar SignalR, rwt - RopeWar TCP / Protobuf): ");
 
             await (Console.ReadLine() switch
             {
-                /*"s" => MainSignalR(),
-                "cs" => CombatSignalR(),*/
                 "rw" => RopeWarSignalR(),
-                "world" => WorldSignalR(),
-                "rwt" => RopeWarTcp()/*,
-                _ => MainTpc()*/
+                "rwt" => RopeWarTcp(),
+                _ => throw new InvalidOperationException("Invalid type of connection")
             }).ConfigureAwait(false);
         }
 
-        /*public static async Task MainTpc()
+        public static async Task RopeWarTcp(bool useLocalAuth = false)
         {
-            var provider = new ServiceCollection()
-                .AddSerializationCore()
-                .AddDomainCore()
-                .AddJson()
-                .Services
-                .AddProtobuf()
-                .BuildServiceProvider();
+            var services = new ServiceCollection();
 
-            var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
-                .GetAllTypes()
-                .Select(idToType => idToType.Value)
-                .ToList();
+            services.AddAuth0ProfileTokenProvider();
 
-            var protobufConnectionFactory = provider.GetRequiredService<IProtobufConnectionFactory>();
-
-            Console.WriteLine("Press enter to connect.");
-            Console.ReadLine();
-
-            using var client = new TcpClient();
-            await client.ConnectAsync("127.0.0.1", 30100).ConfigureAwait(false);
-
-            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
-
-            using var stream = client.GetStream();
-            using var sendLock = new SemaphoreSlimLock();
-            using var receiveLock = new SemaphoreSlimLock();
-            var connection = protobufConnectionFactory.CreateProtobufConnection(stream)
-                .WithJson(jsonConnectionFactory)
-                .WithLocking(sendLock, receiveLock);
-
-            await Handle(connection, messageTypes).ConfigureAwait(false);
-        }*/
-
-        public static async Task RopeWarTcp()
-        {
-            Console.Write("Authentication type (a - auth0, i - identityserver, l - local token): ");
-            var authenticationType = Console.ReadLine()?.ToLowerInvariant() switch
+            if (useLocalAuth)
             {
-                "a" => AuthenticationProviderType.Auth0,
-                "i" => AuthenticationProviderType.IdentityServer,
-                "l" => AuthenticationProviderType.Local,
-                _ => throw new InvalidOperationException("Invalid type.")
-            };
+                Console.Write("Profile for local token: ");
+                var profile = Console.ReadLine() ?? "default";
 
-            var profile = "ivan";
-            if (authenticationType == AuthenticationProviderType.Local)
-            {
-                Console.Write("Profile for local token (default = 'ivan'): ");
-                profile = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(profile))
-                    profile = "ivan";
+                services.AddLocalProfileTokenProvider(profile);
             }
 
-            var provider = new ServiceCollection()
+            services
+                .AddLogging() // TODO: Log only to file, console is needed for UI.
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
                 .AddRopeWarMessages()
                 .Services
-                .AddProtobuf()
-                .AddJson()
-                .AddProfileTokenProvider(authenticationType, profile)
+                .AddProtobuf() // Also adds Protobuf ConnectionFactory.
+                .AddJson() // Serialize messages with JSON instead of Protobuf.
+                .UseTcpProtobufClientConnectionFactory("127.0.0.1", 30112)
+                .RegisterClientMessaging()
                 .BuildServiceProvider();
+
+            var provider = services.BuildServiceProvider();
+
+            // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
+            var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
+            _ = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
                 .GetAllTypes()
                 .Select(idToType => idToType.Value)
                 .ToList();
 
-            var protobufConnectionFactory = provider.GetRequiredService<IProtobufConnectionFactory>();
+            var messageProcessor = provider.GetRequiredService<MessageProcessor>();
 
-            Console.WriteLine("Press enter to connect.");
-            Console.ReadLine();
+            using var cts = new CancellationTokenSource();
+            await messageProcessor.ConnectAsync(cts.Token).ConfigureAwait(false);
 
-            var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
-
-            using var client = new TcpClient();
-            await client.ConnectAsync("127.0.0.1", 30112).ConfigureAwait(false);
-
-            using var stream = client.GetStream();
-            using var sendLock = new SemaphoreSlimLock();
-            using var receiveLock = new SemaphoreSlimLock();
-            var connection = protobufConnectionFactory.CreateProtobufConnectionForClient(stream)
-                .WithLocking(sendLock, receiveLock);
-
-            await Handle(connection, messageTypes, tokenProvider, null!).ConfigureAwait(false);
+            await Handle(messageProcessor, messageTypes, tokenProvider).ConfigureAwait(false);
         }
 
-        public static async Task RopeWarSignalR()
+        public static async Task RopeWarSignalR(bool useLocalAuth = false)
         {
-            Console.Write("Authentication type (a - auth0, i - identityserver, l - local token): ");
-            var authenticationType = Console.ReadLine()?.ToLowerInvariant() switch
-            {
-                "a" => AuthenticationProviderType.Auth0,
-                "i" => AuthenticationProviderType.IdentityServer,
-                "l" => AuthenticationProviderType.Local,
-                _ => throw new InvalidOperationException("Invalid type.")
-            };
+            var services = new ServiceCollection();
 
-            var profile = "ivan";
-            if (authenticationType == AuthenticationProviderType.Local)
+            services.AddAuth0ProfileTokenProvider();
+
+            if (useLocalAuth)
             {
-                Console.Write("Profile for local token (default = 'ivan'): ");
-                profile = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(profile))
-                    profile = "ivan";
+                Console.Write("Profile for local token: ");
+                var profile = Console.ReadLine() ?? "default";
+
+                services.AddLocalProfileTokenProvider(profile);
             }
 
-            var provider = new ServiceCollection()
+            services
+                .AddLogging() // TODO: Log only to file, console is needed for UI.
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
                 .AddRopeWarMessages()
                 .Services
                 .AddJson()
-                .AddProtobufMessageSerializer() // Serialize messages with protobuf instead of json.
+                .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
                 .AddSignalRConnectionFactory()
-                .AddProfileTokenProvider(authenticationType, profile)
+                .UseSignalRClientConnectionFactory("http://127.0.0.1:30102/hub")
+                .RegisterClientMessaging()
                 .BuildServiceProvider();
+
+            var provider = services.BuildServiceProvider();
+
+            // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
+            var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
+            _ = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
                 .GetAllTypes()
                 .Select(idToType => idToType.Value)
                 .ToList();
 
-            Console.WriteLine("Press enter to connect.");
-            Console.ReadLine();
+            var messageProcessor = provider.GetRequiredService<MessageProcessor>();
 
-            var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
-            var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
+            using var cts = new CancellationTokenSource();
+            await messageProcessor.ConnectAsync(cts.Token).ConfigureAwait(false);
 
-            var hub = new HubConnectionBuilder()
-                .WithUrl($"http://127.0.0.1:30102/hub", options =>
-                {
-                    options.AccessTokenProvider = () => Task.FromResult(accessToken);
-                    options.Transports = HttpTransportType.WebSockets;
-                })
-                .Build();
-
-            var factory = provider.GetRequiredService<ISignalRConnectionFactory>();
-            await hub.StartAsync(default).ConfigureAwait(false);
-
-            var connection = factory.CreateProtobufConnectionForClient(hub);
-
-            await Handle(connection, messageTypes, tokenProvider, null!).ConfigureAwait(false);
+            await Handle(messageProcessor, messageTypes, tokenProvider).ConfigureAwait(false);
         }
 
-        public static async Task WorldSignalR()
+        /*public static async Task WorldSignalR()
         {
             Console.Write("Authentication type (a - auth0, i - identityserver, l - local token): ");
             var authenticationType = Console.ReadLine()?.ToLowerInvariant() switch
@@ -303,7 +210,7 @@ namespace TypingRealm.TestClient
             }
 
             await Handle(connection, messageTypes, tokenProvider, ConnectToRw).ConfigureAwait(false);
-        }
+        }*/
 
 
         /*public static async Task CombatSignalR()
@@ -380,53 +287,39 @@ namespace TypingRealm.TestClient
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }*/
 
-        private static async Task Handle(IConnection connection, IEnumerable<Type> messageTypes, IProfileTokenProvider tokenProvider, Func<ValueTask<IConnection>> connectToRw, string? characterId = null)
+        private static async Task Handle(MessageProcessor processor, IEnumerable<Type> messageTypes, IProfileTokenProvider tokenProvider)
         {
-            _ = ListenForMessagesFromServer(connection, tokenProvider);
-            Console.WriteLine("Connected.");
+            processor.Subscribe<object>(message =>
+            {
+                Console.WriteLine($"Received {message.GetType().Name}: {JsonSerializer.Serialize(message, options: new JsonSerializerOptions{ WriteIndented = true })}");
+                return default;
+            });
+
             Console.WriteLine("messages - show list of available messages");
             Console.WriteLine("<some-message> - initiate process of sending message to server");
             Console.WriteLine("exit - quit the application");
-            Console.WriteLine("connect-to-rw - connect to ropewar from world");
 
-            Console.WriteLine("Connect automatically and create a character? (y) (uses local token if not authenticated)");
+            Console.Write("Character name: ");
+            var characterName = Console.ReadLine();
 
             var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
-
-            string? clientId = null;
-            if (Console.ReadLine() == "y")
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            using var content = new StringContent(JsonSerializer.Serialize(new
             {
-                Console.WriteLine($"Access token: {token}");
+                name = characterName
+            }), Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("http://127.0.0.1:30103/api/characters", content).ConfigureAwait(false);
 
-                if (characterId == null)
-                {
-                    Console.Write("Character name: ");
-                    var characterName = Console.ReadLine();
+            var character = JsonSerializer.Deserialize<Character>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+            var clientId = character?.characterId;
+            var group = "lobby";
 
-                    using var httpClient = new HttpClient();
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                    var response = httpClient.PostAsync("http://127.0.0.1:30103/api/characters", new StringContent(JsonSerializer.Serialize(new
-                    {
-                        name = characterName
-                    }), Encoding.UTF8, "application/json"));
+            await processor.SendRpcAsync(new Authenticate(token), default)
+                .ConfigureAwait(false);
 
-                    var character = JsonSerializer.Deserialize<Character>(await response.Result.Content.ReadAsStringAsync().ConfigureAwait(false));
-                    clientId = character?.characterId;
-                }
-                else
-                {
-                    clientId = characterId;
-                }
-
-                Console.Write("Group: ");
-                var group = Console.ReadLine() ?? throw new InvalidOperationException("Group is not supplied.");
-
-                await _listener!.SendRpcAsync(new Authenticate(token))
-                    .ConfigureAwait(false);
-
-                await connection.SendAsync(new Connect(clientId!, group), default)
-                    .ConfigureAwait(false);
-            }
+            await processor.SendAsync(new Connect(clientId!, group), default)
+                .ConfigureAwait(false);
 
             while (true)
             {
@@ -441,11 +334,6 @@ namespace TypingRealm.TestClient
                 {
                     Console.WriteLine(JsonSerializer.Serialize(messageTypes.Select(t => t.Name).ToList()));
                     continue;
-                }
-
-                if (input == "connect-to-rw")
-                {
-                    await Handle(await connectToRw().ConfigureAwait(false), messageTypes, tokenProvider, connectToRw, clientId).ConfigureAwait(false);
                 }
 
                 var messageType = messageTypes.FirstOrDefault(t => t.Name.ToUpperInvariant() == input.ToUpperInvariant());
@@ -476,119 +364,7 @@ namespace TypingRealm.TestClient
                 if (Console.ReadLine() == "no")
                     continue;
 
-                await connection.SendAsync(message, default).ConfigureAwait(false);
-            }
-        }
-
-        private static MessageListener? _listener;
-        private static async Task ListenForMessagesFromServer(IConnection connection, IProfileTokenProvider tokenProvider)
-        {
-            _listener = new MessageListener(connection);
-            _listener.Subscribe<object>(async message =>
-            {
-                switch (message)
-                {
-                    case Announce say:
-                        Console.WriteLine($"Announcement: {say.Message}");
-                        break;
-                    case Disconnected disconnected:
-                        Console.WriteLine($"Disconnected with reason: {disconnected.Reason}");
-                        return; // Return after server tells us that he's disconnecting us. Or socket exception will be thrown on the next WaitAsync operation.
-                    case TokenExpired _:
-                        Console.WriteLine($"Received TokenExpired message. Re-sending token.");
-                        var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
-                        await connection.SendAsync(new Authenticate(token), default).ConfigureAwait(false);
-                        break;
-                    default:
-                        Console.WriteLine($"Received {message.GetType()} message:");
-                        var json = JsonSerializer.Serialize(message, options: new JsonSerializerOptions
-                        {
-                            WriteIndented = true
-                        });
-                        Console.WriteLine(json);
-                        break;
-                }
-            });
-        }
-    }
-
-    public sealed class MessageListener
-    {
-        private readonly IConnection _connection;
-        private readonly Dictionary<string, Func<object, ValueTask>> _handlers
-            = new Dictionary<string, Func<object, ValueTask>>();
-
-        public MessageListener(IConnection connection)
-        {
-            _connection = connection;
-            _ = ListenForMessagesFromServer();
-        }
-
-        public async Task ListenForMessagesFromServer()
-        {
-            while (true)
-            {
-                var message = await _connection.ReceiveAsync(default).ConfigureAwait(false);
-
-                await AsyncHelpers.WhenAll(_handlers.Values.Select(handler => handler(message)))
-                    .ConfigureAwait(false);
-            }
-        }
-
-        public string Subscribe<TMessage>(Func<TMessage, ValueTask> handler)
-        {
-            var subscriptionId = Guid.NewGuid().ToString();
-
-            _handlers.Add(subscriptionId, message =>
-            {
-                if (message is TMessage tMessage)
-                    return handler(tMessage);
-
-                return default;
-            });
-
-            return subscriptionId;
-        }
-
-        public void Unsubscribe(string subscriptionId)
-        {
-            _handlers.Remove(subscriptionId);
-        }
-
-        public async ValueTask SendRpcAsync(object message)
-        {
-            var isAcknowledged = false;
-            var metadata = ClientToServerMessageMetadata.CreateEmpty();
-            metadata.EnableAcknowledgement(Guid.NewGuid().ToString());
-            // TODO: Think of a way to enable acknowledgement BUT still GET message id as INT from the factory.
-
-            ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
-            {
-                if (acknowledgeReceived.MessageId == metadata.MessageId)
-                    isAcknowledged = true;
-
-                return default;
-            }
-
-            var subscriptionId = Subscribe<AcknowledgeReceived>(Handler);
-
-            try
-            {
-                await _connection.SendAsync(message, metadata, default).ConfigureAwait(false);
-
-                var i = 0;
-                while (!isAcknowledged)
-                {
-                    await Task.Delay(10).ConfigureAwait(false);
-                    i++;
-
-                    if (i > 300)
-                        throw new InvalidOperationException("Acknowledgement is not received.");
-                }
-            }
-            finally
-            {
-                Unsubscribe(subscriptionId);
+                await processor.SendAsync(message, default).ConfigureAwait(false);
             }
         }
     }

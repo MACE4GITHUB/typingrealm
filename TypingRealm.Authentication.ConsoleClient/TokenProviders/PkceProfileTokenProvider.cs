@@ -1,28 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using IdentityModel.OidcClient;
-using TypingRealm.Authentication;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Connections;
 
-namespace TypingRealm.TestClient
+namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
 {
-    public sealed class LocalProfileTokenProvider : IProfileTokenProvider
-    {
-        private readonly string _profile;
-
-        public LocalProfileTokenProvider(string profile)
-        {
-            _profile = profile;
-        }
-
-        public ValueTask<string> SignInAsync()
-        {
-            return new ValueTask<string>(LocalAuthentication.GenerateProfileAccessToken(_profile));
-        }
-    }
-
-    public sealed class PkceClient : SyncManagedDisposable, IProfileTokenProvider
+    public sealed class PkceProfileTokenProvider : SyncManagedDisposable, IProfileTokenProvider
     {
         private readonly OidcClient _oidcClient;
         private readonly SemaphoreSlimLock _lock = new SemaphoreSlimLock();
@@ -32,7 +16,7 @@ namespace TypingRealm.TestClient
         private string? _identityToken;
         private string? _refreshToken;
 
-        public PkceClient(string authority, string clientId)
+        public PkceProfileTokenProvider(string authority, string clientId)
         {
             var browser = new SystemBrowser(4200);
             var redirectUri = $"http://127.0.0.1:{browser.Port}";

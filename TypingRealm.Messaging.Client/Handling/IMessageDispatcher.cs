@@ -1,0 +1,18 @@
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace TypingRealm.Messaging.Client.Handling
+{
+    /// <summary>
+    /// Dispatches message to all registered handlers.
+    /// </summary>
+    public interface IMessageDispatcher
+    {
+        /// <summary>
+        /// Dispatches message to all registered handlers.
+        /// </summary>
+        /// <param name="message">Message that needs to be dispatched.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        ValueTask DispatchAsync(object message, CancellationToken cancellationToken);
+    }
+}
