@@ -26,39 +26,41 @@ namespace TypingRealm.Messaging.Serialization.Connections
             var message = await _connection.ReceiveAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            if (message is not MessageData messageData)
-                throw new InvalidOperationException("Received invalid message: not a MessageData type.");
+            if (message is not ClientToServerMessageData messageData)
+                throw new InvalidOperationException($"Received invalid message: {message.GetType().Name} is not a {typeof(ClientToServerMessageData).Name} type.");
 
             var data = messageData.Data;
             var messageType = _messageTypeCache.GetTypeById(messageData.TypeId);
 
             var deserialized = _serializer.Deserialize(data, messageType);
 
-            if (message is ClientToServerMessageData clientMessageData)
-            {
-                return new ClientToServerMessageWithMetadata
-                {
-                    Message = deserialized,
-                    Metadata = clientMessageData.Metadata
-                };
-            }
+            if (messageData.Metadata == null)
+                messageData.Metadata = ClientToServerMessageMetadata.CreateEmpty();
 
             return new ClientToServerMessageWithMetadata
             {
                 Message = deserialized,
-                Metadata = ClientToServerMessageMetadata.CreateEmpty()
+                Metadata = messageData.Metadata
             };
         }
 
         public ValueTask SendAsync(object message, CancellationToken cancellationToken)
         {
+            ServerToClientMessageMetadata? metadata = null;
+            if (message is ServerToClientMessageWithMetadata messageWithMetadata)
+            {
+                message = messageWithMetadata.Message;
+                metadata = messageWithMetadata.Metadata;
+            }
+
             var serialized = _serializer.Serialize(message);
             var messageTypeId = _messageTypeCache.GetTypeId(message.GetType());
 
             var result = new ServerToClientMessageData
             {
                 Data = serialized,
-                TypeId = messageTypeId
+                TypeId = messageTypeId,
+                Metadata = metadata // Can be null.
             };
 
             return _connection.SendAsync(result, cancellationToken);

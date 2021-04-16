@@ -32,15 +32,22 @@ namespace TypingRealm.Messaging.Serialization.Connections
             var message = await _connection.ReceiveAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            if (message is not MessageData messageData)
-                throw new InvalidOperationException("Received invalid message: not a MessageData type.");
+            if (message is not ServerToClientMessageData messageData)
+                throw new InvalidOperationException($"Received invalid message: {message.GetType().Name} is not a {typeof(ServerToClientMessageData).Name} type.");
 
             var data = messageData.Data;
             var messageType = _messageTypeCache.GetTypeById(messageData.TypeId);
 
             var deserialized = _serializer.Deserialize(data, messageType);
 
-            return deserialized;
+            if (messageData.Metadata == null)
+                messageData.Metadata = ServerToClientMessageMetadata.CreateEmpty();
+
+            return new ServerToClientMessageWithMetadata
+            {
+                Message = deserialized,
+                Metadata = messageData.Metadata
+            };
         }
 
         public ValueTask SendAsync(object message, CancellationToken cancellationToken)
@@ -55,9 +62,10 @@ namespace TypingRealm.Messaging.Serialization.Connections
             var serialized = _serializer.Serialize(message);
             var messageTypeId = _messageTypeCache.GetTypeId(message.GetType());
 
+            // TODO: Remove this code and generate metadata above - where we need to save messageId for idempotency (retries).
             // If metadata was sent from user side - use user's metadata, otherwise create for this message.
-            if (metadata == null)
-                metadata = _metadataFactory.CreateFor(message);
+            /*if (metadata == null)
+                metadata = _metadataFactory.CreateFor(message);*/
 
             var result = new ClientToServerMessageData
             {

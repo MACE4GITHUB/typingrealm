@@ -80,7 +80,7 @@ namespace TypingRealm.Chat.ConsoleApp
                 }
             });
 
-            await messageProcessor.SendRpcAsync(new Authenticate(token), default)
+            await messageProcessor.SendAcknowledgedAsync(new Authenticate(token), default)
                 .ConfigureAwait(false);
 
             await messageProcessor.SendAsync(new Connect(clientId, group), default)

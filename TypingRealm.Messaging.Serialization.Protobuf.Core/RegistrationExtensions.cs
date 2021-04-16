@@ -19,7 +19,8 @@ namespace TypingRealm.Messaging.Serialization.Protobuf
                 {
                     typeof(ClientToServerMessageData),
                     typeof(ClientToServerMessageMetadata),
-                    typeof(ServerToClientMessageData)
+                    typeof(ServerToClientMessageData),
+                    typeof(ServerToClientMessageMetadata)
                 });
             });
 

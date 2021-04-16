@@ -93,6 +93,11 @@ namespace TypingRealm.Messaging.Handling
 
                     if (messageWithMetadata.Metadata.RequireAcknowledgement)
                     {
+                        // !!!
+                        // I need to get acknowledgement from Authentication message and it's not possible
+                        // to send it here since we are still in ConnectionInitializer at that time.
+                        // So it definitely needs to be done as Connection decorator.
+
                         // TODO: Send acknowledgement (it's already being sent, but in Connection decorator instead of after handling the code).
                         // Send AcknowledgeHandled instead of AcknowledgeReceived (probably no need to send both, just rename this message).
                     }

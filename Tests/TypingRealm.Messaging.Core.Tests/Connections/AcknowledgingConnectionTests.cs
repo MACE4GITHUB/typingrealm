@@ -77,7 +77,10 @@ namespace TypingRealm.Messaging.Tests.Connections
             await sut.ReceiveAsync(Cts.Token);
 
             connection.Verify(x => x.SendAsync(
-                It.Is<AcknowledgeReceived>(y => y.MessageId == message.Metadata.MessageId),
+                It.Is<ServerToClientMessageWithMetadata>(
+                    y => (y.Message as AcknowledgeReceived) != null
+                    && ((AcknowledgeReceived)y.Message).MessageId == message.Metadata.MessageId
+                    && y.Metadata.RequestMessageId == message.Metadata.MessageId),
                 Cts.Token));
         }
     }

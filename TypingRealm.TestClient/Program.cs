@@ -313,7 +313,7 @@ namespace TypingRealm.TestClient
             var clientId = character?.characterId;
             var group = "lobby";
 
-            await processor.SendRpcAsync(new Authenticate(token), default)
+            await processor.SendAcknowledgedAsync(new Authenticate(token), default)
                 .ConfigureAwait(false);
 
             await processor.SendAsync(new Connect(clientId!, group), default)

@@ -19,9 +19,12 @@ namespace TypingRealm.Messaging.Client
         private readonly IMessageDispatcher _dispatcher;
         private readonly IProfileTokenProvider _profileTokenProvider;
         private readonly IMessageIdFactory _messageIdFactory;
+        private readonly IClientToServerMessageMetadataFactory _metadataFactory;
         private readonly SemaphoreSlimLock _lock = new SemaphoreSlimLock();
         private readonly Dictionary<string, Func<object, ValueTask>> _handlers
             = new Dictionary<string, Func<object, ValueTask>>();
+        private readonly Dictionary<string, Func<object, string?, ValueTask>> _handlersWithId
+            = new Dictionary<string, Func<object, string?, ValueTask>>();
 
         private CancellationTokenSource? _cts;
         private CancellationTokenSource? _combinedCts;
@@ -33,13 +36,15 @@ namespace TypingRealm.Messaging.Client
             IClientConnectionFactory connectionFactory,
             IMessageDispatcher dispatcher,
             IProfileTokenProvider profileTokenProvider,
-            IMessageIdFactory messageIdFactory)
+            IMessageIdFactory messageIdFactory,
+            IClientToServerMessageMetadataFactory metadataFactory)
         {
             _logger = logger;
             _connectionFactory = connectionFactory;
             _dispatcher = dispatcher;
             _profileTokenProvider = profileTokenProvider;
             _messageIdFactory = messageIdFactory;
+            _metadataFactory = metadataFactory;
         }
 
         public bool IsConnected { get; private set; }
@@ -102,12 +107,59 @@ namespace TypingRealm.Messaging.Client
             }
         }
 
-        public async ValueTask SendRpcAsync(object message, CancellationToken cancellationToken)
+        public async ValueTask<TResponse> SendQueryAsync<TResponse>(object message, CancellationToken cancellationToken)
+            where TResponse : class
+        {
+            var metadata = _metadataFactory.CreateFor(message);
+
+            var subscriptionId = SubscribeWithMessageId<TResponse>(Handler, metadata.MessageId);
+            TResponse? response = null;
+
+            ValueTask Handler(TResponse result)
+            {
+                response = result;
+                return default;
+            }
+
+            try
+            {
+                // TODO: Do not duplicate this logic (try/catch logic) with Send() method.
+                await _connectionResource!.Connection.SendAsync(message, metadata, cancellationToken).ConfigureAwait(false);
+
+                var i = 0;
+                while (response == null)
+                {
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+                    i++;
+
+                    if (i > 300)
+                        throw new InvalidOperationException("Could not receive response in time (timeout).");
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Error while trying to send a message.");
+
+                await ReconnectAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
+                // TODO: throw or return or smth. Do not return null response!
+            }
+            finally
+            {
+                Unsubscribe(subscriptionId);
+            }
+
+            return response!;
+        }
+
+        // I Cannot use SubscribeWithId method because it works only after initial connection has been established.
+        // But we need to have acknowledgement on the level of all messages (like Authentication, that are used during connection stage).
+        public async ValueTask SendAcknowledgedAsync(object message, CancellationToken cancellationToken)
         {
             var isAcknowledged = false;
-            var metadata = ClientToServerMessageMetadata.CreateEmpty();
-            var messageId = _messageIdFactory.CreateMessageId();
-            metadata.EnableAcknowledgement(messageId);
+            var metadata = _metadataFactory.CreateFor(message);
+            metadata.RequireAcknowledgement = true;
 
             // TODO: Re-do this using CTS and Task.Delay(cts) instead of isAcknowledged.
             ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
@@ -118,7 +170,7 @@ namespace TypingRealm.Messaging.Client
                 return default;
             }
 
-            var subscriptionId = Subscribe<AcknowledgeReceived>(Handler);
+            var subscriptionId = SubscribeWithMessageId<AcknowledgeReceived>(Handler, metadata.MessageId);
 
             try
             {
@@ -139,8 +191,9 @@ namespace TypingRealm.Messaging.Client
             {
                 _logger.LogError(exception, "Error while trying to send a message.");
 
-                await ReconnectAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                throw;
+                /*await ReconnectAsync(cancellationToken)
+                    .ConfigureAwait(false);*/
             }
             finally
             {
@@ -163,9 +216,25 @@ namespace TypingRealm.Messaging.Client
             return subscriptionId;
         }
 
+        public string SubscribeWithMessageId<TMessage>(Func<TMessage, ValueTask> handler, string? messageId)
+        {
+            var subscriptionId = Guid.NewGuid().ToString();
+
+            _handlersWithId.Add(subscriptionId, (message, id) =>
+            {
+                if (message is TMessage tMessage && id == messageId)
+                    return handler(tMessage);
+
+                return default;
+            });
+
+            return subscriptionId;
+        }
+
         public void Unsubscribe(string subscriptionId)
         {
             _handlers.Remove(subscriptionId);
+            _handlersWithId.Remove(subscriptionId);
         }
 
         protected override async ValueTask DisposeManagedResourcesAsync()
@@ -191,6 +260,11 @@ namespace TypingRealm.Messaging.Client
                     var message = await _connectionResource!.Connection.ReceiveAsync(_combinedCts!.Token)
                         .ConfigureAwait(false);
 
+                    if (message is not ServerToClientMessageWithMetadata messageWithMetadata)
+                        throw new InvalidOperationException($"Message is not of {typeof(ServerToClientMessageWithMetadata).Name} type.");
+
+                    message = messageWithMetadata.Message;
+
                     switch (message)
                     {
                         case Disconnected:
@@ -206,6 +280,9 @@ namespace TypingRealm.Messaging.Client
                         .ConfigureAwait(false);
 
                     await AsyncHelpers.WhenAll(_handlers.Values.Select(handler => handler(message)))
+                        .ConfigureAwait(false);
+
+                    await AsyncHelpers.WhenAll(_handlersWithId.Values.Select(handler => handler(message, messageWithMetadata.Metadata.RequestMessageId)))
                         .ConfigureAwait(false);
                 }
                 catch (Exception exception)

@@ -19,5 +19,20 @@ namespace TypingRealm.Messaging
 
             return messageSender.SendAsync(messageWithMetadata, cancellationToken);
         }
+
+        public static ValueTask SendAsync(
+            this IMessageSender messageSender,
+            object message,
+            ServerToClientMessageMetadata metadata,
+            CancellationToken cancellationToken)
+        {
+            var messageWithMetadata = new ServerToClientMessageWithMetadata
+            {
+                Message = message,
+                Metadata = metadata
+            };
+
+            return messageSender.SendAsync(messageWithMetadata, cancellationToken);
+        }
     }
 }

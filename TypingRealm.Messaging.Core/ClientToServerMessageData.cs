@@ -6,6 +6,6 @@
         public ClientToServerMessageData() { }
 #pragma warning restore CS8618
 
-        public ClientToServerMessageMetadata Metadata { get; set; }
+        public ClientToServerMessageMetadata? Metadata { get; set; }
     }
 }

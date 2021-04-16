@@ -119,6 +119,10 @@ namespace TypingRealm.Messaging.Tests
         {
             AssertSerializable<ClientToServerMessageData>();
             Assert.IsAssignableFrom<MessageData>(sut);
+
+            // Metadata can be null.
+            sut.Metadata = null;
+            Assert.Null(sut.Metadata);
         }
 
         [Theory, AutoMoqData]
@@ -126,6 +130,10 @@ namespace TypingRealm.Messaging.Tests
         {
             AssertSerializable<ServerToClientMessageData>();
             Assert.IsAssignableFrom<MessageData>(sut);
+
+            // Metadata can be null.
+            sut.Metadata = null;
+            Assert.Null(sut.Metadata);
         }
     }
 }

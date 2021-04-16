@@ -20,7 +20,12 @@ namespace TypingRealm.Messaging.Connections
             var metadata = message.GetMetadataOrEmpty();
             if (metadata.RequireAcknowledgement && metadata.MessageId != null)
             {
-                await _connection.SendAsync(new AcknowledgeReceived(metadata.MessageId), cancellationToken)
+                var serverToClientMetadata = new ServerToClientMessageMetadata
+                {
+                    RequestMessageId = metadata.MessageId
+                };
+
+                await _connection.SendAsync(new AcknowledgeReceived(metadata.MessageId), serverToClientMetadata, cancellationToken)
                     .ConfigureAwait(false);
             }
 
