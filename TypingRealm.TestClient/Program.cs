@@ -43,13 +43,12 @@ namespace TypingRealm.TestClient
             }).ConfigureAwait(false);
         }
 
-        public static async Task RopeWarTcp(bool useLocalAuth = false)
+        public static async Task RopeWarTcp()
         {
             var services = new ServiceCollection();
 
             services.AddAuth0ProfileTokenProvider();
-
-            if (useLocalAuth)
+            if (DebugHelpers.UseLocalAuthentication)
             {
                 Console.Write("Profile for local token: ");
                 var profile = Console.ReadLine() ?? "default";
@@ -87,13 +86,12 @@ namespace TypingRealm.TestClient
             await Handle(messageProcessor, messageTypes, tokenProvider).ConfigureAwait(false);
         }
 
-        public static async Task RopeWarSignalR(bool useLocalAuth = false)
+        public static async Task RopeWarSignalR()
         {
             var services = new ServiceCollection();
 
             services.AddAuth0ProfileTokenProvider();
-
-            if (useLocalAuth)
+            if (DebugHelpers.UseLocalAuthentication)
             {
                 Console.Write("Profile for local token: ");
                 var profile = Console.ReadLine() ?? "default";
@@ -289,7 +287,7 @@ namespace TypingRealm.TestClient
         {
             processor.Subscribe<object>(message =>
             {
-                Console.WriteLine($"Received {message.GetType().Name}: {JsonSerializer.Serialize(message, options: new JsonSerializerOptions{ WriteIndented = true })}");
+                Console.WriteLine($"Received {message.GetType().Name}: {JsonSerializer.Serialize(message, options: new JsonSerializerOptions { WriteIndented = true })}");
                 return default;
             });
 

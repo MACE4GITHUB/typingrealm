@@ -24,7 +24,16 @@ namespace TypingRealm.Chat.ConsoleApp
 
             var services = new ServiceCollection();
 
-            var provider = services.AddAuth0ProfileTokenProvider()
+            services.AddAuth0ProfileTokenProvider();
+            if (DebugHelpers.UseLocalAuthentication)
+            {
+                Console.Write("Profile for local token: ");
+                var profile = Console.ReadLine() ?? "default";
+
+                services.AddLocalProfileTokenProvider(profile);
+            }
+
+            var provider = services
                 .AddLogging() // TODO: Log only to file, console is needed for UI.
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()

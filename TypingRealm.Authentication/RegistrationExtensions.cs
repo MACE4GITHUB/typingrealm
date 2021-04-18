@@ -84,9 +84,7 @@ namespace TypingRealm.Authentication
 
         public static IServiceCollection AddTyrApiAuthentication(this IServiceCollection services)
         {
-            var profileAuthentication = new AuthenticationInformationBuilder()
-                .UseAuth0Provider()
-                .Build();
+            var profileAuthentication = BuildAuth0OrLocal();
 
             var serviceAuthentication = new AuthenticationInformationBuilder()
                 .UseIdentityServerProvider()
@@ -98,9 +96,7 @@ namespace TypingRealm.Authentication
 
         public static MessageTypeCacheBuilder AddTyrWebServiceAuthentication(this MessageTypeCacheBuilder builder)
         {
-            var profileAuthentication = new AuthenticationInformationBuilder()
-                .UseAuth0Provider()
-                .Build();
+            var profileAuthentication = BuildAuth0OrLocal();
 
             var serviceAuthentication = new AuthenticationInformationBuilder()
                 .UseIdentityServerProvider()
@@ -192,9 +188,7 @@ namespace TypingRealm.Authentication
         // TODO: Move it to separate assembly, not related to AspNet.
         public static MessageTypeCacheBuilder AddTyrServiceWithoutAspNetAuthentication(this MessageTypeCacheBuilder builder)
         {
-            var profileAuthentication = new AuthenticationInformationBuilder()
-                .UseAuth0Provider()
-                .Build();
+            var profileAuthentication = BuildAuth0OrLocal();
 
             var serviceAuthentication = new AuthenticationInformationBuilder()
                 .UseIdentityServerProvider()
@@ -232,6 +226,20 @@ namespace TypingRealm.Authentication
         public static MessageTypeCacheBuilder AddTyrAuthenticationMessages(this MessageTypeCacheBuilder builder)
         {
             return builder.AddMessageTypesFromAssembly(typeof(Authenticate).Assembly);
+        }
+
+        private static AuthenticationInformation BuildAuth0OrLocal()
+        {
+            if (DebugHelpers.UseLocalAuthentication)
+            {
+                return new AuthenticationInformationBuilder()
+                    .UseLocalProvider()
+                    .Build();
+            }
+
+            return new AuthenticationInformationBuilder()
+                .UseAuth0Provider()
+                .Build();
         }
     }
 }
