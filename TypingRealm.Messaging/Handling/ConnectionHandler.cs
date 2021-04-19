@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
+using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Updating;
 
 namespace TypingRealm.Messaging.Handling
@@ -17,7 +18,9 @@ namespace TypingRealm.Messaging.Handling
         private readonly IConnectionInitializer _connectionInitializer;
         private readonly IConnectedClientStore _connectedClients;
         private readonly IMessageDispatcher _messageDispatcher;
+        private readonly IQueryDispatcher _queryDispatcher;
         private readonly IUpdateDetector _updateDetector;
+        private readonly IMessageTypeCache _messageTypeCache;
         private readonly IUpdater _updater;
 
         public ConnectionHandler(
@@ -25,14 +28,18 @@ namespace TypingRealm.Messaging.Handling
             IConnectionInitializer connectionInitializer,
             IConnectedClientStore connectedClients,
             IMessageDispatcher messageDispatcher,
+            IQueryDispatcher queryDispatcher,
             IUpdateDetector updateDetector,
+            IMessageTypeCache messageTypeCache,
             IUpdater updater)
         {
             _logger = logger;
             _connectionInitializer = connectionInitializer;
             _connectedClients = connectedClients;
             _messageDispatcher = messageDispatcher;
+            _queryDispatcher = queryDispatcher;
             _updateDetector = updateDetector;
+            _messageTypeCache = messageTypeCache;
             _updater = updater;
         }
 
@@ -81,6 +88,22 @@ namespace TypingRealm.Messaging.Handling
                     }
 
                     await DispatchMessageAsync(connectedClient, messageWithMetadata.Message, cancellationToken).ConfigureAwait(false);
+
+                    // TODO: Unit test this.
+                    if (messageWithMetadata.Metadata.ResponseMessageTypeId != null)
+                    {
+                        // TODO: Send query response in background, do not block connection handling.
+                        var responseType = _messageTypeCache.GetTypeById(messageWithMetadata.Metadata.ResponseMessageTypeId);
+                        var response = await _queryDispatcher.DispatchAsync(connectedClient, messageWithMetadata.Message, responseType, cancellationToken)
+                            .ConfigureAwait(false);
+
+                        // TODO: Do this also in background.
+                        await connectedClient.Connection.SendAsync(response, new ServerToClientMessageMetadata
+                        {
+                            RequestMessageId = messageWithMetadata.Metadata.MessageId
+                        }, cancellationToken)
+                            .ConfigureAwait(false);
+                    }
 
                     // If everything was dispatched successfully:
                     if (messageWithMetadata.Metadata.MessageId != null && !idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))

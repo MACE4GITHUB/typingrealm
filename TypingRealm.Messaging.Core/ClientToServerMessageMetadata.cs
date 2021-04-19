@@ -5,6 +5,11 @@
         public string? MessageId { get; set; }
         public bool RequireAcknowledgement { get; set; }
 
+        /// <summary>
+        /// Requests response with this type from the server.
+        /// </summary>
+        public string? ResponseMessageTypeId { get; set; }
+
         public static ClientToServerMessageMetadata CreateEmpty() => new ClientToServerMessageMetadata();
 
         public void EnableAcknowledgement(string messageId)

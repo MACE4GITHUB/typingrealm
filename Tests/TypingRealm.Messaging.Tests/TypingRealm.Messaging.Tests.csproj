@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
+    <ProjectReference Include="..\..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
     <ProjectReference Include="..\..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
     <ProjectReference Include="..\..\TypingRealm.Testing\TypingRealm.Testing.csproj" />
   </ItemGroup>

@@ -8,6 +8,7 @@ using TypingRealm.Authentication;
 using TypingRealm.Messaging.Client.Handling;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;
+using TypingRealm.Messaging.Serialization;
 
 namespace TypingRealm.Messaging.Client
 {
@@ -20,6 +21,7 @@ namespace TypingRealm.Messaging.Client
         private readonly IProfileTokenProvider _profileTokenProvider;
         private readonly IMessageIdFactory _messageIdFactory;
         private readonly IClientToServerMessageMetadataFactory _metadataFactory;
+        private readonly IMessageTypeCache _messageTypeCache;
         private readonly SemaphoreSlimLock _lock = new SemaphoreSlimLock();
         private readonly Dictionary<string, Func<object, ValueTask>> _handlers
             = new Dictionary<string, Func<object, ValueTask>>();
@@ -37,7 +39,8 @@ namespace TypingRealm.Messaging.Client
             IMessageDispatcher dispatcher,
             IProfileTokenProvider profileTokenProvider,
             IMessageIdFactory messageIdFactory,
-            IClientToServerMessageMetadataFactory metadataFactory)
+            IClientToServerMessageMetadataFactory metadataFactory,
+            IMessageTypeCache messageTypeCache)
         {
             _logger = logger;
             _connectionFactory = connectionFactory;
@@ -45,6 +48,7 @@ namespace TypingRealm.Messaging.Client
             _profileTokenProvider = profileTokenProvider;
             _messageIdFactory = messageIdFactory;
             _metadataFactory = metadataFactory;
+            _messageTypeCache = messageTypeCache;
         }
 
         public bool IsConnected { get; private set; }
@@ -111,6 +115,7 @@ namespace TypingRealm.Messaging.Client
             where TResponse : class
         {
             var metadata = _metadataFactory.CreateFor(message);
+            metadata.ResponseMessageTypeId = _messageTypeCache.GetTypeId(typeof(TResponse));
 
             var subscriptionId = SubscribeWithMessageId<TResponse>(Handler, metadata.MessageId);
             TResponse? response = null;
@@ -140,8 +145,9 @@ namespace TypingRealm.Messaging.Client
             {
                 _logger.LogError(exception, "Error while trying to send a message.");
 
-                await ReconnectAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                throw;
+                /*await ReconnectAsync(cancellationToken)
+                    .ConfigureAwait(false);*/
 
                 // TODO: throw or return or smth. Do not return null response!
             }

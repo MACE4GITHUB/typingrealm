@@ -32,6 +32,10 @@ namespace TypingRealm.Messaging
             services.AddTransient<IMessageDispatcher, MessageDispatcher>();
             services.AddTransient<IMessageHandlerFactory, MessageHandlerFactory>();
 
+            services.AddSingleton<QueryHandlerMethodCache>();
+            services.AddTransient<IQueryDispatcher, QueryDispatcher>();
+            services.AddTransient<IQueryHandlerFactory, QueryHandlerFactory>();
+
             // Handlers.
             services.RegisterHandler<Announce, AnnounceHandler>();
             services.RegisterHandler<Disconnect, DisconnectHandler>();
@@ -47,6 +51,14 @@ namespace TypingRealm.Messaging
             where TMessageHandler : class, IMessageHandler<TMessage>
         {
             services.AddTransient<IMessageHandler<TMessage>, TMessageHandler>();
+
+            return services;
+        }
+
+        public static IServiceCollection RegisterQueryHandler<TQuery, TQueryHandler, TResponse>(this IServiceCollection services)
+            where TQueryHandler : class, IQueryHandler<TQuery, TResponse>
+        {
+            services.AddTransient<IQueryHandler<TQuery, TResponse>, TQueryHandler>();
 
             return services;
         }

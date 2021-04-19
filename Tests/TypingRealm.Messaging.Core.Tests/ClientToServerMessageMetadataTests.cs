@@ -12,6 +12,7 @@ namespace TypingRealm.Messaging.Tests
 
             Assert.Null(sut.MessageId);
             Assert.False(sut.RequireAcknowledgement);
+            Assert.Null(sut.ResponseMessageTypeId);
         }
 
         [Theory, AutoMoqData]
@@ -23,6 +24,7 @@ namespace TypingRealm.Messaging.Tests
 
             Assert.Equal(messageId, sut.MessageId);
             Assert.True(sut.RequireAcknowledgement);
+            Assert.Null(sut.ResponseMessageTypeId);
         }
 
         [Fact]
