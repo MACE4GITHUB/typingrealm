@@ -11,7 +11,7 @@ namespace TypingRealm
         public static IServiceCollection Decorate<TInterface, TDecorator>(this IServiceCollection services)
           where TDecorator : TInterface
         {
-            var wrappedDescriptor = services.FirstOrDefault(
+            var wrappedDescriptor = services.LastOrDefault(
                 s => s.ServiceType == typeof(TInterface));
 
             if (wrappedDescriptor == null)
