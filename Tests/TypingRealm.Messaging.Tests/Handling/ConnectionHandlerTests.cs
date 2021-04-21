@@ -55,7 +55,7 @@ namespace TypingRealm.Messaging.Tests.Handling
         }
     }
 
-    public class ConnectionHandlerTests : TestsBase
+    public class ConnectionHandlerTests : MessagingTestsBase
     {
         [Theory, AutoMoqData]
         public async Task ShouldThrow_WhenInitializerThrows(
@@ -187,8 +187,8 @@ namespace TypingRealm.Messaging.Tests.Handling
             SetupClientFromInitializer(initializer, connection, client);
 
             var groups = new List<string>();
-            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
-                .Callback<string>(group => groups.Add(group));
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<IEnumerable<string>>()))
+                .Callback<IEnumerable<string>>(gr => groups.AddRange(gr));
             updateDetector.Setup(x => x.PopMarked())
                 .Returns(groups);
             store.Setup(x => x.FindInGroups(groups))
@@ -241,7 +241,7 @@ namespace TypingRealm.Messaging.Tests.Handling
 
             SetupClientFromInitializer(initializer, connection, client);
 
-            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<IEnumerable<string>>()))
                 .Throws(Create<TestException>());
 
             var result = sut.HandleAsync(connection, Cts.Token);
@@ -296,7 +296,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             await Assert.ThrowsAsync<OperationCanceledException>(() => result);
         }
 
-        [Theory, AutoMoqData]
+        [Theory, SingleGroupData]
         public async Task ShouldSendUpdateToGroup_WhenClientConnectionDiesUnexpectedly(
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnection> connection,
@@ -321,8 +321,13 @@ namespace TypingRealm.Messaging.Tests.Handling
                 && y.Contains(client.Group))))
                 .Returns(new[] { client, anotherClient });
 
-            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
-                .Callback<string>(group => popGroups.Add(group));
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<IEnumerable<string>>()))
+                .Callback<IEnumerable<string>>(grs => {
+                    foreach (var group in grs)
+                    {
+                        popGroups.Add(group);
+                    }
+                });
             updateDetector.Setup(x => x.PopMarked())
                 .Returns(popGroups);
 
@@ -413,8 +418,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             ConnectionHandler sut)
         {
             var connection = new TestConnection();
-            var client = Create<ConnectedClient>(
-                new ClientWithConnectionBuilder(connection));
+            var client = CreateSingleGroupClient(connection);
 
             SetupClientFromInitializer(initializer, connection, client);
 
@@ -426,7 +430,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             connection.Received = message;
             await Wait();
 
-            updateDetector.Verify(x => x.MarkForUpdate(client.Group));
+            VerifyMarkedForUpdate(updateDetector, client.Group);
         }
 
         [Theory]
@@ -444,7 +448,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             ConnectionHandler sut)
         {
             var connection = new TestConnection();
-            var client = Create<ConnectedClient>(new ClientWithConnectionBuilder(connection));
+            var client = CreateSingleGroupClient(connection);
             initializer.Setup(x => x.ConnectAsync(It.IsAny<IConnection>(), Cts.Token))
                 .ReturnsAsync(client);
 
@@ -460,8 +464,8 @@ namespace TypingRealm.Messaging.Tests.Handling
                 && y.Contains(client.Group))))
                 .Returns(new[] { client, anotherClient });
 
-            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
-                .Callback<string>(group => popGroups.Add(group));
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<IEnumerable<string>>()))
+                .Callback<IEnumerable<string>>(gr => popGroups.AddRange(gr));
             updateDetector.Setup(x => x.PopMarked())
                 .Returns(popGroups);
 
@@ -501,7 +505,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))
                 .Returns(new ValueTask(Task.FromException(exception)));
 
-            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<string>()))
+            updateDetector.Setup(x => x.MarkForUpdate(It.IsAny<IEnumerable<string>>()))
                 .Throws(Create<Exception>());
 
             var connection = Create<IConnection>();
@@ -557,7 +561,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             Mock.Get(connection).Verify(x => x.SendAsync(It.IsAny<Disconnected>(), Cts.Token));
         }
 
-        [Theory, AutoMoqData]
+        [Theory, SingleGroupData]
         public async Task ShouldHandleFullIntegrationScenario(
             [Frozen]Mock<IConnectionInitializer> initializer,
             [Frozen]Mock<IConnectedClientStore> store,
@@ -567,9 +571,7 @@ namespace TypingRealm.Messaging.Tests.Handling
             ConnectionHandler sut)
         {
             var connection = new TestConnection();
-            var client = Create<ConnectedClient>(
-                new ClientWithConnectionBuilder(connection),
-                new ClientWithUpdateDetectorBuilder(updateDetector.Object));
+            var client = CreateSingleGroupClient(connection, updateDetector.Object);
 
             SetupClientFromInitializer(initializer, connection, client);
 
@@ -597,7 +599,7 @@ namespace TypingRealm.Messaging.Tests.Handling
                         client.Group = newGroup;
                     });
 
-            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Exactly(2));
+            VerifyMarkedForUpdate(updateDetector, client.Group, Times.Exactly(2));
             updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(2));
 
             var currentGroup = client.Group;
@@ -605,11 +607,11 @@ namespace TypingRealm.Messaging.Tests.Handling
             await Wait();
 
             // After the group has changed, previous group should be marked by Setter.
-            updateDetector.Verify(x => x.MarkForUpdate(currentGroup), Times.Exactly(3));
+            VerifyMarkedForUpdate(updateDetector, currentGroup, Times.Exactly(3));
 
             // One time from ConnectedClient.Group setter, another one from ConnectionHandler.
             // Consider changing this logic.
-            updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Exactly(2));
+            VerifyMarkedForUpdate(updateDetector, newGroup, Times.Exactly(2));
 
             updater.Verify(x => x.SendUpdateAsync(client, Cts.Token), Times.Exactly(3));
         }

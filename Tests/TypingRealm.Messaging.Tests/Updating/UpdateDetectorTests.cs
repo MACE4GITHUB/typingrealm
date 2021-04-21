@@ -28,6 +28,20 @@ namespace TypingRealm.Messaging.Tests.Updating
         }
 
         [Theory, AutoMoqData]
+        public void ShouldMarkManyGroupsForUpdate(
+            string[] groups,
+            UpdateDetector sut)
+        {
+            sut.MarkForUpdate(groups);
+
+            var result = sut.PopMarked();
+            foreach (var group in groups)
+            {
+                Assert.Contains(group, result);
+            }
+        }
+
+        [Theory, AutoMoqData]
         public void ShouldNotMarkTheSameGroupTwice(
             string group,
             UpdateDetector sut)
@@ -65,6 +79,7 @@ namespace TypingRealm.Messaging.Tests.Updating
                 var group = Create<string>();
                 tasks.Add(new Task(() => sut.MarkForUpdate(group)));
                 tasks.Add(new Task(() => sut.MarkForUpdate(group)));
+                tasks.Add(new Task(() => sut.MarkForUpdate(new[] { group, group })));
             }
 
             Parallel.ForEach(tasks, t => t.Start());

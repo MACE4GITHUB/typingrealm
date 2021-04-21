@@ -71,7 +71,8 @@ namespace TypingRealm.Messaging.Handling
             // TODO: Unit test all the logic about idempotency.
             var idempotencyKeys = new Dictionary<string, DateTime>();
 
-            await TrySendPendingUpdates(connectedClient.Group, cancellationToken).ConfigureAwait(false);
+            // TODO: Send only to groups that were specified in Metadata from the client (if they were sent).
+            await TrySendPendingUpdates(connectedClient.Groups, cancellationToken).ConfigureAwait(false);
             while (_connectedClients.IsClientConnected(connectedClient.ClientId))
             {
                 try
@@ -132,7 +133,7 @@ namespace TypingRealm.Messaging.Handling
                 }
                 finally
                 {
-                    await TrySendPendingUpdates(connectedClient.Group, cancellationToken).ConfigureAwait(false);
+                    await TrySendPendingUpdates(connectedClient.Groups, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -175,11 +176,11 @@ namespace TypingRealm.Messaging.Handling
             }
         }
 
-        private async ValueTask TrySendPendingUpdates(string group, CancellationToken cancellationToken)
+        private async ValueTask TrySendPendingUpdates(IEnumerable<string> groups, CancellationToken cancellationToken)
         {
             try
             {
-                _updateDetector.MarkForUpdate(group);
+                _updateDetector.MarkForUpdate(groups);
 
                 var clientsThatNeedUpdate = _connectedClients.FindInGroups(_updateDetector.PopMarked()).ToList();
 

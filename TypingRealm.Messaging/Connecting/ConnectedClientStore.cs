@@ -21,7 +21,7 @@ namespace TypingRealm.Messaging.Connecting
             if (!_connectedClients.TryAdd(connectedClient.ClientId, connectedClient))
                 throw new ClientAlreadyConnectedException(connectedClient);
 
-            _updateDetector.MarkForUpdate(connectedClient.Group);
+            _updateDetector.MarkForUpdate(connectedClient.Groups);
         }
 
         public ConnectedClient? Find(string clientId)
@@ -32,13 +32,13 @@ namespace TypingRealm.Messaging.Connecting
 
         public IEnumerable<ConnectedClient> FindInGroups(IEnumerable<string> groups)
         {
-            return _connectedClients.Values.Where(x => groups.Contains(x.Group)).ToList();
+            return _connectedClients.Values.Where(x => groups.Intersect(x.Groups).Any()).ToList();
         }
 
         public void Remove(string clientId)
         {
             if (_connectedClients.TryRemove(clientId, out var removed))
-                _updateDetector.MarkForUpdate(removed.Group);
+                _updateDetector.MarkForUpdate(removed.Groups);
         }
     }
 }

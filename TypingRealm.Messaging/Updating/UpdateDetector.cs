@@ -9,11 +9,14 @@ namespace TypingRealm.Messaging.Updating
         private readonly HashSet<string> _marked
             = new HashSet<string>();
 
-        public void MarkForUpdate(string group)
+        public void MarkForUpdate(IEnumerable<string> groups)
         {
             lock (_lock)
             {
-                _marked.Add(group);
+                foreach (var group in groups)
+                {
+                    _marked.Add(group);
+                }
             }
         }
 

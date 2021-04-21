@@ -10,14 +10,13 @@ using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Handlers;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Tests.SpecimenBuilders;
-using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Messaging.Tests.Handlers
 {
-    public class AnnounceHandlerTests : TestsBase
+    public class AnnounceHandlerTests : MessagingTestsBase
     {
-        [Theory, AutoMoqData]
+        [Theory, SingleGroupData]
         public async Task ShouldBroadcastMessageToGroup(
             [Frozen] Mock<IConnectedClientStore> connectedClients,
             ConnectedClient sender,
@@ -27,8 +26,7 @@ namespace TypingRealm.Messaging.Tests.Handlers
         {
             var connections = Fixture.CreateMany<IConnection>().ToList();
             var clients = connections
-                .Select(connection => Create<ConnectedClient>(
-                    new ClientWithConnectionBuilder(connection)))
+                .Select(connection => CreateSingleGroupClient(connection))
                 .ToList();
 
             connectedClients

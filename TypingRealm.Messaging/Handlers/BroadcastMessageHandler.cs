@@ -19,7 +19,7 @@ namespace TypingRealm.Messaging.Handlers
         {
             message.SenderId = sender.ClientId;
 
-            var clients = _connectedClients.FindInGroups(sender.Group);
+            var clients = _connectedClients.FindInGroups(sender.Groups);
 
             return AsyncHelpers.WhenAll(clients
                 .Except(new[] { sender })

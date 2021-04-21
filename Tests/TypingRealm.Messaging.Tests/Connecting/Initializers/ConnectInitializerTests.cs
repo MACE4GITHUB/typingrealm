@@ -14,7 +14,7 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests.Connecting.Initializers
 {
-    public class ConnectInitializerTests : TestsBase
+    public class ConnectInitializerTests : MessagingTestsBase
     {
         private readonly Connect _connectMessage;
         private readonly IConnection _validConnection;
@@ -84,7 +84,7 @@ namespace TypingRealm.Messaging.Tests.Connecting.Initializers
             Assert.Equal(updateDetector, GetPrivateField(client, "_updateDetector"));
 
             client.Group = "new";
-            Mock.Get(updateDetector).Verify(x => x.MarkForUpdate("new"));
+            VerifyMarkedForUpdate(Mock.Get(updateDetector), "new");
         }
 
         [Theory, AutoMoqData]

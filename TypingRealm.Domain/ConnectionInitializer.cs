@@ -36,7 +36,7 @@ namespace TypingRealm.Domain
                 throw new InvalidOperationException($"Could not connect: could not find player {playerId}.");
 
             var group = player.MessagingGroup;
-            return new ConnectedClient(playerId, connection, group, _updateDetector);
+            return new ConnectedClient(playerId, connection, _updateDetector, group);
         }
     }
 }

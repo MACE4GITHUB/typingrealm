@@ -17,9 +17,9 @@ namespace TypingRealm.Messaging.Handlers
         public ValueTask HandleAsync(ConnectedClient sender, Announce message, CancellationToken cancellationToken)
         {
             var broadcastMessage = new Announce($"{sender.ClientId} > {message.Message}");
-            var group = sender.Group;
+            var groups = sender.Groups;
 
-            return _connectedClients.SendAsync(broadcastMessage, group, cancellationToken);
+            return _connectedClients.SendAsync(broadcastMessage, groups, cancellationToken);
         }
     }
 }

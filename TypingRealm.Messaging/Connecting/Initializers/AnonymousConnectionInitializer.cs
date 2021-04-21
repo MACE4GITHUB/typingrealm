@@ -33,7 +33,7 @@ namespace TypingRealm.Messaging.Connecting.Initializers
         public ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
         {
             var clientId = Guid.NewGuid().ToString();
-            var connectedClient = new ConnectedClient(clientId, connection, DefaultGroup, _updateDetector);
+            var connectedClient = new ConnectedClient(clientId, connection, _updateDetector, DefaultGroup);
 
             return new ValueTask<ConnectedClient>(connectedClient);
         }

@@ -40,7 +40,7 @@ namespace TypingRealm.Messaging.Connecting.Initializers
                 await connectHook.HandleAsync(connect, cancellationToken).ConfigureAwait(false);
             }
 
-            return new ConnectedClient(connect.ClientId, connection, connect.Group, _updateDetector);
+            return new ConnectedClient(connect.ClientId, connection, _updateDetector, connect.Group);
         }
     }
 }

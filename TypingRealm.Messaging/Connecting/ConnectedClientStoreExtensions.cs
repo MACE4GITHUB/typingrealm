@@ -37,5 +37,17 @@ namespace TypingRealm.Messaging.Connecting
         public static ValueTask SendAsync(this IConnectedClientStore store, object message, string group, CancellationToken cancellationToken)
             => AsyncHelpers.WhenAll(store.FindInGroups(group)
                 .Select(x => x.Connection.SendAsync(message, cancellationToken)));
+
+        /// <summary>
+        /// Sends message to all the clients in specified list of groups.
+        /// </summary>
+        /// <param name="store">ConnectedClientStore instance.</param>
+        /// <param name="message">Message to send to all the clients in given group.</param>
+        /// <param name="groups">The list of groups to which the message will be sent.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns></returns>
+        public static ValueTask SendAsync(this IConnectedClientStore store, object message, IEnumerable<string> groups, CancellationToken cancellationToken)
+            => AsyncHelpers.WhenAll(store.FindInGroups(groups)
+                .Select(x => x.Connection.SendAsync(message, cancellationToken)));
     }
 }

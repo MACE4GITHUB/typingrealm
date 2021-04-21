@@ -1,12 +1,14 @@
-﻿using AutoFixture.Xunit2;
+﻿using System.Collections.Generic;
+using AutoFixture.Xunit2;
 using Moq;
+using TypingRealm.Messaging.Tests.SpecimenBuilders;
 using TypingRealm.Messaging.Updating;
 using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Messaging.Tests
 {
-    public class ConnectedClientTests : TestsBase
+    public class ConnectedClientTests : MessagingTestsBase
     {
         [Theory, AutoMoqData]
         public void ShouldBeCreatedUsingConstructor(
@@ -15,7 +17,7 @@ namespace TypingRealm.Messaging.Tests
             string group,
             IUpdateDetector updateDetector)
         {
-            var client = new ConnectedClient(clientId, connection, group, updateDetector);
+            var client = new ConnectedClient(clientId, connection, updateDetector, group);
 
             Assert.Equal(clientId, client.ClientId);
             Assert.Equal(connection, client.Connection);
@@ -29,13 +31,13 @@ namespace TypingRealm.Messaging.Tests
             _ = new ConnectedClient(
                 Create<string>(),
                 Create<IConnection>(),
-                Create<string>(),
-                updateDetector);
+                updateDetector,
+                Create<string>());
 
-            Mock.Get(updateDetector).Verify(x => x.MarkForUpdate(It.IsAny<string>()), Times.Never);
+            Mock.Get(updateDetector).Verify(x => x.MarkForUpdate(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
-        [Theory, AutoMoqData]
+        [Theory, SingleGroupData]
         public void ShouldMarkPreviousAndNewGroupsForUpdate_WhenGroupIsChanged(
             [Frozen]Mock<IUpdateDetector> updateDetector,
             string newGroup,
@@ -44,8 +46,8 @@ namespace TypingRealm.Messaging.Tests
             var oldGroup = sut.Group;
             sut.Group = newGroup;
 
-            updateDetector.Verify(x => x.MarkForUpdate(oldGroup));
-            updateDetector.Verify(x => x.MarkForUpdate(newGroup));
+            VerifyMarkedForUpdate(updateDetector, oldGroup);
+            VerifyMarkedForUpdate(updateDetector, newGroup);
         }
 
         [Theory, AutoMoqData]
@@ -54,13 +56,13 @@ namespace TypingRealm.Messaging.Tests
             string newGroup,
             ConnectedClient sut)
         {
-            updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Never);
+            VerifyMarkedForUpdate(updateDetector, newGroup, Times.Never());
 
             sut.Group = newGroup;
-            updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Once);
+            VerifyMarkedForUpdate(updateDetector, newGroup, Times.Once());
 
             sut.Group = newGroup;
-            updateDetector.Verify(x => x.MarkForUpdate(newGroup), Times.Once); // Still once.
+            VerifyMarkedForUpdate(updateDetector, newGroup, Times.Once()); // Still once.
         }
     }
 }

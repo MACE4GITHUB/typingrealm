@@ -34,7 +34,7 @@ namespace TypingRealm.Combat
 
             _combatRoomStore.FindOrCreate(message.CombatRoomId, message.PlayerId);
 
-            return new ConnectedClient(message.PlayerId, connection, message.CombatRoomId, _updateDetector);
+            return new ConnectedClient(message.PlayerId, connection, _updateDetector, message.CombatRoomId);
         }
     }
 }

@@ -6,6 +6,7 @@ using Moq;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Handlers;
 using TypingRealm.Messaging.Messages;
+using TypingRealm.Messaging.Tests.SpecimenBuilders;
 using TypingRealm.Testing;
 using Xunit;
 
@@ -13,7 +14,7 @@ namespace TypingRealm.Messaging.Tests.Handlers
 {
     public class BroadcastMessageHandlerTests : TestsBase
     {
-        [Theory, AutoMoqData]
+        [Theory, SingleGroupData]
         public async Task ShouldResendMessageToEveryoneInTheSameGroupExceptTheSender(
             ConnectedClient sender,
             BroadcastMessage message,

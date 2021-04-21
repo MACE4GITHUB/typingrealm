@@ -8,10 +8,10 @@ namespace TypingRealm.Messaging.Updating
     public interface IUpdateDetector
     {
         /// <summary>
-        /// Mark messaging group for update.
+        /// Mark messaging groups for update.
         /// </summary>
-        /// <param name="group">Messaging group.</param>
-        void MarkForUpdate(string group);
+        /// <param name="groups">Messaging groups.</param>
+        void MarkForUpdate(IEnumerable<string> groups);
 
         /// <summary>
         /// Returns collection of all the messaging groups that were marked for

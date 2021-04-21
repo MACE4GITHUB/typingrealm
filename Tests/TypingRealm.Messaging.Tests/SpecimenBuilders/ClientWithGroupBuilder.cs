@@ -3,7 +3,6 @@ using AutoFixture.Kernel;
 
 namespace TypingRealm.Messaging.Tests.SpecimenBuilders
 {
-
     public class ClientWithGroupBuilder : ISpecimenBuilder
     {
         private readonly string _group;

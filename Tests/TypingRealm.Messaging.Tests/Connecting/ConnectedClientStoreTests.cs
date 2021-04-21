@@ -13,7 +13,7 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests.Connecting
 {
-    public class ConnectedClientStoreTests : TestsBase
+    public class ConnectedClientStoreTests : MessagingTestsBase
     {
         [Theory, AutoMoqData]
         public void Add_ShouldThrow_WhenAlreadyAdded(ConnectedClientStore sut)
@@ -39,14 +39,45 @@ namespace TypingRealm.Messaging.Tests.Connecting
             Assert.Equal(client, result);
         }
 
-        [Theory, AutoMoqData]
+        [Theory, SingleGroupData]
         public void Add_ShouldMarkForUpdate_WhenAdded(
             [Frozen]Mock<IUpdateDetector> updateDetector,
             ConnectedClient client,
             ConnectedClientStore sut)
         {
             sut.Add(client);
-            updateDetector.Verify(x => x.MarkForUpdate(client.Group));
+            updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
+                x => x.Count() == 1
+                && x.First() == client.Group)));
+        }
+
+        [Theory, MultiGroupData]
+        public void Add_ShouldMarkForUpdateMultipleGroups_WhenAdded(
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            ConnectedClient client,
+            ConnectedClientStore sut)
+        {
+            sut.Add(client);
+            updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
+                x => x.Count() == 3
+                && x.SequenceEqual(client.Groups))));
+        }
+
+        [Theory, MultiGroupData]
+        public void Add_ShouldMarkForUpdateMultipleGroupsAndSingleGroup_WhenAdded(
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            ConnectedClient client,
+            string group,
+            ConnectedClientStore sut)
+        {
+            // Possibly improve this unit test.
+            client.Group = group;
+
+            sut.Add(client);
+            updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
+                x => x.Count() == 4
+                && x.SequenceEqual(client.Groups)
+                && x.Contains(group))));
         }
 
         [Theory, AutoMoqData]
@@ -92,9 +123,15 @@ namespace TypingRealm.Messaging.Tests.Connecting
                 .With(x => x.Group, group3)
                 .CreateMany(2);
 
+            var clientInGroups1And2 = CreateMultiGroupClient(new[] { group1, group2 });
+            var clientInGroups123 = CreateMultiGroupClient(new[] { group1, group2 });
+            clientInGroups123.Group = group3;
+
             foreach (var client in clientsInGroup1
                 .Concat(clientsInGroup2)
-                .Concat(clientsInGroup3))
+                .Concat(clientsInGroup3)
+                .Append(clientInGroups1And2)
+                .Append(clientInGroups123))
             {
                 sut.Add(client);
             }
@@ -105,10 +142,12 @@ namespace TypingRealm.Messaging.Tests.Connecting
                 FindType.ExtensionParamsMethod => sut.FindInGroups(group1, group3),
                 _ => throw new InvalidOperationException()
             };
-            Assert.Equal(4, result.Count());
+            Assert.Equal(6, result.Count());
             Assert.True(clientsInGroup1.All(x => result.Contains(x)));
             Assert.True(clientsInGroup2.All(x => !result.Contains(x)));
             Assert.True(clientsInGroup3.All(x => result.Contains(x)));
+            Assert.Contains(clientInGroups1And2, result);
+            Assert.Contains(clientInGroups123, result);
         }
 
         [Theory, AutoMoqData]
@@ -123,17 +162,36 @@ namespace TypingRealm.Messaging.Tests.Connecting
             Assert.Null(sut.Find(client.ClientId));
         }
 
-        [Theory, AutoMoqData]
+        [Theory, SingleGroupData]
         public void Remove_ShouldMarkForUpdate_WhenRemoved(
             [Frozen]Mock<IUpdateDetector> updateDetector,
             ConnectedClient client,
             ConnectedClientStore sut)
         {
             sut.Add(client);
-            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Once);
+            updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
+                x => x.Count() == 1 && x.First() == client.Group)), Times.Once);
 
             sut.Remove(client.ClientId);
-            updateDetector.Verify(x => x.MarkForUpdate(client.Group), Times.Exactly(2));
+            updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
+                x => x.Count() == 1 && x.First() == client.Group)), Times.Exactly(2));
+        }
+
+        [Theory, AutoMoqData]
+        public void Remove_ShouldMarkForUpdateMultiGroupClient_WhenRemoved(
+            [Frozen]Mock<IUpdateDetector> updateDetector,
+            string[] groups,
+            ConnectedClientStore sut)
+        {
+            var client = CreateMultiGroupClient(groups);
+
+            sut.Add(client);
+            updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
+                x => x.SequenceEqual(groups))), Times.Once);
+
+            sut.Remove(client.ClientId);
+            updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
+                x => x.SequenceEqual(groups))), Times.Exactly(2));
         }
 
         [Theory, AutoMoqData]
