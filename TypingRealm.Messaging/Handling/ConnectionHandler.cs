@@ -75,12 +75,16 @@ namespace TypingRealm.Messaging.Handling
             await TrySendPendingUpdates(connectedClient.Groups, cancellationToken).ConfigureAwait(false);
             while (_connectedClients.IsClientConnected(connectedClient.ClientId))
             {
+                ClientToServerMessageMetadata? metadata = null;
+
                 try
                 {
                     var message = await connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
 
                     if (message is not ClientToServerMessageWithMetadata messageWithMetadata)
                         throw new InvalidOperationException($"Message is not of {typeof(ClientToServerMessageWithMetadata).Name} type.");
+
+                    metadata = messageWithMetadata.Metadata;
 
                     if (messageWithMetadata.Metadata.MessageId != null && idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
                     {
@@ -133,6 +137,12 @@ namespace TypingRealm.Messaging.Handling
                 }
                 finally
                 {
+                    var groups = connectedClient.Groups;
+
+                    // TODO: Unit test this (affected groups).
+                    if (metadata?.AffectedGroups != null)
+                        groups = groups.Where(group => metadata.AffectedGroups.Contains(group));
+
                     await TrySendPendingUpdates(connectedClient.Groups, cancellationToken).ConfigureAwait(false);
                 }
             }
