@@ -22,7 +22,7 @@ namespace TypingRealm.SignalR.Client
             _uri = uri;
         }
 
-        public async ValueTask<ConnectionResource> ConnectAsync(CancellationToken cancellationToken)
+        public async ValueTask<ConnectionWithDisconnect> ConnectAsync(CancellationToken cancellationToken)
         {
             var hub = new HubConnectionBuilder()
                 .WithUrl(_uri, options =>
@@ -36,7 +36,7 @@ namespace TypingRealm.SignalR.Client
 
             var connection = _factory.CreateProtobufConnectionForClient(hub);
 
-            return new ConnectionResource(connection, async () =>
+            return new ConnectionWithDisconnect(connection, async () =>
             {
                 await hub.StopAsync().ConfigureAwait(false);
                 await hub.DisposeAsync().ConfigureAwait(false);

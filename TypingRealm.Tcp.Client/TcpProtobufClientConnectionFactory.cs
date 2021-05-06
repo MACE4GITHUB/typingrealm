@@ -22,7 +22,7 @@ namespace TypingRealm.Tcp.Client
             _port = port;
         }
 
-        public async ValueTask<ConnectionResource> ConnectAsync(CancellationToken cancellationToken)
+        public async ValueTask<ConnectionWithDisconnect> ConnectAsync(CancellationToken cancellationToken)
         {
             var client = new TcpClient();
             await client.ConnectAsync(_host, _port, cancellationToken).ConfigureAwait(false);
@@ -33,7 +33,7 @@ namespace TypingRealm.Tcp.Client
             var connection = _factory.CreateProtobufConnectionForClient(stream)
                 .WithLocking(sendLock, receiveLock);
 
-            return new ConnectionResource(connection, async () =>
+            return new ConnectionWithDisconnect(connection, async () =>
             {
                 receiveLock.Dispose();
                 sendLock.Dispose();

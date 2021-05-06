@@ -19,26 +19,21 @@ namespace TypingRealm.Messaging.Client
         private readonly IClientConnectionFactory _connectionFactory;
         private readonly IMessageDispatcher _dispatcher;
         private readonly IProfileTokenProvider _profileTokenProvider;
-        private readonly IMessageIdFactory _messageIdFactory;
         private readonly IClientToServerMessageMetadataFactory _metadataFactory;
         private readonly IMessageTypeCache _messageTypeCache;
-        private readonly SemaphoreSlimLock _lock = new SemaphoreSlimLock();
+        private readonly SemaphoreSlimLock _reconnectLock = new SemaphoreSlimLock();
         private readonly Dictionary<string, Func<object, ValueTask>> _handlers
             = new Dictionary<string, Func<object, ValueTask>>();
         private readonly Dictionary<string, Func<object, string?, ValueTask>> _handlersWithId
             = new Dictionary<string, Func<object, string?, ValueTask>>();
 
-        private CancellationTokenSource? _cts;
-        private CancellationTokenSource? _combinedCts;
-        private ConnectionResource? _connectionResource;
-        private Task? _listening;
+        private ConnectionResource? _resource;
 
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
             IClientConnectionFactory connectionFactory,
             IMessageDispatcher dispatcher,
             IProfileTokenProvider profileTokenProvider,
-            IMessageIdFactory messageIdFactory,
             IClientToServerMessageMetadataFactory metadataFactory,
             IMessageTypeCache messageTypeCache)
         {
@@ -46,7 +41,6 @@ namespace TypingRealm.Messaging.Client
             _connectionFactory = connectionFactory;
             _dispatcher = dispatcher;
             _profileTokenProvider = profileTokenProvider;
-            _messageIdFactory = messageIdFactory;
             _metadataFactory = metadataFactory;
             _messageTypeCache = messageTypeCache;
         }
@@ -59,45 +53,33 @@ namespace TypingRealm.Messaging.Client
             if (IsConnected)
                 throw new InvalidOperationException("Already connected.");
 
-            var connectionResource = await _connectionFactory.ConnectAsync(cancellationToken)
+            var connectionWithDisconnect = await _connectionFactory.ConnectAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            _cts = new CancellationTokenSource();
-            _combinedCts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
-            _connectionResource = connectionResource;
+            // Need to set it before calling ListenAndDispatchAsync.
             IsConnected = true;
 
-            _listening = ListenAndDispatchAsync(cancellationToken);
+            _resource = new ConnectionResource(
+                connectionWithDisconnect,
+                cancellationToken);
+
+            Task listening(CancellationToken cancellationToken)
+                => ListenAndDispatchAsync();
+
+            _resource.SetListening(listening);
         }
 
-        private async Task ReconnectAsync(CancellationToken cancellationToken)
-        {
-            if (IsConnected)
-                return;
-
-            await using var _ = await _lock.UseWaitAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            if (IsConnected)
-                return;
-
-            _cts!.Cancel();
-            await _listening!.ConfigureAwait(false); // TODO: This might potentially throw.
-            _cts.Dispose();
-            _combinedCts!.Dispose();
-            await _connectionResource!.DisconnectAsync().ConfigureAwait(false);
-
-            await ConnectAsync(cancellationToken).ConfigureAwait(false);
-        }
-
+        // TODO: Pass combined token to the actual Connection.SendAsync.
         public async ValueTask SendAsync(object message, CancellationToken cancellationToken)
         {
             if (!IsConnected)
                 throw new InvalidOperationException("Not connected.");
 
+            var resource = GetConnectionResource();
+
             try
             {
-                await _connectionResource!.Connection.SendAsync(message, cancellationToken)
+                await resource.Connection.SendAsync(message, cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception exception)
@@ -106,7 +88,8 @@ namespace TypingRealm.Messaging.Client
                 // Make sure you generate message ID here so that resending message is idempotent.
                 _logger.LogError(exception, "Error while trying to send a message.");
 
-                await ReconnectAsync(cancellationToken)
+                IsConnected = false;
+                await ReconnectAsync()
                     .ConfigureAwait(false);
             }
         }
@@ -126,10 +109,12 @@ namespace TypingRealm.Messaging.Client
                 return default;
             }
 
+            var resource = GetConnectionResource();
+
             try
             {
                 // TODO: Do not duplicate this logic (try/catch logic) with Send() method.
-                await _connectionResource!.Connection.SendAsync(message, metadata, cancellationToken).ConfigureAwait(false);
+                await resource.Connection.SendAsync(message, metadata, cancellationToken).ConfigureAwait(false);
 
                 var i = 0;
                 while (response == null)
@@ -178,10 +163,12 @@ namespace TypingRealm.Messaging.Client
 
             var subscriptionId = SubscribeWithMessageId<AcknowledgeReceived>(Handler, metadata.MessageId);
 
+            var resource = GetConnectionResource();
+
             try
             {
                 // TODO: Do not duplicate this logic (try/catch logic) with Send() method.
-                await _connectionResource!.Connection.SendAsync(message, metadata, cancellationToken).ConfigureAwait(false);
+                await resource.Connection.SendAsync(message, metadata, cancellationToken).ConfigureAwait(false);
 
                 var i = 0;
                 while (!isAcknowledged)
@@ -245,25 +232,24 @@ namespace TypingRealm.Messaging.Client
 
         protected override async ValueTask DisposeManagedResourcesAsync()
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _combinedCts?.Dispose();
-            //await _listening?.ConfigureAwait(false); // TODO: Consider doing this.
+            var resource = _resource;
 
-            var disconnect = _connectionResource?.DisconnectAsync();
+            if (resource == null)
+                return;
 
-            if (disconnect.HasValue)
-                await disconnect.Value.ConfigureAwait(false);
+            await resource.DisposeAsync().ConfigureAwait(false);
         }
 
         // Here comes original cancellation token.
-        private async Task ListenAndDispatchAsync(CancellationToken cancellationToken)
+        private async Task ListenAndDispatchAsync()
         {
+            var resource = GetConnectionResource();
+
             while (IsConnected)
             {
                 try
                 {
-                    var message = await _connectionResource!.Connection.ReceiveAsync(_combinedCts!.Token)
+                    var message = await resource!.Connection.ReceiveAsync(resource.CombinedCts.Token)
                         .ConfigureAwait(false);
 
                     if (message is not ServerToClientMessageWithMetadata messageWithMetadata)
@@ -278,11 +264,11 @@ namespace TypingRealm.Messaging.Client
                             break;
                         case TokenExpired:
                             var token = await _profileTokenProvider.SignInAsync().ConfigureAwait(false);
-                            _ = SendAsync(new Authenticate(token), cancellationToken);
+                            _ = SendAsync(new Authenticate(token), resource.CombinedCts.Token);
                             break;
                     }
 
-                    await _dispatcher.DispatchAsync(message, _combinedCts!.Token)
+                    await _dispatcher.DispatchAsync(message, resource.CombinedCts.Token)
                         .ConfigureAwait(false);
 
                     await AsyncHelpers.WhenAll(_handlers.Values.Select(handler => handler(message)))
@@ -297,10 +283,39 @@ namespace TypingRealm.Messaging.Client
 
                     // 1. Wait until all Send operations finish (consider canceling local CTS), do not allow any new Send operations to start.
                     IsConnected = false;
-                    _ = ReconnectAsync(cancellationToken).ConfigureAwait(false);
+                    _ = ReconnectAsync().ConfigureAwait(false);
                     return;
                 }
             }
+        }
+
+        private async Task ReconnectAsync()
+        {
+            if (IsConnected)
+                return;
+
+            var resource = GetConnectionResource();
+
+            await using var _ = await _reconnectLock.UseWaitAsync(resource.OriginalCancellationToken)
+                .ConfigureAwait(false);
+
+            if (IsConnected)
+                return;
+
+            await resource.DisposeAsync()
+                .ConfigureAwait(false);
+
+            await ConnectAsync(resource.OriginalCancellationToken).ConfigureAwait(false);
+        }
+
+        private ConnectionResource GetConnectionResource()
+        {
+            var resource = _resource;
+
+            if (resource is null)
+                throw new InvalidOperationException("Connection resource has been erased. Cannot continue.");
+
+            return resource;
         }
     }
 }

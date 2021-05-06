@@ -5,6 +5,6 @@ namespace TypingRealm.Messaging.Client
 {
     public interface IClientConnectionFactory
     {
-        ValueTask<ConnectionResource> ConnectAsync(CancellationToken cancellationToken);
+        ValueTask<ConnectionWithDisconnect> ConnectAsync(CancellationToken cancellationToken);
     }
 }

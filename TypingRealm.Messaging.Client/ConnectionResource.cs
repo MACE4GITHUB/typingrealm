@@ -1,23 +1,51 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TypingRealm.Messaging.Client
 {
-    public sealed class ConnectionResource
+    public sealed class ConnectionResource : AsyncManagedDisposable
     {
-        private readonly Func<ValueTask> _disconnect;
+        private readonly CancellationTokenSource _cts;
+        private readonly ConnectionWithDisconnect _connectionWithDisconnect;
 
-        public ConnectionResource(IConnection connection, Func<ValueTask> disconnect)
+        public ConnectionResource(
+            ConnectionWithDisconnect connectionWithDisconnect,
+            CancellationToken originalCancellationToken)
         {
-            Connection = connection;
-            _disconnect = disconnect;
+            _connectionWithDisconnect = connectionWithDisconnect;
+            OriginalCancellationToken = originalCancellationToken;
+
+            _cts = new CancellationTokenSource();
+            CombinedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                originalCancellationToken,
+                _cts.Token);
         }
 
-        public IConnection Connection { get; }
+        public CancellationToken OriginalCancellationToken { get; }
+        public CancellationTokenSource CombinedCts { get; }
 
-        public ValueTask DisconnectAsync()
+        private Task? _listening;
+        public Task Listening => _listening ?? throw new InvalidOperationException("Listening has not been set.");
+
+        public void SetListening(Func<CancellationToken, Task> listening)
         {
-            return _disconnect();
+            _listening = listening(CombinedCts.Token);
+        }
+
+        public IConnection Connection => _connectionWithDisconnect.Connection;
+
+        protected override async ValueTask DisposeManagedResourcesAsync()
+        {
+            _cts.Cancel();
+
+            // TODO: Consider catching and logging exceptions, do not fail execution.
+            await Listening.ConfigureAwait(false);
+            await _connectionWithDisconnect.DisconnectAsync()
+                .ConfigureAwait(false);
+
+            _cts.Dispose();
+            CombinedCts.Dispose();
         }
     }
 }
