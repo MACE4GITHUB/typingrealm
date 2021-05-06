@@ -28,6 +28,15 @@ namespace TypingRealm.Messaging.Client
         private Task? _listening;
         public Task Listening => _listening ?? throw new InvalidOperationException("Listening has not been set.");
 
+        public async ValueTask UseCombinedCts(Func<CancellationToken, ValueTask> action, CancellationToken cancellationToken)
+        {
+            using var cts = new CancellationTokenSource();
+            using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(CombinedCts.Token, cancellationToken);
+
+            await action(combinedCts.Token)
+                .ConfigureAwait(false);
+        }
+
         public void SetListening(Func<CancellationToken, Task> listening)
         {
             _listening = listening(CombinedCts.Token);

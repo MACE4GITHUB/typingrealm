@@ -27,6 +27,8 @@ namespace TypingRealm.Messaging.Client
         private readonly Dictionary<string, Func<object, string?, ValueTask>> _handlersWithId
             = new Dictionary<string, Func<object, string?, ValueTask>>();
 
+        private static readonly int _reconnectRetryCount = 3;
+
         private ConnectionResource? _resource;
 
         public MessageProcessor(
@@ -69,76 +71,87 @@ namespace TypingRealm.Messaging.Client
             _resource.SetListening(listening);
         }
 
-        // TODO: Pass combined token to the actual Connection.SendAsync.
-        public async ValueTask SendAsync(object message, CancellationToken cancellationToken)
+        public ValueTask SendAsync(
+            object message,
+            CancellationToken cancellationToken)
+            => SendAsync(message, null, cancellationToken);
+
+        public async ValueTask SendAsync(
+            object message,
+            Action<ClientToServerMessageMetadata>? metadataSetter,
+            CancellationToken cancellationToken)
         {
             if (!IsConnected)
                 throw new InvalidOperationException("Not connected.");
 
             var resource = GetConnectionResource();
 
-            try
-            {
-                await resource.Connection.SendAsync(message, cancellationToken)
-                    .ConfigureAwait(false);
-            }
-            catch (Exception exception)
-            {
-                // TODO: ReSend a message if reconnection was successful, otherwise throw an exception.
-                // Make sure you generate message ID here so that resending message is idempotent.
-                _logger.LogError(exception, "Error while trying to send a message.");
+            var metadata = _metadataFactory.CreateFor(message);
+            metadataSetter?.Invoke(metadata);
 
-                IsConnected = false;
-                await ReconnectAsync()
-                    .ConfigureAwait(false);
+            var reconnectedTimes = 0;
+            while (reconnectedTimes < _reconnectRetryCount)
+            {
+                try
+                {
+                    await resource.UseCombinedCts(ct => resource.Connection.SendAsync(message, metadata, ct), cancellationToken)
+                        .ConfigureAwait(false);
+
+                    return;
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogError(exception, "Error while trying to send a message.");
+                    reconnectedTimes++;
+                    IsConnected = false;
+
+                    if (reconnectedTimes == _reconnectRetryCount)
+                        throw;
+
+                    await ReconnectAsync()
+                        .ConfigureAwait(false);
+                }
             }
         }
 
         public async ValueTask<TResponse> SendQueryAsync<TResponse>(object message, CancellationToken cancellationToken)
             where TResponse : class
         {
-            var metadata = _metadataFactory.CreateFor(message);
-            metadata.ResponseMessageTypeId = _messageTypeCache.GetTypeId(typeof(TResponse));
-
-            var subscriptionId = SubscribeWithMessageId<TResponse>(Handler, metadata.MessageId);
             TResponse? response = null;
-
-            ValueTask Handler(TResponse result)
-            {
-                response = result;
-                return default;
-            }
-
-            var resource = GetConnectionResource();
+            string? subscriptionId = null;
 
             try
             {
-                // TODO: Do not duplicate this logic (try/catch logic) with Send() method.
-                await resource.Connection.SendAsync(message, metadata, cancellationToken).ConfigureAwait(false);
+                // We're passing original token here because SendAsync method will have passed combined one.
+                await SendAsync(message, metadata =>
+                {
+                    ValueTask Handler(TResponse result)
+                    {
+                        response = result;
+                        return default;
+                    }
+
+                    subscriptionId = SubscribeWithMessageId<TResponse>(Handler, metadata.MessageId);
+
+                    metadata.ResponseMessageTypeId = _messageTypeCache.GetTypeId(typeof(TResponse));
+                }, cancellationToken)
+                    .ConfigureAwait(false);
 
                 var i = 0;
                 while (response == null)
                 {
+                    // TODO: Pass combined token here.
                     await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                     i++;
 
+                    // TODO: Improve this.
                     if (i > 300)
                         throw new InvalidOperationException("Could not receive response in time (timeout).");
                 }
             }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Error while trying to send a message.");
-
-                throw;
-                /*await ReconnectAsync(cancellationToken)
-                    .ConfigureAwait(false);*/
-
-                // TODO: throw or return or smth. Do not return null response!
-            }
             finally
             {
-                Unsubscribe(subscriptionId);
+                Unsubscribe(subscriptionId!);
             }
 
             return response!;
@@ -148,49 +161,43 @@ namespace TypingRealm.Messaging.Client
         // But we need to have acknowledgement on the level of all messages (like Authentication, that are used during connection stage).
         public async ValueTask SendAcknowledgedAsync(object message, CancellationToken cancellationToken)
         {
-            var isAcknowledged = false;
-            var metadata = _metadataFactory.CreateFor(message);
-            metadata.RequireAcknowledgement = true;
-
             // TODO: Re-do this using CTS and Task.Delay(cts) instead of isAcknowledged.
-            ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
-            {
-                if (acknowledgeReceived.MessageId == metadata.MessageId)
-                    isAcknowledged = true;
-
-                return default;
-            }
-
-            var subscriptionId = SubscribeWithMessageId<AcknowledgeReceived>(Handler, metadata.MessageId);
-
-            var resource = GetConnectionResource();
+            var isAcknowledged = false;
+            string? subscriptionId = null;
 
             try
             {
-                // TODO: Do not duplicate this logic (try/catch logic) with Send() method.
-                await resource.Connection.SendAsync(message, metadata, cancellationToken).ConfigureAwait(false);
+                await SendAsync(message, metadata =>
+                {
+                    ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
+                    {
+                        if (acknowledgeReceived.MessageId == metadata.MessageId)
+                            isAcknowledged = true;
+
+                        return default;
+                    }
+
+                    subscriptionId = SubscribeWithMessageId<AcknowledgeReceived>(Handler, metadata.MessageId);
+
+                    metadata.RequireAcknowledgement = true;
+                }, cancellationToken)
+                    .ConfigureAwait(false);
 
                 var i = 0;
                 while (!isAcknowledged)
                 {
+                    // TODO: Pass combined token here.
                     await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                     i++;
 
+                    // TODO: Improve this.
                     if (i > 300)
-                        throw new InvalidOperationException("Acknowledgement is not received.");
+                        throw new InvalidOperationException("Could not receive response in time (timeout). Acknowledgement is not received.");
                 }
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Error while trying to send a message.");
-
-                throw;
-                /*await ReconnectAsync(cancellationToken)
-                    .ConfigureAwait(false);*/
             }
             finally
             {
-                Unsubscribe(subscriptionId);
+                Unsubscribe(subscriptionId!);
             }
         }
 
