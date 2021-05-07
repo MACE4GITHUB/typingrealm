@@ -13,7 +13,7 @@ using TypingRealm.Messaging.Serialization;
 namespace TypingRealm.Messaging.Client
 {
     // TODO: Introduce heartbeat and heartbeat timeout when we try to reconnect after no reply.
-    public sealed class MessageProcessor : AsyncManagedDisposable, IMessageSender
+    public sealed class MessageProcessor : AsyncManagedDisposable
     {
         private readonly ILogger<MessageProcessor> _logger;
         private readonly IClientConnectionFactory _connectionFactory;
