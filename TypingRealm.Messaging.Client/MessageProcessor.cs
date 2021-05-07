@@ -84,14 +84,16 @@ namespace TypingRealm.Messaging.Client
             if (!IsConnected)
                 throw new InvalidOperationException("Not connected.");
 
-            var resource = GetConnectionResource();
-
             var metadata = _metadataFactory.CreateFor(message);
             metadataSetter?.Invoke(metadata);
 
             var reconnectedTimes = 0;
             while (reconnectedTimes < _reconnectRetryCount)
             {
+                // Do not allow starting new operations while reconnect is happening.
+                await WaitForReconnectAsync(cancellationToken).ConfigureAwait(false);
+                var resource = GetConnectionResource();
+
                 try
                 {
                     await resource.UseCombinedCts(ct => resource.Connection.SendAsync(message, metadata, ct), cancellationToken)
@@ -309,6 +311,11 @@ namespace TypingRealm.Messaging.Client
                 throw new InvalidOperationException("Connection resource has been erased. Cannot continue.");
 
             return resource;
+        }
+
+        private async ValueTask WaitForReconnectAsync(CancellationToken cancellationToken)
+        {
+            await using var _ = await _reconnectLock.UseWaitAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }
