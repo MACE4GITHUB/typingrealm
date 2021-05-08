@@ -11,9 +11,11 @@ namespace TypingRealm.Messaging.Client
 
         public ConnectionResource(
             ConnectionWithDisconnect connectionWithDisconnect,
+            string characterId,
             CancellationToken originalCancellationToken)
         {
             _connectionWithDisconnect = connectionWithDisconnect;
+            CharacterId = characterId;
             OriginalCancellationToken = originalCancellationToken;
 
             _cts = new CancellationTokenSource();
@@ -22,6 +24,7 @@ namespace TypingRealm.Messaging.Client
                 _cts.Token);
         }
 
+        public string CharacterId { get; }
         public CancellationToken OriginalCancellationToken { get; }
         public CancellationTokenSource CombinedCts { get; }
 

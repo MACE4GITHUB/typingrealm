@@ -18,6 +18,6 @@ namespace TypingRealm.SignalR
 
         public Notificator Notificator { get; }
 
-        public Task Cancel() => _cancel();
+        public Task CancelAsync() => _cancel();
     }
 }

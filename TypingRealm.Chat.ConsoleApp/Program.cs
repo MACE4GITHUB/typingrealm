@@ -69,7 +69,7 @@ namespace TypingRealm.Chat.ConsoleApp
             var messageProcessor = provider.GetRequiredService<MessageProcessor>();
 
             using var cts = new CancellationTokenSource();
-            await messageProcessor.ConnectAsync(cts.Token).ConfigureAwait(false);
+            await messageProcessor.ConnectAsync(clientId, cts.Token).ConfigureAwait(false);
 
             var @lock = new object();
             messageProcessor.Subscribe<MessageLog>(log =>

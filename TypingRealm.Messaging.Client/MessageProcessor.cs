@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +12,40 @@ using TypingRealm.Messaging.Serialization;
 
 namespace TypingRealm.Messaging.Client
 {
+    public interface IAuthenticationService
+    {
+        ValueTask AuthenticateAsync(
+            MessageProcessor processor,
+            string characterId,
+            CancellationToken cancellationToken);
+    }
+
+    public sealed class AuthenticationService : IAuthenticationService
+    {
+        private readonly IProfileTokenProvider _profileTokenProvider;
+
+        public AuthenticationService(IProfileTokenProvider profileTokenProvider)
+        {
+            _profileTokenProvider = profileTokenProvider;
+        }
+
+        public async ValueTask AuthenticateAsync(
+            MessageProcessor processor,
+            string characterId,
+            CancellationToken cancellationToken)
+        {
+            var token = await _profileTokenProvider.SignInAsync()
+                .ConfigureAwait(false);
+
+            await processor.SendAcknowledgedAsync(new Authenticate(token), cancellationToken)
+                .ConfigureAwait(false);
+
+            // TODO: Support passing group here.
+            await processor.SendAcknowledgedAsync(new Connect(characterId), cancellationToken)
+                .ConfigureAwait(false);
+        }
+    }
+
     // TODO: Introduce heartbeat and heartbeat timeout when we try to reconnect after no reply.
     public sealed class MessageProcessor : AsyncManagedDisposable
     {
@@ -21,11 +55,12 @@ namespace TypingRealm.Messaging.Client
         private readonly IProfileTokenProvider _profileTokenProvider;
         private readonly IClientToServerMessageMetadataFactory _metadataFactory;
         private readonly IMessageTypeCache _messageTypeCache;
+        private readonly IAuthenticationService _authenticationService;
         private readonly SemaphoreSlimLock _reconnectLock = new SemaphoreSlimLock();
-        private readonly Dictionary<string, Func<object, ValueTask>> _handlers
-            = new Dictionary<string, Func<object, ValueTask>>();
-        private readonly Dictionary<string, Func<object, string?, ValueTask>> _handlersWithId
-            = new Dictionary<string, Func<object, string?, ValueTask>>();
+        private readonly ConcurrentDictionary<string, Func<object, ValueTask>> _handlers
+            = new ConcurrentDictionary<string, Func<object, ValueTask>>();
+        private readonly ConcurrentDictionary<string, Func<object, string?, ValueTask>> _handlersWithId
+            = new ConcurrentDictionary<string, Func<object, string?, ValueTask>>();
 
         private static readonly int _reconnectRetryCount = 3;
 
@@ -37,7 +72,8 @@ namespace TypingRealm.Messaging.Client
             IMessageDispatcher dispatcher,
             IProfileTokenProvider profileTokenProvider,
             IClientToServerMessageMetadataFactory metadataFactory,
-            IMessageTypeCache messageTypeCache)
+            IMessageTypeCache messageTypeCache,
+            IAuthenticationService authenticationService)
         {
             _logger = logger;
             _connectionFactory = connectionFactory;
@@ -45,12 +81,13 @@ namespace TypingRealm.Messaging.Client
             _profileTokenProvider = profileTokenProvider;
             _metadataFactory = metadataFactory;
             _messageTypeCache = messageTypeCache;
+            _authenticationService = authenticationService;
         }
 
         public bool IsConnected { get; private set; }
 
         // This method is used within a lock so it shouldn't wait for lock itself anywhere inside.
-        public async ValueTask ConnectAsync(CancellationToken cancellationToken)
+        public async ValueTask ConnectAsync(string characterId, CancellationToken cancellationToken)
         {
             if (IsConnected)
                 throw new InvalidOperationException("Already connected.");
@@ -63,12 +100,16 @@ namespace TypingRealm.Messaging.Client
 
             _resource = new ConnectionResource(
                 connectionWithDisconnect,
+                characterId,
                 cancellationToken);
 
             Task listening(CancellationToken cancellationToken)
                 => ListenAndDispatchAsync();
 
             _resource.SetListening(listening);
+
+            await _authenticationService.AuthenticateAsync(this, characterId, _resource.CombinedCts.Token)
+                .ConfigureAwait(false);
         }
 
         public ValueTask SendAsync(
@@ -90,8 +131,10 @@ namespace TypingRealm.Messaging.Client
             var reconnectedTimes = 0;
             while (reconnectedTimes < _reconnectRetryCount)
             {
+                // This creates a deadlock. Come up with another solution.
                 // Do not allow starting new operations while reconnect is happening.
-                await WaitForReconnectAsync(cancellationToken).ConfigureAwait(false);
+                // await WaitForReconnectAsync(cancellationToken).ConfigureAwait(false);
+
                 var resource = GetConnectionResource();
 
                 try
@@ -161,7 +204,9 @@ namespace TypingRealm.Messaging.Client
 
         // I Cannot use SubscribeWithId method because it works only after initial connection has been established.
         // But we need to have acknowledgement on the level of all messages (like Authentication, that are used during connection stage).
-        public async ValueTask SendAcknowledgedAsync(object message, CancellationToken cancellationToken)
+        public async ValueTask SendAcknowledgedAsync(
+            object message,
+            CancellationToken cancellationToken)
         {
             // TODO: Re-do this using CTS and Task.Delay(cts) instead of isAcknowledged.
             var isAcknowledged = false;
@@ -207,7 +252,7 @@ namespace TypingRealm.Messaging.Client
         {
             var subscriptionId = Guid.NewGuid().ToString();
 
-            _handlers.Add(subscriptionId, message =>
+            _handlers.TryAdd(subscriptionId, message =>
             {
                 if (message is TMessage tMessage)
                     return handler(tMessage);
@@ -222,7 +267,7 @@ namespace TypingRealm.Messaging.Client
         {
             var subscriptionId = Guid.NewGuid().ToString();
 
-            _handlersWithId.Add(subscriptionId, (message, id) =>
+            _handlersWithId.TryAdd(subscriptionId, (message, id) =>
             {
                 if (message is TMessage tMessage && id == messageId)
                     return handler(tMessage);
@@ -235,8 +280,8 @@ namespace TypingRealm.Messaging.Client
 
         public void Unsubscribe(string subscriptionId)
         {
-            _handlers.Remove(subscriptionId);
-            _handlersWithId.Remove(subscriptionId);
+            _handlers.TryRemove(subscriptionId, out _);
+            _handlersWithId.TryRemove(subscriptionId, out _);
         }
 
         protected override async ValueTask DisposeManagedResourcesAsync()
@@ -269,7 +314,8 @@ namespace TypingRealm.Messaging.Client
                     switch (message)
                     {
                         case Disconnected:
-                            IsConnected = false;
+                            //IsConnected = false;
+                            //throw new InvalidOperationException("Hack to go to catch to reconnect.");
                             break;
                         case TokenExpired:
                             var token = await _profileTokenProvider.SignInAsync().ConfigureAwait(false);
@@ -314,7 +360,7 @@ namespace TypingRealm.Messaging.Client
             await resource.DisposeAsync()
                 .ConfigureAwait(false);
 
-            await ConnectAsync(resource.OriginalCancellationToken).ConfigureAwait(false);
+            await ConnectAsync(resource.CharacterId, resource.OriginalCancellationToken).ConfigureAwait(false);
         }
 
         private ConnectionResource GetConnectionResource()

@@ -14,6 +14,7 @@ namespace TypingRealm.Messaging.Client
             services.AddSingleton<MessageProcessor>();
             services.AddTransient<IMessageDispatcher, MessageDispatcher>();
             services.AddTransient<IMessageHandlerFactory, MessageHandlerFactory>();
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
 
             return services;
         }

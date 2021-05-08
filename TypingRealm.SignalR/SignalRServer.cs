@@ -33,6 +33,8 @@ namespace TypingRealm.SignalR
         public void NotifyReceived(string connectionId, object message)
         {
             _notificators.TryGetValue(connectionId, out var resource);
+
+            // This happens when server threw an exception but did not disconnect the client, and the client did not disconnect and tries to send more messages.
             if (resource == null)
                 throw new InvalidOperationException($"Connection {connectionId} does not exist.");
 
@@ -45,7 +47,7 @@ namespace TypingRealm.SignalR
         public async Task StopHandling(string connectionId)
         {
             if (_notificators.TryGetValue(connectionId, out var resource))
-                await resource.Cancel().ConfigureAwait(false);
+                await resource.CancelAsync().ConfigureAwait(false);
         }
 
         private async Task HandleAsync(HubCallerContext context, IClientProxy caller)
@@ -97,13 +99,19 @@ namespace TypingRealm.SignalR
                 _connectionProcessors.RemoveAll(t => t.IsCompleted);
 
                 await task.ConfigureAwait(false);
+
+                // Warning: when exception is thrown inside the task, cancellation token is not canceled (only disposed).
+                await resource.CancelAsync().ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, $"Error happened when creating SignalR connection: {connectionDetails}");
+                _logger.LogError(exception, $"Error happened when creating or handling SignalR connection: {connectionDetails}");
             }
             finally
             {
+                // Disconnect the client from the server side.
+                context.Abort();
+
                 _notificators.TryRemove(context.ConnectionId, out _);
             }
         }

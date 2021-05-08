@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
 using TypingRealm.Authentication.ConsoleClient;
 using TypingRealm.Messaging.Client;
-using TypingRealm.Messaging.Messages;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
@@ -57,6 +56,7 @@ namespace TypingRealm.TestClient
             }
 
             services
+                .AddHttpClient()
                 .AddLogging() // TODO: Log only to file, console is needed for UI.
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
@@ -79,11 +79,9 @@ namespace TypingRealm.TestClient
                 .ToList();
 
             var messageProcessor = provider.GetRequiredService<MessageProcessor>();
+            var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
 
-            using var cts = new CancellationTokenSource();
-            await messageProcessor.ConnectAsync(cts.Token).ConfigureAwait(false);
-
-            await Handle(messageProcessor, messageTypes, tokenProvider).ConfigureAwait(false);
+            await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
         }
 
         public static async Task RopeWarSignalR()
@@ -100,6 +98,7 @@ namespace TypingRealm.TestClient
             }
 
             services
+                .AddHttpClient()
                 .AddLogging() // TODO: Log only to file, console is needed for UI.
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
@@ -123,11 +122,9 @@ namespace TypingRealm.TestClient
                 .ToList();
 
             var messageProcessor = provider.GetRequiredService<MessageProcessor>();
+            var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
 
-            using var cts = new CancellationTokenSource();
-            await messageProcessor.ConnectAsync(cts.Token).ConfigureAwait(false);
-
-            await Handle(messageProcessor, messageTypes, tokenProvider).ConfigureAwait(false);
+            await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
         }
 
         /*public static async Task WorldSignalR()
@@ -283,7 +280,11 @@ namespace TypingRealm.TestClient
             await Handle(connection, messageTypes).ConfigureAwait(false);
         }*/
 
-        private static async Task Handle(MessageProcessor processor, IEnumerable<Type> messageTypes, IProfileTokenProvider tokenProvider)
+        private static async Task Handle(
+            MessageProcessor processor,
+            IEnumerable<Type> messageTypes,
+            IProfileTokenProvider tokenProvider,
+            IHttpClientFactory httpClientFactory)
         {
             processor.Subscribe<object>(message =>
             {
@@ -297,25 +298,14 @@ namespace TypingRealm.TestClient
 
             Console.Write("Character name: ");
             var characterName = Console.ReadLine();
+            if (string.IsNullOrEmpty(characterName))
+                throw new InvalidOperationException("Character name cannot be empty.");
 
-            var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            using var content = new StringContent(JsonSerializer.Serialize(new
-            {
-                name = characterName
-            }), Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync("http://127.0.0.1:30103/api/characters", content).ConfigureAwait(false);
-
-            var character = JsonSerializer.Deserialize<Character>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
-            var clientId = character?.characterId;
-            var group = "lobby";
-
-            await processor.SendAcknowledgedAsync(new Authenticate(token), default)
+            var characterId = await CreateCharacterAsync(httpClientFactory, tokenProvider, characterName)
                 .ConfigureAwait(false);
 
-            await processor.SendAsync(new Connect(clientId!, group), default)
-                .ConfigureAwait(false);
+            using var cts = new CancellationTokenSource();
+            await processor.ConnectAsync(characterId, cts.Token).ConfigureAwait(false);
 
             while (true)
             {
@@ -362,6 +352,27 @@ namespace TypingRealm.TestClient
 
                 await processor.SendAsync(message, default).ConfigureAwait(false);
             }
+        }
+
+        private static async ValueTask<string> CreateCharacterAsync(
+            IHttpClientFactory httpClientFactory,
+            IProfileTokenProvider tokenProvider,
+            string characterName)
+        {
+            var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
+            var httpClient = httpClientFactory.CreateClient();
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            using var content = new StringContent(JsonSerializer.Serialize(new
+            {
+                name = characterName
+            }), Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("http://127.0.0.1:30103/api/characters", content).ConfigureAwait(false);
+
+            var character = JsonSerializer.Deserialize<Character>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+            if (character == null || character.characterId == null)
+                throw new InvalidOperationException("Character deserialization failed.");
+
+            return character.characterId;
         }
     }
 }
