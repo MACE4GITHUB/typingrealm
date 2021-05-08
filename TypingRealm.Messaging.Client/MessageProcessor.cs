@@ -119,7 +119,7 @@ namespace TypingRealm.Messaging.Client
         public async ValueTask<TResponse> SendQueryAsync<TResponse>(object message, CancellationToken cancellationToken)
             where TResponse : class
         {
-            var tcs = new TaskCompletionSource<TResponse>();
+            TResponse? response = null;
             string? subscriptionId = null;
 
             try
@@ -129,7 +129,7 @@ namespace TypingRealm.Messaging.Client
                 {
                     ValueTask Handler(TResponse result)
                     {
-                        tcs.SetResult(result);
+                        response = result;
                         return default;
                     }
 
@@ -139,17 +139,24 @@ namespace TypingRealm.Messaging.Client
                 }, cancellationToken)
                     .ConfigureAwait(false);
 
-                var response = await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(3))
-                    .ConfigureAwait(false);
+                var i = 0;
+                while (response == null)
+                {
+                    // TODO: Pass combined token here.
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+                    i++;
 
-                // TODO: Test how it behaves when timeout occurs.
-
-                return response;
+                    // TODO: Improve this.
+                    if (i > 300)
+                        throw new InvalidOperationException("Could not receive response in time (timeout).");
+                }
             }
             finally
             {
                 Unsubscribe(subscriptionId!);
             }
+
+            return response!;
         }
 
         // I Cannot use SubscribeWithId method because it works only after initial connection has been established.
@@ -157,7 +164,7 @@ namespace TypingRealm.Messaging.Client
         public async ValueTask SendAcknowledgedAsync(object message, CancellationToken cancellationToken)
         {
             // TODO: Re-do this using CTS and Task.Delay(cts) instead of isAcknowledged.
-            var tcs = new TaskCompletionSource();
+            var isAcknowledged = false;
             string? subscriptionId = null;
 
             try
@@ -167,7 +174,7 @@ namespace TypingRealm.Messaging.Client
                     ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
                     {
                         if (acknowledgeReceived.MessageId == metadata.MessageId)
-                            tcs.SetResult();
+                            isAcknowledged = true;
 
                         return default;
                     }
@@ -178,10 +185,17 @@ namespace TypingRealm.Messaging.Client
                 }, cancellationToken)
                     .ConfigureAwait(false);
 
-                await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(3))
-                    .ConfigureAwait(false);
+                var i = 0;
+                while (!isAcknowledged)
+                {
+                    // TODO: Pass combined token here.
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+                    i++;
 
-                // TODO: Test how it behaves when timeout occurs.
+                    // TODO: Improve this.
+                    if (i > 300)
+                        throw new InvalidOperationException("Could not receive response in time (timeout). Acknowledgement is not received.");
+                }
             }
             finally
             {

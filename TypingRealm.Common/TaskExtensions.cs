@@ -58,26 +58,6 @@ namespace TypingRealm
             return await task.ConfigureAwait(false);
         }
 
-        // TODO: Unit test this.
-        public static async Task WithTimeoutAsync(
-            this Task task, TimeSpan timeout)
-        {
-            using var cts = new CancellationTokenSource(timeout);
-
-            await task.WithCancellationAsync(cts.Token)
-                .ConfigureAwait(false);
-        }
-
-        // TODO: Unit test this.
-        public static async Task<TResult> WithTimeoutAsync<TResult>(
-            this Task<TResult> task, TimeSpan timeout)
-        {
-            using var cts = new CancellationTokenSource(timeout);
-
-            return await task.WithCancellationAsync(cts.Token)
-                .ConfigureAwait(false);
-        }
-
         /// <summary>
         /// Handles exception thrown during task execution.
         /// </summary>
