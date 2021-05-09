@@ -33,7 +33,6 @@ namespace TypingRealm.Messaging.Client
 
         public async ValueTask UseCombinedCts(Func<CancellationToken, ValueTask> action, CancellationToken cancellationToken)
         {
-            using var cts = new CancellationTokenSource();
             using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(CombinedCts.Token, cancellationToken);
 
             await action(combinedCts.Token)

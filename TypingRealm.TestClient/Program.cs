@@ -363,13 +363,13 @@ namespace TypingRealm.TestClient
 
                 if (bulk == null)
                 {
-                    await processor.SendAsync(message, default).ConfigureAwait(false);
+                    await processor.SendWithAcknowledgementAsync(message, default).ConfigureAwait(false);
                     continue;
                 }
 
                 for (var i = 1; i <= bulk; i++)
                 {
-                    await processor.SendAsync(message, default).ConfigureAwait(false);
+                    await processor.SendWithAcknowledgementAsync(message, default).ConfigureAwait(false);
                 }
             }
         }

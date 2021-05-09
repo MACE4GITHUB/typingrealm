@@ -37,11 +37,11 @@ namespace TypingRealm.Messaging.Client
             var token = await _profileTokenProvider.SignInAsync()
                 .ConfigureAwait(false);
 
-            await processor.SendAcknowledgedAsync(new Authenticate(token), cancellationToken)
+            await processor.SendAsync(new Authenticate(token), cancellationToken)
                 .ConfigureAwait(false);
 
             // TODO: Support passing group here.
-            await processor.SendAcknowledgedAsync(new Connect(characterId), cancellationToken)
+            await processor.SendAsync(new Connect(characterId), cancellationToken)
                 .ConfigureAwait(false);
         }
     }
@@ -112,12 +112,12 @@ namespace TypingRealm.Messaging.Client
                 .ConfigureAwait(false);
         }
 
-        public ValueTask SendAsync(
+        public ValueTask SendWithoutAcknowledgementAsync(
             object message,
             CancellationToken cancellationToken)
-            => SendAsync(message, null, cancellationToken);
+            => SendWithoutAcknowledgementAsync(message, null, cancellationToken);
 
-        public async ValueTask SendAsync(
+        public async ValueTask SendWithoutAcknowledgementAsync(
             object message,
             Action<ClientToServerMessageMetadata>? metadataSetter,
             CancellationToken cancellationToken)
@@ -168,7 +168,7 @@ namespace TypingRealm.Messaging.Client
             try
             {
                 // We're passing original token here because SendAsync method will have passed combined one.
-                await SendAsync(message, metadata =>
+                await SendWithoutAcknowledgementAsync(message, metadata =>
                 {
                     ValueTask Handler(TResponse result)
                     {
@@ -182,7 +182,7 @@ namespace TypingRealm.Messaging.Client
                 }, cancellationToken)
                     .ConfigureAwait(false);
 
-                var response = await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(3))
+                var response = await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(1))
                     .ConfigureAwait(false);
 
                 // TODO: Investigate why we need this.
@@ -199,9 +199,15 @@ namespace TypingRealm.Messaging.Client
             }
         }
 
-        // I Cannot use SubscribeWithId method because it works only after initial connection has been established.
+        /// <summary>
+        /// Sends message with acknowledgement enabled.
+        /// </summary>
+        public ValueTask SendAsync(object message, CancellationToken cancellationToken)
+            => SendWithAcknowledgementAsync(message, cancellationToken);
+
+        // I Cannot use SendQuery method because it works only after initial connection has been established.
         // But we need to have acknowledgement on the level of all messages (like Authentication, that are used during connection stage).
-        public async ValueTask SendAcknowledgedAsync(
+        public async ValueTask SendWithAcknowledgementAsync(
             object message,
             CancellationToken cancellationToken)
         {
@@ -211,7 +217,7 @@ namespace TypingRealm.Messaging.Client
 
             try
             {
-                await SendAsync(message, metadata =>
+                await SendWithoutAcknowledgementAsync(message, metadata =>
                 {
                     ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
                     {
@@ -227,7 +233,7 @@ namespace TypingRealm.Messaging.Client
                 }, cancellationToken)
                     .ConfigureAwait(false);
 
-                await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(3))
+                await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(1))
                     .ConfigureAwait(false);
 
                 // TODO: Investigate why we need this.
@@ -313,7 +319,7 @@ namespace TypingRealm.Messaging.Client
                             break;
                         case TokenExpired:
                             var token = await _profileTokenProvider.SignInAsync().ConfigureAwait(false);
-                            _ = SendAsync(new Authenticate(token), resource.CombinedCts.Token);
+                            _ = SendWithoutAcknowledgementAsync(new Authenticate(token), resource.CombinedCts.Token);
                             break;
                     }
 

@@ -5,7 +5,7 @@ namespace TypingRealm.Messaging
     public sealed class ClientToServerMessageMetadata
     {
         public string? MessageId { get; set; }
-        public bool RequireAcknowledgement { get; set; }
+        public bool RequireAcknowledgement { get; set; } = true;
 
         /// <summary>
         /// Requests response with this type from the server.
