@@ -71,8 +71,7 @@ namespace TypingRealm.SignalR
                     _cts.Token, localCts.Token);
 
                 var notificator = new Notificator();
-                var connection = _signalRConnectionFactory.CreateProtobufConnectionForServer(caller, notificator)
-                    .WithReceiveAcknowledgement();
+                var connection = _signalRConnectionFactory.CreateProtobufConnectionForServer(caller, notificator);
 
                 var task = _connectionHandler
                     .HandleAsync(connection, combinedCts.Token)

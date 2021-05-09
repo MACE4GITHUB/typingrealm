@@ -47,6 +47,7 @@ namespace TypingRealm.Messaging.Handling
         {
             ConnectedClient connectedClient;
 
+            connection = connection.WithReceiveAcknowledgement();
             var unwrapperConnection = new ServerMessageUnwrapperConnection(connection);
 
             try
