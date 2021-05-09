@@ -322,6 +322,17 @@ namespace TypingRealm.TestClient
                     continue;
                 }
 
+                int? bulk = null;
+                if (input == "bulk")
+                {
+                    Console.Write("How much: ");
+                    bulk = Convert.ToInt32(Console.ReadLine());
+
+                    input = Console.ReadLine();
+                    if (input == null)
+                        continue;
+                }
+
                 var messageType = messageTypes.FirstOrDefault(t => t.Name.ToUpperInvariant() == input.ToUpperInvariant());
                 if (messageType == null)
                 {
@@ -344,13 +355,22 @@ namespace TypingRealm.TestClient
                 }
 
                 var json = JsonSerializer.Serialize(message);
-                Console.WriteLine($"Sending json? (write 'no' to abort)");
+                Console.WriteLine($"Sending json? (write 'no' to abort)" + bulk == null ? "" : $" BULK: {bulk} times");
                 Console.WriteLine(json);
 
                 if (Console.ReadLine() == "no")
                     continue;
 
-                await processor.SendAsync(message, default).ConfigureAwait(false);
+                if (bulk == null)
+                {
+                    await processor.SendAsync(message, default).ConfigureAwait(false);
+                    continue;
+                }
+
+                for (var i = 1; i <= bulk; i++)
+                {
+                    await processor.SendAsync(message, default).ConfigureAwait(false);
+                }
             }
         }
 
