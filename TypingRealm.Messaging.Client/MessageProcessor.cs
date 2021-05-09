@@ -117,11 +117,20 @@ namespace TypingRealm.Messaging.Client
             CancellationToken cancellationToken)
             => SendWithoutAcknowledgementAsync(message, null, cancellationToken);
 
-        public async ValueTask SendWithoutAcknowledgementAsync(
+        public ValueTask SendWithoutAcknowledgementAsync(
             object message,
             Action<ClientToServerMessageMetadata>? metadataSetter,
             CancellationToken cancellationToken)
+            => SendAsync(message, metadataSetter, false, cancellationToken);
+
+        public async ValueTask SendAsync(
+            object message,
+            Action<ClientToServerMessageMetadata>? metadataSetter,
+            bool requireAcknowledgement,
+            CancellationToken cancellationToken)
         {
+            string? subscriptionId = null; // For acknowledgement.
+
             if (!IsConnected)
                 throw new InvalidOperationException("Not connected.");
 
@@ -139,8 +148,43 @@ namespace TypingRealm.Messaging.Client
 
                 try
                 {
+                    TaskCompletionSource? tcs = null;
+
+                    if (requireAcknowledgement)
+                    {
+                        // Setup subscription for acknowledgement.
+
+                        tcs = new TaskCompletionSource();
+
+                        ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
+                        {
+                            if (acknowledgeReceived.MessageId == metadata.MessageId)
+                                tcs.SetResult();
+
+                            return default;
+                        }
+
+                        subscriptionId = SubscribeWithMessageId<AcknowledgeReceived>(Handler, metadata.MessageId);
+                        metadata.RequireAcknowledgement = true;
+                    }
+
                     await resource.UseCombinedCts(ct => resource.Connection.SendAsync(message, metadata, ct), cancellationToken)
                         .ConfigureAwait(false);
+
+                    if (requireAcknowledgement)
+                    {
+                        // Wait for acknowledgement, and if not received - throw.
+
+                        if (tcs == null)
+                            throw new InvalidOperationException("Should never happen.");
+
+                        await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(1))
+                            .ConfigureAwait(false);
+
+                        // TODO: Investigate why we need this.
+                        // Magic. I don't understand why but it doesn't work without it.
+                        await Task.Yield();
+                    }
 
                     return;
                 }
@@ -155,6 +199,13 @@ namespace TypingRealm.Messaging.Client
 
                     await ReconnectAsync()
                         .ConfigureAwait(false);
+                }
+                finally
+                {
+                    if (requireAcknowledgement)
+                    {
+                        Unsubscribe(subscriptionId!);
+                    }
                 }
             }
         }
@@ -207,46 +258,10 @@ namespace TypingRealm.Messaging.Client
 
         // I Cannot use SendQuery method because it works only after initial connection has been established.
         // But we need to have acknowledgement on the level of all messages (like Authentication, that are used during connection stage).
-        public async ValueTask SendWithAcknowledgementAsync(
+        public ValueTask SendWithAcknowledgementAsync(
             object message,
             CancellationToken cancellationToken)
-        {
-            // TODO: Re-do this using CTS and Task.Delay(cts) instead of isAcknowledged.
-            var tcs = new TaskCompletionSource();
-            string? subscriptionId = null;
-
-            try
-            {
-                await SendWithoutAcknowledgementAsync(message, metadata =>
-                {
-                    ValueTask Handler(AcknowledgeReceived acknowledgeReceived)
-                    {
-                        if (acknowledgeReceived.MessageId == metadata.MessageId)
-                            tcs.SetResult();
-
-                        return default;
-                    }
-
-                    subscriptionId = SubscribeWithMessageId<AcknowledgeReceived>(Handler, metadata.MessageId);
-
-                    metadata.RequireAcknowledgement = true;
-                }, cancellationToken)
-                    .ConfigureAwait(false);
-
-                await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(1))
-                    .ConfigureAwait(false);
-
-                // TODO: Investigate why we need this.
-                // Magic. I don't understand why but it doesn't work without it.
-                await Task.Yield();
-
-                // TODO: Test how it behaves when timeout occurs.
-            }
-            finally
-            {
-                Unsubscribe(subscriptionId!);
-            }
-        }
+            => SendAsync(message, null, true, cancellationToken);
 
         public string Subscribe<TMessage>(Func<TMessage, ValueTask> handler)
         {
