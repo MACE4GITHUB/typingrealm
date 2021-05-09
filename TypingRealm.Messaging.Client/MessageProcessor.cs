@@ -329,8 +329,8 @@ namespace TypingRealm.Messaging.Client
                     switch (message)
                     {
                         case Disconnected:
-                            //IsConnected = false;
-                            //throw new InvalidOperationException("Hack to go to catch to reconnect.");
+                            // Hack to go to reconnect.
+                            throw new InvalidOperationException("Server send Disconnected message. Reconnecting...");
                             break;
                         case TokenExpired:
                             var token = await _profileTokenProvider.SignInAsync().ConfigureAwait(false);
