@@ -11,19 +11,7 @@ namespace TypingRealm.Messaging.Tests
             var sut = ClientToServerMessageMetadata.CreateEmpty();
 
             Assert.Null(sut.MessageId);
-            Assert.False(sut.RequireAcknowledgement);
-            Assert.Null(sut.ResponseMessageTypeId);
-        }
-
-        [Theory, AutoMoqData]
-        public void ShouldEnableAcknowledgement(string messageId)
-        {
-            var sut = ClientToServerMessageMetadata.CreateEmpty();
-
-            sut.EnableAcknowledgement(messageId);
-
-            Assert.Equal(messageId, sut.MessageId);
-            Assert.True(sut.RequireAcknowledgement);
+            Assert.False(sut.RequireReceivedAcknowledgement);
             Assert.Null(sut.ResponseMessageTypeId);
         }
 

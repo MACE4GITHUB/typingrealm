@@ -13,7 +13,7 @@ namespace TypingRealm.Messaging.Tests.Connections
         public async Task ShouldSendAsUsual(
             object message,
             [Frozen]Mock<IConnection> connection,
-            AcknowledgingConnection sut)
+            ReceivedAcknowledgingConnection sut)
         {
             await sut.SendAsync(message, Cts.Token);
 
@@ -23,7 +23,7 @@ namespace TypingRealm.Messaging.Tests.Connections
         [Theory, AutoMoqData]
         public async Task ShouldNotSendAcknowledgeReceived_WhenMessageDoesNotHaveMetadata(
             [Frozen]Mock<IConnection> connection,
-            AcknowledgingConnection sut)
+            ReceivedAcknowledgingConnection sut)
         {
             await sut.ReceiveAsync(Cts.Token);
 
@@ -34,13 +34,13 @@ namespace TypingRealm.Messaging.Tests.Connections
         public async Task ShouldNotSendAcknowledgeReceived_WhenMessageIdIsNotSet(
             ClientToServerMessageWithMetadata message,
             [Frozen]Mock<IConnection> connection,
-            AcknowledgingConnection sut)
+            ReceivedAcknowledgingConnection sut)
         {
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(message);
 
             message.Metadata.MessageId = null;
-            message.Metadata.RequireAcknowledgement = true;
+            message.Metadata.RequireReceivedAcknowledgement = true;
 
             await sut.ReceiveAsync(Cts.Token);
 
@@ -51,12 +51,12 @@ namespace TypingRealm.Messaging.Tests.Connections
         public async Task ShouldNotSendAcknowledgeReceived_WhenRequireAcknowledgementIsFalse(
             ClientToServerMessageWithMetadata message,
             [Frozen]Mock<IConnection> connection,
-            AcknowledgingConnection sut)
+            ReceivedAcknowledgingConnection sut)
         {
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(message);
 
-            message.Metadata.RequireAcknowledgement = false;
+            message.Metadata.RequireReceivedAcknowledgement = false;
 
             await sut.ReceiveAsync(Cts.Token);
 
@@ -67,12 +67,12 @@ namespace TypingRealm.Messaging.Tests.Connections
         public async Task ShouldSendAcknowledgeReceived_WhenMessageHasId_AndRequireAcknowledgementIsTrue(
             ClientToServerMessageWithMetadata message,
             [Frozen]Mock<IConnection> connection,
-            AcknowledgingConnection sut)
+            ReceivedAcknowledgingConnection sut)
         {
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(message);
 
-            message.Metadata.RequireAcknowledgement = true;
+            message.Metadata.RequireReceivedAcknowledgement = true;
 
             await sut.ReceiveAsync(Cts.Token);
 

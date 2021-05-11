@@ -22,10 +22,10 @@
             return new NotificatorConnection(messageSender, notificator);
         }
 
-        public static AcknowledgingConnection WithReceiveAcknowledgement(
+        public static ReceivedAcknowledgingConnection WithReceiveAcknowledgement(
             this IConnection connection)
         {
-            return new AcknowledgingConnection(connection);
+            return new ReceivedAcknowledgingConnection(connection);
         }
     }
 }

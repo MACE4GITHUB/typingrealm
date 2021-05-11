@@ -37,11 +37,11 @@ namespace TypingRealm.Messaging.Client
             var token = await _profileTokenProvider.SignInAsync()
                 .ConfigureAwait(false);
 
-            await processor.SendAsync(new Authenticate(token), cancellationToken)
+            await processor.SendWithReceivedAcknowledgementAsync(new Authenticate(token), cancellationToken)
                 .ConfigureAwait(false);
 
             // TODO: Support passing group here.
-            await processor.SendAsync(new Connect(characterId), cancellationToken)
+            await processor.SendWithReceivedAcknowledgementAsync(new Connect(characterId), cancellationToken)
                 .ConfigureAwait(false);
         }
     }
@@ -121,12 +121,12 @@ namespace TypingRealm.Messaging.Client
             object message,
             Action<ClientToServerMessageMetadata>? metadataSetter,
             CancellationToken cancellationToken)
-            => SendAsync(message, metadataSetter, false, cancellationToken);
+            => SendAsync(message, metadataSetter, AcknowledgementType.None, cancellationToken);
 
         public async ValueTask SendAsync(
             object message,
             Action<ClientToServerMessageMetadata>? metadataSetter,
-            bool requireAcknowledgement,
+            AcknowledgementType acknowledgementType,
             CancellationToken cancellationToken)
         {
             string? subscriptionId = null; // For acknowledgement.
@@ -136,6 +136,7 @@ namespace TypingRealm.Messaging.Client
 
             var metadata = _metadataFactory.CreateFor(message);
             metadataSetter?.Invoke(metadata);
+            metadata.AcknowledgementType = acknowledgementType;
 
             var reconnectedTimes = 0;
             while (reconnectedTimes < _reconnectRetryCount)
@@ -150,7 +151,7 @@ namespace TypingRealm.Messaging.Client
                 {
                     TaskCompletionSource? tcs = null;
 
-                    if (requireAcknowledgement)
+                    if (acknowledgementType == AcknowledgementType.Received)
                     {
                         // Setup subscription for acknowledgement.
 
@@ -165,20 +166,36 @@ namespace TypingRealm.Messaging.Client
                         }
 
                         subscriptionId = SubscribeWithMessageId<AcknowledgeReceived>(Handler, metadata.MessageId);
-                        metadata.RequireAcknowledgement = true;
+                    }
+
+                    if (acknowledgementType == AcknowledgementType.Handled)
+                    {
+                        // Setup subscription for acknowledgement.
+
+                        tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+                        ValueTask Handler(AcknowledgeHandled acknowledgeHandled)
+                        {
+                            if (acknowledgeHandled.MessageId == metadata.MessageId)
+                                tcs.SetResult();
+
+                            return default;
+                        }
+
+                        subscriptionId = SubscribeWithMessageId<AcknowledgeHandled>(Handler, metadata.MessageId);
                     }
 
                     await resource.UseCombinedCts(ct => resource.Connection.SendAsync(message, metadata, ct), cancellationToken)
                         .ConfigureAwait(false);
 
-                    if (requireAcknowledgement)
+                    if (acknowledgementType.IsAcknowledgementRequired())
                     {
                         // Wait for acknowledgement, and if not received - throw.
 
                         if (tcs == null)
                             throw new InvalidOperationException("Should never happen.");
 
-                        await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(1))
+                        await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(3))
                             .ConfigureAwait(false);
                     }
 
@@ -198,7 +215,7 @@ namespace TypingRealm.Messaging.Client
                 }
                 finally
                 {
-                    if (requireAcknowledgement)
+                    if (acknowledgementType.IsAcknowledgementRequired())
                     {
                         Unsubscribe(subscriptionId!);
                     }
@@ -229,7 +246,7 @@ namespace TypingRealm.Messaging.Client
                 }, cancellationToken)
                     .ConfigureAwait(false);
 
-                var response = await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(1))
+                var response = await tcs.Task.WithTimeoutAsync(TimeSpan.FromSeconds(3))
                     .ConfigureAwait(false);
 
                 // TODO: Test how it behaves when timeout occurs.
@@ -246,14 +263,21 @@ namespace TypingRealm.Messaging.Client
         /// Sends message with acknowledgement enabled.
         /// </summary>
         public ValueTask SendAsync(object message, CancellationToken cancellationToken)
-            => SendWithAcknowledgementAsync(message, cancellationToken);
+            => SendWithHandledAcknowledgementAsync(message, cancellationToken);
 
         // I Cannot use SendQuery method because it works only after initial connection has been established.
         // But we need to have acknowledgement on the level of all messages (like Authentication, that are used during connection stage).
-        public ValueTask SendWithAcknowledgementAsync(
+        public ValueTask SendWithHandledAcknowledgementAsync(
             object message,
             CancellationToken cancellationToken)
-            => SendAsync(message, null, true, cancellationToken);
+            => SendAsync(message, null, AcknowledgementType.Handled, cancellationToken);
+
+        // I Cannot use SendQuery method because it works only after initial connection has been established.
+        // But we need to have acknowledgement on the level of all messages (like Authentication, that are used during connection stage).
+        public ValueTask SendWithReceivedAcknowledgementAsync(
+            object message,
+            CancellationToken cancellationToken)
+            => SendAsync(message, null, AcknowledgementType.Received, cancellationToken);
 
         public string Subscribe<TMessage>(Func<TMessage, ValueTask> handler)
         {

@@ -89,10 +89,10 @@ namespace TypingRealm.Chat.ConsoleApp
                 }
             });
 
-            await messageProcessor.SendWithAcknowledgementAsync(new Authenticate(token), default)
+            await messageProcessor.SendWithHandledAcknowledgementAsync(new Authenticate(token), default)
                 .ConfigureAwait(false);
 
-            await messageProcessor.SendWithAcknowledgementAsync(new Connect(clientId, group), default)
+            await messageProcessor.SendWithHandledAcknowledgementAsync(new Connect(clientId, group), default)
                 .ConfigureAwait(false);
 
             while (true)
@@ -100,7 +100,7 @@ namespace TypingRealm.Chat.ConsoleApp
                 var message = Console.ReadLine();
                 if (message != null)
                 {
-                    await messageProcessor.SendWithAcknowledgementAsync(new Say(message), cts.Token)
+                    await messageProcessor.SendWithHandledAcknowledgementAsync(new Say(message), cts.Token)
                         .ConfigureAwait(false);
                 }
             }

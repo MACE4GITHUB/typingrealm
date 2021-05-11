@@ -42,7 +42,7 @@ namespace TypingRealm.Messaging.Tests.Connections
         {
             var sut = connection.WithReceiveAcknowledgement();
 
-            Assert.IsType<AcknowledgingConnection>(sut);
+            Assert.IsType<ReceivedAcknowledgingConnection>(sut);
             Assert.Equal(connection, GetPrivateField(sut, "_connection"));
         }
     }

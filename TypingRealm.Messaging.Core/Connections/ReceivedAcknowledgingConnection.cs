@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace TypingRealm.Messaging.Connections
 {
-    public sealed class AcknowledgingConnection : IConnection
+    public sealed class ReceivedAcknowledgingConnection : IConnection
     {
         private readonly IConnection _connection;
 
-        public AcknowledgingConnection(IConnection connection)
+        public ReceivedAcknowledgingConnection(IConnection connection)
         {
             _connection = connection;
         }
@@ -18,7 +18,7 @@ namespace TypingRealm.Messaging.Connections
             var message = await _connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
 
             var metadata = message.GetMetadataOrEmpty();
-            if (metadata.RequireAcknowledgement && metadata.MessageId != null)
+            if (metadata.AcknowledgementType == AcknowledgementType.Received && metadata.MessageId != null)
             {
                 var serverToClientMetadata = new ServerToClientMessageMetadata
                 {

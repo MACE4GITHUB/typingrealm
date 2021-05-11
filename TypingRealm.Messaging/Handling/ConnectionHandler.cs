@@ -120,15 +120,15 @@ namespace TypingRealm.Messaging.Handling
                         idempotencyKeys.Remove(item.Key);
                     }
 
-                    if (messageWithMetadata.Metadata.RequireAcknowledgement)
+                    if (messageWithMetadata.Metadata.AcknowledgementType == AcknowledgementType.Handled && messageWithMetadata.Metadata.MessageId != null)
                     {
-                        // !!!
-                        // I need to get acknowledgement from Authentication message and it's not possible
-                        // to send it here since we are still in ConnectionInitializer at that time.
-                        // So it definitely needs to be done as Connection decorator.
+                        var serverToClientMetadata = new ServerToClientMessageMetadata
+                        {
+                            RequestMessageId = messageWithMetadata.Metadata.MessageId
+                        };
 
-                        // TODO: Send acknowledgement (it's already being sent, but in Connection decorator instead of after handling the code).
-                        // Send AcknowledgeHandled instead of AcknowledgeReceived (probably no need to send both, just rename this message).
+                        await connectedClient.Connection.SendAsync(new AcknowledgeHandled(messageWithMetadata.Metadata.MessageId), serverToClientMetadata, cancellationToken)
+                            .ConfigureAwait(false);
                     }
                 }
                 catch

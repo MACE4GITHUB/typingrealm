@@ -5,7 +5,7 @@ namespace TypingRealm.Messaging
     public sealed class ClientToServerMessageMetadata
     {
         public string? MessageId { get; set; }
-        public bool RequireAcknowledgement { get; set; } = true;
+        public AcknowledgementType AcknowledgementType { get; set; } = AcknowledgementType.Handled;
 
         /// <summary>
         /// Requests response with this type from the server.
@@ -15,11 +15,5 @@ namespace TypingRealm.Messaging
         public List<string>? AffectedGroups { get; set; }
 
         public static ClientToServerMessageMetadata CreateEmpty() => new ClientToServerMessageMetadata();
-
-        public void EnableAcknowledgement(string messageId)
-        {
-            MessageId = messageId;
-            RequireAcknowledgement = true;
-        }
     }
 }

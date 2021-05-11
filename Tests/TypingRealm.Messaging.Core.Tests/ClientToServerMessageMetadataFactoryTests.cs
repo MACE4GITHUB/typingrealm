@@ -13,7 +13,7 @@ namespace TypingRealm.Messaging.Tests
             ClientToServerMessageMetadataFactory sut)
         {
             var result = sut.CreateFor(message);
-            Assert.False(result.RequireAcknowledgement);
+            Assert.False(result.RequireReceivedAcknowledgement);
         }
 
         [Theory, AutoMoqData]
