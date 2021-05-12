@@ -11,7 +11,7 @@ namespace TypingRealm.Messaging.Tests
         {
             var metadata = message.GetMetadataOrEmpty();
 
-            Assert.False(metadata.RequireReceivedAcknowledgement);
+            Assert.Equal(AcknowledgementType.Handled, metadata.AcknowledgementType);
             Assert.Null(metadata.MessageId);
         }
 
@@ -23,7 +23,7 @@ namespace TypingRealm.Messaging.Tests
 
             var metadata = message.GetMetadataOrEmpty();
 
-            Assert.False(metadata.RequireReceivedAcknowledgement);
+            Assert.Equal(AcknowledgementType.Handled, metadata.AcknowledgementType);
             Assert.Null(metadata.MessageId);
         }
 

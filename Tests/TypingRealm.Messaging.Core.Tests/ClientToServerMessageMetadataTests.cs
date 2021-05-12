@@ -11,7 +11,7 @@ namespace TypingRealm.Messaging.Tests
             var sut = ClientToServerMessageMetadata.CreateEmpty();
 
             Assert.Null(sut.MessageId);
-            Assert.False(sut.RequireReceivedAcknowledgement);
+            Assert.Equal(AcknowledgementType.Handled, sut.AcknowledgementType);
             Assert.Null(sut.ResponseMessageTypeId);
         }
 

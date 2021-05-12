@@ -8,12 +8,12 @@ namespace TypingRealm.Messaging.Tests
     public class ClientToServerMessageMetadataFactoryTests
     {
         [Theory, AutoMoqData]
-        public void ShouldHaveFalseAcknowledgementByDefault(
+        public void ShouldHaveHandledAcknowledgementByDefault(
             object message,
             ClientToServerMessageMetadataFactory sut)
         {
             var result = sut.CreateFor(message);
-            Assert.False(result.RequireReceivedAcknowledgement);
+            Assert.Equal(AcknowledgementType.Handled, result.AcknowledgementType);
         }
 
         [Theory, AutoMoqData]

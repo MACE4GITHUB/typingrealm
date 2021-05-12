@@ -40,7 +40,7 @@ namespace TypingRealm.Messaging.Tests.Connections
                 .ReturnsAsync(message);
 
             message.Metadata.MessageId = null;
-            message.Metadata.RequireReceivedAcknowledgement = true;
+            message.Metadata.AcknowledgementType = AcknowledgementType.Received;
 
             await sut.ReceiveAsync(Cts.Token);
 
@@ -56,7 +56,7 @@ namespace TypingRealm.Messaging.Tests.Connections
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(message);
 
-            message.Metadata.RequireReceivedAcknowledgement = false;
+            message.Metadata.AcknowledgementType = AcknowledgementType.None;
 
             await sut.ReceiveAsync(Cts.Token);
 
@@ -72,7 +72,7 @@ namespace TypingRealm.Messaging.Tests.Connections
             connection.Setup(x => x.ReceiveAsync(Cts.Token))
                 .ReturnsAsync(message);
 
-            message.Metadata.RequireReceivedAcknowledgement = true;
+            message.Metadata.AcknowledgementType = AcknowledgementType.Received;
 
             await sut.ReceiveAsync(Cts.Token);
 

@@ -26,7 +26,7 @@ namespace TypingRealm.Messaging.Tests
         [Fact]
         public void ShouldHaveTestsForAllMessages()
         {
-            Assert.Equal(9, typeof(Announce).Assembly.GetTypes().Count(
+            Assert.Equal(10, typeof(Announce).Assembly.GetTypes().Count(
                 t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
 
@@ -89,6 +89,15 @@ namespace TypingRealm.Messaging.Tests
             AssertSerializable<AcknowledgeReceived>();
 
             var sut = new AcknowledgeReceived(messageId);
+            Assert.Equal(messageId, sut.MessageId);
+        }
+
+        [Theory, AutoMoqData]
+        public void AcknowledgeHandled(string messageId)
+        {
+            AssertSerializable<AcknowledgeHandled>();
+
+            var sut = new AcknowledgeHandled(messageId);
             Assert.Equal(messageId, sut.MessageId);
         }
 
