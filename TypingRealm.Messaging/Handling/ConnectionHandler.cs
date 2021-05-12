@@ -144,7 +144,7 @@ namespace TypingRealm.Messaging.Handling
                     if (metadata?.AffectedGroups != null)
                         groups = groups.Where(group => metadata.AffectedGroups.Contains(group));
 
-                    await TrySendPendingUpdates(connectedClient.Groups, cancellationToken).ConfigureAwait(false);
+                    await TrySendPendingUpdates(groups, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
