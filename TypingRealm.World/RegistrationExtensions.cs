@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Profiles.Api.Client;
+using TypingRealm.SignalR.Client;
 
 namespace TypingRealm.World
 {
@@ -23,6 +25,8 @@ namespace TypingRealm.World
                 .RegisterHandler<MoveToLocation, MoveToLocationHandler>()
                 .RegisterHandler<ProposeRopeWarContest, ProposeRopeWarContestHandler>()
                 .RegisterHandler<VoteToStartRopeWar, VoteToStartRopeWarHandler>();
+
+            services.RegisterClientMessagingForServer<SignalRClientConnectionFactoryFactory>();
 
             messageTypes.AddWorldMessages();
             return messageTypes;
