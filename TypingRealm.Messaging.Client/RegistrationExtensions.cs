@@ -19,6 +19,14 @@ namespace TypingRealm.Messaging.Client
             return services;
         }
 
+        public static IServiceCollection RegisterClientMessagingForServer(this IServiceCollection services)
+        {
+            services.RegisterClientMessaging();
+            services.AddTransient<IProfileTokenProvider, ServerProfileTokenProvider>();
+
+            return services;
+        }
+
         public static IServiceCollection RegisterHandler<TMessage, TMessageHandler>(this IServiceCollection services)
             where TMessageHandler : class, IMessageHandler<TMessage>
         {
