@@ -34,7 +34,7 @@ namespace TypingRealm.Messaging.Client
             string characterId,
             CancellationToken cancellationToken)
         {
-            var token = await _profileTokenProvider.SignInAsync()
+            var token = await _profileTokenProvider.SignInAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             await processor.SendWithReceivedAcknowledgementAsync(new Authenticate(token), cancellationToken)
@@ -349,7 +349,7 @@ namespace TypingRealm.Messaging.Client
                             throw new InvalidOperationException("Server send Disconnected message. Reconnecting...");
                             break;
                         case TokenExpired:
-                            var token = await _profileTokenProvider.SignInAsync().ConfigureAwait(false);
+                            var token = await _profileTokenProvider.SignInAsync(default).ConfigureAwait(false);
                             _ = SendWithoutAcknowledgementAsync(new Authenticate(token), resource.CombinedCts.Token);
                             break;
                     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel.OidcClient;
 using TypingRealm.Messaging.Client;
@@ -36,7 +37,7 @@ namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
             _oidcClient = new OidcClient(options);
         }
 
-        public async ValueTask<string> SignInAsync()
+        public async ValueTask<string> SignInAsync(CancellationToken cancellationToken)
         {
             await using var @lock = await _lock.UseWaitAsync(default).ConfigureAwait(false);
 
@@ -48,7 +49,7 @@ namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
             {
                 try
                 {
-                    var refreshResult = await _oidcClient.RefreshTokenAsync(_refreshToken).ConfigureAwait(false);
+                    var refreshResult = await _oidcClient.RefreshTokenAsync(_refreshToken, cancellationToken: cancellationToken).ConfigureAwait(false);
                     if (refreshResult.RefreshToken != null)
                         _refreshToken = refreshResult.RefreshToken;
                     if (refreshResult.IdentityToken != null)
@@ -65,7 +66,7 @@ namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
                 }
             }
 
-            var loginResult = await _oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
+            var loginResult = await _oidcClient.LoginAsync(new LoginRequest(), cancellationToken).ConfigureAwait(false);
             if (loginResult.RefreshToken != null)
                 _refreshToken = loginResult.RefreshToken;
             if (loginResult.IdentityToken != null)

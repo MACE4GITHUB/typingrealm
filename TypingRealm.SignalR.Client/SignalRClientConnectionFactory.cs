@@ -27,7 +27,7 @@ namespace TypingRealm.SignalR.Client
             var hub = new HubConnectionBuilder()
                 .WithUrl(_uri, options =>
                 {
-                    options.AccessTokenProvider = async () => await _profileTokenProvider.SignInAsync().ConfigureAwait(false);
+                    options.AccessTokenProvider = async () => await _profileTokenProvider.SignInAsync(cancellationToken).ConfigureAwait(false);
                     options.Transports = HttpTransportType.WebSockets;
                 })
                 .Build();

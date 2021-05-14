@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using TypingRealm.Messaging.Client;
 
 namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
@@ -12,7 +13,7 @@ namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
             _profile = profile;
         }
 
-        public ValueTask<string> SignInAsync()
+        public ValueTask<string> SignInAsync(CancellationToken cancellationToken)
         {
             return new ValueTask<string>(LocalAuthentication.GenerateProfileAccessToken(_profile));
         }

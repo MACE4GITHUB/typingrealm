@@ -73,7 +73,7 @@ namespace TypingRealm.TestClient
 
             // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
             var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
-            _ = await tokenProvider.SignInAsync().ConfigureAwait(false);
+            _ = await tokenProvider.SignInAsync(default).ConfigureAwait(false);
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
                 .GetAllTypes()
@@ -116,7 +116,7 @@ namespace TypingRealm.TestClient
 
             // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
             var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
-            _ = await tokenProvider.SignInAsync().ConfigureAwait(false);
+            _ = await tokenProvider.SignInAsync(default).ConfigureAwait(false);
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
                 .GetAllTypes()
@@ -159,7 +159,7 @@ namespace TypingRealm.TestClient
 
             // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
             var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
-            _ = await tokenProvider.SignInAsync().ConfigureAwait(false);
+            _ = await tokenProvider.SignInAsync(default).ConfigureAwait(false);
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
                 .GetAllTypes()
@@ -308,7 +308,7 @@ namespace TypingRealm.TestClient
             IProfileTokenProvider tokenProvider,
             string characterName)
         {
-            var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
+            var token = await tokenProvider.SignInAsync(default).ConfigureAwait(false);
             var httpClient = httpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             using var content = new StringContent(JsonSerializer.Serialize(new

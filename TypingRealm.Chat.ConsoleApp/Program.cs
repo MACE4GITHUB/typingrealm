@@ -51,7 +51,7 @@ namespace TypingRealm.Chat.ConsoleApp
 
             // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
             var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
-            var token = await tokenProvider.SignInAsync().ConfigureAwait(false);
+            var token = await tokenProvider.SignInAsync(default).ConfigureAwait(false);
 
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
