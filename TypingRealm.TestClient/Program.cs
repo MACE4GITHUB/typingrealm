@@ -80,7 +80,7 @@ namespace TypingRealm.TestClient
                 .Select(idToType => idToType.Value)
                 .ToList();
 
-            var messageProcessor = provider.GetRequiredService<MessageProcessor>();
+            var messageProcessor = provider.GetRequiredService<IMessageProcessor>();
             var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
 
             await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
@@ -123,7 +123,7 @@ namespace TypingRealm.TestClient
                 .Select(idToType => idToType.Value)
                 .ToList();
 
-            var messageProcessor = provider.GetRequiredService<MessageProcessor>();
+            var messageProcessor = provider.GetRequiredService<IMessageProcessor>();
             var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
 
             await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
@@ -166,7 +166,7 @@ namespace TypingRealm.TestClient
                 .Select(idToType => idToType.Value)
                 .ToList();
 
-            var messageProcessor = provider.GetRequiredService<MessageProcessor>();
+            var messageProcessor = provider.GetRequiredService<IMessageProcessor>();
             var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
 
             await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
@@ -210,7 +210,7 @@ namespace TypingRealm.TestClient
         }*/
 
         private static async Task Handle(
-            MessageProcessor processor,
+            IMessageProcessor processor,
             IEnumerable<Type> messageTypes,
             IProfileTokenProvider tokenProvider,
             IHttpClientFactory httpClientFactory)
@@ -292,13 +292,13 @@ namespace TypingRealm.TestClient
 
                 if (bulk == null)
                 {
-                    await processor.SendWithHandledAcknowledgementAsync(message, default).ConfigureAwait(false);
+                    await processor.SendAsync(message, default).ConfigureAwait(false);
                     continue;
                 }
 
                 for (var i = 1; i <= bulk; i++)
                 {
-                    await processor.SendWithHandledAcknowledgementAsync(message, default).ConfigureAwait(false);
+                    await processor.SendAsync(message, default).ConfigureAwait(false);
                 }
             }
         }

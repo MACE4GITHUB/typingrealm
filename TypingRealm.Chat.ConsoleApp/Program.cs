@@ -66,7 +66,7 @@ namespace TypingRealm.Chat.ConsoleApp
             var clientId = character?.characterId ?? throw new InvalidOperationException("Could not create a character.");
             var group = "lobby";
 
-            var messageProcessor = provider.GetRequiredService<MessageProcessor>();
+            var messageProcessor = provider.GetRequiredService<IMessageProcessor>();
 
             using var cts = new CancellationTokenSource();
             await messageProcessor.ConnectAsync(clientId, cts.Token).ConfigureAwait(false);
@@ -89,10 +89,10 @@ namespace TypingRealm.Chat.ConsoleApp
                 }
             });
 
-            await messageProcessor.SendWithHandledAcknowledgementAsync(new Authenticate(token), default)
+            await messageProcessor.SendAsync(new Authenticate(token), default)
                 .ConfigureAwait(false);
 
-            await messageProcessor.SendWithHandledAcknowledgementAsync(new Connect(clientId, group), default)
+            await messageProcessor.SendAsync(new Connect(clientId, group), default)
                 .ConfigureAwait(false);
 
             while (true)
@@ -100,7 +100,7 @@ namespace TypingRealm.Chat.ConsoleApp
                 var message = Console.ReadLine();
                 if (message != null)
                 {
-                    await messageProcessor.SendWithHandledAcknowledgementAsync(new Say(message), cts.Token)
+                    await messageProcessor.SendAsync(new Say(message), cts.Token)
                         .ConfigureAwait(false);
                 }
             }

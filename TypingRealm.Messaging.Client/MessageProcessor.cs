@@ -46,8 +46,16 @@ namespace TypingRealm.Messaging.Client
         }
     }
 
+    public interface IMessageProcessor
+    {
+        ValueTask ConnectAsync(string characterId, CancellationToken cancellationToken);
+        ValueTask SendAsync(object message, CancellationToken cancellationToken);
+        string Subscribe<TMessage>(Func<TMessage, ValueTask> handler);
+        void Unsubscribe(string subscriptionId);
+    }
+
     // TODO: Introduce heartbeat and heartbeat timeout when we try to reconnect after no reply.
-    public sealed class MessageProcessor : AsyncManagedDisposable
+    public sealed class MessageProcessor : AsyncManagedDisposable, IMessageProcessor
     {
         private readonly ILogger<MessageProcessor> _logger;
         private readonly IClientConnectionFactory _connectionFactory;

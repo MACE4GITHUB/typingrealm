@@ -11,7 +11,7 @@ namespace TypingRealm.Messaging.Client
         /// </summary>
         public static IServiceCollection RegisterClientMessaging(this IServiceCollection services)
         {
-            services.AddSingleton<MessageProcessor>();
+            services.AddSingleton<IMessageProcessor, MessageProcessor>();
             services.AddTransient<IMessageDispatcher, MessageDispatcher>();
             services.AddTransient<IMessageHandlerFactory, MessageHandlerFactory>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
