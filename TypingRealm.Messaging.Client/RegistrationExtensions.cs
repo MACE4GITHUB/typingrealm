@@ -11,20 +11,26 @@ namespace TypingRealm.Messaging.Client
         /// </summary>
         public static IServiceCollection RegisterClientMessaging(this IServiceCollection services)
         {
+            RegisterClientMessagingBase(services);
             services.AddSingleton<IMessageProcessor, MessageProcessor>();
-            services.AddTransient<IMessageDispatcher, MessageDispatcher>();
-            services.AddTransient<IMessageHandlerFactory, MessageHandlerFactory>();
-            services.AddTransient<IAuthenticationService, AuthenticationService>();
 
             return services;
         }
 
         public static IServiceCollection RegisterClientMessagingForServer(this IServiceCollection services)
         {
-            services.RegisterClientMessaging();
+            RegisterClientMessagingBase(services);
             services.AddTransient<IProfileTokenProvider, ServerProfileTokenProvider>();
+            services.AddTransient<IMessageProcessorFactory, MessageProcessorFactory>();
 
             return services;
+        }
+
+        private static void RegisterClientMessagingBase(IServiceCollection services)
+        {
+            services.AddTransient<IMessageDispatcher, MessageDispatcher>();
+            services.AddTransient<IMessageHandlerFactory, MessageHandlerFactory>();
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
         }
 
         public static IServiceCollection RegisterHandler<TMessage, TMessageHandler>(this IServiceCollection services)

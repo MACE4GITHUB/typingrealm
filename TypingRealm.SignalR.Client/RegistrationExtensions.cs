@@ -18,5 +18,12 @@ namespace TypingRealm.SignalR.Client
 
             return services;
         }
+
+        public static IServiceCollection UseSignalRClientConnectionFactoryFactory(this IServiceCollection services)
+        {
+            services.AddTransient<IClientConnectionFactoryFactory, SignalRClientConnectionFactoryFactory>();
+
+            return services;
+        }
     }
 }

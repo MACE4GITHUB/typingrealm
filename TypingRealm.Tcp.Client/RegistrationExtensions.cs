@@ -18,5 +18,12 @@ namespace TypingRealm.Tcp.Client
 
             return services;
         }
+
+        public static IServiceCollection UseTcpProtobufClientConnectionFactoryFactory(
+            this IServiceCollection services)
+        {
+            services.AddTransient<IClientConnectionFactoryFactory, TcpProtobufClientConnectionFactoryFactory>();
+            return services;
+        }
     }
 }
