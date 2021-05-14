@@ -17,6 +17,7 @@ using TypingRealm.RopeWar;
 using TypingRealm.SignalR;
 using TypingRealm.SignalR.Client;
 using TypingRealm.Tcp.Client;
+using TypingRealm.World;
 
 namespace TypingRealm.TestClient
 {
@@ -32,12 +33,13 @@ namespace TypingRealm.TestClient
         public static async Task Main()
         {
             Console.WriteLine("=== TypingRealm test client ===");
-            Console.Write("Type of connection (rw - RopeWar SignalR, rwt - RopeWar TCP / Protobuf): ");
+            Console.Write("Type of connection (rw - RopeWar SignalR, rwt - RopeWar TCP / Protobuf, w - World SignalR): ");
 
             await (Console.ReadLine() switch
             {
                 "rw" => RopeWarSignalR(),
                 "rwt" => RopeWarTcp(),
+                "w" => WorldSignalR(),
                 _ => throw new InvalidOperationException("Invalid type of connection")
             }).ConfigureAwait(false);
         }
@@ -127,121 +129,48 @@ namespace TypingRealm.TestClient
             await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
         }
 
-        /*public static async Task WorldSignalR()
+        public static async Task WorldSignalR()
         {
-            Console.Write("Authentication type (a - auth0, i - identityserver, l - local token): ");
-            var authenticationType = Console.ReadLine()?.ToLowerInvariant() switch
-            {
-                "a" => AuthenticationProviderType.Auth0,
-                "i" => AuthenticationProviderType.IdentityServer,
-                "l" => AuthenticationProviderType.Local,
-                _ => throw new InvalidOperationException("Invalid type.")
-            };
+            var services = new ServiceCollection();
 
-            var profile = "ivan";
-            if (authenticationType == AuthenticationProviderType.Local)
+            services.AddAuth0ProfileTokenProvider();
+            if (DebugHelpers.UseLocalAuthentication)
             {
-                Console.Write("Profile for local token (default = 'ivan'): ");
-                profile = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(profile))
-                    profile = "ivan";
+                Console.Write("Profile for local token: ");
+                var profile = Console.ReadLine() ?? "default";
+
+                services.AddLocalProfileTokenProvider(profile);
             }
 
-            var provider = new ServiceCollection()
+            services
+                .AddHttpClient()
+                .AddLogging() // TODO: Log only to file, console is needed for UI.
                 .AddSerializationCore()
                 .AddTyrAuthenticationMessages()
-                .AddRopeWarMessages()
                 .AddWorldMessages()
                 .Services
                 .AddJson()
-                .AddProfileTokenProvider(authenticationType, profile)
-                .BuildServiceProvider();
+                .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
+                .AddSignalRConnectionFactory()
+                .UseSignalRClientConnectionFactory("http://127.0.0.1:30111/hub")
+                .RegisterClientMessaging();
 
-            var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
-                .GetAllTypes()
-                .Select(idToType => idToType.Value)
-                .ToList();
+            var provider = services.BuildServiceProvider();
 
-            Console.WriteLine("Press enter to connect.");
-            Console.ReadLine();
-
+            // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
             var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
-            var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
-
-            var hub = new HubConnectionBuilder()
-                .WithUrl($"http://127.0.0.1:30111/hub", options =>
-                {
-                    options.AccessTokenProvider = () => Task.FromResult(accessToken);
-                })
-                .Build();
-
-            var notificator = new Notificator();
-            hub.On<ServerToClientMessageData>("Send", message => notificator.NotifyReceived(message));
-
-            await hub.StartAsync(default).ConfigureAwait(false);
-
-            var connection = new SignalRMessageSender(hub).WithNotificator(notificator);
-
-            async ValueTask<IConnection> ConnectToRw()
-            {
-                var accessToken = await tokenProvider.SignInAsync().ConfigureAwait(false);
-
-                var hub = new HubConnectionBuilder()
-                    .WithUrl($"http://127.0.0.1:30102/hub", options =>
-                    {
-                        options.AccessTokenProvider = () => Task.FromResult(accessToken);
-                    })
-                    .WithAutomaticReconnect() // TODO: Test if this works as we expect.
-                    .Build();
-
-                var notificator = new Notificator();
-                hub.On<ServerToClientMessageData>("Send", message => notificator.NotifyReceived(message));
-
-                await hub.StartAsync(default).ConfigureAwait(false);
-
-                return new SignalRMessageSender(hub).WithNotificator(notificator);
-            }
-
-            await Handle(connection, messageTypes, tokenProvider, ConnectToRw).ConfigureAwait(false);
-        }*/
-
-
-        /*public static async Task CombatSignalR()
-        {
-            var provider = new ServiceCollection()
-                .AddSerializationCore()
-                .AddMessageTypesFromAssembly(typeof(TargetingPlayer).Assembly)
-                .AddJson()
-                .Services
-                .BuildServiceProvider();
+            _ = await tokenProvider.SignInAsync().ConfigureAwait(false);
 
             var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
                 .GetAllTypes()
                 .Select(idToType => idToType.Value)
                 .ToList();
 
-            var jsonConnectionFactory = provider.GetRequiredService<IJsonConnectionFactory>();
+            var messageProcessor = provider.GetRequiredService<MessageProcessor>();
+            var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
 
-            Console.WriteLine("Press enter to connect.");
-            Console.ReadLine();
-
-            var hub = new HubConnectionBuilder()
-                .WithUrl("http://127.0.0.1:30101/hub")
-                .Build();
-
-            var notificator = new Notificator();
-            hub.On<JsonSerializedMessage>("Send", message => notificator.NotifyReceived(message));
-
-            await hub.StartAsync(default).ConfigureAwait(false);
-
-            using var sendLock = new SemaphoreSlimLock();
-            using var receiveLock = new SemaphoreSlimLock();
-            var connection = new SignalRMessageSender(hub).WithNotificator(notificator)
-                .WithJson(jsonConnectionFactory)
-                .WithLocking(sendLock, receiveLock);
-
-            await Handle(connection, messageTypes).ConfigureAwait(false);
-        }*/
+            await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
+        }
 
         /*public static async Task MainSignalR()
         {
