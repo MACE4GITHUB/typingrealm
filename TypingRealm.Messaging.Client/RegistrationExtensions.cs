@@ -17,11 +17,13 @@ namespace TypingRealm.Messaging.Client
             return services;
         }
 
-        public static IServiceCollection RegisterClientMessagingForServer(this IServiceCollection services)
+        public static IServiceCollection RegisterClientMessagingForServer<TClientConnectionFactoryFactory>(this IServiceCollection services)
+            where TClientConnectionFactoryFactory : class, IClientConnectionFactoryFactory
         {
             RegisterClientMessagingBase(services);
             services.AddTransient<IProfileTokenProvider, ServerProfileTokenProvider>();
             services.AddTransient<IMessageProcessorFactory, MessageProcessorFactory>();
+            services.AddTransient<IClientConnectionFactoryFactory, TClientConnectionFactoryFactory>();
 
             return services;
         }
