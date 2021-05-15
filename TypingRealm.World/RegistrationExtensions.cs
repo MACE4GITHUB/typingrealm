@@ -4,6 +4,7 @@ using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Profiles.Api.Client;
+using TypingRealm.RopeWar;
 using TypingRealm.SignalR.Client;
 
 namespace TypingRealm.World
@@ -27,6 +28,7 @@ namespace TypingRealm.World
                 .RegisterHandler<VoteToStartRopeWar, VoteToStartRopeWarHandler>();
 
             services.RegisterClientMessagingForServer<SignalRClientConnectionFactoryFactory>();
+            messageTypes.AddRopeWarMessages(); // All the messages from multiplexed connections should be in cache.
 
             messageTypes.AddWorldMessages();
             return messageTypes;
