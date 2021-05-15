@@ -21,7 +21,8 @@ namespace TypingRealm.Messaging.Handling
         private ValueTask DynamicDispatchAsync<TMessage>(ConnectedClient sender, TMessage message, CancellationToken cancellationToken)
         {
             var valueTasks = _messageHandlerFactory.GetHandlersFor<TMessage>()
-                .Select(handler => handler.HandleAsync(sender, message, cancellationToken));
+                .Select(handler => handler.HandleAsync(sender, message, cancellationToken))
+                .ToList(); // ! Important. Without ToList handlers are being called two times. Probably due to ValueTask.
 
             return AsyncHelpers.WhenAll(valueTasks);
         }
