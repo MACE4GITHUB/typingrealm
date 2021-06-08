@@ -36,7 +36,7 @@ namespace TypingRealm.World
             return _locations.FirstOrDefault(l => l.Characters.Contains(characterId));
         }
 
-        public Location FindStartingLocation()
+        public Location FindStartingLocation(string characterId)
         {
             return _locations.FirstOrDefault(l => l.LocationId == "1")!;
         }

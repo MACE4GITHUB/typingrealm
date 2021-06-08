@@ -6,7 +6,7 @@ namespace TypingRealm.World
     {
         Location? Find(string locationId);
         Location? FindLocationForCharacter(string characterId);
-        Location FindStartingLocation();
+        Location FindStartingLocation(string characterId);
         void Save(Location location);
     }
 }

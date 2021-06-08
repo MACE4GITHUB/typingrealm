@@ -19,7 +19,7 @@ namespace TypingRealm.World
             var location = _locationStore.FindLocationForCharacter(connect.ClientId);
             if (location == null)
             {
-                location = _locationStore.FindStartingLocation(); // First time joining the World.
+                location = _locationStore.FindStartingLocation(connect.ClientId); // First time joining the World.
                 location.Characters.Add(connect.ClientId);
                 _locationStore.Save(location);
             }
