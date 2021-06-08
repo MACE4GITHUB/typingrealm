@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.Profiles.Api.Client;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-namespace TypingRealm.World
+namespace TypingRealm.World.Activities.RopeWar
 {
     public sealed class ProposeRopeWarContestHandler : IMessageHandler<ProposeRopeWarContest>
     {
@@ -21,11 +19,11 @@ namespace TypingRealm.World
 
         public async ValueTask HandleAsync(ConnectedClient sender, ProposeRopeWarContest message, CancellationToken cancellationToken)
         {
-            // TODO: Subtract "bet" from character money.
-
             var characterId = sender.ClientId;
 
-            // TODO: Consider just using Group property to get location.
+            // TODO: Subtract "bet" from character money (or put those money on HOLD).
+            // Return them if anything bad happened and contest did not actually work / was canceled / he won eventually.
+
             var location = _locationStore.FindLocationForCharacter(sender.ClientId);
             if (location == null)
                 throw new InvalidOperationException("Location does not exist.");
@@ -38,28 +36,19 @@ namespace TypingRealm.World
 
             var activityId = Guid.NewGuid().ToString();
 
-            // TODO: Maybe consider storing this info in WORLD domain (ALL CHARACTER INFO) for quick and easy access.
-            // Or create a separate domain with faster access than profile API.
+            // TODO: Store Activity in World domain first and foremost, it's not a Character API concern.
+            // Just update Characters API just for a central data store that can be accessed by other domains to check
+            // whether it can serve this client.
+            // Maybe even create a separate api apart from profile - high-performant ACL-like Character Data Cache.
+            // TODO: Check if character is already participating in any other activity - he cannot propose or join any other activity.
             await _charactersClient.EnterActivityAsync(characterId, activityId, cancellationToken)
                 .ConfigureAwait(false);
 
-            location.RopeWars.Add(new RopeWar
-            {
-                ActivityId = activityId,
-                Bet = message.Bet,
-                Name = message.Name,
-                CreatorId = characterId,
-                LeftSideParticipants = message.Side == RopeWarSide.Left ? new List<string>
-                {
-                    characterId
-                } : new List<string>(),
-                RightSideParticipants = message.Side == RopeWarSide.Right ? new List<string>
-                {
-                    characterId
-                } : new List<string>()
-            });
+            var activity = new RopeWarActivity(activityId, message.Name, characterId, message.Bet);
+            activity.Join(characterId, message.Side);
+            location.RopeWarActivities.Add(activity);
+
             _locationStore.Save(location);
         }
     }
 }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

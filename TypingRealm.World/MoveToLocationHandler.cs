@@ -6,6 +6,7 @@ using TypingRealm.Messaging;
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 namespace TypingRealm.World
 {
+    // TODO: I still can move between locations even when I participate in activity. Make sure it's impossible.
     public sealed class MoveToLocationHandler : IMessageHandler<MoveToLocation>
     {
         private readonly ILocationStore _locationStore;

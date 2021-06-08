@@ -5,6 +5,7 @@ using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.SignalR.Client;
+using TypingRealm.World.Activities.RopeWar;
 
 namespace TypingRealm.World
 {
@@ -19,7 +20,7 @@ namespace TypingRealm.World
 
             services
                 .AddTransient<IConnectHook, ConnectHook>()
-                .UseUpdateFactory<LocationUpdateFactory>()
+                .UseUpdateFactory<WorldUpdateFactory>()
                 .RegisterHandler<JoinRopeWarContest, JoinRopeWarContestHandler>()
                 .RegisterHandler<LeaveJoinedRopeWarContest, LeaveJoinedRopeWarContestHandler>()
                 .RegisterHandler<MoveToLocation, MoveToLocationHandler>()
