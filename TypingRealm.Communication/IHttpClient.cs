@@ -7,5 +7,6 @@ namespace TypingRealm.Communication
     {
         ValueTask<T> GetAsync<T>(string uri, string? accessToken, CancellationToken cancellationToken);
         ValueTask PostAsync<T>(string uri, string? accessToken, T content, CancellationToken cancellationToken);
+        ValueTask DeleteAsync(string uri, string? accessToken, CancellationToken cancellationToken);
     }
 }

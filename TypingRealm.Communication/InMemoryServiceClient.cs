@@ -57,5 +57,23 @@ namespace TypingRealm.Communication
             await _httpClient.PostAsync(uri, accessToken, content, cancellationToken)
                 .ConfigureAwait(false);
         }
+
+        public async ValueTask DeleteAsync(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, CancellationToken cancellationToken)
+        {
+            if (!_serviceAddresses.ContainsKey(serviceName))
+                throw new InvalidOperationException("Service is not registered in service discovery.");
+
+            var uri = $"{_serviceAddresses[serviceName]}/{endpoint}";
+
+            var accessToken = endpointAuthenticationType switch
+            {
+                EndpointAuthenticationType.Profile => await _accessTokenProvider.GetProfileTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => await _accessTokenProvider.GetServiceTokenAsync(cancellationToken).ConfigureAwait(false),
+                _ => null
+            };
+
+            await _httpClient.DeleteAsync(uri, accessToken, cancellationToken)
+                .ConfigureAwait(false);
+        }
     }
 }

@@ -3,21 +3,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.Profiles.Api.Client;
+using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Activities.RopeWar
 {
-    public sealed class ProposeRopeWarContestHandler : IMessageHandler<ProposeRopeWarContest>
+    public sealed class ProposeRopeWarContestHandler : LayerHandler<ProposeRopeWarContest>
     {
         private readonly ILocationStore _locationStore;
         private readonly ICharactersClient _charactersClient;
 
-        public ProposeRopeWarContestHandler(ILocationStore locationStore, ICharactersClient charactersClient)
+        public ProposeRopeWarContestHandler(
+            ICharacterActivityStore characterActivityStore,
+            ILocationStore locationStore,
+            ICharactersClient charactersClient)
+            : base(characterActivityStore, Layer.World)
         {
             _locationStore = locationStore;
             _charactersClient = charactersClient;
         }
 
-        public async ValueTask HandleAsync(ConnectedClient sender, ProposeRopeWarContest message, CancellationToken cancellationToken)
+        protected override async ValueTask HandleLayeredMessageAsync(ConnectedClient sender, ProposeRopeWarContest message, CancellationToken cancellationToken)
         {
             var characterId = sender.ClientId;
 
@@ -41,8 +46,6 @@ namespace TypingRealm.World.Activities.RopeWar
             // whether it can serve this client.
             // Maybe even create a separate api apart from profile - high-performant ACL-like Character Data Cache.
             // TODO: Check if character is already participating in any other activity - he cannot propose or join any other activity.
-            await _charactersClient.EnterActivityAsync(characterId, activityId, cancellationToken)
-                .ConfigureAwait(false);
 
             var activity = new RopeWarActivity(activityId, message.Name, characterId, message.Bet);
             activity.Join(characterId, message.Side);

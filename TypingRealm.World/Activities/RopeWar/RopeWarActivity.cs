@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging;
+using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Activities.RopeWar
 {
@@ -32,7 +33,7 @@ namespace TypingRealm.World.Activities.RopeWar
             string name,
             string creatorId,
             long bet)
-            : base(activityId, name, creatorId)
+            : base(Layer.RopeWar, activityId, name, creatorId)
         {
             Bet = bet;
         }
@@ -110,6 +111,14 @@ namespace TypingRealm.World.Activities.RopeWar
                 _leftSideParticipants.Remove(characterId);
 
             _rightSideParticipants.Add(characterId);
+        }
+
+        public void SwitchSides(string characterId)
+        {
+            if (_leftSideParticipants.Contains(characterId))
+                JoinToRightSide(characterId);
+            else
+                JoinToLeftSide(characterId);
         }
 
         public void Leave(string characterId)

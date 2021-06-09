@@ -7,18 +7,18 @@ using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Activities.RopeWar
 {
-    public sealed class LeaveJoinedRopeWarContestHandler : LayerHandler<LeaveJoinedRopeWarContest>
+    public sealed class VoteToStartHandler : LayerHandler<VoteToStart>
     {
         private readonly ILocationStore _locationStore;
 
-        public LeaveJoinedRopeWarContestHandler(
+        public VoteToStartHandler(
             ICharacterActivityStore characterActivityStore, ILocationStore locationStore)
             : base(characterActivityStore, Layer.RopeWar)
         {
             _locationStore = locationStore;
         }
 
-        protected override ValueTask HandleLayeredMessageAsync(ConnectedClient sender, LeaveJoinedRopeWarContest message, CancellationToken cancellationToken)
+        protected override ValueTask HandleLayeredMessageAsync(ConnectedClient sender, VoteToStart message, CancellationToken cancellationToken)
         {
             var location = _locationStore.FindLocationForClient(sender);
             var characterId = sender.ClientId;
@@ -27,9 +27,12 @@ namespace TypingRealm.World.Activities.RopeWar
             if (ropeWar == null)
                 throw new InvalidOperationException("Not in rope war in current location.");
 
-            ropeWar.Leave(characterId);
+            ropeWar.VoteToStart(characterId);
 
             _locationStore.Save(location);
+
+            if (ropeWar.HasStarted)
+                return CharacterActivityStore.EnterActivityAsync(characterId, ropeWar.ActivityId, cancellationToken);
 
             return default;
         }

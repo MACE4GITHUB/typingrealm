@@ -1,22 +1,27 @@
 ﻿using System;
+using TypingRealm.World.Layers;
 
 namespace TypingRealm.World
 {
     public abstract class Activity
     {
-        protected Activity(string activityId, string name, string creatorId)
+        protected Activity(Layer layer, string activityId, string name, string creatorId)
         {
+            Layer = layer;
             ActivityId = activityId;
             Name = name;
             CreatorId = creatorId;
         }
 
+        public Layer Layer { get; }
         public string ActivityId { get; }
         public string Name { get; }
         public string CreatorId { get; }
 
         public bool HasStarted { get; private set; }
         public bool HasFinished { get; private set; }
+
+        public bool IsInProgress => HasStarted && !HasFinished;
 
         protected void Start()
         {

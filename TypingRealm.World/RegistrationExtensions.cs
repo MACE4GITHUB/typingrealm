@@ -6,6 +6,8 @@ using TypingRealm.Messaging.Serialization;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.SignalR.Client;
 using TypingRealm.World.Activities.RopeWar;
+using TypingRealm.World.Layers;
+using TypingRealm.World.Movement;
 
 namespace TypingRealm.World
 {
@@ -16,15 +18,18 @@ namespace TypingRealm.World
             var services = messageTypes.Services;
 
             services.AddSingleton<ILocationStore, LocationStore>();
+            services.AddTransient<IActivityStore>(x => (IActivityStore)x.GetRequiredService<ILocationStore>());
+            services.AddTransient<ICharacterActivityStore, CharacterActivityStore>();
             services.AddProfileApiClients();
 
             services
                 .AddTransient<IConnectHook, ConnectHook>()
                 .UseUpdateFactory<WorldUpdateFactory>()
+                .RegisterHandler<MoveToLocation, MoveToLocationHandler>()
                 .RegisterHandler<JoinRopeWarContest, JoinRopeWarContestHandler>()
                 .RegisterHandler<LeaveJoinedRopeWarContest, LeaveJoinedRopeWarContestHandler>()
-                .RegisterHandler<MoveToLocation, MoveToLocationHandler>()
                 .RegisterHandler<ProposeRopeWarContest, ProposeRopeWarContestHandler>()
+                .RegisterHandler<SwitchSides, SwitchSidesHandler>()
                 .RegisterHandler<VoteToStartRopeWar, VoteToStartRopeWarHandler>();
 
             services.RegisterClientMessagingForServer<SignalRClientConnectionFactoryFactory>();

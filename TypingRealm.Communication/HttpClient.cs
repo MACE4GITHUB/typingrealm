@@ -69,6 +69,21 @@ namespace TypingRealm.Communication
             response.EnsureSuccessStatusCode();
         }
 
+        public async ValueTask DeleteAsync(string uri, string accessToken, CancellationToken cancellationToken)
+        {
+            using var message = new HttpRequestMessage(HttpMethod.Delete, uri);
+
+            if (accessToken != null)
+            {
+                message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
+            var response = await _httpClient.SendAsync(message, cancellationToken)
+                .ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+        }
+
         protected override void DisposeManagedResources()
         {
             _httpClient.Dispose();

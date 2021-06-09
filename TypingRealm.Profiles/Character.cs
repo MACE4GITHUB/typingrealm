@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TypingRealm.Profiles
 {
@@ -11,13 +12,24 @@ namespace TypingRealm.Profiles
             Name = name;
         }
 
+        public Stack<string> Activities { get; } = new Stack<string>();
+
         public CharacterId CharacterId { get; }
         public ProfileId ProfileId { get; }
         public CharacterName Name { get; set; }
         public bool IsArchived { get; private set; }
 
         // TODO: Move from profiles to characters api.
-        public string? ActivityId { get; private set; }
+        public string? CurrentActivityId
+        {
+            get
+            {
+                if (Activities.TryPeek(out var activity))
+                    return activity;
+
+                return null;
+            }
+        }
 
         public void Archive()
         {
@@ -26,18 +38,15 @@ namespace TypingRealm.Profiles
 
         public void EnterActivity(string activityId)
         {
-            if (ActivityId != null)
-                throw new InvalidOperationException("Character already participates in activity.");
-
-            ActivityId = activityId;
+            Activities.Push(activityId);
         }
 
         public void LeaveActivity()
         {
-            if (ActivityId == null)
+            if (CurrentActivityId == null)
                 throw new InvalidOperationException("Not participating in activity.");
 
-            ActivityId = null;
+            Activities.Pop();
         }
     }
 }

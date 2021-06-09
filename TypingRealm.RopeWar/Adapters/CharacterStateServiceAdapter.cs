@@ -16,7 +16,7 @@ namespace TypingRealm.RopeWar.Adapters
 
         public ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken)
         {
-            return _charactersClient.CanJoinRopeWarContestAsync(characterId, contestId, cancellationToken);
+            return _charactersClient.CanJoinActivityAsync(characterId, contestId, cancellationToken);
         }
     }
 }

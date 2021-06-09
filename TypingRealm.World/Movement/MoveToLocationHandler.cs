@@ -2,21 +2,24 @@
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
+using TypingRealm.World.Layers;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-namespace TypingRealm.World
+namespace TypingRealm.World.Movement
 {
     // TODO: I still can move between locations even when I participate in activity. Make sure it's impossible.
-    public sealed class MoveToLocationHandler : IMessageHandler<MoveToLocation>
+    public sealed class MoveToLocationHandler : LayerHandler<MoveToLocation>
     {
         private readonly ILocationStore _locationStore;
 
-        public MoveToLocationHandler(ILocationStore locationStore)
+        public MoveToLocationHandler(
+            ICharacterActivityStore characterActivityStore,
+            ILocationStore locationStore)
+            : base(characterActivityStore, Layer.World)
         {
             _locationStore = locationStore;
         }
 
-        public ValueTask HandleAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
+        protected override ValueTask HandleLayeredMessageAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
         {
             var characterId = sender.ClientId;
             var location = _locationStore.FindLocationForCharacter(characterId);
@@ -51,4 +54,3 @@ namespace TypingRealm.World
         }
     }
 }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

@@ -3,19 +3,23 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
+using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Activities.RopeWar
 {
-    public sealed class JoinRopeWarContestHandler : IMessageHandler<JoinRopeWarContest>
+    public sealed class JoinRopeWarContestHandler : LayerHandler<JoinRopeWarContest>
     {
         private readonly ILocationStore _locationStore;
 
-        public JoinRopeWarContestHandler(ILocationStore locationStore)
+        public JoinRopeWarContestHandler(
+            ICharacterActivityStore characterActivityStore,
+            ILocationStore locationStore)
+            : base(characterActivityStore, Layer.World)
         {
             _locationStore = locationStore;
         }
 
-        public ValueTask HandleAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
+        protected override ValueTask HandleLayeredMessageAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
         {
             var location = _locationStore.FindLocationForCharacter(sender.ClientId);
             if (location == null)

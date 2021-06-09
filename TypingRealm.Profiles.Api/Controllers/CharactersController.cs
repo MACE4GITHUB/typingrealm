@@ -118,25 +118,8 @@ namespace TypingRealm.Profiles.Api.Controllers
             return IsOwner(character);
         }
 
-        // TODO: Move to different, "world character status" API.
-        [HttpGet]
-        [Route("{characterId}/rope-war/{contestId}")]
-        [ServiceScoped]
-        public async ValueTask<ActionResult<bool>> CanJoinRopeWarContest(string characterId, string contestId)
-        {
-            var character = await _characterRepository.FindAsync(new CharacterId(characterId));
-            if (character == null)
-                return NotFound();
-
-            // We are checking scope now, so only backend services are able to call it.
-            /*if (!IsOwner(character))
-                return Forbid();*/
-
-            return character.ActivityId == contestId;
-        }
-
         [HttpPost]
-        [Route("{characterId}/activity/{activityId}")]
+        [Route("{characterId}/activities/{activityId}")]
         [ServiceScoped]
         public async ValueTask<ActionResult> EnterActivity(string characterId, string activityId)
         {
@@ -147,6 +130,47 @@ namespace TypingRealm.Profiles.Api.Controllers
             character.EnterActivity(activityId);
             await _characterRepository.SaveAsync(character);
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route("{characterId}/activities/{activityId}")]
+        [ServiceScoped]
+        public async ValueTask<ActionResult<bool>> CanJoinActivity(string characterId, string activityId)
+        {
+            var character = await _characterRepository.FindAsync(new CharacterId(characterId));
+            if (character == null)
+                return NotFound();
+
+            return character.CurrentActivityId == activityId;
+        }
+
+        [HttpDelete]
+        [Route("{characterId}/activities/{activityId}")]
+        [ServiceScoped]
+        public async ValueTask<ActionResult> LeaveActivity(string characterId, string activityId)
+        {
+            var character = await _characterRepository.FindAsync(new CharacterId(characterId));
+            if (character == null)
+                return NotFound();
+
+            if (character.CurrentActivityId != activityId)
+                return BadRequest("Character's last activity ID is not correct.");
+
+            character.LeaveActivity();
+            await _characterRepository.SaveAsync(character);
+            return NoContent();
+        }
+
+        [HttpGet]
+        [Route("{characterId}/activities")]
+        [ServiceScoped]
+        public async ValueTask<ActionResult<Stack<string>>> GetActivities(string characterId)
+        {
+            var character = await _characterRepository.FindAsync(new CharacterId(characterId));
+            if (character == null)
+                return NotFound();
+
+            return character.Activities;
         }
     }
 }
