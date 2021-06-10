@@ -1,19 +1,22 @@
 ﻿using System;
+using TypingRealm.World.Activities;
 using TypingRealm.World.Layers;
 
 namespace TypingRealm.World
 {
     public abstract class Activity
     {
-        protected Activity(Layer layer, string activityId, string name, string creatorId)
+        protected Activity(Layer layer, string activityId, ActivityType type, string name, string creatorId)
         {
             Layer = layer;
             ActivityId = activityId;
+            Type = type;
             Name = name;
             CreatorId = creatorId;
         }
 
         public Layer Layer { get; }
+        public ActivityType Type { get; }
         public string ActivityId { get; }
         public string Name { get; }
         public string CreatorId { get; }

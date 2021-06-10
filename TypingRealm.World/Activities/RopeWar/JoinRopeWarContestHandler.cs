@@ -28,7 +28,7 @@ namespace TypingRealm.World.Activities.RopeWar
             if (location.LocationId != sender.Group)
                 throw new InvalidOperationException("Synchronization mismatch.");
 
-            var ropeWar = location.RopeWarActivities.Find(rw => rw.ActivityId == message.RopeWarId);
+            var ropeWar = location.RopeWarActivities.ToList().Find(rw => rw.ActivityId == message.RopeWarId);
             if (ropeWar == null)
                 throw new InvalidOperationException("RopeWar with this identity is not proposed yet.");
 

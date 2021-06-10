@@ -33,7 +33,7 @@ namespace TypingRealm.World.Activities.RopeWar
             string name,
             string creatorId,
             long bet)
-            : base(Layer.RopeWar, activityId, name, creatorId)
+            : base(Layer.RopeWar, activityId, ActivityType.RopeWar, name, creatorId)
         {
             Bet = bet;
         }

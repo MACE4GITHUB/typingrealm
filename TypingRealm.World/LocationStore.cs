@@ -1,10 +1,9 @@
-﻿#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TypingRealm.World.Activities.RopeWar;
+using TypingRealm.World.Activities;
 using TypingRealm.World.Layers;
 
 namespace TypingRealm.World
@@ -13,22 +12,25 @@ namespace TypingRealm.World
     {
         private readonly List<Location> _locations = new List<Location>()
         {
-            new Location
+            Location.FromPersistenceState(new LocationPersistenceState
             {
                 LocationId = "1",
-                Locations = new List<string> { "2" },
-                CanProposeRopeWar = false,
-                Characters = new List<string>(),
-                RopeWarActivities = new List<RopeWarActivity>()
-            },
-            new Location
+                Locations = new HashSet<string> { "2" },
+                AllowedActivityTypes = new HashSet<Activities.ActivityType>(),
+                Characters = new HashSet<string>(),
+                Activities = new HashSet<Activity>()
+            }),
+            Location.FromPersistenceState(new LocationPersistenceState
             {
                 LocationId = "2",
-                Locations = new List<string> { "1" },
-                CanProposeRopeWar = true,
-                Characters = new List<string>(),
-                RopeWarActivities = new List<RopeWarActivity>()
-            }
+                Locations = new HashSet<string> { "1" },
+                AllowedActivityTypes = new HashSet<Activities.ActivityType>
+                {
+                    ActivityType.RopeWar
+                },
+                Characters = new HashSet<string>(),
+                Activities = new HashSet<Activity>()
+            })
         };
 
         public Location? Find(string locationId)
@@ -52,6 +54,7 @@ namespace TypingRealm.World
             if (location == null)
                 throw new InvalidOperationException("Location for this character does not exist.");
 
+            // TODO: Get descriptors instead of actual objects that can be modified.
             // TODO: Query total list of activities, not just ropewar activities.
             // And somehow get the STACK of activities for the character?..
             var activities = location.RopeWarActivities.Where(x => x.LeftSideParticipants.Contains(characterId) || x.RightSideParticipants.Contains(characterId));
@@ -64,4 +67,3 @@ namespace TypingRealm.World
         }
     }
 }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

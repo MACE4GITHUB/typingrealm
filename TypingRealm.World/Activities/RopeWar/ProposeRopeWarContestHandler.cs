@@ -36,8 +36,9 @@ namespace TypingRealm.World.Activities.RopeWar
             if (location.LocationId != sender.Group)
                 throw new InvalidOperationException("Synchronization mismatch.");
 
-            if (!location.CanProposeRopeWar)
-                throw new InvalidOperationException("Cannot propose ropewar here.");
+            // TODO: It is being checked inside Location. Remove this code.
+            /*if (!location.CanProposeRopeWar)
+                throw new InvalidOperationException("Cannot propose ropewar here.");*/
 
             var activityId = Guid.NewGuid().ToString();
 
@@ -49,7 +50,7 @@ namespace TypingRealm.World.Activities.RopeWar
 
             var activity = new RopeWarActivity(activityId, message.Name, characterId, message.Bet);
             activity.Join(characterId, message.Side);
-            location.RopeWarActivities.Add(activity);
+            location.CreateActivity(activity); // This will throw if activity cannot be created at this location.
 
             _locationStore.Save(location);
         }

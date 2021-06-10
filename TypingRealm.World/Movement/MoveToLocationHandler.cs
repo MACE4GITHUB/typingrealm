@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
@@ -42,10 +43,10 @@ namespace TypingRealm.World.Movement
                 throw new InvalidOperationException("Location does not exist.");
 
             // TODO: Transaction?
-            location.Characters.Remove(characterId);
+            location.RemoveCharacter(characterId);
             _locationStore.Save(location);
 
-            newLocation.Characters.Add(characterId);
+            newLocation.AddCharacter(characterId);
             _locationStore.Save(newLocation);
 
             sender.Group = newLocation.LocationId;
