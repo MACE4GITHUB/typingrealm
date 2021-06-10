@@ -2,8 +2,7 @@
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-namespace TypingRealm.World
+namespace TypingRealm.World.Activities.RopeWar
 {
     public sealed class VoteToStartRopeWarHandler : IMessageHandler<VoteToStartRopeWar>
     {
@@ -25,4 +24,3 @@ namespace TypingRealm.World
         }
     }
 }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

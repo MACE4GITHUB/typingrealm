@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging;
+using TypingRealm.World.Activities.RopeWar;
 using TypingRealm.World.Layers;
 
-namespace TypingRealm.World.Activities.RopeWar
+namespace TypingRealm.World.Activities
 {
 #pragma warning disable CS8618
     [Message]

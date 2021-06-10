@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging;
 using TypingRealm.World.Activities;
-using TypingRealm.World.Activities.RopeWar;
 
 namespace TypingRealm.World
 {
