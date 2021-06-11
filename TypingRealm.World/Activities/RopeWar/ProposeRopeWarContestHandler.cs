@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
-using TypingRealm.Profiles.Api.Client;
 using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Activities.RopeWar
@@ -10,16 +9,13 @@ namespace TypingRealm.World.Activities.RopeWar
     public sealed class ProposeRopeWarContestHandler : LayerHandler<ProposeRopeWarContest>
     {
         private readonly ILocationStore _locationStore;
-        private readonly ICharactersClient _charactersClient;
 
         public ProposeRopeWarContestHandler(
             ICharacterActivityStore characterActivityStore,
-            ILocationStore locationStore,
-            ICharactersClient charactersClient)
+            ILocationStore locationStore)
             : base(characterActivityStore, Layer.World)
         {
             _locationStore = locationStore;
-            _charactersClient = charactersClient;
         }
 
         protected override async ValueTask HandleLayeredMessageAsync(ConnectedClient sender, ProposeRopeWarContest message, CancellationToken cancellationToken)
