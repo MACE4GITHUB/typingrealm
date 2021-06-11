@@ -21,12 +21,7 @@ namespace TypingRealm.World.Activities.RopeWar
 
         protected override ValueTask HandleMessageAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
         {
-            var location = _locationStore.FindLocationForCharacter(sender.ClientId);
-            if (location == null)
-                throw new InvalidOperationException("Location does not exist.");
-
-            if (location.LocationId != sender.Group)
-                throw new InvalidOperationException("Synchronization mismatch.");
+            var location = _locationStore.FindLocationForClient(sender);
 
             var ropeWar = location.RopeWarActivities.ToList().Find(rw => rw.ActivityId == message.RopeWarId);
             if (ropeWar == null)

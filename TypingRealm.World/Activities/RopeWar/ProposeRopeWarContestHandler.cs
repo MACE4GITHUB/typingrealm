@@ -25,12 +25,7 @@ namespace TypingRealm.World.Activities.RopeWar
             // TODO: Subtract "bet" from character money (or put those money on HOLD).
             // Return them if anything bad happened and contest did not actually work / was canceled / he won eventually.
 
-            var location = _locationStore.FindLocationForCharacter(sender.ClientId);
-            if (location == null)
-                throw new InvalidOperationException("Location does not exist.");
-
-            if (location.LocationId != sender.Group)
-                throw new InvalidOperationException("Synchronization mismatch.");
+            var location = _locationStore.FindLocationForClient(sender);
 
             // TODO: It is being checked inside Location. Remove this code.
             /*if (!location.CanProposeRopeWar)
