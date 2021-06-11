@@ -19,7 +19,7 @@ namespace TypingRealm.World.Activities.RopeWar
             _locationStore = locationStore;
         }
 
-        protected override ValueTask HandleLayeredMessageAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
+        protected override ValueTask HandleMessageAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
         {
             var location = _locationStore.FindLocationForCharacter(sender.ClientId);
             if (location == null)

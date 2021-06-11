@@ -115,11 +115,11 @@ namespace TypingRealm.World.Layers
             if (!canPerformAction)
                 throw new InvalidOperationException("Character cannot perform this action in current layer.");
 
-            await HandleLayeredMessageAsync(sender, message, cancellationToken)
+            await HandleMessageAsync(sender, message, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        protected abstract ValueTask HandleLayeredMessageAsync(
+        protected abstract ValueTask HandleMessageAsync(
             ConnectedClient sender,
             TMessage message,
             CancellationToken cancellationToken);

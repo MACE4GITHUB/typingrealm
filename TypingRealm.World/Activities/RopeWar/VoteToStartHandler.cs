@@ -18,7 +18,7 @@ namespace TypingRealm.World.Activities.RopeWar
             _locationStore = locationStore;
         }
 
-        protected override ValueTask HandleLayeredMessageAsync(ConnectedClient sender, VoteToStart message, CancellationToken cancellationToken)
+        protected override ValueTask HandleMessageAsync(ConnectedClient sender, VoteToStart message, CancellationToken cancellationToken)
         {
             var location = _locationStore.FindLocationForClient(sender);
             var characterId = sender.ClientId;

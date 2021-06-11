@@ -20,7 +20,7 @@ namespace TypingRealm.World.Movement
             _locationStore = locationStore;
         }
 
-        protected override ValueTask HandleLayeredMessageAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
+        protected override ValueTask HandleMessageAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
         {
             var characterId = sender.ClientId;
             var location = _locationStore.FindLocationForCharacter(characterId);
