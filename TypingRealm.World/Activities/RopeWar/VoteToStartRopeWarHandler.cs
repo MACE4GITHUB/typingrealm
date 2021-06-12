@@ -1,19 +1,23 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
+using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Activities.RopeWar
 {
-    public sealed class VoteToStartRopeWarHandler : IMessageHandler<VoteToStartRopeWar>
+    public sealed class VoteToStartRopeWarHandler : LayerHandler<VoteToStartRopeWar>
     {
         private readonly ILocationStore _locationStore;
 
-        public VoteToStartRopeWarHandler(ILocationStore locationStore)
+        public VoteToStartRopeWarHandler(
+            ICharacterActivityStore characterActivityStore,
+            ILocationStore locationStore)
+            : base(characterActivityStore, Layer.RopeWar)
         {
             _locationStore = locationStore;
         }
 
-        public ValueTask HandleAsync(ConnectedClient sender, VoteToStartRopeWar message, CancellationToken cancellationToken)
+        protected override ValueTask HandleMessageAsync(ConnectedClient sender, VoteToStartRopeWar message, CancellationToken cancellationToken)
         {
             var location = _locationStore.FindLocationForClient(sender);
 
