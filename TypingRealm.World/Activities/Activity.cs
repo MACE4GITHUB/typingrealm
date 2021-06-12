@@ -23,8 +23,11 @@ namespace TypingRealm.World
 
         public bool HasStarted { get; private set; }
         public bool HasFinished { get; private set; }
+        public bool CanEdit => !HasStarted && !HasFinished;
 
         public bool IsInProgress => HasStarted && !HasFinished;
+
+        public abstract bool HasParticipant(string characterId);
 
         protected void Start()
         {

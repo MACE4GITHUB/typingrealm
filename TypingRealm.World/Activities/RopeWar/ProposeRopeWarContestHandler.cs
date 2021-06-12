@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.World.Layers;
@@ -18,7 +17,7 @@ namespace TypingRealm.World.Activities.RopeWar
             _locationStore = locationStore;
         }
 
-        protected override async ValueTask HandleMessageAsync(ConnectedClient sender, ProposeRopeWarContest message, CancellationToken cancellationToken)
+        protected override ValueTask HandleMessageAsync(ConnectedClient sender, ProposeRopeWarContest message, CancellationToken cancellationToken)
         {
             var characterId = sender.ClientId;
 
@@ -31,19 +30,16 @@ namespace TypingRealm.World.Activities.RopeWar
             /*if (!location.CanProposeRopeWar)
                 throw new InvalidOperationException("Cannot propose ropewar here.");*/
 
-            var activityId = Guid.NewGuid().ToString();
-
             // TODO: Store Activity in World domain first and foremost, it's not a Character API concern.
             // Just update Characters API just for a central data store that can be accessed by other domains to check
             // whether it can serve this client.
             // Maybe even create a separate api apart from profile - high-performant ACL-like Character Data Cache.
             // TODO: Check if character is already participating in any other activity - he cannot propose or join any other activity.
 
-            var activity = new RopeWarActivity(activityId, message.Name, characterId, message.Bet);
-            activity.Join(characterId, message.Side);
-            location.CreateActivity(activity); // This will throw if activity cannot be created at this location.
+            location.ProposeRopeWarContest(characterId, message.Name, message.Bet, message.Side);
 
             _locationStore.Save(location);
+            return default;
         }
     }
 }

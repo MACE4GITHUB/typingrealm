@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,10 +30,9 @@ namespace TypingRealm.World.Layers
             if (activitiesIds.Any())
                 return false;
 
-            var activities = await _activityStore.GetActivitiesForCharacterAsync(characterId, cancellationToken)
-                .ConfigureAwait(false);
+            var activity = _activityStore.GetCurrentCharacterActivityOrDefault(characterId);
 
-            return CanPerformActionsInLayer(activities, layer);
+            return CanPerformActionsInLayer(activity, layer);
         }
 
         public ValueTask EnterActivityAsync(string characterId, string activityId, CancellationToken cancellationToken)
@@ -47,9 +45,9 @@ namespace TypingRealm.World.Layers
             return _charactersClient.LeaveActivityAsync(characterId, activityId, cancellationToken);
         }
 
-        private static bool CanPerformActionsInLayer(Stack<Activity> activities, Layer layer)
+        private static bool CanPerformActionsInLayer(Activity? currentActivity, Layer layer)
         {
-            if (activities.Count == 0)
+            if (currentActivity == null)
             {
                 // Player is in World, it has no removable activities.
                 if (layer == Layer.World)
@@ -57,8 +55,6 @@ namespace TypingRealm.World.Layers
 
                 return false;
             }
-
-            var currentActivity = activities.Peek();
 
             // If activity is in progress - you can only talk to a different domain until activity is finished.
             // We cannot edit the activity anymore.
@@ -92,7 +88,7 @@ namespace TypingRealm.World.Layers
 
     public interface IActivityStore
     {
-        ValueTask<Stack<Activity>> GetActivitiesForCharacterAsync(string characterId, CancellationToken cancellationToken);
+        Activity? GetCurrentCharacterActivityOrDefault(string characterId);
     }
 
     public abstract class LayerHandler<TMessage> : IMessageHandler<TMessage>

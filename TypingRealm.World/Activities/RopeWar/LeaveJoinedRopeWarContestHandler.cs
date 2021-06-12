@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.World.Layers;
@@ -23,11 +21,7 @@ namespace TypingRealm.World.Activities.RopeWar
             var location = _locationStore.FindLocationForClient(sender);
             var characterId = sender.ClientId;
 
-            var ropeWar = location.RopeWarActivities.FirstOrDefault(rw => rw.LeftSideParticipants.Contains(characterId) || rw.RightSideParticipants.Contains(characterId));
-            if (ropeWar == null)
-                throw new InvalidOperationException("Not in rope war in current location.");
-
-            ropeWar.Leave(characterId);
+            location.LeaveRopeWarContest(characterId);
 
             _locationStore.Save(location);
 

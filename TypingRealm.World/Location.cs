@@ -81,54 +81,84 @@ namespace TypingRealm.World
         public IEnumerable<string> Locations => _locations;
 
         // TODO: Make this private, do not expose modifiable objects outside aggregate root boundary.
-        public IEnumerable<RopeWarActivity> RopeWarActivities => _activities
+        private IEnumerable<RopeWarActivity> RopeWarActivities => _activities
             .Where(a => a.Type == ActivityType.RopeWar)
             .Select(activity => (RopeWarActivity)activity);
+
+        public Activity? GetCurrentActivityOrDefault(string characterId)
+        {
+            // TODO: Do not return the activity itself, return an immutable descriptor.
+            return _activities.SingleOrDefault(a => a.HasParticipant(characterId));
+        }
 
         public void VoteToStartRopeWar(string characterId)
         {
             var ropeWar = GetRopeWarFor(characterId);
-            if (ropeWar == null)
-                throw new InvalidOperationException("Rope war does not exist for this character.");
 
-            if (ropeWar.HasStarted || ropeWar.HasFinished)
-                throw new InvalidOperationException("Rope war has already started or finished.");
+            if (!ropeWar.CanEdit)
+                throw new InvalidOperationException("Rope war has already started or finished, or you cannot edit it by some other reason.");
 
             ropeWar.VoteToStart(characterId);
         }
 
         public void JoinRopeWarContest(string characterId, string ropeWarId, RopeWarSide side)
         {
-            if (!_characters.Contains(characterId))
-                throw new InvalidOperationException("Character is not at this location.");
+            ValidateCharacterIsHere(characterId);
+            ValidateCharacterIsNotInAnyActivity(characterId);
 
-            var ropeWar = RopeWarActivities.SingleOrDefault(a => a.ActivityId == ropeWarId);
-            if (ropeWar == null)
-                throw new InvalidOperationException("RopeWarContest with this ID does not exist at this location.");
-
-            if (ropeWar.HasParticipant(characterId))
-                throw new InvalidOperationException("Character is already joined to this contest.");
-
+            var ropeWar = GetRopeWarById(ropeWarId);
             ropeWar.Join(characterId, side);
         }
 
-        public void CreateActivity(Activity activity)
+        public string ProposeRopeWarContest(string characterId, string name, long bet, RopeWarSide side)
         {
-            if (!_allowedActivityTypes.Contains(activity.Type))
-                throw new InvalidOperationException("Cannot create this activity at this location.");
+            ValidateCharacterIsHere(characterId);
+            ValidateCharacterIsNotInAnyActivity(characterId);
 
-            _activities.Add(activity);
+            var activityId = Guid.NewGuid().ToString();
+
+            var ropeWar = new RopeWarActivity(activityId, name, characterId, bet);
+            _activities.Add(ropeWar);
+
+            ropeWar.Join(characterId, side);
+            return activityId;
         }
 
-        public void AddCharacter(string character)
+        public void LeaveRopeWarContest(string characterId)
         {
-            _characters.Add(character);
+            ValidateCharacterIsHere(characterId);
+
+            var ropeWar = GetRopeWarFor(characterId);
+            ropeWar.Leave(characterId);
         }
 
-        public void RemoveCharacter(string character)
+        public void SwitchSidesInRopeWar(string characterId)
         {
+            ValidateCharacterIsHere(characterId);
+
+            var ropeWar = GetRopeWarFor(characterId);
+            ropeWar.SwitchSides(characterId);
+        }
+
+        public void AddCharacter(string characterId)
+        {
+            if (_characters.Contains(characterId))
+                throw new InvalidOperationException("Character is already on this location.");
+
+            // TODO: !!! validate somehow that character is NOT at ANY other location (location-less).
+
+            _characters.Add(characterId);
+        }
+
+        public void RemoveCharacter(string characterId)
+        {
+            ValidateCharacterIsHere(characterId);
+
+            if (IsCharacterInActivity(characterId))
+                throw new InvalidOperationException("Character is participating in an activity. Cannot leave location.");
+
             // TODO: When moving from one location to another we need to do a transaction. Consider having a separate "Character" aggregate that will have locationId set on it.
-            _characters.Remove(character);
+            _characters.Remove(characterId);
         }
 
         public WorldState GetWorldState()
@@ -143,9 +173,40 @@ namespace TypingRealm.World
             };
         }
 
-        private RopeWarActivity? GetRopeWarFor(string characterId)
+        private RopeWarActivity GetRopeWarById(string ropeWarId)
         {
-            return RopeWarActivities.FirstOrDefault(rw => rw.HasParticipant(characterId));
+            var ropeWar = RopeWarActivities.SingleOrDefault(a => a.ActivityId == ropeWarId);
+            if (ropeWar == null)
+                throw new InvalidOperationException("RopeWarContest with this ID does not exist at this location.");
+
+            return ropeWar;
+        }
+
+        private RopeWarActivity GetRopeWarFor(string characterId)
+        {
+            var ropeWar = RopeWarActivities.FirstOrDefault(rw => rw.HasParticipant(characterId));
+            if (ropeWar == null)
+                throw new InvalidOperationException("RopeWar for this character is not found.");
+
+            return ropeWar;
+        }
+
+        private void ValidateCharacterIsHere(string characterId)
+        {
+            if (!_characters.Contains(characterId))
+                throw new InvalidOperationException("Character is not at this location.");
+        }
+
+        private void ValidateCharacterIsNotInAnyActivity(string characterId)
+        {
+            // TODO: Think about making a Character entity that would have CurrentActivity property.
+            if (IsCharacterInActivity(characterId))
+                throw new InvalidOperationException("Character is already participating in an activity.");
+        }
+
+        private bool IsCharacterInActivity(string characterId)
+        {
+            return _activities.Any(activity => activity.HasParticipant(characterId));
         }
     }
 #pragma warning restore IDE0032 // Use auto property

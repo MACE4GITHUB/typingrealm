@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using TypingRealm.World.Activities;
 using TypingRealm.World.Layers;
 
@@ -48,7 +46,7 @@ namespace TypingRealm.World
             return _locations.FirstOrDefault(l => l.LocationId == "1")!;
         }
 
-        public ValueTask<Stack<Activity>> GetActivitiesForCharacterAsync(string characterId, CancellationToken cancellationToken)
+        public Activity? GetCurrentCharacterActivityOrDefault(string characterId)
         {
             var location = _locations.FirstOrDefault(l => l.Characters.Contains(characterId));
             if (location == null)
@@ -57,9 +55,9 @@ namespace TypingRealm.World
             // TODO: Get descriptors instead of actual objects that can be modified.
             // TODO: Query total list of activities, not just ropewar activities.
             // And somehow get the STACK of activities for the character?..
-            var activities = location.RopeWarActivities.Where(x => x.LeftSideParticipants.Contains(characterId) || x.RightSideParticipants.Contains(characterId));
+            var currentActivity = location.GetCurrentActivityOrDefault(characterId);
 
-            return new ValueTask<Stack<Activity>>(new Stack<Activity>(activities));
+            return currentActivity;
         }
 
         public void Save(Location location)
