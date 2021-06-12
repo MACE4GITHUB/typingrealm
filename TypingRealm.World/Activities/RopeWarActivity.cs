@@ -44,10 +44,9 @@ namespace TypingRealm.World.Activities
         public IEnumerable<string> RightSideParticipants => _rightSideParticipants;
         public IEnumerable<string> VotesToStart => _votesToStart;
 
-        public override bool HasParticipant(string characterId)
+        public override IEnumerable<string> GetParticipants()
         {
-            return _leftSideParticipants.Contains(characterId)
-                || _rightSideParticipants.Contains(characterId);
+            return _leftSideParticipants.Concat(_rightSideParticipants);
         }
 
         public void VoteToStart(string characterId)

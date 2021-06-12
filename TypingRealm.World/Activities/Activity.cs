@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using TypingRealm.World.Activities;
 using TypingRealm.World.Layers;
 
@@ -27,7 +29,7 @@ namespace TypingRealm.World
 
         public bool IsInProgress => HasStarted && !HasFinished;
 
-        public abstract bool HasParticipant(string characterId);
+        public bool HasParticipant(string characterId) => GetParticipants().Contains(characterId);
 
         protected void Start()
         {
@@ -50,5 +52,7 @@ namespace TypingRealm.World
 
             HasFinished = true;
         }
+
+        public abstract IEnumerable<string> GetParticipants();
     }
 }

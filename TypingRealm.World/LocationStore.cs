@@ -8,6 +8,13 @@ namespace TypingRealm.World
 {
     public sealed class LocationStore : ILocationStore, IActivityStore
     {
+        /*private readonly ICharactersClient _charactersClient;
+
+        public LocationStore(ICharactersClient charactersClient)
+        {
+            _charactersClient = charactersClient;
+        }*/
+
         private readonly List<Location> _locations = new List<Location>()
         {
             Location.FromPersistenceState(new LocationPersistenceState
@@ -62,6 +69,40 @@ namespace TypingRealm.World
 
         public void Save(Location location)
         {
+            foreach (var @event in location.CommitDomainEvents())
+            {
+                if (@event.Type == DomainEventType.ActivityStarted)
+                {
+                    HandleActivityStarted(@event.ActivityId);
+                }
+            }
+        }
+
+        private Location GetLocationForActivity(string activityId)
+        {
+            var location = _locations.SingleOrDefault(l => l.HasActivity(activityId));
+            if (location == null)
+                throw new InvalidOperationException("No such activity found in any of the locations.");
+
+            return location;
+        }
+
+        private void HandleActivityStarted(string activityId)
+        {
+            var location = GetLocationForActivity(activityId);
+
+            foreach (var characterId in location.GetAllCharactersInActivity(activityId))
+            {
+                // If some operations fail - we end up in inconsistent state. We need to make it a single API call.
+                // And if we fail - we need to revert IsStarted to false and repeat voting process or smth.
+
+                // TODO: Come up with a way to do this here. We can't use _charactersClient
+                // because it requires ConnectedClientContext and we don't have it here (scoped inside singleton).
+
+                _ = characterId;
+                /*_charactersClient.EnterActivityAsync(characterId, activityId, default).AsTask()
+                    .GetAwaiter().GetResult();*/
+            }
         }
     }
 }

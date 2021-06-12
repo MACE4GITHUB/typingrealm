@@ -29,6 +29,17 @@ namespace TypingRealm.World
     }
 #pragma warning restore CS8618
 
+    public enum DomainEventType
+    {
+        ActivityStarted
+    }
+
+    public sealed record DomainEvent(
+        DomainEventType Type,
+        string LocationId,
+        string CharacterId,
+        string ActivityId);
+
 #pragma warning disable IDE0032
     public sealed class Location
     {
@@ -37,6 +48,17 @@ namespace TypingRealm.World
         private readonly HashSet<ActivityType> _allowedActivityTypes;
         private readonly HashSet<Activity> _activities = new HashSet<Activity>();
         private readonly HashSet<string> _characters = new HashSet<string>();
+
+        // Experimental take on domain events.
+        private readonly Queue<DomainEvent> _domainEvents = new Queue<DomainEvent>();
+
+        public IEnumerable<DomainEvent> CommitDomainEvents()
+        {
+            var events = _domainEvents.ToList();
+            _domainEvents.Clear();
+
+            return events;
+        }
 
         private Location(LocationPersistenceState persistenceState)
         {
@@ -85,6 +107,17 @@ namespace TypingRealm.World
             .Where(a => a.Type == ActivityType.RopeWar)
             .Select(activity => (RopeWarActivity)activity);
 
+        public bool HasActivity(string activityId) => _activities.Any(a => a.ActivityId == activityId);
+
+        public IEnumerable<string> GetAllCharactersInActivity(string activityId)
+        {
+            var activity = _activities.SingleOrDefault(a => a.ActivityId == activityId);
+            if (activity == null)
+                throw new InvalidOperationException("Activity doesn't exist on this location.");
+
+            return activity.GetParticipants();
+        }
+
         public Activity? GetCurrentActivityOrDefault(string characterId)
         {
             // TODO: Do not return the activity itself, return an immutable descriptor.
@@ -99,6 +132,11 @@ namespace TypingRealm.World
                 throw new InvalidOperationException("Rope war has already started or finished, or you cannot edit it by some other reason.");
 
             ropeWar.VoteToStart(characterId);
+
+            if (ropeWar.HasStarted)
+            {
+                _domainEvents.Enqueue(new DomainEvent(DomainEventType.ActivityStarted, _locationId, characterId, ropeWar.ActivityId));
+            }
         }
 
         public void JoinRopeWarContest(string characterId, string ropeWarId, RopeWarSide side)

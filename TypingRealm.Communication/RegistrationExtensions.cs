@@ -9,7 +9,7 @@ namespace TypingRealm.Communication
         {
             services.TryAddTransient<IAccessTokenProvider, AnonymousAccessTokenProvider>();
 
-            // One http client per connection.
+            // Register as scoped so that we have one http client per connection.
             services.AddScoped<IHttpClient, HttpClient>();
 
             services.AddTransient<IServiceClient, InMemoryServiceClient>();
