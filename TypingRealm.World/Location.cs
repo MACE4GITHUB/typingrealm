@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging;
 using TypingRealm.World.Activities;
+using TypingRealm.World.Activities.RopeWar;
 
 namespace TypingRealm.World
 {
@@ -94,6 +95,21 @@ namespace TypingRealm.World
                 throw new InvalidOperationException("Rope war has already started or finished.");
 
             ropeWar.VoteToStart(characterId);
+        }
+
+        public void JoinRopeWarContest(string characterId, string ropeWarId, RopeWarSide side)
+        {
+            if (!_characters.Contains(characterId))
+                throw new InvalidOperationException("Character is not at this location.");
+
+            var ropeWar = RopeWarActivities.SingleOrDefault(a => a.ActivityId == ropeWarId);
+            if (ropeWar == null)
+                throw new InvalidOperationException("RopeWarContest with this ID does not exist at this location.");
+
+            if (ropeWar.HasParticipant(characterId))
+                throw new InvalidOperationException("Character is already joined to this contest.");
+
+            ropeWar.Join(characterId, side);
         }
 
         public void CreateActivity(Activity activity)

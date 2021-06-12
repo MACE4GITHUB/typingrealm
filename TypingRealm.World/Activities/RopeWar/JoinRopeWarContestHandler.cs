@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.World.Layers;
@@ -21,17 +19,10 @@ namespace TypingRealm.World.Activities.RopeWar
 
         protected override ValueTask HandleMessageAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
         {
+            var characterId = sender.ClientId;
             var location = _locationStore.FindLocationForClient(sender);
 
-            var ropeWar = location.RopeWarActivities.ToList().Find(rw => rw.ActivityId == message.RopeWarId);
-            if (ropeWar == null)
-                throw new InvalidOperationException("RopeWar with this identity is not proposed yet.");
-
-            if (ropeWar.LeftSideParticipants.Contains(sender.ClientId)
-                || ropeWar.RightSideParticipants.Contains(sender.ClientId))
-                throw new InvalidOperationException("You are already joined to this contest.");
-
-            ropeWar.Join(sender.ClientId, message.Side);
+            location.JoinRopeWarContest(characterId, message.RopeWarId, message.Side);
 
             _locationStore.Save(location);
             return default;
