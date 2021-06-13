@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TypingRealm.Profiles.Infrastructure
@@ -29,6 +30,42 @@ namespace TypingRealm.Profiles.Infrastructure
 
             _cache[character.CharacterId] = character;
             return default;
+        }
+    }
+
+    public sealed class InMemoryActivityRepository : IActivityRepository
+    {
+        internal readonly Dictionary<string, Activity> _cache
+            = new Dictionary<string, Activity>();
+
+        public Activity? Find(string activityId)
+        {
+            if (!_cache.ContainsKey(activityId))
+                return null;
+
+            return _cache[activityId];
+        }
+
+        public Activity? FindForCharacter(string characterId)
+        {
+            return _cache.Values.SingleOrDefault(activity => activity.CharacterIds.Contains(characterId));
+        }
+
+        public void Save(Activity activity)
+        {
+            if (!_cache.ContainsKey(activity.ActivityId))
+            {
+                _cache.Add(activity.ActivityId, activity);
+            }
+
+            _cache[activity.ActivityId] = activity;
+        }
+
+        public bool ValidateCharactersDoNotHaveActivity(IEnumerable<string> characterIds)
+        {
+            return !_cache.Values.SelectMany(activity => activity.CharacterIds)
+                .Intersect(characterIds)
+                .Any();
         }
     }
 }

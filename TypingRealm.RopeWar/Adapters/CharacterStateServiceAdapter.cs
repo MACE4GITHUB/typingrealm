@@ -7,16 +7,20 @@ namespace TypingRealm.RopeWar.Adapters
     // TODO: Consider getting rid of this adapter now that we have ICharactersClient.
     public sealed class CharacterStateServiceAdapter : ICharacterStateService
     {
-        private readonly ICharactersClient _charactersClient;
+        private readonly IActivitiesClient _activitiesClient;
 
-        public CharacterStateServiceAdapter(ICharactersClient charactersClient)
+        public CharacterStateServiceAdapter(IActivitiesClient activitiesClient)
         {
-            _charactersClient = charactersClient;
+            _activitiesClient = activitiesClient;
         }
 
-        public ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken)
+        public async ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken)
         {
-            return _charactersClient.CanJoinActivityAsync(characterId, contestId, cancellationToken);
+            var currentActivity = await _activitiesClient.GetCurrentActivityAsync(characterId, cancellationToken)
+                .ConfigureAwait(false);
+
+            // TODO: Also check that given activity is exactly of RopeWar type!!!
+            return currentActivity != null && currentActivity == contestId;
         }
     }
 }

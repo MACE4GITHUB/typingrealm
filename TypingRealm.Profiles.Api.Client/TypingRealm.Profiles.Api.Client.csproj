@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles.Api.Resources\TypingRealm.Profiles.Api.Resources.csproj" />
   </ItemGroup>
 
 </Project>

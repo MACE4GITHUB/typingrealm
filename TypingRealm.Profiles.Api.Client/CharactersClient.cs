@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Communication;
+using TypingRealm.Profiles.Api.Resources;
 
 namespace TypingRealm.Profiles.Api.Client
 {
@@ -23,43 +23,45 @@ namespace TypingRealm.Profiles.Api.Client
                 EndpointAuthenticationType.Profile,
                 cancellationToken);
         }
+    }
 
-        public ValueTask<bool> CanJoinActivityAsync(string characterId, string activityId, CancellationToken cancellationToken)
+    public sealed class ActivitiesClient : IActivitiesClient
+    {
+        public static readonly string RoutePrefix = "api/activities";
+        private readonly IServiceClient _serviceClient;
+
+        public ActivitiesClient(IServiceClient serviceClient)
         {
-            return _serviceClient.GetAsync<bool>(
+            _serviceClient = serviceClient;
+        }
+
+        public ValueTask<string?> GetCurrentActivityAsync(string characterId, CancellationToken cancellationToken)
+        {
+            // TODO: If controller returnsNotFound - do not fail but return null.
+            return _serviceClient.GetAsync<string?>(
                 ServiceConfiguration.ServiceName,
-                $"{RoutePrefix}/{characterId}/activities/{activityId}",
+                $"{RoutePrefix}/current/{characterId}",
                 EndpointAuthenticationType.Service,
                 cancellationToken);
         }
 
-        public ValueTask EnterActivityAsync(string characterId, string activityId, CancellationToken cancellationToken)
+        public ValueTask StartActivityAsync(ActivityResource activityResource, CancellationToken cancellationToken)
         {
-            return _serviceClient.PostAsync<object>(
+            return _serviceClient.PostAsync(
                 ServiceConfiguration.ServiceName,
-                $"{RoutePrefix}/{characterId}/activities/{activityId}",
+                $"{RoutePrefix}",
                 EndpointAuthenticationType.Service,
-                new { },
+                activityResource,
                 cancellationToken);
         }
 
-        public ValueTask<Stack<string>> GetActivitiesAsync(string characterId, CancellationToken cancellationToken)
-        {
-            return _serviceClient.GetAsync<Stack<string>>(
-                ServiceConfiguration.ServiceName,
-                $"{RoutePrefix}/{characterId}/activities",
-                EndpointAuthenticationType.Service,
-                cancellationToken);
-        }
-
-        public ValueTask LeaveActivityAsync(string characterId, string activityId, CancellationToken cancellationToken)
+        public ValueTask FinishActivityAsync(string activityId, CancellationToken cancellationToken)
         {
             return _serviceClient.DeleteAsync(
                 ServiceConfiguration.ServiceName,
-                $"{RoutePrefix}/{characterId}/activities/{activityId}",
+                $"{RoutePrefix}/{activityId}",
                 EndpointAuthenticationType.Service,
                 cancellationToken);
         }
-
     }
 }

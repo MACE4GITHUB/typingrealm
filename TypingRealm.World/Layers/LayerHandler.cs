@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
@@ -9,40 +8,30 @@ namespace TypingRealm.World.Layers
 {
     public sealed class CharacterActivityStore : ICharacterActivityStore
     {
-        private readonly ICharactersClient _charactersClient;
+        private readonly IActivitiesClient _activitiesClient;
         private readonly IActivityStore _activityStore;
 
         public CharacterActivityStore(
-            ICharactersClient charactersClient,
+            IActivitiesClient activitiesClient,
             IActivityStore activityStore)
         {
-            _charactersClient = charactersClient;
+            _activitiesClient = activitiesClient;
             _activityStore = activityStore;
         }
 
         public async ValueTask<bool> CanPerformActionsInLayerAsync(string characterId, Layer layer, CancellationToken cancellationToken)
         {
             // Get already started activities.
-            var activitiesIds = await _charactersClient.GetActivitiesAsync(characterId, cancellationToken)
+            var currentActivity = await _activitiesClient.GetCurrentActivityAsync(characterId, cancellationToken)
                 .ConfigureAwait(false);
 
             // For now whenever we already have any started activity - do not allow any actions in the whole World domain anymore.
-            if (activitiesIds.Any())
+            if (currentActivity != null)
                 return false;
 
             var activity = _activityStore.GetCurrentCharacterActivityOrDefault(characterId);
 
             return CanPerformActionsInLayer(activity, layer);
-        }
-
-        public ValueTask EnterActivityAsync(string characterId, string activityId, CancellationToken cancellationToken)
-        {
-            return _charactersClient.EnterActivityAsync(characterId, activityId, cancellationToken);
-        }
-
-        public ValueTask LeaveActivityAsync(string characterId, string activityId, CancellationToken cancellationToken)
-        {
-            return _charactersClient.LeaveActivityAsync(characterId, activityId, cancellationToken);
         }
 
         private static bool CanPerformActionsInLayer(Activity? currentActivity, Layer layer)
@@ -82,8 +71,6 @@ namespace TypingRealm.World.Layers
     public interface ICharacterActivityStore
     {
         ValueTask<bool> CanPerformActionsInLayerAsync(string characterId, Layer layer, CancellationToken cancellationToken);
-        ValueTask EnterActivityAsync(string characterId, string activityId, CancellationToken cancellationToken);
-        ValueTask LeaveActivityAsync(string characterId, string activityId, CancellationToken cancellationToken);
     }
 
     public interface IActivityStore

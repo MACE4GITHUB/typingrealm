@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Profiles.Api.Client;
+using TypingRealm.Profiles.Api.Resources;
 using TypingRealm.World.Activities;
 using TypingRealm.World.Layers;
 
@@ -36,14 +37,14 @@ namespace TypingRealm.World
     public sealed class LocationRepository : ILocationRepository, IActivityStore
     {
         private readonly LocationStore _locationStore;
-        private readonly ICharactersClient _charactersClient;
+        private readonly IActivitiesClient _activitiesClient;
 
         public LocationRepository(
             LocationStore locationStore,
-            ICharactersClient charactersClient)
+            IActivitiesClient activitiesClient)
         {
             _locationStore = locationStore;
-            _charactersClient = charactersClient;
+            _activitiesClient = activitiesClient;
         }
 
         public Location? Find(string locationId)
@@ -98,18 +99,11 @@ namespace TypingRealm.World
         private void HandleActivityStarted(string activityId)
         {
             var location = GetLocationForActivity(activityId);
+            var characters = location.GetAllCharactersInActivity(activityId);
 
-            foreach (var characterId in location.GetAllCharactersInActivity(activityId))
-            {
-                // If some operations fail - we end up in inconsistent state. We need to make it a single API call.
-                // And if we fail - we need to revert IsStarted to false and repeat voting process or smth.
-
-                // TODO: Come up with a way to do this here. We can't use _charactersClient
-                // because it requires ConnectedClientContext and we don't have it here (scoped inside singleton).
-
-                _charactersClient.EnterActivityAsync(characterId, activityId, default).AsTask()
-                    .GetAwaiter().GetResult();
-            }
+            var activityResource = new ActivityResource(activityId, characters);
+            _activitiesClient.StartActivityAsync(activityResource, default)
+                .AsTask().GetAwaiter().GetResult();
         }
     }
 }

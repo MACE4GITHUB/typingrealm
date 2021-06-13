@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,8 +38,20 @@ namespace TypingRealm.Communication
                 _ => null
             };
 
-            return await _httpClient.GetAsync<T>(uri, accessToken, cancellationToken)
-                .ConfigureAwait(false);
+            try
+            {
+                return await _httpClient.GetAsync<T>(uri, accessToken, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (HttpRequestException exception)
+            {
+                // TODO: Consider placing it in some other place of code, like IHttpClient.
+                // TODO: Fix the issue that if endpoint return STRUCT - we return default value when it's not found!
+                if (exception.StatusCode == HttpStatusCode.NotFound)
+                    return default!;
+
+                throw;
+            }
         }
 
         public async ValueTask PostAsync<T>(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, T content, CancellationToken cancellationToken)

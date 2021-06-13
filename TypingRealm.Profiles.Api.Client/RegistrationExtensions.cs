@@ -6,7 +6,8 @@ namespace TypingRealm.Profiles.Api.Client
     {
         public static IServiceCollection AddProfileApiClients(this IServiceCollection services)
         {
-            return services.AddTransient<ICharactersClient, CharactersClient>();
+            return services.AddTransient<ICharactersClient, CharactersClient>()
+                .AddTransient<IActivitiesClient, ActivitiesClient>();
         }
     }
 }
