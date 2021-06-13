@@ -58,6 +58,8 @@ namespace TypingRealm.Communication
             using var message = new HttpRequestMessage(HttpMethod.Post, uri);
             using var stringContent = new StringContent(JsonSerializer.Serialize(content, options: options), Encoding.UTF8, "application/json");
 
+            message.Content = stringContent;
+
             if (accessToken != null)
             {
                 message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
