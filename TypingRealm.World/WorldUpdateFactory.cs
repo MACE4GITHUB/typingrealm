@@ -5,10 +5,10 @@ namespace TypingRealm.World
 {
     public sealed class WorldUpdateFactory : IUpdateFactory
     {
-        private readonly ILocationStore _locationStore;
+        private readonly ILocationRepository _locationStore;
 
         public WorldUpdateFactory(
-            ILocationStore locationStore)
+            ILocationRepository locationStore)
         {
             _locationStore = locationStore;
         }

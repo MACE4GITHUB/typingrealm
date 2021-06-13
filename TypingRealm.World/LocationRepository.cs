@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TypingRealm.Profiles.Api.Client;
 using TypingRealm.World.Activities;
 using TypingRealm.World.Layers;
 
 namespace TypingRealm.World
 {
-    public sealed class LocationStore : ILocationStore, IActivityStore
+    public sealed class LocationStore
     {
-        /*private readonly ICharactersClient _charactersClient;
-
-        public LocationStore(ICharactersClient charactersClient)
-        {
-            _charactersClient = charactersClient;
-        }*/
-
-        private readonly List<Location> _locations = new List<Location>()
+        public List<Location> Locations { get; } = new List<Location>
         {
             Location.FromPersistenceState(new LocationPersistenceState
             {
@@ -37,25 +31,39 @@ namespace TypingRealm.World
                 Activities = new HashSet<Activity>()
             })
         };
+    }
+
+    public sealed class LocationRepository : ILocationRepository, IActivityStore
+    {
+        private readonly LocationStore _locationStore;
+        private readonly ICharactersClient _charactersClient;
+
+        public LocationRepository(
+            LocationStore locationStore,
+            ICharactersClient charactersClient)
+        {
+            _locationStore = locationStore;
+            _charactersClient = charactersClient;
+        }
 
         public Location? Find(string locationId)
         {
-            return _locations.FirstOrDefault(l => l.LocationId == locationId);
+            return _locationStore.Locations.FirstOrDefault(l => l.LocationId == locationId);
         }
 
         public Location? FindLocationForCharacter(string characterId)
         {
-            return _locations.FirstOrDefault(l => l.Characters.Contains(characterId));
+            return _locationStore.Locations.FirstOrDefault(l => l.Characters.Contains(characterId));
         }
 
         public Location FindStartingLocation(string characterId)
         {
-            return _locations.FirstOrDefault(l => l.LocationId == "1")!;
+            return _locationStore.Locations.FirstOrDefault(l => l.LocationId == "1")!;
         }
 
         public Activity? GetCurrentCharacterActivityOrDefault(string characterId)
         {
-            var location = _locations.FirstOrDefault(l => l.Characters.Contains(characterId));
+            var location = _locationStore.Locations.FirstOrDefault(l => l.Characters.Contains(characterId));
             if (location == null)
                 throw new InvalidOperationException("Location for this character does not exist.");
 
@@ -80,7 +88,7 @@ namespace TypingRealm.World
 
         private Location GetLocationForActivity(string activityId)
         {
-            var location = _locations.SingleOrDefault(l => l.HasActivity(activityId));
+            var location = _locationStore.Locations.SingleOrDefault(l => l.HasActivity(activityId));
             if (location == null)
                 throw new InvalidOperationException("No such activity found in any of the locations.");
 
@@ -99,9 +107,8 @@ namespace TypingRealm.World
                 // TODO: Come up with a way to do this here. We can't use _charactersClient
                 // because it requires ConnectedClientContext and we don't have it here (scoped inside singleton).
 
-                _ = characterId;
-                /*_charactersClient.EnterActivityAsync(characterId, activityId, default).AsTask()
-                    .GetAwaiter().GetResult();*/
+                _charactersClient.EnterActivityAsync(characterId, activityId, default).AsTask()
+                    .GetAwaiter().GetResult();
             }
         }
     }

@@ -17,8 +17,11 @@ namespace TypingRealm.World
         {
             var services = messageTypes.Services;
 
-            services.AddSingleton<ILocationStore, LocationStore>();
-            services.AddTransient<IActivityStore>(x => (IActivityStore)x.GetRequiredService<ILocationStore>());
+            // Should be transient or scoped since it needs IClientsService.
+            services.AddTransient<ILocationRepository, LocationRepository>();
+            services.AddSingleton<LocationStore>();
+
+            services.AddTransient<IActivityStore>(x => (IActivityStore)x.GetRequiredService<ILocationRepository>());
             services.AddTransient<ICharacterActivityStore, CharacterActivityStore>();
             services.AddProfileApiClients();
 

@@ -7,11 +7,11 @@ namespace TypingRealm.World.Activities.RopeWar
 {
     public sealed class JoinRopeWarContestHandler : LayerHandler<JoinRopeWarContest>
     {
-        private readonly ILocationStore _locationStore;
+        private readonly ILocationRepository _locationStore;
 
         public JoinRopeWarContestHandler(
             ICharacterActivityStore characterActivityStore,
-            ILocationStore locationStore)
+            ILocationRepository locationStore)
             : base(characterActivityStore, Layer.World)
         {
             _locationStore = locationStore;

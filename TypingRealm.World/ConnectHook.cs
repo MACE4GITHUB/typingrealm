@@ -7,9 +7,9 @@ namespace TypingRealm.World
 {
     public sealed class ConnectHook : IConnectHook
     {
-        private readonly ILocationStore _locationStore;
+        private readonly ILocationRepository _locationStore;
 
-        public ConnectHook(ILocationStore locationStore)
+        public ConnectHook(ILocationRepository locationStore)
         {
             _locationStore = locationStore;
         }

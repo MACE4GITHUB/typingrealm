@@ -7,11 +7,11 @@ namespace TypingRealm.World.Activities.RopeWar
 {
     public sealed class VoteToStartRopeWarHandler : LayerHandler<VoteToStartRopeWar>
     {
-        private readonly ILocationStore _locationStore;
+        private readonly ILocationRepository _locationStore;
 
         public VoteToStartRopeWarHandler(
             ICharacterActivityStore characterActivityStore,
-            ILocationStore locationStore)
+            ILocationRepository locationStore)
             : base(characterActivityStore, Layer.RopeWar)
         {
             _locationStore = locationStore;

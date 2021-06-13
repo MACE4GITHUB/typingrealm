@@ -10,11 +10,11 @@ namespace TypingRealm.World.Movement
     // TODO: I still can move between locations even when I participate in activity. Make sure it's impossible.
     public sealed class MoveToLocationHandler : LayerHandler<MoveToLocation>
     {
-        private readonly ILocationStore _locationStore;
+        private readonly ILocationRepository _locationStore;
 
         public MoveToLocationHandler(
             ICharacterActivityStore characterActivityStore,
-            ILocationStore locationStore)
+            ILocationRepository locationStore)
             : base(characterActivityStore, Layer.World)
         {
             _locationStore = locationStore;

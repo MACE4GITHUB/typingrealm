@@ -5,7 +5,7 @@ namespace TypingRealm.World
 {
     public static class LocationStoreExtensions
     {
-        public static Location FindLocationForClient(this ILocationStore locationStore, ConnectedClient sender)
+        public static Location FindLocationForClient(this ILocationRepository locationStore, ConnectedClient sender)
         {
             var location = locationStore.FindLocationForCharacter(sender.ClientId);
             if (location == null)

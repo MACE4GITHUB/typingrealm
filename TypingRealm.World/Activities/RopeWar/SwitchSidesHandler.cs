@@ -7,10 +7,10 @@ namespace TypingRealm.World.Activities.RopeWar
 {
     public sealed class SwitchSidesHandler : LayerHandler<SwitchSides>
     {
-        private readonly ILocationStore _locationStore;
+        private readonly ILocationRepository _locationStore;
 
         public SwitchSidesHandler(
-            ICharacterActivityStore characterActivityStore, ILocationStore locationStore)
+            ICharacterActivityStore characterActivityStore, ILocationRepository locationStore)
             : base(characterActivityStore, Layer.RopeWar)
         {
             _locationStore = locationStore;

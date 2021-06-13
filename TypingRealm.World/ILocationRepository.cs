@@ -1,6 +1,6 @@
 ﻿namespace TypingRealm.World
 {
-    public interface ILocationStore
+    public interface ILocationRepository
     {
         Location? Find(string locationId);
         Location? FindLocationForCharacter(string characterId);
