@@ -8,8 +8,11 @@ namespace TypingRealm.Client.Interaction
         ModalModule ActiveModalModule { get; set; }
         ModalModule BackgroundModalModule { get; set; }
 
-        void OpenModalDialog(string text, Action ok);
-        void SwitchBetweenModalModules();
-        void CloseActiveModalModule();
+        /// <summary>
+        /// If this is set - the dialog is forced on top of everything else.
+        /// </summary>
+        IScreenHandler? Dialog { get; set; }
+
+        void OpenDialog(string text, Action ok, Action cancel);
     }
 }

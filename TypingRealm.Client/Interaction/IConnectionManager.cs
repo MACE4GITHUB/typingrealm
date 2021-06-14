@@ -1,11 +1,11 @@
-﻿using TypingRealm.Messaging;
+﻿using TypingRealm.Messaging.Client;
 
 namespace TypingRealm.Client.Interaction
 {
     public interface IConnectionManager
     {
-        IConnection? WorldConnection { get; }
-        IConnection? RopeWarConnection { get; }
+        IMessageProcessor? WorldConnection { get; }
+        IMessageProcessor? RopeWarConnection { get; }
 
         void ConnectToWorld(string characterId);
         void ConnectToRopeWar(string ropeWarContestId);

@@ -4,7 +4,7 @@ using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.Interaction
 {
-    public sealed class DialogModalScreenHandler : MultiTyperInputHandler, IScreenHandler
+    public sealed class DialogScreenHandler : MultiTyperInputHandler, IScreenHandler
     {
         private string _text;
         private Typer _ok;
@@ -14,7 +14,7 @@ namespace TypingRealm.Client.Interaction
 
         private readonly IOutput _output;
 
-        public DialogModalScreenHandler(
+        public DialogScreenHandler(
             ITextGenerator textGenerator,
             IOutput output) : base(textGenerator)
         {

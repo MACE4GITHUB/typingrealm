@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TypingRealm.Client.Data;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
@@ -28,6 +29,10 @@ namespace TypingRealm.Client.MainMenu
             _output.Write(new string(' ', 10));
             _output.Write(state.CreateCharacterTyper);
             _output.WriteLine();
+
+            if (!state.ConnectAsCharacterTypers.Any())
+                return;
+
             _output.WriteLine("You have these characters:");
             _output.WriteLine();
 

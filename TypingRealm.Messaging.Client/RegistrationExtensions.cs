@@ -22,6 +22,14 @@ namespace TypingRealm.Messaging.Client
         {
             RegisterClientMessagingBase(services);
             services.AddTransient<IProfileTokenProvider, ServerProfileTokenProvider>();
+            services.RegisterClientConnectionFactoryFactory<TClientConnectionFactoryFactory>();
+
+            return services;
+        }
+
+        public static IServiceCollection RegisterClientConnectionFactoryFactory<TClientConnectionFactoryFactory>(this IServiceCollection services)
+            where TClientConnectionFactoryFactory : class, IClientConnectionFactoryFactory
+        {
             services.AddTransient<IMessageProcessorFactory, MessageProcessorFactory>();
             services.AddTransient<IClientConnectionFactoryFactory, TClientConnectionFactoryFactory>();
 

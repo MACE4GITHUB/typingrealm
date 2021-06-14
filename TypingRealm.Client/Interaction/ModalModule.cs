@@ -3,8 +3,15 @@
     public enum ModalModule
     {
         None,
-        Dialog,
+
+        /// <summary>
+        /// Information about your character including name and some statistics.
+        /// </summary>
         CharacterInfo,
-        Inventory
+
+        /// <summary>
+        /// Detailed description of your surroundings.
+        /// </summary>
+        PlaceDescription
     }
 }
