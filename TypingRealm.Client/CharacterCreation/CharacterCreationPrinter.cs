@@ -1,17 +1,14 @@
-﻿using TypingRealm.Client.Data;
-using TypingRealm.Client.Output;
+﻿using TypingRealm.Client.Output;
 
 namespace TypingRealm.Client.CharacterCreation
 {
     public sealed class CharacterCreationPrinter : IPrinter<CharacterCreationPrintableState>
     {
         private readonly IOutput _output;
-        private readonly ICharacterService _characterService;
 
-        public CharacterCreationPrinter(IOutput output, ICharacterService characterService)
+        public CharacterCreationPrinter(IOutput output)
         {
             _output = output;
-            _characterService = characterService;
         }
 
         public void Print(CharacterCreationPrintableState state)

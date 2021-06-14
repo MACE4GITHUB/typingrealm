@@ -50,46 +50,6 @@ namespace TypingRealm.ConsoleApp
         IScreenHandler GetCurrentScreenHandler();
     }
 
-    public sealed class ScreenHandlerProvider : IScreenHandlerProvider
-    {
-        private readonly IScreenNavigation _screenNavigation;
-        private readonly IScreenHandler _mainMenuScreen;
-        private readonly IScreenHandler _characterCreationScreen;
-
-        private readonly IScreenHandler _dialogModal;
-
-        public ScreenHandlerProvider(
-            IScreenNavigation screenNavigation,
-            IScreenHandler mainMenuScreen,
-            IScreenHandler characterCreationScreen,
-            IScreenHandler dialogModal)
-        {
-            _screenNavigation = screenNavigation;
-            _mainMenuScreen = mainMenuScreen;
-            _characterCreationScreen = characterCreationScreen;
-            _dialogModal = dialogModal;
-        }
-
-        public IScreenHandler GetCurrentScreenHandler()
-        {
-            if (_screenNavigation.ActiveModalModule != ModalModule.None)
-            {
-                if (_screenNavigation.ActiveModalModule == ModalModule.Dialog)
-                    return _dialogModal;
-
-                throw new InvalidOperationException();
-            }
-
-            if (_screenNavigation.Screen == GameScreen.MainMenu)
-                return _mainMenuScreen;
-
-            if (_screenNavigation.Screen == GameScreen.CharacterCreation)
-                return _characterCreationScreen;
-
-            throw new InvalidOperationException();
-        }
-    }
-
     public static class Program
     {
         public static void Main()
@@ -99,17 +59,21 @@ namespace TypingRealm.ConsoleApp
             var characterService = new CharacterService();
 
             var textGenerator = new TextGenerator();
-            var dialogModalScreenHandler = new DialogModalScreenHandler(textGenerator, output);
+            var dialogModalScreenHandler = new DialogScreenHandler(textGenerator, output);
             var screenNavigation = new ScreenNavigation(dialogModalScreenHandler);
             var connectionManager = new ConnectionManager();
             var mainMenuHandler = new MainMenuHandler(screenNavigation, connectionManager);
             var mainMenuPrinter = new MainMenuPrinter(output, characterService);
             var mainMenuScreenHandler = new MainMenuScreenHandler(textGenerator, mainMenuHandler, mainMenuPrinter);
             var characterCreationHandler = new CharacterCreationHandler(screenNavigation);
-            var characterCreationPrinter = new CharacterCreationPrinter(output, characterService);
+            var characterCreationPrinter = new CharacterCreationPrinter(output);
             var characterCreationScreenHandler = new CharacterCreationScreenHandler(textGenerator, characterCreationHandler, characterCreationPrinter);
 
-            var screenProvider = new ScreenHandlerProvider(screenNavigation, mainMenuScreenHandler, characterCreationScreenHandler, dialogModalScreenHandler);
+            var screenProvider = new ScreenHandlerProvider(screenNavigation, new Dictionary<GameScreen, IScreenHandler>
+            {
+                [GameScreen.MainMenu] = mainMenuScreenHandler,
+                [GameScreen.CharacterCreation] = characterCreationScreenHandler
+            });
 
             // Authenticated and got list of characters from API.
             var characters = new[] { "1", "2", "ivan-id" };

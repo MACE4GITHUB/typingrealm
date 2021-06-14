@@ -7,42 +7,34 @@ namespace TypingRealm.Client.Interaction
         public GameScreen Screen { get; set; } = GameScreen.MainMenu;
         public ModalModule ActiveModalModule { get; set; }
         public ModalModule BackgroundModalModule { get; set; }
+        public IScreenHandler? Dialog { get; set; }
 
-        private readonly DialogModalScreenHandler _dialogModalScreenHandler;
+        private readonly DialogScreenHandler _dialogModalScreenHandler;
 
-        public ScreenNavigation(DialogModalScreenHandler dialogModalScreenHandler)
+        public ScreenNavigation(DialogScreenHandler dialogModalScreenHandler)
         {
             _dialogModalScreenHandler = dialogModalScreenHandler;
         }
 
-        public void OpenModalDialog(string text, Action ok)
+        public void OpenDialog(string text, Action ok, Action cancel)
         {
-            if (ActiveModalModule != ModalModule.None)
-                throw new InvalidOperationException();
+            if (Dialog != null)
+                return; // Do not override existing dialog.
 
-            _dialogModalScreenHandler.Initialize(
-                text,
-                () =>
-                {
-                    ok();
-                    ActiveModalModule = ModalModule.None;
-                },
-                () => ActiveModalModule = ModalModule.None);
+            _dialogModalScreenHandler.Initialize(text, OkAction, CancelAction);
+            Dialog = _dialogModalScreenHandler;
 
-            ActiveModalModule = ModalModule.Dialog;
-        }
+            void OkAction()
+            {
+                ok();
+                Dialog = null;
+            }
 
-        public void CloseActiveModalModule()
-        {
-            ActiveModalModule = BackgroundModalModule;
-            BackgroundModalModule = ModalModule.None;
-        }
-
-        public void SwitchBetweenModalModules()
-        {
-            var bg = BackgroundModalModule;
-            BackgroundModalModule = ActiveModalModule;
-            ActiveModalModule = bg;
+            void CancelAction()
+            {
+                cancel();
+                Dialog = null;
+            }
         }
     }
 }
