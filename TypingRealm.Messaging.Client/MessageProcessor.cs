@@ -385,6 +385,8 @@ namespace TypingRealm.Messaging.Client
 
         private async Task ReconnectAsync()
         {
+            throw new NotImplementedException();
+
             if (IsConnected)
                 return;
 
