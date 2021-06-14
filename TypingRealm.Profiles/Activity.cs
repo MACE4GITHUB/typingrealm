@@ -3,7 +3,15 @@ using System.Collections.Generic;
 
 namespace TypingRealm.Profiles
 {
-    public sealed record Activity(string ActivityId, IEnumerable<string> CharacterIds)
+    public enum ActivityType
+    {
+        RopeWar = 1
+    }
+
+    public sealed record Activity(
+        string ActivityId,
+        ActivityType Type,
+        IEnumerable<string> CharacterIds)
     {
         public bool IsFinished { get; private set; }
 

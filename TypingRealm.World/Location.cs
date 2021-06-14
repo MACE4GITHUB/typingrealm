@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging;
+using TypingRealm.Profiles;
 using TypingRealm.World.Activities;
 using TypingRealm.World.Activities.RopeWar;
 
@@ -38,7 +39,8 @@ namespace TypingRealm.World
         DomainEventType Type,
         string LocationId,
         string CharacterId,
-        string ActivityId);
+        string ActivityId,
+        ActivityType ActivityType);
 
 #pragma warning disable IDE0032
     public sealed class Location
@@ -135,7 +137,7 @@ namespace TypingRealm.World
 
             if (ropeWar.HasStarted)
             {
-                _domainEvents.Enqueue(new DomainEvent(DomainEventType.ActivityStarted, _locationId, characterId, ropeWar.ActivityId));
+                _domainEvents.Enqueue(new DomainEvent(DomainEventType.ActivityStarted, _locationId, characterId, ropeWar.ActivityId, ActivityType.RopeWar));
             }
         }
 

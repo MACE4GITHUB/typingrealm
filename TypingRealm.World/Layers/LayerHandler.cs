@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
+using TypingRealm.Profiles;
 using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.World.Layers
@@ -51,13 +52,22 @@ namespace TypingRealm.World.Layers
                 return false;
 
             // While activity didn't start yet - we can edit it's state (join another team, leave, vote to start).
-            if (currentActivity.Layer == layer && !currentActivity.HasStarted)
+            if (currentActivity.Type.GetLayer() == layer && !currentActivity.HasStarted)
                 return true;
 
             // But we cannot do any actions from other layers - like moving to another location.
             // It will also return false if for some reason activity has been finished but you still have it as your current activity.
             return false;
         }
+    }
+
+    public static class ActivityTypeExtensions
+    {
+        public static Layer GetLayer(this ActivityType activityType) => activityType switch
+        {
+            ActivityType.RopeWar => Layer.RopeWar,
+            _ => throw new InvalidOperationException("Unknown activity type.")
+        };
     }
 
     public enum Layer

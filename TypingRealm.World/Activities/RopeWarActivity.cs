@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging;
+using TypingRealm.Profiles;
 using TypingRealm.World.Activities.RopeWar;
-using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Activities
 {
@@ -34,7 +34,7 @@ namespace TypingRealm.World.Activities
             string name,
             string creatorId,
             long bet)
-            : base(Layer.RopeWar, activityId, ActivityType.RopeWar, name, creatorId)
+            : base(activityId, ActivityType.RopeWar, name, creatorId)
         {
             Bet = bet;
         }

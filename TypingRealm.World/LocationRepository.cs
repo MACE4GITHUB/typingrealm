@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TypingRealm.Profiles;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources;
-using TypingRealm.World.Activities;
 using TypingRealm.World.Layers;
 
 namespace TypingRealm.World
@@ -16,7 +16,7 @@ namespace TypingRealm.World
             {
                 LocationId = "1",
                 Locations = new HashSet<string> { "2" },
-                AllowedActivityTypes = new HashSet<Activities.ActivityType>(),
+                AllowedActivityTypes = new HashSet<ActivityType>(),
                 Characters = new HashSet<string>(),
                 Activities = new HashSet<Activity>()
             }),
@@ -24,7 +24,7 @@ namespace TypingRealm.World
             {
                 LocationId = "2",
                 Locations = new HashSet<string> { "1" },
-                AllowedActivityTypes = new HashSet<Activities.ActivityType>
+                AllowedActivityTypes = new HashSet<ActivityType>
                 {
                     ActivityType.RopeWar
                 },
@@ -82,7 +82,7 @@ namespace TypingRealm.World
             {
                 if (@event.Type == DomainEventType.ActivityStarted)
                 {
-                    HandleActivityStarted(@event.ActivityId);
+                    HandleActivityStarted(@event.ActivityId, @event.ActivityType);
                 }
             }
         }
@@ -96,12 +96,12 @@ namespace TypingRealm.World
             return location;
         }
 
-        private void HandleActivityStarted(string activityId)
+        private void HandleActivityStarted(string activityId, ActivityType activityType)
         {
             var location = GetLocationForActivity(activityId);
             var characters = location.GetAllCharactersInActivity(activityId);
 
-            var activityResource = new ActivityResource(activityId, characters);
+            var activityResource = new ActivityResource(activityId, activityType, characters);
             _activitiesClient.StartActivityAsync(activityResource, default)
                 .AsTask().GetAwaiter().GetResult();
         }

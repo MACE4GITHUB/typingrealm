@@ -15,13 +15,14 @@ namespace TypingRealm.Profiles.Api.Controllers
         }
 
         [HttpGet("current/{characterId}")]
-        public ValueTask<ActionResult<string>> GetCurrentActivity(string characterId)
+        public ValueTask<ActionResult<ActivityResource>> GetCurrentActivity(string characterId)
         {
             var activity = _activityRepository.FindActiveActivityForCharacter(characterId);
             if (activity == null)
-                return new ValueTask<ActionResult<string>>(NotFound("Activity for the character does not exist."));
+                return new ValueTask<ActionResult<ActivityResource>>(NotFound("Activity for the character does not exist."));
 
-            return new ValueTask<ActionResult<string>>(activity.ActivityId);
+            return new ValueTask<ActionResult<ActivityResource>>(
+                new ActivityResource(activity.ActivityId, activity.Type, activity.CharacterIds));
         }
 
         [HttpPost]
@@ -30,7 +31,7 @@ namespace TypingRealm.Profiles.Api.Controllers
             if (!_activityRepository.ValidateCharactersDoNotHaveActiveActivity(activity.CharacterIds))
                 return new ValueTask<ActionResult>(BadRequest("Some characters are already in a different activity."));
 
-            _activityRepository.Save(new Activity(activity.ActivityId, activity.CharacterIds));
+            _activityRepository.Save(new Activity(activity.ActivityId, activity.Type, activity.CharacterIds));
             return new ValueTask<ActionResult>(Ok());
         }
 

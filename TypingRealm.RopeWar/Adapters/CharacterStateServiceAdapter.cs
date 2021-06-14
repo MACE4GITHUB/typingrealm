@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Profiles;
 using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.RopeWar.Adapters
@@ -19,8 +20,9 @@ namespace TypingRealm.RopeWar.Adapters
             var currentActivity = await _activitiesClient.GetCurrentActivityAsync(characterId, cancellationToken)
                 .ConfigureAwait(false);
 
-            // TODO: Also check that given activity is exactly of RopeWar type!!!
-            return currentActivity != null && currentActivity == contestId;
+            return currentActivity != null
+                && currentActivity.ActivityId == contestId
+                && currentActivity.Type == ActivityType.RopeWar;
         }
     }
 }

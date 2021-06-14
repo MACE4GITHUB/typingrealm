@@ -15,6 +15,7 @@
     <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Api.Client\TypingRealm.Profiles.Api.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Api.Resources\TypingRealm.Profiles.Api.Resources.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles\TypingRealm.Profiles.csproj" />
     <ProjectReference Include="..\TypingRealm.SignalR.Client\TypingRealm.SignalR.Client.csproj" />
   </ItemGroup>
 
