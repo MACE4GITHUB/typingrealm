@@ -4,9 +4,9 @@ namespace TypingRealm.Profiles
 {
     public interface IActivityRepository
     {
-        bool ValidateCharactersDoNotHaveActivity(IEnumerable<string> characterIds);
+        bool ValidateCharactersDoNotHaveActiveActivity(IEnumerable<string> characterIds);
         Activity? Find(string activityId);
-        Activity? FindForCharacter(string characterId);
+        Activity? FindActiveActivityForCharacter(string characterId);
 
         void Save(Activity activity);
     }

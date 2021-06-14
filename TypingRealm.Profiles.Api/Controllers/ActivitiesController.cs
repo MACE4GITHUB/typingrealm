@@ -17,7 +17,7 @@ namespace TypingRealm.Profiles.Api.Controllers
         [HttpGet("current/{characterId}")]
         public ValueTask<ActionResult<string>> GetCurrentActivity(string characterId)
         {
-            var activity = _activityRepository.FindForCharacter(characterId);
+            var activity = _activityRepository.FindActiveActivityForCharacter(characterId);
             if (activity == null)
                 return new ValueTask<ActionResult<string>>(NotFound("Activity for the character does not exist."));
 
@@ -27,7 +27,7 @@ namespace TypingRealm.Profiles.Api.Controllers
         [HttpPost]
         public ValueTask<ActionResult> StartActivity(ActivityResource activity)
         {
-            if (!_activityRepository.ValidateCharactersDoNotHaveActivity(activity.CharacterIds))
+            if (!_activityRepository.ValidateCharactersDoNotHaveActiveActivity(activity.CharacterIds))
                 return new ValueTask<ActionResult>(BadRequest("Some characters are already in a different activity."));
 
             _activityRepository.Save(new Activity(activity.ActivityId, activity.CharacterIds));

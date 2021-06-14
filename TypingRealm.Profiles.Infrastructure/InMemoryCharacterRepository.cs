@@ -46,9 +46,11 @@ namespace TypingRealm.Profiles.Infrastructure
             return _cache[activityId];
         }
 
-        public Activity? FindForCharacter(string characterId)
+        public Activity? FindActiveActivityForCharacter(string characterId)
         {
-            return _cache.Values.SingleOrDefault(activity => activity.CharacterIds.Contains(characterId));
+            return _cache.Values.SingleOrDefault(activity
+                => !activity.IsFinished // Get only active activities.
+                && activity.CharacterIds.Contains(characterId));
         }
 
         public void Save(Activity activity)
@@ -61,9 +63,11 @@ namespace TypingRealm.Profiles.Infrastructure
             _cache[activity.ActivityId] = activity;
         }
 
-        public bool ValidateCharactersDoNotHaveActivity(IEnumerable<string> characterIds)
+        public bool ValidateCharactersDoNotHaveActiveActivity(IEnumerable<string> characterIds)
         {
-            return !_cache.Values.SelectMany(activity => activity.CharacterIds)
+            return !_cache.Values
+                .Where(x => !x.IsFinished) // Get only active activities.
+                .SelectMany(activity => activity.CharacterIds)
                 .Intersect(characterIds)
                 .Any();
         }
