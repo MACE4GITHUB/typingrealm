@@ -7,11 +7,11 @@ namespace TypingRealm.ConsoleApp
     public sealed class ScreenHandlerProvider : IScreenHandlerProvider
     {
         private readonly IScreenNavigation _screenNavigation;
-        private readonly Dictionary<GameScreen, IScreenHandler> _screenHandlers;
+        private readonly IDictionary<GameScreen, IScreenHandler> _screenHandlers;
 
         public ScreenHandlerProvider(
             IScreenNavigation screenNavigation,
-            Dictionary<GameScreen, IScreenHandler> screenHandlers)
+            IDictionary<GameScreen, IScreenHandler> screenHandlers)
         {
             _screenNavigation = screenNavigation;
             _screenHandlers = screenHandlers;

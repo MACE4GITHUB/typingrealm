@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Authentication;
+using TypingRealm.Authentication.ConsoleClient;
 using TypingRealm.Client.CharacterCreation;
 using TypingRealm.Client.Data;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
+using TypingRealm.Messaging.Client;
+using TypingRealm.Messaging.Serialization;
+using TypingRealm.Messaging.Serialization.Json;
+using TypingRealm.Messaging.Serialization.Protobuf;
+using TypingRealm.SignalR;
+using TypingRealm.SignalR.Client;
+using TypingRealm.World;
 
 namespace TypingRealm.ConsoleApp
 {
@@ -54,30 +64,64 @@ namespace TypingRealm.ConsoleApp
     {
         public static void Main()
         {
-            // Resolved deps.
-            var output = new ConsoleOutput();
-            var characterService = new CharacterService();
+            var services = new ServiceCollection();
 
-            var textGenerator = new TextGenerator();
-            var dialogModalScreenHandler = new DialogScreenHandler(textGenerator, output);
-            var screenNavigation = new ScreenNavigation(dialogModalScreenHandler);
-            var connectionManager = new ConnectionManager();
-            var mainMenuHandler = new MainMenuHandler(screenNavigation, connectionManager);
-            var mainMenuPrinter = new MainMenuPrinter(output, characterService);
-            var mainMenuScreenHandler = new MainMenuScreenHandler(textGenerator, mainMenuHandler, mainMenuPrinter);
-            var characterCreationHandler = new CharacterCreationHandler(screenNavigation);
-            var characterCreationPrinter = new CharacterCreationPrinter(output);
-            var characterCreationScreenHandler = new CharacterCreationScreenHandler(textGenerator, characterCreationHandler, characterCreationPrinter);
-
-            var screenProvider = new ScreenHandlerProvider(screenNavigation, new Dictionary<GameScreen, IScreenHandler>
+            services.AddAuth0ProfileTokenProvider();
+            if (DebugHelpers.UseLocalAuthentication)
             {
-                [GameScreen.MainMenu] = mainMenuScreenHandler,
-                [GameScreen.CharacterCreation] = characterCreationScreenHandler
+                Console.Write("Profile for local token: ");
+                var profile = Console.ReadLine() ?? "default";
+
+                services.AddLocalProfileTokenProvider(profile);
+            }
+
+            services
+                .AddHttpClient()
+                //.AddLogging()
+                .AddSerializationCore()
+                .AddTyrAuthenticationMessages()
+                .AddWorldMessages()
+                .Services
+                .AddJson()
+                .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
+                .RegisterClientMessaging() // TODO: Use RegisterClientMessagingBase instead.
+                .AddSignalRConnectionFactory()
+                .RegisterClientConnectionFactoryFactory<SignalRClientConnectionFactoryFactory>();
+
+            services.AddSingleton<IOutput, ConsoleOutput>();
+            services.AddSingleton<ICharacterService, CharacterService>();
+            services.AddSingleton<ITextGenerator, TextGenerator>();
+
+            services.AddSingleton<DialogScreenHandler>();
+            services.AddSingleton<IScreenNavigation, ScreenNavigation>();
+            services.AddSingleton<IConnectionManager, ConnectionManager>();
+
+            services.AddSingleton<IMainMenuHandler, MainMenuHandler>();
+            services.AddSingleton<IPrinter<MainMenuPrinter.State>, MainMenuPrinter>();
+            services.AddSingleton<MainMenuScreenHandler>();
+
+            services.AddSingleton<ICharacterCreationHandler, CharacterCreationHandler>();
+            services.AddSingleton<IPrinter<CharacterCreationPrintableState>, CharacterCreationPrinter>();
+            services.AddSingleton<CharacterCreationScreenHandler>();
+
+            services.AddSingleton<IDictionary<GameScreen, IScreenHandler>>(p => new Dictionary<GameScreen, IScreenHandler>
+            {
+                [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenHandler>(),
+                [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenHandler>()
             });
+            services.AddSingleton<ScreenHandlerProvider>();
+
+            var provider = services.BuildServiceProvider();
+
+            // Authenticate in background.
+            _ = provider.GetRequiredService<IProfileTokenProvider>().SignInAsync(default);
 
             // Authenticated and got list of characters from API.
             var characters = new[] { "1", "2", "ivan-id" };
-            mainMenuScreenHandler.UpdateState(new MainMenuState(characters));
+            provider.GetRequiredService<MainMenuScreenHandler>()
+                .UpdateState(new MainMenuState(characters));
+
+            var screenProvider = provider.GetRequiredService<ScreenHandlerProvider>();
 
             while (true)
             {

@@ -9,11 +9,11 @@ namespace TypingRealm.Client.Interaction
         public ModalModule BackgroundModalModule { get; set; }
         public IScreenHandler? Dialog { get; set; }
 
-        private readonly DialogScreenHandler _dialogModalScreenHandler;
+        private readonly DialogScreenHandler _dialogScreenHandler;
 
-        public ScreenNavigation(DialogScreenHandler dialogModalScreenHandler)
+        public ScreenNavigation(DialogScreenHandler dialogScreenHandler)
         {
-            _dialogModalScreenHandler = dialogModalScreenHandler;
+            _dialogScreenHandler = dialogScreenHandler;
         }
 
         public void OpenDialog(string text, Action ok, Action cancel)
@@ -21,8 +21,8 @@ namespace TypingRealm.Client.Interaction
             if (Dialog != null)
                 return; // Do not override existing dialog.
 
-            _dialogModalScreenHandler.Initialize(text, OkAction, CancelAction);
-            Dialog = _dialogModalScreenHandler;
+            _dialogScreenHandler.Initialize(text, OkAction, CancelAction);
+            Dialog = _dialogScreenHandler;
 
             void OkAction()
             {
