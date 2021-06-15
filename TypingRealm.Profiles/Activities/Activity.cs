@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TypingRealm.Profiles
+namespace TypingRealm.Profiles.Activities
 {
-    public enum ActivityType
-    {
-        RopeWar = 1
-    }
-
     public sealed record Activity(
         string ActivityId,
         ActivityType Type,

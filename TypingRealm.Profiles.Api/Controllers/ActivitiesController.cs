@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Profiles.Activities;
 using TypingRealm.Profiles.Api.Resources;
 
 namespace TypingRealm.Profiles.Api.Controllers

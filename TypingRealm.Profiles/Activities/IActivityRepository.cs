@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TypingRealm.Profiles
+namespace TypingRealm.Profiles.Activities
 {
     public interface IActivityRepository
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Profiles.Activities;
 using TypingRealm.Profiles.Api.Resources;
 
 namespace TypingRealm.Profiles.Infrastructure

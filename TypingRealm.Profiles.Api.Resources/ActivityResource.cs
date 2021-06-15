@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TypingRealm.Profiles.Activities;
 
 namespace TypingRealm.Profiles.Api.Resources
 {

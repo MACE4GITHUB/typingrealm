@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TypingRealm.Profiles;
+using TypingRealm.Profiles.Activities;
 
 namespace TypingRealm.World
 {

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
-using TypingRealm.Profiles;
+using TypingRealm.Profiles.Activities;
 using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.World.Layers
