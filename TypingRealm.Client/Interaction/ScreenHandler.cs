@@ -1,8 +1,7 @@
-﻿using TypingRealm.Client.Interaction;
-using TypingRealm.Client.Output;
+﻿using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
 
-namespace TypingRealm.Client.MainMenu
+namespace TypingRealm.Client.Interaction
 {
     public abstract class ScreenHandler<TPrintState> : MultiTyperInputHandler, IScreenHandler
     {
