@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
+using TypingRealm.Authentication.ConsoleClient;
 using TypingRealm.Communication;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
+using TypingRealm.Profiles.Api.Client;
 using TypingRealm.SignalR;
+using TypingRealm.SignalR.Client;
 using TypingRealm.Tcp;
 
 namespace TypingRealm.Hosting
@@ -97,6 +101,28 @@ namespace TypingRealm.Hosting
 
             return services;
         }
-    }
 
+        /// <summary>
+        /// This is a specific host that shouldn't register any server-side logic, only main framework for the front-end.
+        /// </summary>
+        public static MessageTypeCacheBuilder UseConsoleAppHost(this IServiceCollection services)
+        {
+            var builder = services.AddSerializationCore();
+
+            builder
+                .AddTyrAuthenticationMessages();
+
+            services
+                .AddCommunication()
+                .AddJson()
+                .AddProtobufMessageSerializer()
+                .RegisterClientMessaging() // Client-specific. TODO: use RegisterClientMessagingBase instead.
+                .AddSignalRConnectionFactory()
+                .AddProfileApiClients()
+                .RegisterClientConnectionFactoryFactory<SignalRClientConnectionFactoryFactory>()
+                .AddAuth0ProfileTokenProvider();
+
+            return builder;
+        }
+    }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using TypingRealm.Authentication;
 using TypingRealm.Authentication.ConsoleClient;
 using TypingRealm.Client.CharacterCreation;
 using TypingRealm.Client.Data;
@@ -11,16 +11,10 @@ using TypingRealm.Client.Interaction;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
-using TypingRealm.Communication;
+using TypingRealm.Hosting;
 using TypingRealm.Messaging.Client;
-using TypingRealm.Messaging.Serialization;
-using TypingRealm.Messaging.Serialization.Json;
-using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources.Data;
-using TypingRealm.SignalR;
-using TypingRealm.SignalR.Client;
-using TypingRealm.World;
 
 namespace TypingRealm.ConsoleApp
 {
@@ -69,80 +63,88 @@ namespace TypingRealm.ConsoleApp
     {
         public static async Task Main()
         {
-            var services = new ServiceCollection();
-
-            services.AddAuth0ProfileTokenProvider();
+            string? localProfile = null;
             if (DebugHelpers.UseLocalAuthentication)
             {
                 Console.Write("Profile for local token: ");
-                var profile = Console.ReadLine() ?? "default";
-
-                services.AddLocalProfileTokenProvider(profile);
+                localProfile = Console.ReadLine() ?? "default";
             }
 
-            services
-                .AddHttpClient()
-                //.AddLogging()
-                .AddSerializationCore()
-                .AddTyrAuthenticationMessages()
-                .AddWorldMessages()
-                .Services
-                .AddJson()
-                .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
-                .RegisterClientMessaging() // TODO: Use RegisterClientMessagingBase instead.
-                .AddSignalRConnectionFactory()
-
-                .AddCommunication()
-                .AddProfileApiClients()
-                .RegisterClientConnectionFactoryFactory<SignalRClientConnectionFactoryFactory>();
-
-            services.AddSingleton<IOutput, ConsoleOutput>();
-            services.AddSingleton<ICharacterService, CharacterService>();
-            services.AddSingleton<ITextGenerator, TextGenerator>();
-
-            services.AddSingleton<DialogScreenHandler>();
-            services.AddSingleton<IScreenNavigation, ScreenNavigation>();
-            services.AddSingleton<IConnectionManager, ConnectionManager>();
-
-            services.AddSingleton<IMainMenuHandler, MainMenuHandler>();
-            services.AddSingleton<IPrinter<MainMenuPrinter.State>, MainMenuPrinter>();
-            services.AddSingleton<MainMenuScreenHandler>();
-
-            services.AddSingleton<ICharacterCreationHandler, CharacterCreationHandler>();
-            services.AddSingleton<IPrinter<CharacterCreationPrintableState>, CharacterCreationPrinter>();
-            services.AddSingleton<CharacterCreationScreenHandler>();
-
-            services.AddSingleton<IDictionary<GameScreen, IScreenHandler>>(p => new Dictionary<GameScreen, IScreenHandler>
+            using var cts = new CancellationTokenSource();
+            Console.CancelKeyPress += (s, e) =>
             {
-                [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenHandler>(),
-                [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenHandler>()
-            });
-            services.AddSingleton<ScreenHandlerProvider>();
+                Console.WriteLine("Canceling...");
+                cts.Cancel();
+                e.Cancel = true;
+            };
 
-            var provider = services.BuildServiceProvider();
+            var cancellationToken = cts.Token;
 
-            // Authenticate in background.
-            _ = provider.GetRequiredService<IProfileTokenProvider>().SignInAsync(default);
-
-            var charactersClient = provider.GetRequiredService<ICharactersClient>();
-            await charactersClient.CreateAsync(new CreateCharacterDto
+            using var host = HostFactory.CreateConsoleAppHostBuilder(messageTypes =>
             {
-                Name = "my character"
-            }, default).ConfigureAwait(false);
-            await charactersClient.CreateAsync(new CreateCharacterDto
-            {
-                Name = "my character 2"
-            }, default).ConfigureAwait(false);
+                var services = messageTypes.Services;
 
-            var characters = await charactersClient.GetAllByProfileIdAsync(default)
+                if (localProfile != null && DebugHelpers.UseLocalAuthentication)
+                    services.AddLocalProfileTokenProvider(localProfile);
+
+                services.AddSingleton<IOutput, ConsoleOutput>();
+                services.AddSingleton<ICharacterService, CharacterService>();
+                services.AddSingleton<ITextGenerator, TextGenerator>();
+
+                services.AddSingleton<DialogScreenHandler>();
+                services.AddSingleton<IScreenNavigation, ScreenNavigation>();
+                services.AddSingleton<IConnectionManager, ConnectionManager>();
+
+                services.AddSingleton<IMainMenuHandler, MainMenuHandler>();
+                services.AddSingleton<IPrinter<MainMenuPrinter.State>, MainMenuPrinter>();
+                services.AddSingleton<MainMenuScreenHandler>();
+
+                services.AddSingleton<ICharacterCreationHandler, CharacterCreationHandler>();
+                services.AddSingleton<IPrinter<CharacterCreationPrintableState>, CharacterCreationPrinter>();
+                services.AddSingleton<CharacterCreationScreenHandler>();
+
+                services.AddSingleton<IDictionary<GameScreen, IScreenHandler>>(p => new Dictionary<GameScreen, IScreenHandler>
+                {
+                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenHandler>(),
+                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenHandler>()
+                });
+                services.AddSingleton<IScreenHandlerProvider, ScreenHandlerProvider>();
+            }).Build();
+
+            await host.StartAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            // Authenticated and got list of characters from API.
-            provider.GetRequiredService<MainMenuScreenHandler>()
-                .UpdateState(new MainMenuState(characters.Select(c => c.Name)));
+            {
+                // Authenticate in background.
+                _ = host.Services.GetRequiredService<IProfileTokenProvider>().SignInAsync(cancellationToken);
 
-            var screenProvider = provider.GetRequiredService<ScreenHandlerProvider>();
+                // Create a couple of characters.
+                var charactersClient = host.Services.GetRequiredService<ICharactersClient>();
+                await charactersClient.CreateAsync(new CreateCharacterDto
+                {
+                    Name = "my character"
+                }, default).ConfigureAwait(false);
+                await charactersClient.CreateAsync(new CreateCharacterDto
+                {
+                    Name = "my character 2"
+                }, default).ConfigureAwait(false);
 
+                var characters = await charactersClient.GetAllByProfileIdAsync(default)
+                    .ConfigureAwait(false);
+
+                // Authenticated and got list of characters from API.
+                host.Services.GetRequiredService<MainMenuScreenHandler>()
+                    .UpdateState(new MainMenuState(characters.Select(c => c.Name)));
+            }
+
+            RunApplication(host.Services.GetRequiredService<IScreenHandlerProvider>());
+
+            await host.StopAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        public static void RunApplication(IScreenHandlerProvider screenProvider)
+        {
             while (true)
             {
                 Console.Clear();

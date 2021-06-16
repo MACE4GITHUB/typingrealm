@@ -10,15 +10,20 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Authentication.ConsoleClient\TypingRealm.Authentication.ConsoleClient.csproj" />
     <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
+    <ProjectReference Include="..\TypingRealm.Messaging.Client\TypingRealm.Messaging.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Protobuf.Core\TypingRealm.Messaging.Serialization.Protobuf.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles.Api.Client\TypingRealm.Profiles.Api.Client.csproj" />
+    <ProjectReference Include="..\TypingRealm.SignalR.Client\TypingRealm.SignalR.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.SignalR\TypingRealm.SignalR.csproj" />
     <ProjectReference Include="..\TypingRealm.Tcp\TypingRealm.Tcp.csproj" />
   </ItemGroup>
