@@ -70,6 +70,8 @@ namespace TypingRealm.ConsoleApp
                 localProfile = Console.ReadLine() ?? "default";
             }
 
+            Console.CursorVisible = false;
+
             using var cts = new CancellationTokenSource();
             Console.CancelKeyPress += (s, e) =>
             {
