@@ -139,17 +139,22 @@ namespace TypingRealm.ConsoleApp
                     .UpdateState(new MainMenuState(characters.Select(c => c.Name)));
             }
 
-            RunApplication(host.Services.GetRequiredService<IScreenHandlerProvider>());
+            Console.Clear();
+            RunApplication(
+                host.Services.GetRequiredService<IScreenHandlerProvider>(),
+                host.Services.GetRequiredService<IOutput>());
 
             await host.StopAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public static void RunApplication(IScreenHandlerProvider screenProvider)
+        public static void RunApplication(
+            IScreenHandlerProvider screenProvider,
+            IOutput output)
         {
             while (true)
             {
-                Console.Clear();
+                output.Clear();
                 var screen = screenProvider.GetCurrentScreenHandler();
 
                 screen.PrintState();
