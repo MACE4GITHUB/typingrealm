@@ -3,15 +3,22 @@ using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.Output
 {
-    public sealed class ConsoleOutput : IOutput
+    public sealed class ConsoleOutputWithoutFlicker : IOutput
     {
+        private readonly int _screenWidth = 120;
+        private readonly int _screenHeight = 30;
+
         public void Clear()
         {
-            Console.Clear();
+            Console.SetCursorPosition(0, 0);
         }
 
         public void WriteLine()
         {
+            var (Left, _) = Console.GetCursorPosition();
+            if (Left < _screenWidth)
+                Console.Write(new string(' ', _screenWidth - Left));
+
             Console.WriteLine();
         }
 
@@ -45,7 +52,14 @@ namespace TypingRealm.Client.Output
 
         public void FinalizeScreen()
         {
-            // Do nothing.
+            WriteLine();
+
+            var (_, Top) = Console.GetCursorPosition();
+
+            for (var i = 0; i < _screenHeight - Top; i++)
+            {
+                WriteLine();
+            }
         }
     }
 }

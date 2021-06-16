@@ -25,5 +25,10 @@ namespace TypingRealm.Client.Output
         /// </summary>
         /// <param name="typerInformation">Typer to write.</param>
         void Write(ITyperInformation typerInformation);
+
+        /// <summary>
+        /// Finalizes screen: writes empty lines at the end etc, so everything is beautiful.
+        /// </summary>
+        void FinalizeScreen();
     }
 }

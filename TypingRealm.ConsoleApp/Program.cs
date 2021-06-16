@@ -89,7 +89,7 @@ namespace TypingRealm.ConsoleApp
                 if (localProfile != null && DebugHelpers.UseLocalAuthentication)
                     services.AddLocalProfileTokenProvider(localProfile);
 
-                services.AddSingleton<IOutput, ConsoleOutput>();
+                services.AddSingleton<IOutput, ConsoleOutputWithoutFlicker>();
                 services.AddSingleton<ICharacterService, CharacterService>();
                 services.AddSingleton<ITextGenerator, TextGenerator>();
 
@@ -158,6 +158,7 @@ namespace TypingRealm.ConsoleApp
                 var screen = screenProvider.GetCurrentScreenHandler();
 
                 screen.PrintState();
+                output.FinalizeScreen();
 
                 var key = Console.ReadKey(true);
                 switch (key.Key)
