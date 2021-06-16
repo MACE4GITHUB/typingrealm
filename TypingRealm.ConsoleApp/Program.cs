@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
@@ -16,6 +17,7 @@ using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.Profiles.Api.Client;
+using TypingRealm.Profiles.Api.Resources.Data;
 using TypingRealm.SignalR;
 using TypingRealm.SignalR.Client;
 using TypingRealm.World;
@@ -123,13 +125,21 @@ namespace TypingRealm.ConsoleApp
             _ = provider.GetRequiredService<IProfileTokenProvider>().SignInAsync(default);
 
             var charactersClient = provider.GetRequiredService<ICharactersClient>();
-            var belongs = await charactersClient.BelongsToCurrentProfileAsync("id", default)
+            await charactersClient.CreateAsync(new CreateCharacterDto
+            {
+                Name = "my character"
+            }, default).ConfigureAwait(false);
+            await charactersClient.CreateAsync(new CreateCharacterDto
+            {
+                Name = "my character 2"
+            }, default).ConfigureAwait(false);
+
+            var characters = await charactersClient.GetAllByProfileIdAsync(default)
                 .ConfigureAwait(false);
 
             // Authenticated and got list of characters from API.
-            var characters = new[] { "1", "2", "ivan-id" };
             provider.GetRequiredService<MainMenuScreenHandler>()
-                .UpdateState(new MainMenuState(characters));
+                .UpdateState(new MainMenuState(characters.Select(c => c.Name)));
 
             var screenProvider = provider.GetRequiredService<ScreenHandlerProvider>();
 

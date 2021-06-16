@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.Profiles.Api.Data
+﻿namespace TypingRealm.Profiles.Api.Resources.Data
 {
 #pragma warning disable CS8618
     public sealed class CreateCharacterDto

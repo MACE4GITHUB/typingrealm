@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TypingRealm.Profiles.Api.Data;
 using TypingRealm.Profiles.Api.Resources;
+using TypingRealm.Profiles.Api.Resources.Data;
 
 namespace TypingRealm.Profiles.Api.Controllers
 {

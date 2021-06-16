@@ -1,6 +1,9 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Communication;
+using TypingRealm.Profiles.Api.Resources;
+using TypingRealm.Profiles.Api.Resources.Data;
 
 namespace TypingRealm.Profiles.Api.Client
 {
@@ -19,6 +22,25 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.GetAsync<bool>(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}/{characterId}/belongsToCurrentProfile",
+                EndpointAuthenticationType.Profile,
+                cancellationToken);
+        }
+
+        public ValueTask CreateAsync(CreateCharacterDto dto, CancellationToken cancellationToken)
+        {
+            return _serviceClient.PostAsync(
+                ServiceConfiguration.ServiceName,
+                $"{RoutePrefix}",
+                EndpointAuthenticationType.Profile,
+                dto,
+                cancellationToken);
+        }
+
+        public ValueTask<IEnumerable<CharacterResource>> GetAllByProfileIdAsync(CancellationToken cancellationToken)
+        {
+            return _serviceClient.GetAsync<IEnumerable<CharacterResource>>(
+                ServiceConfiguration.ServiceName,
+                $"{RoutePrefix}",
                 EndpointAuthenticationType.Profile,
                 cancellationToken);
         }
