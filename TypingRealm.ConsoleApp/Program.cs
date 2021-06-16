@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
 using TypingRealm.Authentication.ConsoleClient;
@@ -9,10 +10,12 @@ using TypingRealm.Client.Interaction;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
+using TypingRealm.Communication;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
+using TypingRealm.Profiles.Api.Client;
 using TypingRealm.SignalR;
 using TypingRealm.SignalR.Client;
 using TypingRealm.World;
@@ -62,7 +65,7 @@ namespace TypingRealm.ConsoleApp
 
     public static class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
             var services = new ServiceCollection();
 
@@ -86,6 +89,9 @@ namespace TypingRealm.ConsoleApp
                 .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
                 .RegisterClientMessaging() // TODO: Use RegisterClientMessagingBase instead.
                 .AddSignalRConnectionFactory()
+
+                .AddCommunication()
+                .AddProfileApiClients()
                 .RegisterClientConnectionFactoryFactory<SignalRClientConnectionFactoryFactory>();
 
             services.AddSingleton<IOutput, ConsoleOutput>();
@@ -115,6 +121,10 @@ namespace TypingRealm.ConsoleApp
 
             // Authenticate in background.
             _ = provider.GetRequiredService<IProfileTokenProvider>().SignInAsync(default);
+
+            var charactersClient = provider.GetRequiredService<ICharactersClient>();
+            var belongs = await charactersClient.BelongsToCurrentProfileAsync("id", default)
+                .ConfigureAwait(false);
 
             // Authenticated and got list of characters from API.
             var characters = new[] { "1", "2", "ivan-id" };

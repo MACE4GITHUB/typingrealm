@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication.ConsoleClient.TokenProviders;
+using TypingRealm.Communication;
 using TypingRealm.Messaging.Client;
 
 namespace TypingRealm.Authentication.ConsoleClient
@@ -8,6 +9,8 @@ namespace TypingRealm.Authentication.ConsoleClient
     {
         public static IServiceCollection AddLocalProfileTokenProvider(this IServiceCollection services, string profile)
         {
+            services.AddAccessTokenProvider();
+
             services.AddTransient<IProfileTokenProvider>(
                 _ => new LocalProfileTokenProvider(profile));
 
@@ -16,6 +19,8 @@ namespace TypingRealm.Authentication.ConsoleClient
 
         public static IServiceCollection AddAuth0ProfileTokenProvider(this IServiceCollection services)
         {
+            services.AddAccessTokenProvider();
+
             var auth0Config = new Auth0AuthenticationConfiguration();
             services.AddSingleton<IProfileTokenProvider>(
                 _ => new PkceProfileTokenProvider(auth0Config.Issuer, auth0Config.PkceClientId));
@@ -25,9 +30,18 @@ namespace TypingRealm.Authentication.ConsoleClient
 
         public static IServiceCollection AddIdentityServerProfileTokenProvider(this IServiceCollection services)
         {
+            services.AddAccessTokenProvider();
+
             var idsConfig = new IdentityServerAuthenticationConfiguration();
             services.AddSingleton<IProfileTokenProvider>(
                 _ => new PkceProfileTokenProvider(idsConfig.Issuer, idsConfig.PkceClientId));
+
+            return services;
+        }
+
+        private static IServiceCollection AddAccessTokenProvider(this IServiceCollection services)
+        {
+            services.AddTransient<IAccessTokenProvider, AccessTokenProvider>();
 
             return services;
         }
