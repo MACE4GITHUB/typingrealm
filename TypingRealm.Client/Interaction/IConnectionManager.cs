@@ -1,4 +1,6 @@
-﻿using TypingRealm.Messaging.Client;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using TypingRealm.Messaging.Client;
 
 namespace TypingRealm.Client.Interaction
 {
@@ -7,8 +9,8 @@ namespace TypingRealm.Client.Interaction
         IMessageProcessor? WorldConnection { get; }
         IMessageProcessor? RopeWarConnection { get; }
 
-        void ConnectToWorld(string characterId);
-        void ConnectToRopeWar(string ropeWarContestId);
+        ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken);
+        ValueTask ConnectToRopeWarAsync(string characterId, string ropeWarContestId, CancellationToken cancellationToken);
         void DisconnectFromRopeWar();
         void DisconnectFromWorld();
     }

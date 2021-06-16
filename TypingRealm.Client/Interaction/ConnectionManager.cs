@@ -1,4 +1,6 @@
-﻿using TypingRealm.Messaging.Client;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Messages;
 
 namespace TypingRealm.Client.Interaction
@@ -15,14 +17,17 @@ namespace TypingRealm.Client.Interaction
         public IMessageProcessor? WorldConnection { get; private set; }
         public IMessageProcessor? RopeWarConnection { get; private set; }
 
-        public void ConnectToRopeWar(string ropeWarContestId)
+        public ValueTask ConnectToRopeWarAsync(string characterId, string ropeWarContestId, CancellationToken cancellationToken)
         {
             RopeWarConnection = _messageProcessorFactory.CreateMessageProcessorFor("rope-war");
+            return RopeWarConnection.ConnectAsync(characterId, cancellationToken);
+            // TODO: connect to specific contest (or refactor RopeWar domain so that the character is connected to active activity automatically).
         }
 
-        public void ConnectToWorld(string characterId)
+        public ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken)
         {
-            WorldConnection = _messageProcessorFactory.CreateMessageProcessorFor("world");
+            WorldConnection = _messageProcessorFactory.CreateMessageProcessorFor("http://127.0.0.1:30111/hub"); // world connection string.
+            return WorldConnection.ConnectAsync(characterId, cancellationToken);
         }
 
         public void DisconnectFromRopeWar()

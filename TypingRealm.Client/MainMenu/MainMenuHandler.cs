@@ -23,7 +23,8 @@ namespace TypingRealm.Client.MainMenu
 
         public void ConnectAsCharacter(string characterId)
         {
-            _connectionManager.ConnectToWorld(characterId);
+            _connectionManager.ConnectToWorldAsync(characterId, default)
+                .GetAwaiter().GetResult(); // TODO: Do not block like this.
 
             // Maybe set screen to some intermediatery "loading" value. and after connection screen should be determined by received state.
             // TODO: See if after connecting to world the character is actually in some activity - and select this activity screen instead of world screen.
