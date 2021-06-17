@@ -1,11 +1,14 @@
-﻿using TypingRealm.Client.Interaction;
+﻿using System;
+using System.Threading.Tasks;
+using TypingRealm.Client.Interaction;
+using TypingRealm.World;
 
 namespace TypingRealm.Client.MainMenu
 {
     public interface IMainMenuHandler
     {
         void SwitchToCharacterCreationScreen();
-        void ConnectAsCharacter(string characterId);
+        void ConnectAsCharacter(string characterId, Func<WorldState, ValueTask> updateStateAsync);
     }
 
     public sealed class MainMenuHandler : IMainMenuHandler
@@ -21,14 +24,14 @@ namespace TypingRealm.Client.MainMenu
             _connectionManager = connectionManager;
         }
 
-        public void ConnectAsCharacter(string characterId)
+        public void ConnectAsCharacter(string characterId, Func<WorldState, ValueTask> updateStateAsync)
         {
-            _connectionManager.ConnectToWorldAsync(characterId, default)
+            _connectionManager.ConnectToWorldAsync(characterId, updateStateAsync, default)
                 .GetAwaiter().GetResult(); // TODO: Do not block like this.
 
             // Maybe set screen to some intermediatery "loading" value. and after connection screen should be determined by received state.
             // TODO: See if after connecting to world the character is actually in some activity - and select this activity screen instead of world screen.
-            _screenNavigation.Screen = GameScreen.World;
+            //_screenNavigation.Screen = GameScreen.World;
         }
 
         public void SwitchToCharacterCreationScreen()

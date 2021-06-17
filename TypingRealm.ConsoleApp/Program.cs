@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -136,7 +135,7 @@ namespace TypingRealm.ConsoleApp
 
                 // Authenticated and got list of characters from API.
                 host.Services.GetRequiredService<MainMenuScreenHandler>()
-                    .UpdateState(new MainMenuState(characters.Select(c => c.Name)));
+                    .UpdateState(new MainMenuState(characters));
             }
 
             Console.Clear();

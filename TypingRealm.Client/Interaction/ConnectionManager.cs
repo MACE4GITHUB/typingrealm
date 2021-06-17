@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Messages;
+using TypingRealm.World;
 
 namespace TypingRealm.Client.Interaction
 {
@@ -24,9 +26,12 @@ namespace TypingRealm.Client.Interaction
             // TODO: connect to specific contest (or refactor RopeWar domain so that the character is connected to active activity automatically).
         }
 
-        public ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken)
+        public ValueTask ConnectToWorldAsync(string characterId, Func<WorldState, ValueTask> worldStateAsync, CancellationToken cancellationToken)
         {
             WorldConnection = _messageProcessorFactory.CreateMessageProcessorFor("http://127.0.0.1:30111/hub"); // world connection string.
+
+            _ = WorldConnection.Subscribe(worldStateAsync);
+
             return WorldConnection.ConnectAsync(characterId, cancellationToken);
         }
 

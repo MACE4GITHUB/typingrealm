@@ -10,7 +10,8 @@ namespace TypingRealm.Client.MainMenu
     {
         public sealed record State(
             ITyperInformation CreateCharacterTyper,
-            Dictionary<string, ITyperInformation> ConnectAsCharacterTypers);
+            Dictionary<string, ITyperInformation> ConnectAsCharacterTypers,
+            string WorldStateJson);
 
         private readonly IOutput _output;
         private readonly ICharacterService _characterService;
@@ -47,6 +48,9 @@ namespace TypingRealm.Client.MainMenu
                 _output.Write(new string(' ', 10));
                 _output.Write(typerInfo);
             }
+
+            _output.WriteLine("World state:");
+            _output.WriteLine(state.WorldStateJson);
         }
     }
 }

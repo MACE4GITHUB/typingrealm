@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
@@ -13,6 +14,8 @@ namespace TypingRealm.Client.MainMenu
             = new Dictionary<string, Typer>();
 
         private readonly IMainMenuHandler _handler;
+
+        private string _worldStateJson = "{}";
 
         public MainMenuScreenHandler(
             ITextGenerator textGenerator,
@@ -28,7 +31,7 @@ namespace TypingRealm.Client.MainMenu
             var toRemove = new List<string>();
             foreach (var existing in _connectAsCharacterTypers)
             {
-                if (state.Characters.Contains(existing.Key))
+                if (state.Characters.Select(c => c.CharacterId).Contains(existing.Key))
                     continue;
 
                 toRemove.Add(existing.Key);
@@ -41,14 +44,14 @@ namespace TypingRealm.Client.MainMenu
 
             foreach (var character in state.Characters)
             {
-                if (!_connectAsCharacterTypers.ContainsKey(character))
-                    _connectAsCharacterTypers.Add(character, MakeUniqueTyper());
+                if (!_connectAsCharacterTypers.ContainsKey(character.CharacterId))
+                    _connectAsCharacterTypers.Add(character.CharacterId, MakeUniqueTyper());
             }
         }
 
         protected override MainMenuPrinter.State CreatePrintState()
         {
-            return new MainMenuPrinter.State(_createCharacterTyper, _connectAsCharacterTypers.ToDictionary(x => x.Key, x => (ITyperInformation)x.Value));
+            return new MainMenuPrinter.State(_createCharacterTyper, _connectAsCharacterTypers.ToDictionary(x => x.Key, x => (ITyperInformation)x.Value), _worldStateJson);
         }
 
         protected override void OnTyped(Typer typer)
@@ -60,7 +63,10 @@ namespace TypingRealm.Client.MainMenu
             }
 
             var characterId = _connectAsCharacterTypers.First(x => x.Value == typer).Key;
-            _handler.ConnectAsCharacter(characterId);
+            _handler.ConnectAsCharacter(characterId, async state =>
+            {
+                _worldStateJson = JsonSerializer.Serialize(state);
+            });
         }
     }
 }

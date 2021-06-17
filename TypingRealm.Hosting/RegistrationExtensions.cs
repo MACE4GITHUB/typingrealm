@@ -11,9 +11,11 @@ using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.Profiles.Api.Client;
+using TypingRealm.RopeWar;
 using TypingRealm.SignalR;
 using TypingRealm.SignalR.Client;
 using TypingRealm.Tcp;
+using TypingRealm.World;
 
 namespace TypingRealm.Hosting
 {
@@ -110,7 +112,9 @@ namespace TypingRealm.Hosting
             var builder = services.AddSerializationCore();
 
             builder
-                .AddTyrAuthenticationMessages();
+                .AddTyrAuthenticationMessages()
+                .AddWorldMessages()
+                .AddRopeWarMessages();
 
             services
                 .AddCommunication()
