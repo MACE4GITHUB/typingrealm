@@ -3,23 +3,23 @@ using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.Interaction
 {
-    public abstract class ScreenHandler<TPrintState> : MultiTyperInputHandler, IScreenHandler
+    public abstract class ScreenHandler<TState> : MultiTyperInputHandler, IScreenHandler
     {
-        private readonly IPrinter<TPrintState> _printer;
+        private readonly IPrinter<TState> _printer;
 
         protected ScreenHandler(
             ITextGenerator textGenerator,
-            IPrinter<TPrintState> printer) : base(textGenerator)
+            IPrinter<TState> printer) : base(textGenerator)
         {
             _printer = printer;
         }
 
         public void PrintState()
         {
-            var state = CreatePrintState();
+            var state = GetCurrentState();
             _printer.Print(state);
         }
 
-        protected abstract TPrintState CreatePrintState();
+        protected abstract TState GetCurrentState();
     }
 }

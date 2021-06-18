@@ -10,6 +10,7 @@ using TypingRealm.Client.Interaction;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
+using TypingRealm.Client.World;
 using TypingRealm.Hosting;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Profiles.Api.Client;
@@ -45,7 +46,7 @@ namespace TypingRealm.ConsoleApp
         }
     }
 
-    public sealed class CharacterService : ICharacterService
+    public sealed class StubCharacterService : ICharacterService
     {
         public string GetCharacterName(string characterId)
         {
@@ -89,7 +90,8 @@ namespace TypingRealm.ConsoleApp
                     services.AddLocalProfileTokenProvider(localProfile);
 
                 services.AddSingleton<IOutput, ConsoleOutputWithoutFlicker>();
-                services.AddSingleton<ICharacterService, CharacterService>();
+                services.AddSingleton<ICharacterService, StubCharacterService>();
+                services.AddSingleton<ILocationService, StubLocationService>();
                 services.AddSingleton<ITextGenerator, TextGenerator>();
 
                 services.AddSingleton<DialogScreenHandler>();
@@ -104,10 +106,14 @@ namespace TypingRealm.ConsoleApp
                 services.AddSingleton<IPrinter<CharacterCreationPrintableState>, CharacterCreationPrinter>();
                 services.AddSingleton<CharacterCreationScreenHandler>();
 
+                services.AddSingleton<WorldScreenHandler>();
+                services.AddSingleton<IPrinter<WorldState>, WorldPrinter>();
+
                 services.AddSingleton<IDictionary<GameScreen, IScreenHandler>>(p => new Dictionary<GameScreen, IScreenHandler>
                 {
                     [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenHandler>(),
-                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenHandler>()
+                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenHandler>(),
+                    [GameScreen.World] = p.GetRequiredService<WorldScreenHandler>()
                 });
                 services.AddSingleton<IScreenHandlerProvider, ScreenHandlerProvider>();
             }).Build();

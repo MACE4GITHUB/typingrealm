@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
@@ -14,8 +13,6 @@ namespace TypingRealm.Client.MainMenu
             = new Dictionary<string, Typer>();
 
         private readonly IMainMenuHandler _handler;
-
-        private string _worldStateJson = "{}";
 
         public MainMenuScreenHandler(
             ITextGenerator textGenerator,
@@ -49,9 +46,9 @@ namespace TypingRealm.Client.MainMenu
             }
         }
 
-        protected override MainMenuPrinter.State CreatePrintState()
+        protected override MainMenuPrinter.State GetCurrentState()
         {
-            return new MainMenuPrinter.State(_createCharacterTyper, _connectAsCharacterTypers.ToDictionary(x => x.Key, x => (ITyperInformation)x.Value), _worldStateJson);
+            return new MainMenuPrinter.State(_createCharacterTyper, _connectAsCharacterTypers.ToDictionary(x => x.Key, x => (ITyperInformation)x.Value));
         }
 
         protected override void OnTyped(Typer typer)
@@ -63,10 +60,7 @@ namespace TypingRealm.Client.MainMenu
             }
 
             var characterId = _connectAsCharacterTypers.First(x => x.Value == typer).Key;
-            _handler.ConnectAsCharacter(characterId, async state =>
-            {
-                _worldStateJson = JsonSerializer.Serialize(state);
-            });
+            _handler.ConnectAsCharacter(characterId);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Messages;
@@ -19,6 +18,8 @@ namespace TypingRealm.Client.Interaction
         public IMessageProcessor? WorldConnection { get; private set; }
         public IMessageProcessor? RopeWarConnection { get; private set; }
 
+        public WorldState? CurrentWorldState { get; set; }
+
         public ValueTask ConnectToRopeWarAsync(string characterId, string ropeWarContestId, CancellationToken cancellationToken)
         {
             RopeWarConnection = _messageProcessorFactory.CreateMessageProcessorFor("rope-war");
@@ -26,11 +27,15 @@ namespace TypingRealm.Client.Interaction
             // TODO: connect to specific contest (or refactor RopeWar domain so that the character is connected to active activity automatically).
         }
 
-        public ValueTask ConnectToWorldAsync(string characterId, Func<WorldState, ValueTask> worldStateAsync, CancellationToken cancellationToken)
+        public ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken)
         {
             WorldConnection = _messageProcessorFactory.CreateMessageProcessorFor("http://127.0.0.1:30111/hub"); // world connection string.
 
-            _ = WorldConnection.Subscribe(worldStateAsync);
+            _ = WorldConnection.Subscribe<WorldState>(state =>
+            {
+                CurrentWorldState = state;
+                return default;
+            });
 
             return WorldConnection.ConnectAsync(characterId, cancellationToken);
         }
@@ -44,7 +49,8 @@ namespace TypingRealm.Client.Interaction
 
         public void DisconnectFromWorld()
         {
-            WorldConnection?.SendAsync(new Disconnect(), default);
+            WorldConnection?.SendAsync(new Disconnect(), default)
+                .GetAwaiter().GetResult();
             //WorldConnection.Disconnect();
             WorldConnection = null;
         }
