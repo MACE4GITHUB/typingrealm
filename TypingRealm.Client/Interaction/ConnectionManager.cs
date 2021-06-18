@@ -42,15 +42,17 @@ namespace TypingRealm.Client.Interaction
 
         public void DisconnectFromRopeWar()
         {
-            RopeWarConnection?.SendAsync(new Disconnect(), default);
+            _ = RopeWarConnection?.SendAsync(new Disconnect(), default);
             //RopeWarConnection.Disconnect();
             RopeWarConnection = null;
         }
 
         public void DisconnectFromWorld()
         {
-            WorldConnection?.SendAsync(new Disconnect(), default)
-                .GetAwaiter().GetResult();
+            // HACK: Do not wait for it, it is a temporary hack.
+            // If we wait for this - server sends Disconnected message and closes the connection, but
+            // we are (probably?) waiting for AcknowledgeHandled and this thing fails.
+            _ = WorldConnection?.SendAsync(new Disconnect(), default);
             //WorldConnection.Disconnect();
             WorldConnection = null;
         }
