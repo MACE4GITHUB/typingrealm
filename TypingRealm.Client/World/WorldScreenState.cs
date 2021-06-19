@@ -2,9 +2,9 @@
 
 namespace TypingRealm.Client.World
 {
-    public sealed class WorldState
+    public sealed class WorldScreenState
     {
-        public WorldState(Typer disconnectTyper, string locationId)
+        public WorldScreenState(Typer disconnectTyper, string locationId)
         {
             DisconnectTyper = disconnectTyper;
             LocationId = locationId;

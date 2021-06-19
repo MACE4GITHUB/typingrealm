@@ -107,7 +107,7 @@ namespace TypingRealm.ConsoleApp
                 services.AddSingleton<CharacterCreationScreenHandler>();
 
                 services.AddSingleton<WorldScreenHandler>();
-                services.AddSingleton<IPrinter<WorldState>, WorldPrinter>();
+                services.AddSingleton<IPrinter<WorldScreenState>, WorldPrinter>();
 
                 services.AddSingleton<IDictionary<GameScreen, IScreenHandler>>(p => new Dictionary<GameScreen, IScreenHandler>
                 {

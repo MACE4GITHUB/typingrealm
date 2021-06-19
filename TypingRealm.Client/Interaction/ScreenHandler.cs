@@ -16,10 +16,10 @@ namespace TypingRealm.Client.Interaction
 
         public void PrintState()
         {
-            var state = GetCurrentState();
+            var state = GetCurrentScreenState();
             _printer.Print(state);
         }
 
-        protected abstract TState GetCurrentState();
+        protected abstract TState GetCurrentScreenState();
     }
 }

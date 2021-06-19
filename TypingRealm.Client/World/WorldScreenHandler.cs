@@ -4,7 +4,7 @@ using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.World
 {
-    public sealed class WorldScreenHandler : ScreenHandler<WorldState>
+    public sealed class WorldScreenHandler : ScreenHandler<WorldScreenState>
     {
         private readonly Typer _disconnectTyper;
         private readonly IScreenNavigation _screenNavigation;
@@ -14,14 +14,14 @@ namespace TypingRealm.Client.World
             ITextGenerator textGenerator,
             IScreenNavigation screenNavigation,
             IConnectionManager connectionManager,
-            IPrinter<WorldState> printer) : base(textGenerator, printer)
+            IPrinter<WorldScreenState> printer) : base(textGenerator, printer)
         {
             _screenNavigation = screenNavigation;
             _connectionManager = connectionManager;
             _disconnectTyper = MakeUniqueTyper();
         }
 
-        protected override WorldState GetCurrentState()
+        protected override WorldScreenState GetCurrentScreenState()
         {
             var currentWorldState = _connectionManager.CurrentWorldState;
             /*if (currentWorldState == null)
@@ -29,7 +29,7 @@ namespace TypingRealm.Client.World
             if (currentWorldState == null)
                 return null!;
 
-            return new WorldState(
+            return new WorldScreenState(
                 _disconnectTyper, currentWorldState.LocationId);
         }
 

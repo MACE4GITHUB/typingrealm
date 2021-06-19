@@ -3,7 +3,7 @@ using TypingRealm.Client.Output;
 
 namespace TypingRealm.Client.World
 {
-    public sealed class WorldPrinter : IPrinter<WorldState>
+    public sealed class WorldPrinter : IPrinter<WorldScreenState>
     {
         private readonly IOutput _output;
         private readonly ICharacterService _characterService;
@@ -19,7 +19,7 @@ namespace TypingRealm.Client.World
             _locationService = locationService;
         }
 
-        public void Print(WorldState state)
+        public void Print(WorldScreenState state)
         {
             if (state == null)
             {

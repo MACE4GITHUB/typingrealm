@@ -46,7 +46,7 @@ namespace TypingRealm.Client.MainMenu
             }
         }
 
-        protected override MainMenuPrinter.State GetCurrentState()
+        protected override MainMenuPrinter.State GetCurrentScreenState()
         {
             return new MainMenuPrinter.State(_createCharacterTyper, _connectAsCharacterTypers.ToDictionary(x => x.Key, x => (ITyperInformation)x.Value));
         }
