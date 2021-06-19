@@ -159,9 +159,9 @@ namespace TypingRealm.ConsoleApp
         {
             while (true)
             {
-                output.Clear();
                 var screen = screenProvider.GetCurrentScreenHandler();
 
+                output.Clear();
                 screen.PrintState();
                 output.FinalizeScreen();
 
