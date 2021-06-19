@@ -1,5 +1,4 @@
-﻿using System;
-using TypingRealm.Client.Interaction;
+﻿using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
 
