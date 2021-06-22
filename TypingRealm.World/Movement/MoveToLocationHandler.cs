@@ -7,7 +7,6 @@ using TypingRealm.World.Layers;
 
 namespace TypingRealm.World.Movement
 {
-    // TODO: I still can move between locations even when I participate in activity. Make sure it's impossible.
     public sealed class MoveToLocationHandler : LayerHandler<MoveToLocation>
     {
         private readonly ILocationRepository _locationStore;
