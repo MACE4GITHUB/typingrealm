@@ -5,9 +5,17 @@ namespace TypingRealm.Client.Output
 {
     public sealed class ConsoleOutput : IOutput
     {
+        public ConsoleOutput()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
         public void Clear()
         {
             Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
         public void WriteLine()

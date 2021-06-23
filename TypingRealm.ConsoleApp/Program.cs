@@ -70,6 +70,9 @@ namespace TypingRealm.ConsoleApp
                 localProfile = Console.ReadLine() ?? "default";
             }
 
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
             Console.CursorVisible = false;
 
             using var cts = new CancellationTokenSource();

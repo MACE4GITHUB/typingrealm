@@ -8,9 +8,17 @@ namespace TypingRealm.Client.Output
         private readonly int _screenWidth = 120;
         private readonly int _screenHeight = 30;
 
+        public ConsoleOutputWithoutFlicker()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
         public void Clear()
         {
             Console.SetCursorPosition(0, 0);
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
         public void WriteLine()
