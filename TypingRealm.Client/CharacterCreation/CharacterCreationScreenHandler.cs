@@ -15,10 +15,10 @@ namespace TypingRealm.Client.CharacterCreation
         private readonly IPrinter<CharacterCreationPrintableState> _printer;
 
         public CharacterCreationScreenHandler(
-            ITextGenerator textGenerator,
+            ITyperPool typerPool,
             ICharacterCreationHandler characterCreationHandler,
             IPrinter<CharacterCreationPrintableState> printer)
-            : base(textGenerator)
+            : base(typerPool)
         {
             _returnBackToMainMenuTyper = MakeUniqueTyper();
             _characterCreationHandler = characterCreationHandler;

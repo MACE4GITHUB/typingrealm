@@ -89,6 +89,9 @@ namespace TypingRealm.ConsoleApp
                 if (localProfile != null && DebugHelpers.UseLocalAuthentication)
                     services.AddLocalProfileTokenProvider(localProfile);
 
+                // For every singleton screen handler - it's own typer pool.
+                services.AddTransient<ITyperPool, UniqueTyperPool>();
+
                 services.AddSingleton<IOutput, ConsoleOutputWithoutFlicker>();
                 services.AddSingleton<ICharacterService, StubCharacterService>();
                 services.AddSingleton<ILocationService, StubLocationService>();

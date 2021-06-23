@@ -8,8 +8,8 @@ namespace TypingRealm.Client.Interaction
         private readonly IPrinter<TState> _printer;
 
         protected ScreenHandler(
-            ITextGenerator textGenerator,
-            IPrinter<TState> printer) : base(textGenerator)
+            ITyperPool typerPool,
+            IPrinter<TState> printer) : base(typerPool)
         {
             _printer = printer;
         }

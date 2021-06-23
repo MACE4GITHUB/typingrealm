@@ -15,9 +15,9 @@ namespace TypingRealm.Client.MainMenu
         private readonly IMainMenuHandler _handler;
 
         public MainMenuScreenHandler(
-            ITextGenerator textGenerator,
+            ITyperPool typerPool,
             IMainMenuHandler handler,
-            IPrinter<MainMenuPrinter.State> printer) : base(textGenerator, printer)
+            IPrinter<MainMenuPrinter.State> printer) : base(typerPool, printer)
         {
             _createCharacterTyper = MakeUniqueTyper();
             _handler = handler;

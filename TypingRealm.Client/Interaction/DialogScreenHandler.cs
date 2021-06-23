@@ -15,8 +15,8 @@ namespace TypingRealm.Client.Interaction
         private readonly IOutput _output;
 
         public DialogScreenHandler(
-            ITextGenerator textGenerator,
-            IOutput output) : base(textGenerator)
+            ITyperPool typerPool,
+            IOutput output) : base(typerPool)
         {
             _output = output;
 

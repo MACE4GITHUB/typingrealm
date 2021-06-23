@@ -11,10 +11,10 @@ namespace TypingRealm.Client.World
         private readonly IConnectionManager _connectionManager;
 
         public WorldScreenHandler(
-            ITextGenerator textGenerator,
+            ITyperPool typerPool,
             IScreenNavigation screenNavigation,
             IConnectionManager connectionManager,
-            IPrinter<WorldScreenState> printer) : base(textGenerator, printer)
+            IPrinter<WorldScreenState> printer) : base(typerPool, printer)
         {
             _screenNavigation = screenNavigation;
             _connectionManager = connectionManager;
