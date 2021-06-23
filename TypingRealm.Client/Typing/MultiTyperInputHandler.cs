@@ -58,6 +58,6 @@ namespace TypingRealm.Client.Typing
 
         protected abstract void OnTyped(Typer typer);
 
-        protected Typer MakeUniqueTyper() => _typerPool.MakeUniqueTyper();
+        protected Typer MakeUniqueTyper() => _typerPool.MakeUniqueTyper().Typer;
     }
 }
