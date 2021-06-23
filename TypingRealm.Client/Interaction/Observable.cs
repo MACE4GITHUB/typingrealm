@@ -1,0 +1,3 @@
+﻿namespace TypingRealm.Client.Interaction
+{
+}

@@ -4,19 +4,20 @@ namespace TypingRealm.Client.Typing
 {
     public abstract class MultiTyperInputHandler : IInputHandler
     {
-        private readonly ITyperPool _typerPool;
         private Typer? _focusedTyper;
 
         protected MultiTyperInputHandler(ITyperPool typerPool)
         {
-            _typerPool = typerPool;
+            TyperPool = typerPool;
         }
+
+        protected ITyperPool TyperPool { get; }
 
         public void Type(char character)
         {
             if (_focusedTyper == null)
             {
-                var typer = _typerPool.GetTyper(character);
+                var typer = TyperPool.GetTyper(character);
                 if (typer == null)
                     return;
 
@@ -27,7 +28,7 @@ namespace TypingRealm.Client.Typing
 
             if (_focusedTyper.IsFinishedTyping)
             {
-                _typerPool.ResetUniqueTyper(_focusedTyper);
+                TyperPool.ResetUniqueTyper(_focusedTyper);
 
                 OnTyped(_focusedTyper);
                 _focusedTyper = null;
@@ -58,6 +59,7 @@ namespace TypingRealm.Client.Typing
 
         protected abstract void OnTyped(Typer typer);
 
-        protected Typer MakeUniqueTyper() => _typerPool.MakeUniqueTyper().Typer;
+        // TODO: Remove this and use Typer protected property.
+        protected Typer MakeUniqueTyper() => TyperPool.MakeUniqueTyper().Typer;
     }
 }

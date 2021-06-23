@@ -1,14 +1,17 @@
-﻿using System.Threading;
+﻿using System;
+using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Messages;
-using TypingRealm.World;
 
 namespace TypingRealm.Client.Interaction
 {
     public sealed class ConnectionManager : IConnectionManager
     {
         private readonly IMessageProcessorFactory _messageProcessorFactory;
+        private readonly BehaviorSubject<IMessageProcessor?> _worldConnectionSubject
+            = new BehaviorSubject<IMessageProcessor?>(null);
 
         public ConnectionManager(IMessageProcessorFactory messageProcessorFactory)
         {
@@ -16,35 +19,16 @@ namespace TypingRealm.Client.Interaction
         }
 
         public IMessageProcessor? WorldConnection { get; private set; }
-        public IMessageProcessor? RopeWarConnection { get; private set; }
+        public IObservable<IMessageProcessor?> WorldConnectionObservable => _worldConnectionSubject;
 
-        public WorldState? CurrentWorldState { get; set; }
-
-        public ValueTask ConnectToRopeWarAsync(string characterId, string ropeWarContestId, CancellationToken cancellationToken)
-        {
-            RopeWarConnection = _messageProcessorFactory.CreateMessageProcessorFor("rope-war");
-            return RopeWarConnection.ConnectAsync(characterId, cancellationToken);
-            // TODO: connect to specific contest (or refactor RopeWar domain so that the character is connected to active activity automatically).
-        }
-
-        public ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken)
+        public async ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken)
         {
             WorldConnection = _messageProcessorFactory.CreateMessageProcessorFor("http://127.0.0.1:30111/hub"); // world connection string.
 
-            _ = WorldConnection.Subscribe<WorldState>(state =>
-            {
-                CurrentWorldState = state;
-                return default;
-            });
+            await WorldConnection.ConnectAsync(characterId, cancellationToken)
+                .ConfigureAwait(false);
 
-            return WorldConnection.ConnectAsync(characterId, cancellationToken);
-        }
-
-        public void DisconnectFromRopeWar()
-        {
-            _ = RopeWarConnection?.SendAsync(new Disconnect(), default);
-            //RopeWarConnection.Disconnect();
-            RopeWarConnection = null;
+            _worldConnectionSubject.OnNext(WorldConnection);
         }
 
         public void DisconnectFromWorld()

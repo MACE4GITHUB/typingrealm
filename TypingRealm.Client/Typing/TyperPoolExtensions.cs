@@ -11,5 +11,14 @@ namespace TypingRealm.Client.Typing
 
             return (typer, id);
         }
+
+        public static void RemoveTyper(this ITyperPool typerPool, string id)
+        {
+            var typer = typerPool.GetByKey(id);
+            if (typer == null)
+                return;
+
+            typerPool.RemoveTyper(typer);
+        }
     }
 }

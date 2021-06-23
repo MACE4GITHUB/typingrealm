@@ -1,23 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using TypingRealm.Client.Interaction;
+using TypingRealm.Client.MainMenu;
 
 namespace TypingRealm.ConsoleApp
 {
-    public sealed class ScreenHandlerProvider : IScreenHandlerProvider
+    public sealed class InputHandlerProvider : IScreenProvider
     {
         private readonly IScreenNavigation _screenNavigation;
-        private readonly IDictionary<GameScreen, IScreenHandler> _screenHandlers;
+        private readonly IDictionary<GameScreen, IInputHandler> _screenHandlers;
+        private readonly IDictionary<GameScreen, IChangeDetector> _changeDetectors;
 
-        public ScreenHandlerProvider(
+        public InputHandlerProvider(
             IScreenNavigation screenNavigation,
-            IDictionary<GameScreen, IScreenHandler> screenHandlers)
+            IDictionary<GameScreen, IInputHandler> screenHandlers,
+            IDictionary<GameScreen, IChangeDetector> changeDetectors)
         {
             _screenNavigation = screenNavigation;
             _screenHandlers = screenHandlers;
+            _changeDetectors = changeDetectors;
         }
 
-        public IScreenHandler GetCurrentScreenHandler()
+        public IChangeDetector GetCurrentChangeDetector()
+        {
+            return _changeDetectors[_screenNavigation.Screen];
+        }
+
+        public IInputHandler GetCurrentInputHandler()
         {
             if (_screenNavigation.Dialog != null)
                 return _screenNavigation.Dialog;

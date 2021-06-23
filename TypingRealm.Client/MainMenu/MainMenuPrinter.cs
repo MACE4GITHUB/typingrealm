@@ -1,51 +1,46 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using TypingRealm.Client.Data;
+﻿using System.Linq;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.MainMenu
 {
-    public sealed class MainMenuPrinter : IPrinter<MainMenuPrinter.State>
+    public sealed class MainMenuPrinter : IPrinter<MainMenuScreenState>
     {
-        public sealed record State(
-            ITyperInformation CreateCharacterTyper,
-            Dictionary<string, ITyperInformation> ConnectAsCharacterTypers);
-
         private readonly IOutput _output;
-        private readonly ICharacterService _characterService;
+        private readonly ITyperPool _typerPool;
 
-        public MainMenuPrinter(IOutput output, ICharacterService characterService)
+        public MainMenuPrinter(
+            IOutput output,
+            ITyperPool typerPool)
         {
             _output = output;
-            _characterService = characterService;
+            _typerPool = typerPool;
         }
 
-        public void Print(State state)
+        public void Print(MainMenuScreenState state)
         {
             _output.WriteLine("Main menu:");
             _output.WriteLine();
             _output.Write("Create new character");
             _output.Write(new string(' ', 10));
-            _output.Write(state.CreateCharacterTyper);
+            // TODO: Don't use ! operator.
+            _output.Write(_typerPool.GetByKey("create-character")!);
             _output.WriteLine();
 
-            if (!state.ConnectAsCharacterTypers.Any())
+            if (!state.Characters.Any())
                 return;
 
             _output.WriteLine("You have these characters:");
             _output.WriteLine();
 
-            foreach (var character in state.ConnectAsCharacterTypers)
+            foreach (var character in state.Characters)
             {
-                var characterId = character.Key;
-                var typerInfo = character.Value;
+                // TODO: Don't use ! operator.
+                var typer = _typerPool.GetByKey(character.CharacterId)!;
 
-                var characterName = _characterService.GetCharacterName(characterId);
-
-                _output.Write(characterName);
+                _output.Write(character.Name);
                 _output.Write(new string(' ', 10));
-                _output.Write(typerInfo);
+                _output.Write(typer);
             }
         }
     }

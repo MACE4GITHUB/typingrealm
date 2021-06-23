@@ -1,20 +1,30 @@
 ﻿using System;
+using System.Reactive.Subjects;
 
 namespace TypingRealm.Client.Interaction
 {
     public sealed class ScreenNavigation : IScreenNavigation
     {
-        public GameScreen Screen { get; set; } = GameScreen.MainMenu;
+        private readonly BehaviorSubject<GameScreen> _screenSubject;
+        private readonly DialogScreenHandler _dialogScreenHandler;
+
         public ModalModule ActiveModalModule { get; set; }
         public ModalModule BackgroundModalModule { get; set; }
         public IScreenHandler? Dialog { get; set; }
 
-        private readonly DialogScreenHandler _dialogScreenHandler;
+        public GameScreen Screen
+        {
+            get => _screenSubject.Value;
+            set => _screenSubject.OnNext(value);
+        }
 
         public ScreenNavigation(DialogScreenHandler dialogScreenHandler)
         {
             _dialogScreenHandler = dialogScreenHandler;
+            _screenSubject = new BehaviorSubject<GameScreen>(GameScreen.MainMenu);
         }
+
+        public IObservable<GameScreen> ScreenObservable => _screenSubject;
 
         public void OpenDialog(string text, Action ok, Action cancel)
         {

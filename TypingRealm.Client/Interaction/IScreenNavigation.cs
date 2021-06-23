@@ -5,6 +5,8 @@ namespace TypingRealm.Client.Interaction
     public interface IScreenNavigation
     {
         GameScreen Screen { get; set; }
+        IObservable<GameScreen> ScreenObservable { get; }
+
         ModalModule ActiveModalModule { get; set; }
         ModalModule BackgroundModalModule { get; set; }
 

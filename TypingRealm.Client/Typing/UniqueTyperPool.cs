@@ -69,12 +69,20 @@ namespace TypingRealm.Client.Typing
             return phrase;
         }
 
-        public Typer? GetById(string id)
+        public Typer? GetByKey(string id)
         {
             if (!_idToTypers.ContainsKey(id))
                 return null;
 
             return _idToTypers[id];
+        }
+
+        public string? GetKeyFor(Typer typer)
+        {
+            if (!_idToTypers.Any(x => x.Value == typer))
+                return null;
+
+            return _idToTypers.Single(x => x.Value == typer).Key;
         }
     }
 }

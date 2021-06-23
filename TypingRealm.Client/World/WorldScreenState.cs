@@ -1,16 +1,17 @@
-﻿using TypingRealm.Client.Typing;
-
-namespace TypingRealm.Client.World
+﻿namespace TypingRealm.Client.World
 {
+    public sealed record LocationInfo(
+        string LocationId,
+        string Name,
+        string Description);
+
     public sealed class WorldScreenState
     {
-        public WorldScreenState(Typer disconnectTyper, string locationId)
+        public WorldScreenState(LocationInfo currentLocation)
         {
-            DisconnectTyper = disconnectTyper;
-            LocationId = locationId;
+            CurrentLocation = currentLocation;
         }
 
-        public Typer DisconnectTyper { get; }
-        public string LocationId { get; }
+        public LocationInfo CurrentLocation { get; set; }
     }
 }

@@ -1,22 +1,19 @@
-﻿using TypingRealm.Client.Data;
-using TypingRealm.Client.Output;
+﻿using TypingRealm.Client.Output;
+using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.World
 {
     public sealed class WorldPrinter : IPrinter<WorldScreenState>
     {
         private readonly IOutput _output;
-        private readonly ICharacterService _characterService;
-        private readonly ILocationService _locationService;
+        private readonly ITyperPool _typerPool;
 
         public WorldPrinter(
             IOutput output,
-            ICharacterService characterService,
-            ILocationService locationService)
+            ITyperPool typerPool)
         {
             _output = output;
-            _characterService = characterService;
-            _locationService = locationService;
+            _typerPool = typerPool;
         }
 
         public void Print(WorldScreenState state)
@@ -27,15 +24,16 @@ namespace TypingRealm.Client.World
                 return;
             }
 
-            var location = _locationService.GetLocation(state.LocationId);
             _output.WriteLine("World:");
             _output.WriteLine();
             _output.Write("Your current location: ");
-            _output.Write(location.Name);
+            _output.WriteLine(state.CurrentLocation.Name);
+            _output.WriteLine(state.CurrentLocation.Description);
             _output.WriteLine();
 
             _output.Write("Disconnect -    ");
-            _output.Write(state.DisconnectTyper);
+            // TODO: Don't use ! operator.
+            _output.Write(_typerPool.GetByKey("disconnect")!);
         }
     }
 }

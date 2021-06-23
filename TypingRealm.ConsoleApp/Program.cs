@@ -12,7 +12,6 @@ using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
 using TypingRealm.Client.World;
 using TypingRealm.Hosting;
-using TypingRealm.Messaging.Client;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources.Data;
 
@@ -52,11 +51,6 @@ namespace TypingRealm.ConsoleApp
         {
             return $"ivan name - {characterId}";
         }
-    }
-
-    public interface IScreenHandlerProvider
-    {
-        IScreenHandler GetCurrentScreenHandler();
     }
 
     public static class Program
@@ -104,33 +98,107 @@ namespace TypingRealm.ConsoleApp
                 services.AddSingleton<IScreenNavigation, ScreenNavigation>();
                 services.AddSingleton<IConnectionManager, ConnectionManager>();
 
-                services.AddSingleton<IMainMenuHandler, MainMenuHandler>();
-                services.AddSingleton<IPrinter<MainMenuPrinter.State>, MainMenuPrinter>();
-                services.AddSingleton<MainMenuScreenHandler>();
+                services.AddSingleton(p =>
+                {
+                    var typerPool = p.GetRequiredService<ITyperPool>();
+
+                    var mainMenuScreenStateManager = new MainMenuScreenStateManager(
+                        p.GetRequiredService<ICharactersClient>(),
+                        typerPool);
+                    var mainMenuInputHandler = new MainMenuInputHandler(
+                        typerPool,
+                        p.GetRequiredService<IScreenNavigation>(),
+                        p.GetRequiredService<IConnectionManager>());
+                    var mainMenuPrinter = new MainMenuPrinter(
+                        p.GetRequiredService<IOutput>(),
+                        typerPool);
+
+                    return new ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>(
+                        mainMenuScreenStateManager,
+                        mainMenuPrinter,
+                        mainMenuInputHandler);
+                });
+
+                services.AddTransient(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
+                    return dependencies.Handler;
+                });
+                services.AddTransient(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
+                    return dependencies.Manager;
+                });
+                services.AddTransient<IPrinter<MainMenuScreenState>>(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
+                    return dependencies.Printer;
+                });
+
+                services.AddSingleton(p =>
+                {
+                    var typerPool = p.GetRequiredService<ITyperPool>();
+
+                    var worldScreenStateManager = new WorldScreenStateManager(
+                        typerPool,
+                        p.GetRequiredService<IConnectionManager>());
+                    var worldInputHandler = new WorldInputHandler(
+                        typerPool,
+                        p.GetRequiredService<IScreenNavigation>(),
+                        p.GetRequiredService<IConnectionManager>());
+                    var worldPrinter = new WorldPrinter(
+                        p.GetRequiredService<IOutput>(),
+                        typerPool);
+
+                    return new ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>(
+                        worldScreenStateManager,
+                        worldPrinter,
+                        worldInputHandler);
+                });
+
+                services.AddTransient(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>>();
+                    return dependencies.Handler;
+                });
+                services.AddTransient(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>>();
+                    return dependencies.Manager;
+                });
+                services.AddTransient<IPrinter<WorldScreenState>>(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>>();
+                    return dependencies.Printer;
+                });
 
                 services.AddSingleton<ICharacterCreationHandler, CharacterCreationHandler>();
                 services.AddSingleton<IPrinter<CharacterCreationPrintableState>, CharacterCreationPrinter>();
                 services.AddSingleton<CharacterCreationScreenHandler>();
 
-                services.AddSingleton<WorldScreenHandler>();
-                services.AddSingleton<IPrinter<WorldScreenState>, WorldPrinter>();
-
-                services.AddSingleton<IDictionary<GameScreen, IScreenHandler>>(p => new Dictionary<GameScreen, IScreenHandler>
+                services.AddSingleton<IDictionary<GameScreen, IInputHandler>>(p => new Dictionary<GameScreen, IInputHandler>
                 {
-                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenHandler>(),
+                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuInputHandler>(),
                     [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenHandler>(),
-                    [GameScreen.World] = p.GetRequiredService<WorldScreenHandler>()
+                    [GameScreen.World] = p.GetRequiredService<WorldInputHandler>()
                 });
-                services.AddSingleton<IScreenHandlerProvider, ScreenHandlerProvider>();
+                services.AddSingleton<IDictionary<GameScreen, IChangeDetector>>(p => new Dictionary<GameScreen, IChangeDetector>
+                {
+                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenStateManager>(),
+                    //[GameScreen.CharacterCreation] = ,
+                    [GameScreen.World] = p.GetRequiredService<WorldScreenStateManager>()
+                });
+                services.AddSingleton<IScreenProvider, InputHandlerProvider>();
+
+                // TODO: Create them per page and dispose accordingly.
+                services.AddSingleton<MainMenuStatePrinter>();
+                services.AddSingleton<WorldStatePrinter>();
             }).Build();
 
             await host.StartAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             {
-                // Authenticate in background.
-                _ = host.Services.GetRequiredService<IProfileTokenProvider>().SignInAsync(cancellationToken);
-
                 // Create a couple of characters.
                 var charactersClient = host.Services.GetRequiredService<ICharactersClient>();
                 await charactersClient.CreateAsync(new CreateCharacterDto
@@ -141,35 +209,40 @@ namespace TypingRealm.ConsoleApp
                 {
                     Name = "my character 2"
                 }, default).ConfigureAwait(false);
-
-                var characters = await charactersClient.GetAllByProfileIdAsync(default)
-                    .ConfigureAwait(false);
-
-                // Authenticated and got list of characters from API.
-                host.Services.GetRequiredService<MainMenuScreenHandler>()
-                    .UpdateState(new MainMenuState(characters));
             }
 
-            Console.Clear();
+            // Initialize singletons.
+            // TODO: Create them per page and dispose accordingly.
+            host.Services.GetRequiredService<MainMenuStatePrinter>();
+            host.Services.GetRequiredService<WorldStatePrinter>();
+
             RunApplication(
-                host.Services.GetRequiredService<IScreenHandlerProvider>(),
-                host.Services.GetRequiredService<IOutput>());
+                host.Services.GetRequiredService<IScreenNavigation>(),
+                host.Services.GetRequiredService<IScreenProvider>());
 
             await host.StopAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
         public static void RunApplication(
-            IScreenHandlerProvider screenProvider,
-            IOutput output)
+            IScreenNavigation screenNavigation,
+            IScreenProvider screenProvider)
         {
+            screenNavigation.ScreenObservable.Subscribe(screen =>
+            {
+                // TODO: Refactor to IObservable<IChangeDetector>.
+                var cd = screenProvider.GetCurrentChangeDetector();
+                cd.NotifyChanged();
+            });
+
             while (true)
             {
-                var screen = screenProvider.GetCurrentScreenHandler();
+                var screen = screenProvider.GetCurrentInputHandler();
+                var cd = screenProvider.GetCurrentChangeDetector();
 
-                output.Clear();
-                screen.PrintState();
-                output.FinalizeScreen();
+                //output.Clear();
+                //screen.PrintState();
+                //output.FinalizeScreen();
 
                 var key = Console.ReadKey(true);
                 switch (key.Key)
@@ -187,6 +260,9 @@ namespace TypingRealm.ConsoleApp
                         screen.Type(key.KeyChar);
                         break;
                 }
+
+                // A hack to redraw the screen every time a key is pressed (to highlight Typers).
+                cd.NotifyChanged();
             }
         }
     }
