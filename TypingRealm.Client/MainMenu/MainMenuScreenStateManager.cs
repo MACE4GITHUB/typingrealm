@@ -3,22 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Typing;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources;
 
 namespace TypingRealm.Client.MainMenu
 {
-    public interface IChangeDetector
-    {
-        void NotifyChanged();
-    }
-
-    public sealed record ScreenDependencies<TManager, TPrinter, THandler>(
-        TManager Manager,
-        TPrinter Printer,
-        THandler Handler);
-
     public sealed class MainMenuScreenStateManager : SyncManagedDisposable, IChangeDetector
     {
         private readonly object _updateStateLock = new object();

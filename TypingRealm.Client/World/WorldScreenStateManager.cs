@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 using TypingRealm.Client.Interaction;
-using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Typing;
 using TypingRealm.Messaging.Client;
 using TypingRealm.World;
