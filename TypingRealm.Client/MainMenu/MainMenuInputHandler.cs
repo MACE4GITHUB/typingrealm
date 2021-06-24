@@ -25,6 +25,12 @@ namespace TypingRealm.Client.MainMenu
                 return;
             }
 
+            if (typer == TyperPool.GetByKey("exit"))
+            {
+                Exit();
+                return;
+            }
+
             // TODO: Do not use ! operator.
             var characterId = TyperPool.GetKeyFor(typer)!;
             ConnectAsCharacter(characterId);
@@ -43,6 +49,11 @@ namespace TypingRealm.Client.MainMenu
             // Maybe set screen to some intermediatery "loading" value. and after connection screen should be determined by received state.
             // TODO: See if after connecting to world the character is actually in some activity - and select this activity screen instead of world screen.
             _screenNavigation.Screen = GameScreen.World;
+        }
+
+        private void Exit()
+        {
+            _screenNavigation.Screen = GameScreen.Exit;
         }
     }
 }

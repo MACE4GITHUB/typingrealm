@@ -237,6 +237,9 @@ namespace TypingRealm.ConsoleApp
 
             while (true)
             {
+                if (screenNavigation.Screen == GameScreen.Exit)
+                    return;
+
                 var screen = screenProvider.GetCurrentInputHandler();
                 var cd = screenProvider.GetCurrentChangeDetector();
 

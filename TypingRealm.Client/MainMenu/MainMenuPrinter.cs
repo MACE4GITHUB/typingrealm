@@ -21,6 +21,9 @@ namespace TypingRealm.Client.MainMenu
         {
             _output.WriteLine("Main menu:");
             _output.WriteLine();
+            _output.Write("Exit - ");
+            // TODO: Don't use ! operator.
+            _output.WriteLine(_typerPool.GetByKey("exit")!);
             _output.Write("Create new character");
             _output.Write(new string(' ', 10));
             // TODO: Don't use ! operator.

@@ -5,6 +5,8 @@
         MainMenu,
         CharacterCreation,
         World,
-        RopeWar
+        RopeWar,
+
+        Exit = -1
     }
 }

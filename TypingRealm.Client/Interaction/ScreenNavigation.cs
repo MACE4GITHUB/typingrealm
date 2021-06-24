@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
 namespace TypingRealm.Client.Interaction
@@ -24,7 +25,8 @@ namespace TypingRealm.Client.Interaction
             _screenSubject = new BehaviorSubject<GameScreen>(GameScreen.MainMenu);
         }
 
-        public IObservable<GameScreen> ScreenObservable => _screenSubject;
+        public IObservable<GameScreen> ScreenObservable => _screenSubject
+            .Where(screen => screen != GameScreen.Exit);
 
         public void OpenDialog(string text, Action ok, Action cancel)
         {
