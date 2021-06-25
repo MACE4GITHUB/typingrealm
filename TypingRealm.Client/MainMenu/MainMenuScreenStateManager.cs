@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using TypingRealm.Client.Interaction;
-using TypingRealm.Client.Typing;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources;
 
@@ -15,20 +14,19 @@ namespace TypingRealm.Client.MainMenu
     {
         private readonly object _updateStateLock = new object();
         private readonly ICharactersClient _charactersClient;
-        private readonly ITyperPool _typerPool;
+        private readonly MainMenuTypers _mainMenuTypers;
 
         private readonly MainMenuScreenState _currentState;
         private readonly BehaviorSubject<MainMenuScreenState> _stateSubject;
 
         public MainMenuScreenStateManager(
             ICharactersClient charactersClient,
-            ITyperPool typerPool)
+            MainMenuTypers mainMenuTypers)
         {
             _charactersClient = charactersClient;
-            _typerPool = typerPool;
+            _mainMenuTypers = mainMenuTypers;
 
             _currentState = CreateInitialState();
-            InitializeTyperPool();
             _stateSubject = new BehaviorSubject<MainMenuScreenState>(_currentState);
 
             _ = GetCharacters(); // Fire and forget.
@@ -66,28 +64,20 @@ namespace TypingRealm.Client.MainMenu
             {
                 foreach (var character in _currentState.Characters.Where(c => !characters.Any(x => x.CharacterId == c.CharacterId)))
                 {
-                    _typerPool.RemoveTyper(character.CharacterId);
+                    _mainMenuTypers.RemoveSelectCharacterTyper(character.CharacterId);
                 }
 
                 foreach (var character in characters)
                 {
-                    var typer = _typerPool.GetByKey(character.CharacterId);
-                    if (typer == null)
-                        _typerPool.MakeUniqueTyper(character.CharacterId);
+                    _mainMenuTypers.SyncSelectCharacterTyper(character.CharacterId);
                 }
 
                 _currentState.Characters = characters
-                    .Select(x => MainMenu.CharacterInfo.FromCharacterResource(x))
+                    .Select(x => CharacterInfo.FromCharacterResource(x))
                     .ToList();
 
                 _stateSubject.OnNext(_currentState);
             }
-        }
-
-        private void InitializeTyperPool()
-        {
-            _typerPool.MakeUniqueTyper("exit");
-            _typerPool.MakeUniqueTyper("create-character");
         }
     }
 }

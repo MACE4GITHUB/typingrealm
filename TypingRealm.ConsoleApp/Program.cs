@@ -101,17 +101,20 @@ namespace TypingRealm.ConsoleApp
                 services.AddSingleton(p =>
                 {
                     var typerPool = p.GetRequiredService<ITyperPool>();
+                    var mainMenuTypers = new MainMenuTypers(typerPool);
 
                     var mainMenuScreenStateManager = new MainMenuScreenStateManager(
                         p.GetRequiredService<ICharactersClient>(),
-                        typerPool);
+                        mainMenuTypers);
+
                     var mainMenuInputHandler = new MainMenuInputHandler(
                         typerPool,
+                        mainMenuTypers,
                         p.GetRequiredService<IScreenNavigation>(),
                         p.GetRequiredService<IConnectionManager>());
                     var mainMenuPrinter = new MainMenuPrinter(
                         p.GetRequiredService<IOutput>(),
-                        typerPool);
+                        mainMenuTypers);
 
                     return new ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>(
                         mainMenuScreenStateManager,

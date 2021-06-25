@@ -1,20 +1,19 @@
 ﻿using System.Linq;
 using TypingRealm.Client.Output;
-using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.MainMenu
 {
     public sealed class MainMenuPrinter : IPrinter<MainMenuScreenState>
     {
         private readonly IOutput _output;
-        private readonly ITyperPool _typerPool;
+        private readonly MainMenuTypers _mainMenuTypers;
 
         public MainMenuPrinter(
             IOutput output,
-            ITyperPool typerPool)
+            MainMenuTypers mainMenuTypers)
         {
             _output = output;
-            _typerPool = typerPool;
+            _mainMenuTypers = mainMenuTypers;
         }
 
         public void Print(MainMenuScreenState state)
@@ -22,12 +21,10 @@ namespace TypingRealm.Client.MainMenu
             _output.WriteLine("Main menu:");
             _output.WriteLine();
             _output.Write("Exit - ");
-            // TODO: Don't use ! operator.
-            _output.WriteLine(_typerPool.GetByKey("exit")!);
+            _output.WriteLine(_mainMenuTypers.Exit);
             _output.Write("Create new character");
             _output.Write(new string(' ', 10));
-            // TODO: Don't use ! operator.
-            _output.Write(_typerPool.GetByKey("create-character")!);
+            _output.Write(_mainMenuTypers.CreateCharacter);
             _output.WriteLine();
 
             if (!state.Characters.Any())
@@ -38,8 +35,7 @@ namespace TypingRealm.Client.MainMenu
 
             foreach (var character in state.Characters)
             {
-                // TODO: Don't use ! operator.
-                var typer = _typerPool.GetByKey(character.CharacterId)!;
+                var typer = _mainMenuTypers.GetSelectCharacterTyper(character.CharacterId);
 
                 _output.Write(character.Name);
                 _output.Write(new string(' ', 10));

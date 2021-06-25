@@ -7,33 +7,39 @@ namespace TypingRealm.Client.MainMenu
     {
         private readonly IScreenNavigation _screenNavigation;
         private readonly IConnectionManager _connectionManager;
+        private readonly MainMenuTypers _mainMenuTypers;
 
         public MainMenuInputHandler(
             ITyperPool typerPool,
+            MainMenuTypers mainMenuTypers,
             IScreenNavigation screenNavigation,
             IConnectionManager connectionManager) : base(typerPool)
         {
             _screenNavigation = screenNavigation;
             _connectionManager = connectionManager;
+            _mainMenuTypers = mainMenuTypers;
         }
 
         protected override void OnTyped(Typer typer)
         {
-            if (typer == TyperPool.GetByKey("create-character"))
+            if (typer == _mainMenuTypers.CreateCharacter)
             {
                 SwitchToCharacterCreationScreen();
                 return;
             }
 
-            if (typer == TyperPool.GetByKey("exit"))
+            if (typer == _mainMenuTypers.Exit)
             {
                 Exit();
                 return;
             }
 
-            // TODO: Do not use ! operator.
-            var characterId = TyperPool.GetKeyFor(typer)!;
-            ConnectAsCharacter(characterId);
+            var characterId = TyperPool.GetKeyFor(typer);
+            if (characterId == null)
+                return;
+
+            // TODO: Refactor this (encapsulate).
+            ConnectAsCharacter(characterId.Replace("select-character-", string.Empty));
         }
 
         private void SwitchToCharacterCreationScreen()
