@@ -38,6 +38,7 @@ namespace TypingRealm.Client.CharacterCreation
         private void InitializeTyperPool()
         {
             _typerPool.MakeUniqueTyper("back");
+            _typerPool.MakeUniqueTyper("generate-random-character");
         }
     }
 }

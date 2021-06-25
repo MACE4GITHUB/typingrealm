@@ -23,7 +23,11 @@ namespace TypingRealm.Client.CharacterCreation
             _output.Write("Go back to main menu");
             _output.Write(new string(' ', 10));
             // TODO: Don't use ! operator.
-            _output.Write(_typerPool.GetByKey("back")!);
+            _output.WriteLine(_typerPool.GetByKey("back")!);
+            _output.WriteLine();
+            _output.Write("Generate random character");
+            // TODO: Don't use ! operator.
+            _output.WriteLine(_typerPool.GetByKey("generate-random-character")!);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using TypingRealm.Client.Interaction;
@@ -31,6 +32,9 @@ namespace TypingRealm.Client.MainMenu
             _stateSubject = new BehaviorSubject<MainMenuScreenState>(_currentState);
 
             _ = GetCharacters(); // Fire and forget.
+
+            // HACK to make characters update on the main screen.
+            Observable.Interval(TimeSpan.FromSeconds(5)).Subscribe(_ => GetCharacters());
         }
 
         public IObservable<MainMenuScreenState> StateObservable => _stateSubject;

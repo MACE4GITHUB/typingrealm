@@ -179,7 +179,8 @@ namespace TypingRealm.ConsoleApp
                     var characterCreationScreenStateManager = new CharacterCreationScreenStateManager(typerPool);
                     var characterCreationInputHandler = new CharacterCreationInputHandler(
                         typerPool,
-                        p.GetRequiredService<IScreenNavigation>());
+                        p.GetRequiredService<IScreenNavigation>(),
+                        p.GetRequiredService<ICharactersClient>());
                     var characterCreationPrinter = new CharacterCreationPrinter(
                         p.GetRequiredService<IOutput>(),
                         typerPool);
