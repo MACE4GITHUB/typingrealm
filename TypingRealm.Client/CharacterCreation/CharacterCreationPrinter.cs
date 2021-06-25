@@ -1,23 +1,29 @@
 ﻿using TypingRealm.Client.Output;
+using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.CharacterCreation
 {
-    public sealed class CharacterCreationPrinter : IPrinter<CharacterCreationPrintableState>
+    public sealed class CharacterCreationPrinter : IPrinter<CharacterCreationScreenState>
     {
         private readonly IOutput _output;
+        private readonly ITyperPool _typerPool;
 
-        public CharacterCreationPrinter(IOutput output)
+        public CharacterCreationPrinter(
+            IOutput output,
+            ITyperPool typerPool)
         {
             _output = output;
+            _typerPool = typerPool;
         }
 
-        public void Print(CharacterCreationPrintableState state)
+        public void Print(CharacterCreationScreenState state)
         {
             _output.WriteLine("Character creation screen");
             _output.WriteLine();
             _output.Write("Go back to main menu");
             _output.Write(new string(' ', 10));
-            _output.Write(state.ReturnBackToMainMenuTyper);
+            // TODO: Don't use ! operator.
+            _output.Write(_typerPool.GetByKey("back")!);
         }
     }
 }

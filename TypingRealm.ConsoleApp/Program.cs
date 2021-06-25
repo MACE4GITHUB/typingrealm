@@ -172,26 +172,57 @@ namespace TypingRealm.ConsoleApp
                     return dependencies.Printer;
                 });
 
-                services.AddSingleton<ICharacterCreationHandler, CharacterCreationHandler>();
-                services.AddSingleton<IPrinter<CharacterCreationPrintableState>, CharacterCreationPrinter>();
-                services.AddSingleton<CharacterCreationScreenHandler>();
+                services.AddSingleton(p =>
+                {
+                    var typerPool = p.GetRequiredService<ITyperPool>();
+
+                    var characterCreationScreenStateManager = new CharacterCreationScreenStateManager(typerPool);
+                    var characterCreationInputHandler = new CharacterCreationInputHandler(
+                        typerPool,
+                        p.GetRequiredService<IScreenNavigation>());
+                    var characterCreationPrinter = new CharacterCreationPrinter(
+                        p.GetRequiredService<IOutput>(),
+                        typerPool);
+
+                    return new ScreenDependencies<CharacterCreationScreenStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>(
+                        characterCreationScreenStateManager,
+                        characterCreationPrinter,
+                        characterCreationInputHandler);
+                });
+
+                services.AddTransient(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<CharacterCreationScreenStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>>();
+                    return dependencies.Handler;
+                });
+                services.AddTransient(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<CharacterCreationScreenStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>>();
+                    return dependencies.Manager;
+                });
+                services.AddTransient<IPrinter<CharacterCreationScreenState>>(p =>
+                {
+                    var dependencies = p.GetRequiredService<ScreenDependencies<CharacterCreationScreenStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>>();
+                    return dependencies.Printer;
+                });
 
                 services.AddSingleton<IDictionary<GameScreen, IInputHandler>>(p => new Dictionary<GameScreen, IInputHandler>
                 {
                     [GameScreen.MainMenu] = p.GetRequiredService<MainMenuInputHandler>(),
-                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenHandler>(),
+                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationInputHandler>(),
                     [GameScreen.World] = p.GetRequiredService<WorldInputHandler>()
                 });
                 services.AddSingleton<IDictionary<GameScreen, IChangeDetector>>(p => new Dictionary<GameScreen, IChangeDetector>
                 {
                     [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenStateManager>(),
-                    //[GameScreen.CharacterCreation] = ,
+                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenStateManager>(),
                     [GameScreen.World] = p.GetRequiredService<WorldScreenStateManager>()
                 });
                 services.AddSingleton<IScreenProvider, InputHandlerProvider>();
 
                 // TODO: Create them per page and dispose accordingly.
                 services.AddSingleton<MainMenuStatePrinter>();
+                services.AddSingleton<CharacterCreationStatePrinter>();
                 services.AddSingleton<WorldStatePrinter>();
             }).Build();
 
@@ -214,6 +245,7 @@ namespace TypingRealm.ConsoleApp
             // Initialize singletons.
             // TODO: Create them per page and dispose accordingly.
             host.Services.GetRequiredService<MainMenuStatePrinter>();
+            host.Services.GetRequiredService<CharacterCreationStatePrinter>();
             host.Services.GetRequiredService<WorldStatePrinter>();
 
             RunApplication(
