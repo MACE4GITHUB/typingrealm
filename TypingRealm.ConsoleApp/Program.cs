@@ -104,7 +104,7 @@ namespace TypingRealm.ConsoleApp
                     var componentPool = new ComponentPool(typerPool);
                     var mainMenuModel = new MainMenuState(typerPool, componentPool);
 
-                    var mainMenuScreenStateManager = new MainMenuScreenStateManager(
+                    var mainMenuStateManager = new MainMenuStateManager(
                         p.GetRequiredService<ICharactersClient>(),
                         mainMenuModel);
 
@@ -117,25 +117,25 @@ namespace TypingRealm.ConsoleApp
                     var mainMenuPrinter = new MainMenuPrinter(
                         p.GetRequiredService<IOutput>());
 
-                    return new ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>(
-                        mainMenuScreenStateManager,
+                    return new ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>(
+                        mainMenuStateManager,
                         mainMenuPrinter,
                         mainMenuInputHandler);
                 });
 
                 services.AddTransient(p =>
                 {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
+                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>>();
                     return dependencies.Handler;
                 });
                 services.AddTransient(p =>
                 {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
+                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>>();
                     return dependencies.Manager;
                 });
                 services.AddTransient<IPrinter<MainMenuState>>(p =>
                 {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
+                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>>();
                     return dependencies.Printer;
                 });
 
@@ -219,14 +219,14 @@ namespace TypingRealm.ConsoleApp
                 });
                 services.AddSingleton<IDictionary<GameScreen, IChangeDetector>>(p => new Dictionary<GameScreen, IChangeDetector>
                 {
-                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuScreenStateManager>(),
+                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuStateManager>(),
                     [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationScreenStateManager>(),
                     [GameScreen.World] = p.GetRequiredService<WorldScreenStateManager>()
                 });
                 services.AddSingleton<IScreenProvider, InputHandlerProvider>();
 
                 services.AddSingleton(
-                    p => p.GetRequiredService<MainMenuScreenStateManager>().StateObservable);
+                    p => p.GetRequiredService<MainMenuStateManager>().StateObservable);
                 services.AddSingleton(
                     p => p.GetRequiredService<CharacterCreationScreenStateManager>().StateObservable);
                 services.AddSingleton(

@@ -10,7 +10,7 @@ using TypingRealm.Profiles.Api.Resources;
 
 namespace TypingRealm.Client.MainMenu
 {
-    public sealed class MainMenuScreenStateManager : SyncManagedDisposable, IChangeDetector
+    public sealed class MainMenuStateManager : SyncManagedDisposable, IChangeDetector
     {
         private readonly object _updateStateLock = new object();
         private readonly ICharactersClient _charactersClient;
@@ -18,7 +18,7 @@ namespace TypingRealm.Client.MainMenu
         private readonly MainMenuState _currentState;
         private readonly BehaviorSubject<MainMenuState> _stateSubject;
 
-        public MainMenuScreenStateManager(
+        public MainMenuStateManager(
             ICharactersClient charactersClient,
             MainMenuState model)
         {
