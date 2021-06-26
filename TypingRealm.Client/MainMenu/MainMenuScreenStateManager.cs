@@ -15,17 +15,17 @@ namespace TypingRealm.Client.MainMenu
         private readonly object _updateStateLock = new object();
         private readonly ICharactersClient _charactersClient;
 
-        private readonly MainMenuScreenState _currentState;
-        private readonly BehaviorSubject<MainMenuScreenState> _stateSubject;
+        private readonly MainMenuState _currentState;
+        private readonly BehaviorSubject<MainMenuState> _stateSubject;
 
         public MainMenuScreenStateManager(
             ICharactersClient charactersClient,
-            MainMenuModel model)
+            MainMenuState model)
         {
             _charactersClient = charactersClient;
 
-            _currentState = CreateInitialState(model);
-            _stateSubject = new BehaviorSubject<MainMenuScreenState>(_currentState);
+            _currentState = model;
+            _stateSubject = new BehaviorSubject<MainMenuState>(_currentState);
 
             _ = GetCharacters(); // Fire and forget.
 
@@ -33,7 +33,7 @@ namespace TypingRealm.Client.MainMenu
             Observable.Interval(TimeSpan.FromSeconds(5)).Subscribe(_ => GetCharacters());
         }
 
-        public IObservable<MainMenuScreenState> StateObservable => _stateSubject;
+        public IObservable<MainMenuState> StateObservable => _stateSubject;
 
         public void NotifyChanged() => _stateSubject.OnNext(_currentState);
 
@@ -51,28 +51,19 @@ namespace TypingRealm.Client.MainMenu
             _stateSubject.Dispose();
         }
 
-        private static MainMenuScreenState CreateInitialState(MainMenuModel model)
-        {
-            return new MainMenuScreenState(model);
-        }
-
         private void UpdateCharacters(IEnumerable<CharacterResource> characters)
         {
             lock (_updateStateLock)
             {
                 foreach (var character in _currentState.Characters.Where(c => !characters.Any(x => x.CharacterId == c.CharacterId)))
                 {
-                    _currentState.Model.RemoveSelectCharacterTyper(character.CharacterId);
+                    _currentState.RemoveSelectCharacterTyper(character.CharacterId);
                 }
 
                 foreach (var character in characters)
                 {
-                    _currentState.Model.SyncSelectCharacterTyper(character.CharacterId);
+                    _currentState.SyncSelectCharacterTyper(character.CharacterId, character.Name);
                 }
-
-                _currentState.Characters = characters
-                    .Select(x => CharacterInfo.FromCharacterResource(x))
-                    .ToList();
 
                 _stateSubject.OnNext(_currentState);
             }

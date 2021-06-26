@@ -7,12 +7,12 @@ namespace TypingRealm.Client.MainMenu
     {
         private readonly IScreenNavigation _screenNavigation;
         private readonly IConnectionManager _connectionManager;
-        private readonly MainMenuModel _model;
+        private readonly MainMenuState _model;
 
         public MainMenuInputHandler(
             ITyperPool typerPool,
             ComponentPool componentPool,
-            MainMenuModel model,
+            MainMenuState model,
             IScreenNavigation screenNavigation,
             IConnectionManager connectionManager) : base(typerPool, componentPool)
         {

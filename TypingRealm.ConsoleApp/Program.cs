@@ -102,7 +102,7 @@ namespace TypingRealm.ConsoleApp
                 {
                     var typerPool = p.GetRequiredService<ITyperPool>();
                     var componentPool = new ComponentPool(typerPool);
-                    var mainMenuModel = new MainMenuModel(typerPool, componentPool);
+                    var mainMenuModel = new MainMenuState(typerPool, componentPool);
 
                     var mainMenuScreenStateManager = new MainMenuScreenStateManager(
                         p.GetRequiredService<ICharactersClient>(),
@@ -133,7 +133,7 @@ namespace TypingRealm.ConsoleApp
                     var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
                     return dependencies.Manager;
                 });
-                services.AddTransient<IPrinter<MainMenuScreenState>>(p =>
+                services.AddTransient<IPrinter<MainMenuState>>(p =>
                 {
                     var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>>();
                     return dependencies.Printer;
@@ -234,11 +234,11 @@ namespace TypingRealm.ConsoleApp
 
                 // TODO: Create them per page and dispose accordingly.
                 services.AddSingleton(
-                    p => new StatePrinter<MainMenuScreenState>(
+                    p => new StatePrinter<MainMenuState>(
                         p.GetRequiredService<IScreenNavigation>(),
                         p.GetRequiredService<IOutput>(),
-                        p.GetRequiredService<IObservable<MainMenuScreenState>>(),
-                        p.GetRequiredService<IPrinter<MainMenuScreenState>>(),
+                        p.GetRequiredService<IObservable<MainMenuState>>(),
+                        p.GetRequiredService<IPrinter<MainMenuState>>(),
                         GameScreen.MainMenu));
                 services.AddSingleton(
                     p => new StatePrinter<CharacterCreationScreenState>(
@@ -274,7 +274,7 @@ namespace TypingRealm.ConsoleApp
 
             // Initialize singletons.
             // TODO: Create them per page and dispose accordingly.
-            host.Services.GetRequiredService<StatePrinter<MainMenuScreenState>>();
+            host.Services.GetRequiredService<StatePrinter<MainMenuState>>();
             host.Services.GetRequiredService<StatePrinter<CharacterCreationScreenState>>();
             host.Services.GetRequiredService<StatePrinter<WorldScreenState>>();
 
