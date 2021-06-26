@@ -224,10 +224,35 @@ namespace TypingRealm.ConsoleApp
                 });
                 services.AddSingleton<IScreenProvider, InputHandlerProvider>();
 
+                services.AddSingleton(
+                    p => p.GetRequiredService<MainMenuScreenStateManager>().StateObservable);
+                services.AddSingleton(
+                    p => p.GetRequiredService<CharacterCreationScreenStateManager>().StateObservable);
+                services.AddSingleton(
+                    p => p.GetRequiredService<WorldScreenStateManager>().StateObservable);
+
                 // TODO: Create them per page and dispose accordingly.
-                services.AddSingleton<MainMenuStatePrinter>();
-                services.AddSingleton<CharacterCreationStatePrinter>();
-                services.AddSingleton<WorldStatePrinter>();
+                services.AddSingleton(
+                    p => new StatePrinter<MainMenuScreenState>(
+                        p.GetRequiredService<IScreenNavigation>(),
+                        p.GetRequiredService<IOutput>(),
+                        p.GetRequiredService<IObservable<MainMenuScreenState>>(),
+                        p.GetRequiredService<IPrinter<MainMenuScreenState>>(),
+                        GameScreen.MainMenu));
+                services.AddSingleton(
+                    p => new StatePrinter<CharacterCreationScreenState>(
+                        p.GetRequiredService<IScreenNavigation>(),
+                        p.GetRequiredService<IOutput>(),
+                        p.GetRequiredService<IObservable<CharacterCreationScreenState>>(),
+                        p.GetRequiredService<IPrinter<CharacterCreationScreenState>>(),
+                        GameScreen.CharacterCreation));
+                services.AddSingleton(
+                    p => new StatePrinter<WorldScreenState>(
+                        p.GetRequiredService<IScreenNavigation>(),
+                        p.GetRequiredService<IOutput>(),
+                        p.GetRequiredService<IObservable<WorldScreenState>>(),
+                        p.GetRequiredService<IPrinter<WorldScreenState>>(),
+                        GameScreen.World));
             }).Build();
 
             await host.StartAsync(cancellationToken)
@@ -248,9 +273,9 @@ namespace TypingRealm.ConsoleApp
 
             // Initialize singletons.
             // TODO: Create them per page and dispose accordingly.
-            host.Services.GetRequiredService<MainMenuStatePrinter>();
-            host.Services.GetRequiredService<CharacterCreationStatePrinter>();
-            host.Services.GetRequiredService<WorldStatePrinter>();
+            host.Services.GetRequiredService<StatePrinter<MainMenuScreenState>>();
+            host.Services.GetRequiredService<StatePrinter<CharacterCreationScreenState>>();
+            host.Services.GetRequiredService<StatePrinter<WorldScreenState>>();
 
             RunApplication(
                 host.Services.GetRequiredService<IScreenNavigation>(),

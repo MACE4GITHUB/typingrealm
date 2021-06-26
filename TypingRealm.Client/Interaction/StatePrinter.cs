@@ -1,28 +1,30 @@
 ﻿using System;
-using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Output;
 
-namespace TypingRealm.Client.CharacterCreation
+namespace TypingRealm.Client.Interaction
 {
-    public sealed class CharacterCreationStatePrinter : SyncManagedDisposable
+    public sealed class StatePrinter<TState> : SyncManagedDisposable
     {
         private readonly IScreenNavigation _screenNavigation;
         private readonly IOutput _output;
-        private readonly CharacterCreationScreenStateManager _stateManager;
-        private readonly IPrinter<CharacterCreationScreenState> _statePrinter;
+        private readonly IObservable<TState> _stateObservable;
+        private readonly IPrinter<TState> _statePrinter;
+        private readonly GameScreen _screen;
         private readonly object _printLock = new object();
         private IDisposable? _subscription;
 
-        public CharacterCreationStatePrinter(
+        public StatePrinter(
             IScreenNavigation screenNavigation,
             IOutput output,
-            CharacterCreationScreenStateManager stateManager,
-            IPrinter<CharacterCreationScreenState> statePrinter)
+            IObservable<TState> stateObservable,
+            IPrinter<TState> statePrinter,
+            GameScreen screen) // TODO: Make sure only one StatePrinter exists per GameScreen.
         {
             _screenNavigation = screenNavigation;
             _output = output;
-            _stateManager = stateManager;
+            _stateObservable = stateObservable;
             _statePrinter = statePrinter;
+            _screen = screen;
 
             Subscribe();
         }
@@ -34,9 +36,9 @@ namespace TypingRealm.Client.CharacterCreation
             if (_subscription != null)
                 throw new InvalidOperationException("Already subscribed.");
 
-            _subscription = _stateManager.StateObservable.Subscribe(state =>
+            _subscription = _stateObservable.Subscribe(state =>
             {
-                if (_screenNavigation.Screen != GameScreen.CharacterCreation)
+                if (_screenNavigation.Screen != _screen)
                     return;
 
                 if (state == null)
