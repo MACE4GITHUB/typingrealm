@@ -113,8 +113,7 @@ namespace TypingRealm.ConsoleApp
                         p.GetRequiredService<IScreenNavigation>(),
                         p.GetRequiredService<IConnectionManager>());
                     var mainMenuPrinter = new MainMenuPrinter(
-                        p.GetRequiredService<IOutput>(),
-                        mainMenuTypers);
+                        p.GetRequiredService<IOutput>());
 
                     return new ScreenDependencies<MainMenuScreenStateManager, MainMenuPrinter, MainMenuInputHandler>(
                         mainMenuScreenStateManager,

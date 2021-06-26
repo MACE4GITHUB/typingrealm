@@ -14,7 +14,6 @@ namespace TypingRealm.Client.MainMenu
     {
         private readonly object _updateStateLock = new object();
         private readonly ICharactersClient _charactersClient;
-        private readonly MainMenuTypers _mainMenuTypers;
 
         private readonly MainMenuScreenState _currentState;
         private readonly BehaviorSubject<MainMenuScreenState> _stateSubject;
@@ -24,9 +23,8 @@ namespace TypingRealm.Client.MainMenu
             MainMenuTypers mainMenuTypers)
         {
             _charactersClient = charactersClient;
-            _mainMenuTypers = mainMenuTypers;
 
-            _currentState = CreateInitialState();
+            _currentState = CreateInitialState(mainMenuTypers);
             _stateSubject = new BehaviorSubject<MainMenuScreenState>(_currentState);
 
             _ = GetCharacters(); // Fire and forget.
@@ -53,9 +51,9 @@ namespace TypingRealm.Client.MainMenu
             _stateSubject.Dispose();
         }
 
-        private static MainMenuScreenState CreateInitialState()
+        private static MainMenuScreenState CreateInitialState(MainMenuTypers mainMenuTypers)
         {
-            return new MainMenuScreenState();
+            return new MainMenuScreenState(mainMenuTypers);
         }
 
         private void UpdateCharacters(IEnumerable<CharacterResource> characters)
@@ -64,12 +62,12 @@ namespace TypingRealm.Client.MainMenu
             {
                 foreach (var character in _currentState.Characters.Where(c => !characters.Any(x => x.CharacterId == c.CharacterId)))
                 {
-                    _mainMenuTypers.RemoveSelectCharacterTyper(character.CharacterId);
+                    _currentState.Typers.RemoveSelectCharacterTyper(character.CharacterId);
                 }
 
                 foreach (var character in characters)
                 {
-                    _mainMenuTypers.SyncSelectCharacterTyper(character.CharacterId);
+                    _currentState.Typers.SyncSelectCharacterTyper(character.CharacterId);
                 }
 
                 _currentState.Characters = characters
