@@ -27,6 +27,11 @@ namespace TypingRealm.Client.Output
         void Write(ITyperInformation typerInformation);
 
         /// <summary>
+        /// Writes input field state.
+        /// </summary>
+        void Write(IInputComponent inputComponent);
+
+        /// <summary>
         /// Finalizes screen: writes empty lines at the end etc, so everything is beautiful.
         /// </summary>
         void FinalizeScreen();

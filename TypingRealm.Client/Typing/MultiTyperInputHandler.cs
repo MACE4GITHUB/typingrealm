@@ -5,16 +5,35 @@ namespace TypingRealm.Client.Typing
     public abstract class MultiTyperInputHandler : IInputHandler
     {
         private Typer? _focusedTyper;
+        private readonly ComponentPool? _componentPool;
 
-        protected MultiTyperInputHandler(ITyperPool typerPool)
+        protected MultiTyperInputHandler(
+            ITyperPool typerPool,
+            ComponentPool? componentPool = null)
         {
             TyperPool = typerPool;
+            _componentPool = componentPool;
         }
 
         protected ITyperPool TyperPool { get; }
 
         public void Type(char character)
         {
+            var focusedComponent = _componentPool?.FocusedComponent;
+            if (focusedComponent != null)
+            {
+                // Only work with the component.
+                focusedComponent.Type(character);
+
+                // TODO: Don't use ! operator.
+                if (focusedComponent.IsFocused == false)
+                    _componentPool!.FocusedComponent = null;
+
+                return;
+            }
+
+
+
             if (_focusedTyper == null)
             {
                 var typer = TyperPool.GetTyper(character);
@@ -37,6 +56,21 @@ namespace TypingRealm.Client.Typing
 
         public void Backspace()
         {
+            var focusedComponent = _componentPool?.FocusedComponent;
+            if (focusedComponent != null)
+            {
+                // Only work with the component.
+                focusedComponent.Backspace();
+
+                // TODO: Don't use ! operator.
+                if (focusedComponent.IsFocused == false)
+                    _componentPool!.FocusedComponent = null;
+
+                return;
+            }
+
+
+
             if (_focusedTyper == null)
                 return;
 
@@ -48,6 +82,21 @@ namespace TypingRealm.Client.Typing
 
         public void Escape()
         {
+            var focusedComponent = _componentPool?.FocusedComponent;
+            if (focusedComponent != null)
+            {
+                // Only work with the component.
+                focusedComponent.Escape();
+
+                // TODO: Don't use ! operator.
+                if (focusedComponent.IsFocused == false)
+                    _componentPool!.FocusedComponent = null;
+
+                return;
+            }
+
+
+
             if (_focusedTyper != null)
             {
                 _focusedTyper.Reset();
@@ -55,9 +104,28 @@ namespace TypingRealm.Client.Typing
             }
         }
 
-        public virtual void Tab() { }
+        public virtual void Tab()
+        {
+            var focusedComponent = _componentPool?.FocusedComponent;
+            if (focusedComponent != null)
+            {
+                // Only work with the component.
+                focusedComponent.Tab();
 
-        protected abstract void OnTyped(Typer typer);
+                // TODO: Don't use ! operator.
+                if (focusedComponent.IsFocused == false)
+                    _componentPool!.FocusedComponent = null;
+
+                return;
+            }
+
+            // Do nothing.
+        }
+
+        protected virtual void OnTyped(Typer typer)
+        {
+            _componentPool?.TestTyped(typer);
+        }
 
         // TODO: Remove this and use Typer protected property.
         protected Typer MakeUniqueTyper() => TyperPool.MakeUniqueTyper().Typer;

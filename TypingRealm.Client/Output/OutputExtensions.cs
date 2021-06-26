@@ -15,5 +15,11 @@ namespace TypingRealm.Client.Output
             output.Write(typer);
             output.WriteLine();
         }
+
+        public static void WriteLine(this IOutput output, IInputComponent inputComponent)
+        {
+            output.Write(inputComponent);
+            output.WriteLine();
+        }
     }
 }

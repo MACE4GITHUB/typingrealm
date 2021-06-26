@@ -6,17 +6,32 @@ namespace TypingRealm.Client.MainMenu
     public sealed class MainMenuTypers
     {
         private readonly ITyperPool _typerPool;
+        private readonly ComponentPool _componentPool;
 
-        public MainMenuTypers(ITyperPool typerPool)
+        public MainMenuTypers(
+            ITyperPool typerPool,
+            ComponentPool componentPool)
         {
             _typerPool = typerPool;
+            _componentPool = componentPool;
 
+            TestInput = _componentPool.MakeInputComponent();
             _typerPool.MakeUniqueTyper("exit");
             _typerPool.MakeUniqueTyper("create-character");
         }
 
         public Typer Exit => _typerPool.GetByKey("exit") ?? throw new InvalidOperationException();
         public Typer CreateCharacter => _typerPool.GetByKey("create-character") ?? throw new InvalidOperationException();
+        public InputComponent TestInput { get; }
+
+        public string? GetCharacterIdFor(Typer typer)
+        {
+            var key = _typerPool.GetKeyFor(typer);
+            if (key == null || !key.StartsWith("select-character-"))
+                return null;
+
+            return key.Replace("select-character-", string.Empty);
+        }
 
         public void SyncSelectCharacterTyper(string characterId)
         {

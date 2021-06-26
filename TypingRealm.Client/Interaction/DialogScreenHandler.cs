@@ -51,6 +51,8 @@ namespace TypingRealm.Client.Interaction
 
         protected override void OnTyped(Typer typer)
         {
+            base.OnTyped(typer);
+
             if (typer == _ok)
                 _okAction();
 

@@ -19,6 +19,8 @@ namespace TypingRealm.Client.World
 
         protected override void OnTyped(Typer typer)
         {
+            base.OnTyped(typer);
+
             if (typer == TyperPool.GetByKey("disconnect"))
             {
                 _connectionManager.DisconnectFromWorld();

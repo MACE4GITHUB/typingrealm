@@ -3,7 +3,7 @@ using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.Output
 {
-    public sealed class ConsoleOutput : IOutput
+    public class ConsoleOutput : IOutput
     {
         public ConsoleOutput()
         {
@@ -11,14 +11,14 @@ namespace TypingRealm.Client.Output
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
-        public void WriteLine()
+        public virtual void WriteLine()
         {
             Console.WriteLine();
         }
@@ -51,9 +51,35 @@ namespace TypingRealm.Client.Output
             Console.ForegroundColor = currentFg;
         }
 
-        public void FinalizeScreen()
+        public virtual void FinalizeScreen()
         {
             // Do nothing.
+        }
+
+        public void Write(IInputComponent inputComponent)
+        {
+            var currentFg = Console.ForegroundColor;
+
+            if (inputComponent.IsFocused)
+                Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.Write(" ");
+            if (inputComponent.IsFocused)
+                Console.Write("**");
+            Console.Write("[ ");
+            Console.Write(inputComponent.Value);
+            Console.Write(" ]");
+            if (inputComponent.IsFocused)
+                Console.Write("**");
+
+            // Revert console color to default.
+            Console.ForegroundColor = currentFg;
+
+            if (!inputComponent.IsFocused)
+            {
+                Console.Write("   < ");
+                Write(inputComponent.FocusTyper);
+            }
         }
     }
 }

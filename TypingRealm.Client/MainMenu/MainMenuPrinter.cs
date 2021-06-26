@@ -23,6 +23,9 @@ namespace TypingRealm.Client.MainMenu
             _output.Write(state.Typers.CreateCharacter);
             _output.WriteLine();
 
+            _output.WriteLine("Test input: ");
+            _output.WriteLine(state.Typers.TestInput);
+
             if (!state.Characters.Any())
                 return;
 

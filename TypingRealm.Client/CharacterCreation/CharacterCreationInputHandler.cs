@@ -22,6 +22,8 @@ namespace TypingRealm.Client.CharacterCreation
 
         protected override void OnTyped(Typer typer)
         {
+            base.OnTyped(typer);
+
             if (typer == TyperPool.GetByKey("back"))
             {
                 SwitchBackToMainMenu();

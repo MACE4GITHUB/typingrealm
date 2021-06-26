@@ -11,9 +11,10 @@ namespace TypingRealm.Client.MainMenu
 
         public MainMenuInputHandler(
             ITyperPool typerPool,
+            ComponentPool componentPool,
             MainMenuTypers mainMenuTypers,
             IScreenNavigation screenNavigation,
-            IConnectionManager connectionManager) : base(typerPool)
+            IConnectionManager connectionManager) : base(typerPool, componentPool)
         {
             _screenNavigation = screenNavigation;
             _connectionManager = connectionManager;
@@ -22,6 +23,8 @@ namespace TypingRealm.Client.MainMenu
 
         protected override void OnTyped(Typer typer)
         {
+            base.OnTyped(typer);
+
             if (typer == _mainMenuTypers.CreateCharacter)
             {
                 SwitchToCharacterCreationScreen();
@@ -34,7 +37,7 @@ namespace TypingRealm.Client.MainMenu
                 return;
             }
 
-            var characterId = TyperPool.GetKeyFor(typer);
+            var characterId = _mainMenuTypers.GetCharacterIdFor(typer);
             if (characterId == null)
                 return;
 

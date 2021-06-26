@@ -101,7 +101,8 @@ namespace TypingRealm.ConsoleApp
                 services.AddSingleton(p =>
                 {
                     var typerPool = p.GetRequiredService<ITyperPool>();
-                    var mainMenuTypers = new MainMenuTypers(typerPool);
+                    var componentPool = new ComponentPool(typerPool);
+                    var mainMenuTypers = new MainMenuTypers(typerPool, componentPool);
 
                     var mainMenuScreenStateManager = new MainMenuScreenStateManager(
                         p.GetRequiredService<ICharactersClient>(),
@@ -109,6 +110,7 @@ namespace TypingRealm.ConsoleApp
 
                     var mainMenuInputHandler = new MainMenuInputHandler(
                         typerPool,
+                        componentPool,
                         mainMenuTypers,
                         p.GetRequiredService<IScreenNavigation>(),
                         p.GetRequiredService<IConnectionManager>());
