@@ -17,14 +17,14 @@ namespace TypingRealm.Client.MainMenu
             _output.WriteLine("Main menu:");
             _output.WriteLine();
             _output.Write("Exit - ");
-            _output.WriteLine(state.Typers.Exit);
+            _output.WriteLine(state.Model.Exit);
             _output.Write("Create new character");
             _output.Write(new string(' ', 10));
-            _output.Write(state.Typers.CreateCharacter);
+            _output.Write(state.Model.CreateCharacter);
             _output.WriteLine();
 
             _output.WriteLine("Test input: ");
-            _output.WriteLine(state.Typers.TestInput);
+            _output.WriteLine(state.Model.TestInput);
 
             if (!state.Characters.Any())
                 return;
@@ -34,7 +34,7 @@ namespace TypingRealm.Client.MainMenu
 
             foreach (var character in state.Characters)
             {
-                var typer = state.Typers.GetSelectCharacterTyper(character.CharacterId);
+                var typer = state.Model.GetSelectCharacterTyper(character.CharacterId);
 
                 _output.Write(character.Name);
                 _output.Write(new string(' ', 10));

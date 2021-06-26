@@ -4,13 +4,13 @@ namespace TypingRealm.Client.MainMenu
 {
     public sealed class MainMenuScreenState
     {
-        public MainMenuScreenState(MainMenuTypers typers)
+        public MainMenuScreenState(MainMenuModel typers)
         {
-            Typers = typers;
+            Model = typers;
             Characters = new List<CharacterInfo>();
         }
 
-        public MainMenuTypers Typers { get; }
+        public MainMenuModel Model { get; }
         public List<CharacterInfo> Characters { get; set; }
     }
 }

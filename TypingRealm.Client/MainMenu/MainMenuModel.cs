@@ -3,12 +3,12 @@ using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.MainMenu
 {
-    public sealed class MainMenuTypers
+    public sealed class MainMenuModel
     {
         private readonly ITyperPool _typerPool;
         private readonly ComponentPool _componentPool;
 
-        public MainMenuTypers(
+        public MainMenuModel(
             ITyperPool typerPool,
             ComponentPool componentPool)
         {

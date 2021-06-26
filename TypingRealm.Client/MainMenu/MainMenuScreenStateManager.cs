@@ -20,11 +20,11 @@ namespace TypingRealm.Client.MainMenu
 
         public MainMenuScreenStateManager(
             ICharactersClient charactersClient,
-            MainMenuTypers mainMenuTypers)
+            MainMenuModel model)
         {
             _charactersClient = charactersClient;
 
-            _currentState = CreateInitialState(mainMenuTypers);
+            _currentState = CreateInitialState(model);
             _stateSubject = new BehaviorSubject<MainMenuScreenState>(_currentState);
 
             _ = GetCharacters(); // Fire and forget.
@@ -51,9 +51,9 @@ namespace TypingRealm.Client.MainMenu
             _stateSubject.Dispose();
         }
 
-        private static MainMenuScreenState CreateInitialState(MainMenuTypers mainMenuTypers)
+        private static MainMenuScreenState CreateInitialState(MainMenuModel model)
         {
-            return new MainMenuScreenState(mainMenuTypers);
+            return new MainMenuScreenState(model);
         }
 
         private void UpdateCharacters(IEnumerable<CharacterResource> characters)
@@ -62,12 +62,12 @@ namespace TypingRealm.Client.MainMenu
             {
                 foreach (var character in _currentState.Characters.Where(c => !characters.Any(x => x.CharacterId == c.CharacterId)))
                 {
-                    _currentState.Typers.RemoveSelectCharacterTyper(character.CharacterId);
+                    _currentState.Model.RemoveSelectCharacterTyper(character.CharacterId);
                 }
 
                 foreach (var character in characters)
                 {
-                    _currentState.Typers.SyncSelectCharacterTyper(character.CharacterId);
+                    _currentState.Model.SyncSelectCharacterTyper(character.CharacterId);
                 }
 
                 _currentState.Characters = characters

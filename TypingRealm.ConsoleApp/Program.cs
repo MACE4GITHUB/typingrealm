@@ -102,16 +102,16 @@ namespace TypingRealm.ConsoleApp
                 {
                     var typerPool = p.GetRequiredService<ITyperPool>();
                     var componentPool = new ComponentPool(typerPool);
-                    var mainMenuTypers = new MainMenuTypers(typerPool, componentPool);
+                    var mainMenuModel = new MainMenuModel(typerPool, componentPool);
 
                     var mainMenuScreenStateManager = new MainMenuScreenStateManager(
                         p.GetRequiredService<ICharactersClient>(),
-                        mainMenuTypers);
+                        mainMenuModel);
 
                     var mainMenuInputHandler = new MainMenuInputHandler(
                         typerPool,
                         componentPool,
-                        mainMenuTypers,
+                        mainMenuModel,
                         p.GetRequiredService<IScreenNavigation>(),
                         p.GetRequiredService<IConnectionManager>());
                     var mainMenuPrinter = new MainMenuPrinter(
