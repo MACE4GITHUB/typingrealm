@@ -8,6 +8,8 @@ namespace TypingRealm.Client.MainMenu
     public sealed class MainMenuState
     {
         private readonly ITyperPool _typerPool;
+        private readonly HashSet<SelectCharacter> _characters
+            = new HashSet<SelectCharacter>();
 
         public MainMenuState(
             ITyperPool typerPool,
@@ -19,9 +21,6 @@ namespace TypingRealm.Client.MainMenu
             Exit = _typerPool.MakeUniqueTyper("exit");
             CreateCharacter = _typerPool.MakeUniqueTyper("create-character");
         }
-
-        private readonly HashSet<SelectCharacter> _characters
-            = new HashSet<SelectCharacter>();
 
         public Typer Exit { get; }
         public Typer CreateCharacter { get; }
