@@ -1,5 +1,4 @@
-﻿using System;
-using TypingRealm.Client.Interaction;
+﻿using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Typing;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources.Data;
@@ -10,29 +9,33 @@ namespace TypingRealm.Client.CharacterCreation
     {
         private readonly IScreenNavigation _screenNavigation;
         private readonly ICharactersClient _charactersClient;
+        private readonly CharacterCreationState _state;
 
         public CharacterCreationInputHandler(
             ITyperPool typerPool,
+            ComponentPool componentPool,
+            CharacterCreationState state,
             IScreenNavigation screenNavigation,
-            ICharactersClient charactersClient) : base(typerPool)
+            ICharactersClient charactersClient) : base(typerPool, componentPool)
         {
             _screenNavigation = screenNavigation;
             _charactersClient = charactersClient;
+            _state = state;
         }
 
         protected override void OnTyped(Typer typer)
         {
             base.OnTyped(typer);
 
-            if (typer == TyperPool.GetByKey("back"))
+            if (typer == _state.BackToMainMenu)
             {
                 SwitchBackToMainMenu();
                 return;
             }
 
-            if (typer == TyperPool.GetByKey("generate-random-character"))
+            if (typer == _state.CreateCharacter)
             {
-                GenerateRandomCharacter();
+                CreateCharacter();
                 return;
             }
         }
@@ -42,11 +45,11 @@ namespace TypingRealm.Client.CharacterCreation
             _screenNavigation.Screen = GameScreen.MainMenu;
         }
 
-        private void GenerateRandomCharacter()
+        private void CreateCharacter()
         {
             _charactersClient.CreateAsync(new CreateCharacterDto
             {
-                Name = $"{new string('a', new Random().Next(1, 3))}-{new string('b', new Random().Next(1, 5))}-{new string('c', new Random().Next(2, 10))}"
+                Name = _state.CharacterNameInput.Value
             }, default).GetAwaiter().GetResult();
 
             _screenNavigation.Screen = GameScreen.MainMenu;

@@ -20,11 +20,11 @@ namespace TypingRealm.Client.MainMenu
 
         public MainMenuStateManager(
             ICharactersClient charactersClient,
-            MainMenuState model)
+            MainMenuState state)
         {
             _charactersClient = charactersClient;
 
-            _currentState = model;
+            _currentState = state;
             _stateSubject = new BehaviorSubject<MainMenuState>(_currentState);
 
             _ = GetCharacters(); // Fire and forget.
@@ -34,7 +34,6 @@ namespace TypingRealm.Client.MainMenu
         }
 
         public IObservable<MainMenuState> StateObservable => _stateSubject;
-
         public void NotifyChanged() => _stateSubject.OnNext(_currentState);
 
         // Can be made private.

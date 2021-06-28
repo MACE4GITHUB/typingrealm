@@ -7,37 +7,37 @@ namespace TypingRealm.Client.MainMenu
     {
         private readonly IScreenNavigation _screenNavigation;
         private readonly IConnectionManager _connectionManager;
-        private readonly MainMenuState _model;
+        private readonly MainMenuState _state;
 
         public MainMenuInputHandler(
             ITyperPool typerPool,
             ComponentPool componentPool,
-            MainMenuState model,
+            MainMenuState state,
             IScreenNavigation screenNavigation,
             IConnectionManager connectionManager) : base(typerPool, componentPool)
         {
             _screenNavigation = screenNavigation;
             _connectionManager = connectionManager;
-            _model = model;
+            _state = state;
         }
 
         protected override void OnTyped(Typer typer)
         {
             base.OnTyped(typer);
 
-            if (typer == _model.CreateCharacter)
+            if (typer == _state.CreateCharacter)
             {
                 SwitchToCharacterCreationScreen();
                 return;
             }
 
-            if (typer == _model.Exit)
+            if (typer == _state.Exit)
             {
                 Exit();
                 return;
             }
 
-            var characterId = _model.GetCharacterIdFor(typer);
+            var characterId = _state.GetCharacterIdFor(typer);
             if (characterId == null)
                 return;
 
