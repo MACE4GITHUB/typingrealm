@@ -37,7 +37,7 @@ namespace TypingRealm.Client.Typing
             if (_focusedTyper == null)
             {
                 var typer = TyperPool.GetTyper(character);
-                if (typer == null)
+                if (typer == null || IsTyperDisabled(typer))
                     return;
 
                 _focusedTyper = typer;
@@ -125,6 +125,11 @@ namespace TypingRealm.Client.Typing
         protected virtual void OnTyped(Typer typer)
         {
             _componentPool?.TestTyped(typer);
+        }
+
+        protected virtual bool IsTyperDisabled(Typer typer)
+        {
+            return false;
         }
 
         // TODO: Remove this and use Typer protected property.

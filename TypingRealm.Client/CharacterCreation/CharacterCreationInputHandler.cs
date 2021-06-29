@@ -40,6 +40,14 @@ namespace TypingRealm.Client.CharacterCreation
             }
         }
 
+        protected override bool IsTyperDisabled(Typer typer)
+        {
+            if (typer == _state.CreateCharacter)
+                return !_state.CreateCharacterButtonEnabled;
+
+            return base.IsTyperDisabled(typer);
+        }
+
         private void SwitchBackToMainMenu()
         {
             _screenNavigation.Screen = GameScreen.MainMenu;
