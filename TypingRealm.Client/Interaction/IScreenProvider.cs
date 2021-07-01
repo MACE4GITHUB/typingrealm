@@ -1,6 +1,4 @@
-﻿using TypingRealm.Client.MainMenu;
-
-namespace TypingRealm.Client.Interaction
+﻿namespace TypingRealm.Client.Interaction
 {
     public interface IScreenProvider
     {
