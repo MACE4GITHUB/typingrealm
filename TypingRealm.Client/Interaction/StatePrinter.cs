@@ -10,16 +10,18 @@ namespace TypingRealm.Client.Interaction
         private readonly IObservable<TState> _stateObservable;
         private readonly IPrinter<TState> _statePrinter;
         private readonly GameScreen _screen;
-        private readonly object _printLock = new object();
+        private readonly object _printLock;
         private IDisposable? _subscription;
 
         public StatePrinter(
+            object printLock,
             IScreenNavigation screenNavigation,
             IOutput output,
             IObservable<TState> stateObservable,
             IPrinter<TState> statePrinter,
             GameScreen screen) // TODO: Make sure only one StatePrinter exists per GameScreen.
         {
+            _printLock = printLock;
             _screenNavigation = screenNavigation;
             _output = output;
             _stateObservable = stateObservable;

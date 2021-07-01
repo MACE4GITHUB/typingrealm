@@ -2,7 +2,6 @@
 {
     public interface IScreenProvider
     {
-        IInputHandler GetCurrentInputHandler();
-        IChangeDetector GetCurrentChangeDetector();
+        IScreen GetCurrentScreen();
     }
 }

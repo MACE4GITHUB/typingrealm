@@ -19,7 +19,19 @@ namespace TypingRealm.Client.CharacterCreation
         }
 
         public IObservable<CharacterCreationState> StateObservable => _stateSubject;
-        public void NotifyChanged() => _stateSubject.OnNext(_currentState);
+        public void NotifyChanged()
+        {
+            try
+            {
+                ThrowIfDisposed();
+
+                _stateSubject.OnNext(_currentState);
+            }
+            catch (ObjectDisposedException)
+            {
+                // TODO: Log.
+            }
+        }
 
         protected override void DisposeManagedResources()
         {

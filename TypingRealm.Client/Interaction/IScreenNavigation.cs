@@ -4,6 +4,7 @@ namespace TypingRealm.Client.Interaction
 {
     public interface IScreenNavigation
     {
+        IScreen? CurrentScreen { get; }
         GameScreen Screen { get; set; }
         IObservable<GameScreen> ScreenObservable { get; }
 

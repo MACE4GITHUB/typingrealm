@@ -34,7 +34,19 @@ namespace TypingRealm.Client.MainMenu
         }
 
         public IObservable<MainMenuState> StateObservable => _stateSubject;
-        public void NotifyChanged() => _stateSubject.OnNext(_currentState);
+        public void NotifyChanged()
+        {
+            try
+            {
+                ThrowIfDisposed();
+
+                _stateSubject.OnNext(_currentState);
+            }
+            catch (ObjectDisposedException)
+            {
+                // TODO: Log.
+            }
+        }
 
         // Can be made private.
         public async Task GetCharacters()

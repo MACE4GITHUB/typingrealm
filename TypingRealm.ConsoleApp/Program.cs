@@ -10,7 +10,6 @@ using TypingRealm.Client.Interaction;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
-using TypingRealm.Client.World;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources.Data;
@@ -24,6 +23,7 @@ namespace TypingRealm.ConsoleApp
         public TextGenerator()
         {
             _wordEnumerator = GetWords().GetEnumerator();
+            _wordEnumerator.MoveNext();
         }
 
         public string GetPhrase()
@@ -94,169 +94,18 @@ namespace TypingRealm.ConsoleApp
                 services.AddSingleton<ILocationService, StubLocationService>();
                 services.AddSingleton<ITextGenerator, TextGenerator>();
 
+                services.AddSingleton<ScreenFactory>();
+                services.AddTransient<IScreenFactory>(p => p.GetRequiredService<ScreenFactory>());
+                services.AddTransient<IScreenNavigation>(p => p.GetRequiredService<ScreenFactory>().ScreenNavigation);
+
                 services.AddSingleton<DialogScreenHandler>();
-                services.AddSingleton<IScreenNavigation, ScreenNavigation>();
+                services.AddSingleton<IScreenProvider>(p => (IScreenProvider)p.GetRequiredService<IScreenNavigation>());
                 services.AddSingleton<IConnectionManager, ConnectionManager>();
 
-                services.AddSingleton(p =>
-                {
-                    var typerPool = p.GetRequiredService<ITyperPool>();
-                    var componentPool = new ComponentPool(typerPool);
-                    var mainMenuState = new MainMenuState(typerPool, componentPool);
+                services.AddTransient<IPrinter<MainMenuState>, MainMenuPrinter>();
+                services.AddTransient<IPrinter<CharacterCreationState>, CharacterCreationPrinter>();
 
-                    var mainMenuStateManager = new MainMenuStateManager(
-                        p.GetRequiredService<ICharactersClient>(),
-                        mainMenuState);
-
-                    var mainMenuInputHandler = new MainMenuInputHandler(
-                        typerPool,
-                        componentPool,
-                        mainMenuState,
-                        p.GetRequiredService<IScreenNavigation>(),
-                        p.GetRequiredService<IConnectionManager>());
-                    var mainMenuPrinter = new MainMenuPrinter(
-                        p.GetRequiredService<IOutput>());
-
-                    return new ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>(
-                        mainMenuStateManager,
-                        mainMenuPrinter,
-                        mainMenuInputHandler);
-                });
-
-                services.AddTransient(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>>();
-                    return dependencies.Handler;
-                });
-                services.AddTransient(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>>();
-                    return dependencies.Manager;
-                });
-                services.AddTransient<IPrinter<MainMenuState>>(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<MainMenuStateManager, MainMenuPrinter, MainMenuInputHandler>>();
-                    return dependencies.Printer;
-                });
-
-                services.AddSingleton(p =>
-                {
-                    var typerPool = p.GetRequiredService<ITyperPool>();
-
-                    var worldScreenStateManager = new WorldScreenStateManager(
-                        typerPool,
-                        p.GetRequiredService<IConnectionManager>());
-                    var worldInputHandler = new WorldInputHandler(
-                        typerPool,
-                        p.GetRequiredService<IScreenNavigation>(),
-                        p.GetRequiredService<IConnectionManager>());
-                    var worldPrinter = new WorldPrinter(
-                        p.GetRequiredService<IOutput>(),
-                        typerPool);
-
-                    return new ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>(
-                        worldScreenStateManager,
-                        worldPrinter,
-                        worldInputHandler);
-                });
-
-                services.AddTransient(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>>();
-                    return dependencies.Handler;
-                });
-                services.AddTransient(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>>();
-                    return dependencies.Manager;
-                });
-                services.AddTransient<IPrinter<WorldScreenState>>(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<WorldScreenStateManager, WorldPrinter, WorldInputHandler>>();
-                    return dependencies.Printer;
-                });
-
-                services.AddSingleton(p =>
-                {
-                    var typerPool = p.GetRequiredService<ITyperPool>();
-                    var componentPool = new ComponentPool(typerPool);
-                    var characterCreationState = new CharacterCreationState(typerPool, componentPool);
-
-                    var characterCreationStateManager = new CharacterCreationStateManager(characterCreationState);
-                    var characterCreationInputHandler = new CharacterCreationInputHandler(
-                        typerPool,
-                        componentPool,
-                        characterCreationState,
-                        p.GetRequiredService<IScreenNavigation>(),
-                        p.GetRequiredService<ICharactersClient>());
-                    var characterCreationPrinter = new CharacterCreationPrinter(
-                        p.GetRequiredService<IOutput>());
-
-                    return new ScreenDependencies<CharacterCreationStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>(
-                        characterCreationStateManager,
-                        characterCreationPrinter,
-                        characterCreationInputHandler);
-                });
-
-                services.AddTransient(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<CharacterCreationStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>>();
-                    return dependencies.Handler;
-                });
-                services.AddTransient(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<CharacterCreationStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>>();
-                    return dependencies.Manager;
-                });
-                services.AddTransient<IPrinter<CharacterCreationState>>(p =>
-                {
-                    var dependencies = p.GetRequiredService<ScreenDependencies<CharacterCreationStateManager, CharacterCreationPrinter, CharacterCreationInputHandler>>();
-                    return dependencies.Printer;
-                });
-
-                services.AddSingleton<IDictionary<GameScreen, IInputHandler>>(p => new Dictionary<GameScreen, IInputHandler>
-                {
-                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuInputHandler>(),
-                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationInputHandler>(),
-                    [GameScreen.World] = p.GetRequiredService<WorldInputHandler>()
-                });
-                services.AddSingleton<IDictionary<GameScreen, IChangeDetector>>(p => new Dictionary<GameScreen, IChangeDetector>
-                {
-                    [GameScreen.MainMenu] = p.GetRequiredService<MainMenuStateManager>(),
-                    [GameScreen.CharacterCreation] = p.GetRequiredService<CharacterCreationStateManager>(),
-                    [GameScreen.World] = p.GetRequiredService<WorldScreenStateManager>()
-                });
-                services.AddSingleton<IScreenProvider, InputHandlerProvider>();
-
-                services.AddSingleton(
-                    p => p.GetRequiredService<MainMenuStateManager>().StateObservable);
-                services.AddSingleton(
-                    p => p.GetRequiredService<CharacterCreationStateManager>().StateObservable);
-                services.AddSingleton(
-                    p => p.GetRequiredService<WorldScreenStateManager>().StateObservable);
-
-                // TODO: Create them per page and dispose accordingly.
-                services.AddSingleton(
-                    p => new StatePrinter<MainMenuState>(
-                        p.GetRequiredService<IScreenNavigation>(),
-                        p.GetRequiredService<IOutput>(),
-                        p.GetRequiredService<IObservable<MainMenuState>>(),
-                        p.GetRequiredService<IPrinter<MainMenuState>>(),
-                        GameScreen.MainMenu));
-                services.AddSingleton(
-                    p => new StatePrinter<CharacterCreationState>(
-                        p.GetRequiredService<IScreenNavigation>(),
-                        p.GetRequiredService<IOutput>(),
-                        p.GetRequiredService<IObservable<CharacterCreationState>>(),
-                        p.GetRequiredService<IPrinter<CharacterCreationState>>(),
-                        GameScreen.CharacterCreation));
-                services.AddSingleton(
-                    p => new StatePrinter<WorldScreenState>(
-                        p.GetRequiredService<IScreenNavigation>(),
-                        p.GetRequiredService<IOutput>(),
-                        p.GetRequiredService<IObservable<WorldScreenState>>(),
-                        p.GetRequiredService<IPrinter<WorldScreenState>>(),
-                        GameScreen.World));
+                services.AddSingleton<IScreenFactory, ScreenFactory>();
             }).Build();
 
             await host.StartAsync(cancellationToken)
@@ -275,11 +124,7 @@ namespace TypingRealm.ConsoleApp
                 }, default).ConfigureAwait(false);
             }
 
-            // Initialize singletons.
-            // TODO: Create them per page and dispose accordingly.
-            host.Services.GetRequiredService<StatePrinter<MainMenuState>>();
-            host.Services.GetRequiredService<StatePrinter<CharacterCreationState>>();
-            host.Services.GetRequiredService<StatePrinter<WorldScreenState>>();
+            var a = host.Services.GetRequiredService<IScreenNavigation>();
 
             RunApplication(
                 host.Services.GetRequiredService<IScreenNavigation>(),
@@ -296,8 +141,8 @@ namespace TypingRealm.ConsoleApp
             screenNavigation.ScreenObservable.Subscribe(screen =>
             {
                 // TODO: Refactor to IObservable<IChangeDetector>.
-                var cd = screenProvider.GetCurrentChangeDetector();
-                cd.NotifyChanged();
+                var cd = screenProvider.GetCurrentScreen()?.ChangeDetector;
+                cd?.NotifyChanged();
             });
 
             while (true)
@@ -305,8 +150,12 @@ namespace TypingRealm.ConsoleApp
                 if (screenNavigation.Screen == GameScreen.Exit)
                     return;
 
-                var screen = screenProvider.GetCurrentInputHandler();
-                var cd = screenProvider.GetCurrentChangeDetector();
+                var screen = screenProvider.GetCurrentScreen();
+                if (screen == null)
+                    continue;
+
+                var inputHandler = screen.InputHandler;
+                var cd = screen.ChangeDetector;
 
                 //output.Clear();
                 //screen.PrintState();
@@ -316,16 +165,16 @@ namespace TypingRealm.ConsoleApp
                 switch (key.Key)
                 {
                     case ConsoleKey.Escape:
-                        screen.Escape();
+                        inputHandler.Escape();
                         break;
                     case ConsoleKey.Backspace:
-                        screen.Backspace();
+                        inputHandler.Backspace();
                         break;
                     case ConsoleKey.Tab:
-                        screen.Tab();
+                        inputHandler.Tab();
                         break;
                     default:
-                        screen.Type(key.KeyChar);
+                        inputHandler.Type(key.KeyChar);
                         break;
                 }
 
