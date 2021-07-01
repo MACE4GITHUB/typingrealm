@@ -131,8 +131,5 @@ namespace TypingRealm.Client.Typing
         {
             return false;
         }
-
-        // TODO: Remove this and use Typer protected property.
-        protected Typer MakeUniqueTyper() => TyperPool.MakeUniqueTyper().Typer;
     }
 }

@@ -30,8 +30,8 @@ namespace TypingRealm.Client.Interaction
         public void Initialize(string text, Action ok, Action cancel)
         {
             _text = text;
-            _ok = MakeUniqueTyper();
-            _cancel = MakeUniqueTyper();
+            (_ok, _) = TyperPool.MakeUniqueTyper();
+            (_cancel, _) = TyperPool.MakeUniqueTyper();
             _okAction = ok;
             _cancelAction = cancel;
         }
