@@ -83,7 +83,8 @@ namespace TypingRealm.Client.Interaction
         {
             GameScreen.MainMenu => CreateMainMenuScreen(),
             GameScreen.CharacterCreation => CreateCharacterCreationScreen(),
-            _ => throw new InvalidOperationException("Unknown screen type."),
+            GameScreen.Exit => null!,
+            _ => throw new InvalidOperationException("Unknown screen type.")
         };
 
         public void CloseScreen(IScreen screen)
