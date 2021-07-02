@@ -86,7 +86,8 @@ namespace TypingRealm.ConsoleApp
 
             RunApplication(
                 host.Services.GetRequiredService<IScreenNavigation>(),
-                host.Services.GetRequiredService<IScreenProvider>());
+                host.Services.GetRequiredService<IScreenProvider>(),
+                cancellationToken);
 
             await host.StopAsync(cancellationToken)
                 .ConfigureAwait(false);
@@ -94,7 +95,8 @@ namespace TypingRealm.ConsoleApp
 
         public static void RunApplication(
             IScreenNavigation screenNavigation,
-            IScreenProvider screenProvider)
+            IScreenProvider screenProvider,
+            CancellationToken cancellationToken)
         {
             screenNavigation.ScreenObservable.Subscribe(screen =>
             {
@@ -105,6 +107,9 @@ namespace TypingRealm.ConsoleApp
 
             while (true)
             {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
                 if (screenNavigation.Screen == GameScreen.Exit)
                     return;
 
