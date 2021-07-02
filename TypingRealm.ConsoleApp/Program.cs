@@ -84,8 +84,6 @@ namespace TypingRealm.ConsoleApp
                 }, default).ConfigureAwait(false);
             }
 
-            var a = host.Services.GetRequiredService<IScreenNavigation>();
-
             RunApplication(
                 host.Services.GetRequiredService<IScreenNavigation>(),
                 host.Services.GetRequiredService<IScreenProvider>());
