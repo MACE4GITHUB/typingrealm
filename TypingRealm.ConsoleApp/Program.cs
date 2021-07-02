@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication.ConsoleClient;
+using TypingRealm.Client;
 using TypingRealm.Client.CharacterCreation;
-using TypingRealm.Client.Data;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
@@ -16,43 +15,6 @@ using TypingRealm.Profiles.Api.Resources.Data;
 
 namespace TypingRealm.ConsoleApp
 {
-    public sealed class TextGenerator : ITextGenerator
-    {
-        private readonly IEnumerator<string> _wordEnumerator;
-
-        public TextGenerator()
-        {
-            _wordEnumerator = GetWords().GetEnumerator();
-            _wordEnumerator.MoveNext();
-        }
-
-        public string GetPhrase()
-        {
-            _wordEnumerator.MoveNext();
-
-            return _wordEnumerator.Current;
-        }
-
-        private IEnumerable<string> GetWords()
-        {
-            var words = @"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc"
-                .Split(' ');
-
-            foreach (var word in words)
-            {
-                yield return word;
-            }
-        }
-    }
-
-    public sealed class StubCharacterService : ICharacterService
-    {
-        public string GetCharacterName(string characterId)
-        {
-            return $"ivan name - {characterId}";
-        }
-    }
-
     public static class Program
     {
         public static async Task Main()
@@ -90,8 +52,6 @@ namespace TypingRealm.ConsoleApp
                 services.AddTransient<ITyperPool, UniqueTyperPool>();
 
                 services.AddSingleton<IOutput, ConsoleOutputWithoutFlicker>();
-                services.AddSingleton<ICharacterService, StubCharacterService>();
-                services.AddSingleton<ILocationService, StubLocationService>();
                 services.AddSingleton<ITextGenerator, TextGenerator>();
 
                 services.AddSingleton<ScreenFactory>();
