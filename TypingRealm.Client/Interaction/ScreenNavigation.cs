@@ -101,7 +101,7 @@ namespace TypingRealm.Client.Interaction
         {
             var typerPool = new UniqueTyperPool(_textGenerator);
             var componentPool = new ComponentPool(typerPool);
-            var state = new MainMenuState(typerPool, componentPool);
+            var state = new MainMenuState(typerPool);
 
             var mainMenuInputHandler = new MainMenuInputHandler(
                 typerPool,

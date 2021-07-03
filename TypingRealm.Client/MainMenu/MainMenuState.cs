@@ -11,20 +11,16 @@ namespace TypingRealm.Client.MainMenu
         private readonly HashSet<SelectCharacter> _characters
             = new HashSet<SelectCharacter>();
 
-        public MainMenuState(
-            ITyperPool typerPool,
-            ComponentPool componentPool)
+        public MainMenuState(ITyperPool typerPool)
         {
             _typerPool = typerPool;
 
-            TestInput = componentPool.MakeInputComponent();
             Exit = _typerPool.MakeUniqueTyper("exit");
             CreateCharacter = _typerPool.MakeUniqueTyper("create-character");
         }
 
         public Typer Exit { get; }
         public Typer CreateCharacter { get; }
-        public InputComponent TestInput { get; }
         public IEnumerable<SelectCharacter> Characters => _characters;
 
         public string? GetCharacterIdFor(Typer typer)
