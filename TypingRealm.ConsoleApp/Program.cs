@@ -120,10 +120,6 @@ namespace TypingRealm.ConsoleApp
                 var inputHandler = screen.InputHandler;
                 var cd = screen.ChangeDetector;
 
-                //output.Clear();
-                //screen.PrintState();
-                //output.FinalizeScreen();
-
                 var key = Console.ReadKey(true);
                 switch (key.Key)
                 {
