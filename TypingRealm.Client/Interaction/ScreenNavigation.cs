@@ -7,6 +7,7 @@ using TypingRealm.Client.CharacterCreation;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
+using TypingRealm.Client.World;
 using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Client.Interaction
@@ -52,6 +53,7 @@ namespace TypingRealm.Client.Interaction
         // TODO: Refactor to be generic.
         private readonly IPrinter<MainMenuState> _mainMenuPrinter;
         private readonly IPrinter<CharacterCreationState> _characterCreationPrinter;
+        private readonly IPrinter<WorldScreenState> _worldPrinter;
 
         private readonly Dictionary<string, IEnumerable<IDisposable>> _resources
             = new Dictionary<string, IEnumerable<IDisposable>>();
@@ -62,7 +64,8 @@ namespace TypingRealm.Client.Interaction
             ICharactersClient charactersClient,
             IOutput output,
             IPrinter<MainMenuState> mainMenuPrinter,
-            IPrinter<CharacterCreationState> characterCreationPrinter)
+            IPrinter<CharacterCreationState> characterCreationPrinter,
+            IPrinter<WorldScreenState> worldPrinter)
         {
             _textGenerator = textGenerator;
             _connectionManager = connectionManager;
@@ -70,6 +73,7 @@ namespace TypingRealm.Client.Interaction
             _output = output;
             _mainMenuPrinter = mainMenuPrinter;
             _characterCreationPrinter = characterCreationPrinter;
+            _worldPrinter = worldPrinter;
 
             // Create this only after initializing everything inside ScreenFactory.
             ScreenNavigation = new ScreenNavigation(this);
@@ -83,6 +87,7 @@ namespace TypingRealm.Client.Interaction
         {
             GameScreen.MainMenu => CreateMainMenuScreen(),
             GameScreen.CharacterCreation => CreateCharacterCreationScreen(),
+            GameScreen.World => CreateWorldScreen(),
             GameScreen.Exit => null!,
             _ => throw new InvalidOperationException("Unknown screen type.")
         };
@@ -159,6 +164,39 @@ namespace TypingRealm.Client.Interaction
             _resources.Add(resourceId, resources);
 
             return new Screen(resourceId, characterCreationInputHandler, characterCreationStateManager);
+        }
+
+        private IScreen CreateWorldScreen()
+        {
+            var typerPool = new UniqueTyperPool(_textGenerator);
+            var componentPool = new ComponentPool(typerPool);
+            var state = new WorldScreenState(typerPool);
+
+            var worldInputHandler = new WorldInputHandler(
+                typerPool,
+                componentPool,
+                state,
+                ScreenNavigation,
+                _connectionManager);
+
+            var worldStateManager = new WorldScreenStateManager(
+                _connectionManager,
+                state);
+
+            var printer = new StatePrinter<WorldScreenState>(
+                _printLock,
+                ScreenNavigation,
+                _output,
+                worldStateManager.StateObservable,
+                _worldPrinter,
+                GameScreen.World);
+
+            var resourceId = Guid.NewGuid().ToString();
+            var resources = new IDisposable[] { worldStateManager, printer };
+
+            _resources.Add(resourceId, resources);
+
+            return new Screen(resourceId, worldInputHandler, worldStateManager);
         }
     }
 

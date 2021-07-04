@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.Client.World
+﻿using TypingRealm.Client.Typing;
+
+namespace TypingRealm.Client.World
 {
     public sealed record LocationInfo(
         string LocationId,
@@ -7,11 +9,20 @@
 
     public sealed class WorldScreenState
     {
-        public WorldScreenState(LocationInfo currentLocation)
+        private readonly ITyperPool _typerPool;
+
+        public WorldScreenState(
+            ITyperPool typerPool)
         {
-            CurrentLocation = currentLocation;
+            _typerPool = typerPool;
+            CurrentLocation = null;
+
+            Disconnect = _typerPool.MakeUniqueTyper("disconnect");
         }
 
-        public LocationInfo CurrentLocation { get; set; }
+        public Typer Disconnect { get; }
+
+        public LocationInfo? CurrentLocation { get; set; }
+        public bool IsLoading => CurrentLocation == null;
     }
 }

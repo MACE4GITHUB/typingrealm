@@ -9,6 +9,7 @@ using TypingRealm.Client.Interaction;
 using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
+using TypingRealm.Client.World;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources.Data;
@@ -64,6 +65,7 @@ namespace TypingRealm.ConsoleApp
 
                 services.AddTransient<IPrinter<MainMenuState>, MainMenuPrinter>();
                 services.AddTransient<IPrinter<CharacterCreationState>, CharacterCreationPrinter>();
+                services.AddTransient<IPrinter<WorldScreenState>, WorldPrinter>();
 
                 services.AddSingleton<IScreenFactory, ScreenFactory>();
             }).Build();
