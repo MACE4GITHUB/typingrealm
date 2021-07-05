@@ -1,5 +1,7 @@
-﻿using TypingRealm.Client.Interaction;
+﻿using System.Linq;
+using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Typing;
+using TypingRealm.World.Movement;
 
 namespace TypingRealm.Client.World
 {
@@ -29,6 +31,18 @@ namespace TypingRealm.Client.World
             {
                 _connectionManager.DisconnectFromWorld();
                 _screenNavigation.Screen = GameScreen.MainMenu;
+                return;
+            }
+
+            var entrance = _state.LocationEntrances.FirstOrDefault(
+                e => e.Typer == typer);
+
+            if (entrance != null)
+            {
+                _ = _connectionManager.WorldConnection?.SendAsync(new MoveToLocation
+                {
+                    LocationId = entrance.LocationId
+                }, default);
                 return;
             }
 
