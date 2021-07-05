@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Subjects;
 using TypingRealm.Client.Interaction;
+using TypingRealm.Client.Typing;
 using TypingRealm.Messaging.Client;
 
 namespace TypingRealm.Client.World
@@ -10,6 +12,7 @@ namespace TypingRealm.Client.World
     {
         private readonly object _updateStateLock = new object();
 
+        private readonly ITyperPool _typerPool;
         private readonly WorldScreenState _currentState;
         private readonly BehaviorSubject<WorldScreenState> _stateSubject;
 
@@ -18,9 +21,12 @@ namespace TypingRealm.Client.World
 
         // TODO: Rewrite this whole logic so that all these dependencies are created PER PAGE when it opens, and are disposed when the page closes.
         public WorldScreenStateManager(
+            ITyperPool typerPool,
             IConnectionManager connectionManager,
             WorldScreenState state)
         {
+            _typerPool = typerPool;
+
             connectionManager.WorldConnectionObservable.Subscribe(worldConnection =>
             {
                 // TODO: Cleanup - remove and dispose all subscriptions / previous connection.
@@ -82,6 +88,10 @@ namespace TypingRealm.Client.World
                     state.LocationId,
                     "TODO: get location name from cache",
                     "TODO: get location description from cache");
+
+                // TODO: Dispose all previous location entrances - sync up like at character selection screen.
+                _currentState.LocationEntrances = new HashSet<LocationEntrance>(state.Locations.Select(
+                    x => new LocationEntrance(x, x, _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()))));
 
                 _stateSubject.OnNext(_currentState);
             }

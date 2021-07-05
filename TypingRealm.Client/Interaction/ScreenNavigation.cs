@@ -180,6 +180,7 @@ namespace TypingRealm.Client.Interaction
                 _connectionManager);
 
             var worldStateManager = new WorldScreenStateManager(
+                typerPool,
                 _connectionManager,
                 state);
 

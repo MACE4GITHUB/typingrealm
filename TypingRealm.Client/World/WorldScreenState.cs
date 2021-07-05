@@ -1,4 +1,5 @@
-﻿using TypingRealm.Client.Typing;
+﻿using System.Collections.Generic;
+using TypingRealm.Client.Typing;
 
 namespace TypingRealm.Client.World
 {
@@ -6,6 +7,11 @@ namespace TypingRealm.Client.World
         string LocationId,
         string Name,
         string Description);
+
+    public sealed record LocationEntrance(
+        string LocationId,
+        string Name,
+        Typer Typer);
 
     public sealed class WorldScreenState
     {
@@ -24,5 +30,8 @@ namespace TypingRealm.Client.World
 
         public LocationInfo? CurrentLocation { get; set; }
         public bool IsLoading => CurrentLocation == null;
+
+        public HashSet<LocationEntrance> LocationEntrances { get; set; }
+            = new HashSet<LocationEntrance>();
     }
 }

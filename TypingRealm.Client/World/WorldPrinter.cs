@@ -37,6 +37,14 @@ namespace TypingRealm.Client.World
             _output.WriteLine(state.CurrentLocation.Description);
             _output.WriteLine();
 
+            _output.WriteLine("Possible locations where you can go:");
+            foreach (var locationEntrance in state.LocationEntrances)
+            {
+                _output.Write(locationEntrance.Name);
+                _output.Write("   -   ");
+                _output.WriteLine(locationEntrance.Typer);
+            }
+
             _output.Write("Disconnect -    ");
             _output.Write(state.Disconnect);
         }
