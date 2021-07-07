@@ -45,6 +45,23 @@ namespace TypingRealm.Client.World
                 _output.WriteLine(locationEntrance.Typer);
             }
 
+            if (state.CurrentLocation.CanStartRopeWar && state.CreateRopeWarTyper != null)
+            {
+                _output.WriteLine("Create new rope war (random) and join it: ");
+                _output.WriteLine(state.CreateRopeWarTyper);
+                _output.WriteLine();
+                _output.WriteLine();
+                _output.WriteLine("Existing rope wars:");
+
+                foreach (var ropeWarInfo in state.RopeWars)
+                {
+                    _output.Write($"{ropeWarInfo.Name} - {ropeWarInfo.Bet}   -   ");
+                    _output.WriteLine(ropeWarInfo.Typer);
+                }
+            }
+
+            _output.WriteLine();
+            _output.WriteLine();
             _output.Write("Disconnect -    ");
             _output.Write(state.Disconnect);
         }

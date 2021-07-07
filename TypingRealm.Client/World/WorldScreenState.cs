@@ -6,11 +6,18 @@ namespace TypingRealm.Client.World
     public sealed record LocationInfo(
         string LocationId,
         string Name,
-        string Description);
+        string Description,
+        bool CanStartRopeWar);
 
     public sealed record LocationEntrance(
         string LocationId,
         string Name,
+        Typer Typer);
+
+    public sealed record RopeWarInfo(
+        string RopeWarId,
+        string Name,
+        long Bet,
         Typer Typer);
 
     public sealed class WorldScreenState
@@ -33,5 +40,7 @@ namespace TypingRealm.Client.World
 
         public HashSet<LocationEntrance> LocationEntrances { get; set; }
             = new HashSet<LocationEntrance>();
+        public Typer? CreateRopeWarTyper { get; set; }
+        public HashSet<RopeWarInfo> RopeWars { get; set; } = new HashSet<RopeWarInfo>();
     }
 }

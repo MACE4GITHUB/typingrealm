@@ -14,10 +14,10 @@ namespace TypingRealm.World
     {
         public string LocationId { get; set; }
         public List<string> Locations { get; set; }
-        public List<ActivityType> AllowedActivityTypes { get; set; }
+        public List<ActivityType> AllowedActivityTypes { get; set; } = new List<ActivityType>();
         public List<string> Characters { get; set; }
 
-        public List<RopeWarActivityState> RopeWarActivities { get; set; }
+        public List<RopeWarActivityState> RopeWarActivities { get; set; } = new List<RopeWarActivityState>();
     }
 
     public sealed class LocationPersistenceState

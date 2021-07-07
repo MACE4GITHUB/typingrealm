@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Typing;
+using TypingRealm.World.Activities.RopeWar;
 using TypingRealm.World.Movement;
 
 namespace TypingRealm.Client.World
@@ -31,6 +33,17 @@ namespace TypingRealm.Client.World
             {
                 _connectionManager.DisconnectFromWorld();
                 _screenNavigation.Screen = GameScreen.MainMenu;
+                return;
+            }
+
+            if (typer == _state.CreateRopeWarTyper)
+            {
+                _ = _connectionManager.WorldConnection?.SendAsync(new ProposeRopeWarContest
+                {
+                    Name = Guid.NewGuid().ToString(),
+                    Bet = 100,
+                    Side = RopeWarSide.Left
+                }, default);
                 return;
             }
 

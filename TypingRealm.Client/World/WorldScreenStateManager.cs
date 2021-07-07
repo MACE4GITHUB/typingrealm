@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Typing;
 using TypingRealm.Messaging.Client;
+using TypingRealm.Profiles.Activities;
 
 namespace TypingRealm.Client.World
 {
@@ -87,11 +88,22 @@ namespace TypingRealm.Client.World
                 _currentState.CurrentLocation = new LocationInfo(
                     state.LocationId,
                     "TODO: get location name from cache",
-                    "TODO: get location description from cache");
+                    "TODO: get location description from cache",
+                    state.AllowedActivityTypes.Contains(ActivityType.RopeWar));
+
+                if (state.AllowedActivityTypes.Contains(ActivityType.RopeWar)
+                    && _currentState.CreateRopeWarTyper == null)
+                {
+                    _currentState.CreateRopeWarTyper = _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString());
+                }
 
                 // TODO: Dispose all previous location entrances - sync up like at character selection screen.
                 _currentState.LocationEntrances = new HashSet<LocationEntrance>(state.Locations.Select(
                     x => new LocationEntrance(x, x, _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()))));
+
+                // TODO: Dispose all previous things - sync up like at character selection screen.
+                _currentState.RopeWars = new HashSet<RopeWarInfo>(state.RopeWarActivities.Select(
+                    x => new RopeWarInfo(x.ActivityId, x.ActivityId, x.Bet, _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()))));
 
                 _stateSubject.OnNext(_currentState);
             }
