@@ -47,6 +47,36 @@ namespace TypingRealm.Client.World
                 return;
             }
 
+            if (_state.CurrentRopeWar != null)
+            {
+                if (typer == _state.CurrentRopeWar.LeaveRopeWarTyper)
+                {
+                    _ = _connectionManager.WorldConnection?.SendAsync(new LeaveJoinedRopeWarContest
+                    {
+                    }, default);
+                    return;
+                }
+
+                if (typer == _state.CurrentRopeWar.SwitchSides)
+                {
+                    _ = _connectionManager.WorldConnection?.SendAsync(new SwitchSides(), default);
+                    return;
+                }
+            }
+
+            foreach (var rw in _state.RopeWars)
+            {
+                if (typer == rw.Typer)
+                {
+                    _ = _connectionManager.WorldConnection?.SendAsync(new JoinRopeWarContest
+                    {
+                        RopeWarId = rw.RopeWarId,
+                        Side = RopeWarSide.Left
+                    }, default);
+                    return;
+                }
+            }
+
             var entrance = _state.LocationEntrances.FirstOrDefault(
                 e => e.Typer == typer);
 
@@ -60,6 +90,18 @@ namespace TypingRealm.Client.World
             }
 
             // Handle other actions.
+        }
+
+        protected override bool IsTyperDisabled(Typer typer)
+        {
+            var rwTyper = _state.RopeWars.FirstOrDefault(rw => rw.Typer == typer);
+            if (rwTyper != null && _state.CurrentRopeWar != null)
+                return false;
+
+            if (typer == _state.CreateRopeWarTyper && _state.CurrentRopeWar != null)
+                return false;
+
+            return base.IsTyperDisabled(typer);
         }
     }
 }

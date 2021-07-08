@@ -20,6 +20,11 @@ namespace TypingRealm.Client.World
         long Bet,
         Typer Typer);
 
+    public sealed record JoinedRopeWar(
+        RopeWarInfo RopeWarInfo,
+        Typer LeaveRopeWarTyper,
+        Typer SwitchSides);
+
     public sealed class WorldScreenState
     {
         private readonly ITyperPool _typerPool;
@@ -42,5 +47,6 @@ namespace TypingRealm.Client.World
             = new HashSet<LocationEntrance>();
         public Typer? CreateRopeWarTyper { get; set; }
         public HashSet<RopeWarInfo> RopeWars { get; set; } = new HashSet<RopeWarInfo>();
+        public JoinedRopeWar? CurrentRopeWar { get; set; }
     }
 }

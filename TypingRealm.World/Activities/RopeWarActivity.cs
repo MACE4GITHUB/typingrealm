@@ -12,8 +12,8 @@ namespace TypingRealm.World.Activities
     public sealed class RopeWarActivityState
     {
         public long Bet { get; set; }
-        public List<string> LeftSideParticipants { get; set; }
-        public List<string> RightSideParticipants { get; set; }
+        public List<string> LeftSideParticipants { get; set; } = new List<string>();
+        public List<string> RightSideParticipants { get; set; } = new List<string>();
 
         public string ActivityId { get; set; }
     }

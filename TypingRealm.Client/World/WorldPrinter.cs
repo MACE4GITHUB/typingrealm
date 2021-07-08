@@ -56,7 +56,20 @@ namespace TypingRealm.Client.World
                 foreach (var ropeWarInfo in state.RopeWars)
                 {
                     _output.Write($"{ropeWarInfo.Name} - {ropeWarInfo.Bet}   -   ");
-                    _output.WriteLine(ropeWarInfo.Typer);
+
+                    if (state.CurrentRopeWar == null)
+                        _output.WriteLine(ropeWarInfo.Typer);
+                }
+
+                _output.WriteLine();
+                if (state.CurrentRopeWar != null)
+                {
+                    _output.WriteLine("Current rope war:");
+                    _output.WriteLine(state.CurrentRopeWar.RopeWarInfo.Name);
+                    _output.Write("Leave   -   ");
+                    _output.WriteLine(state.CurrentRopeWar.LeaveRopeWarTyper);
+                    _output.Write("Switch sides   -   ");
+                    _output.WriteLine(state.CurrentRopeWar.SwitchSides);
                 }
             }
 

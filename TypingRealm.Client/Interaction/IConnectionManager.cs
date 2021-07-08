@@ -12,5 +12,7 @@ namespace TypingRealm.Client.Interaction
 
         ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken);
         void DisconnectFromWorld();
+
+        string CharacterId { get; }
     }
 }

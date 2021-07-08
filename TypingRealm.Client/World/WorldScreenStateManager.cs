@@ -19,6 +19,7 @@ namespace TypingRealm.Client.World
 
         private readonly HashSet<string> _subscriptions = new HashSet<string>();
         private IMessageProcessor? _worldConnection;
+        private readonly string _characterId;
 
         // TODO: Rewrite this whole logic so that all these dependencies are created PER PAGE when it opens, and are disposed when the page closes.
         public WorldScreenStateManager(
@@ -26,6 +27,7 @@ namespace TypingRealm.Client.World
             IConnectionManager connectionManager,
             WorldScreenState state)
         {
+            _characterId = connectionManager.CharacterId;
             _typerPool = typerPool;
 
             connectionManager.WorldConnectionObservable.Subscribe(worldConnection =>
@@ -104,6 +106,20 @@ namespace TypingRealm.Client.World
                 // TODO: Dispose all previous things - sync up like at character selection screen.
                 _currentState.RopeWars = new HashSet<RopeWarInfo>(state.RopeWarActivities.Select(
                     x => new RopeWarInfo(x.ActivityId, x.ActivityId, x.Bet, _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()))));
+
+                var characterId = _characterId;
+                var currentRopeWar = state.RopeWarActivities.FirstOrDefault(rw => rw.LeftSideParticipants.Contains(characterId) || rw.RightSideParticipants.Contains(characterId));
+
+                if (currentRopeWar != null)
+                {
+                    _currentState.CurrentRopeWar = new JoinedRopeWar(
+                        _currentState.RopeWars.First(x => x.RopeWarId == currentRopeWar.ActivityId), _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()), _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()));
+                }
+                // TODO: Clean up these typers. When current rope war becomes null - we need to delete them from the typer pool.
+                else
+                {
+                    _currentState.CurrentRopeWar = null;
+                }
 
                 _stateSubject.OnNext(_currentState);
             }

@@ -21,8 +21,11 @@ namespace TypingRealm.Client.Interaction
         public IMessageProcessor? WorldConnection { get; private set; }
         public IObservable<IMessageProcessor?> WorldConnectionObservable => _worldConnectionSubject;
 
+        public string CharacterId { get; private set; } = string.Empty;
+
         public async ValueTask ConnectToWorldAsync(string characterId, CancellationToken cancellationToken)
         {
+            CharacterId = characterId;
             WorldConnection = _messageProcessorFactory.CreateMessageProcessorFor("http://127.0.0.1:30111/hub"); // world connection string.
 
             await WorldConnection.ConnectAsync(characterId, cancellationToken)
