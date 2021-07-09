@@ -90,8 +90,7 @@ namespace TypingRealm.Client.World
                 _currentState.CurrentLocation = new LocationInfo(
                     state.LocationId,
                     "TODO: get location name from cache",
-                    "TODO: get location description from cache",
-                    state.AllowedActivityTypes.Contains(ActivityType.RopeWar));
+                    "TODO: get location description from cache");
 
                 if (state.AllowedActivityTypes.Contains(ActivityType.RopeWar)
                     && _currentState.CreateRopeWarTyper == null)

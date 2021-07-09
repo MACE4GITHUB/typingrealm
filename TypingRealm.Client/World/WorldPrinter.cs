@@ -1,4 +1,5 @@
-﻿using TypingRealm.Client.Output;
+﻿using System.Linq;
+using TypingRealm.Client.Output;
 
 namespace TypingRealm.Client.World
 {
@@ -45,12 +46,16 @@ namespace TypingRealm.Client.World
                 _output.WriteLine(locationEntrance.Typer);
             }
 
-            if (state.CurrentLocation.CanStartRopeWar && state.CreateRopeWarTyper != null)
+            if (state.CanStartRopeWar && state.CreateRopeWarTyper != null)
             {
                 _output.WriteLine("Create new rope war (random) and join it: ");
                 _output.WriteLine(state.CreateRopeWarTyper);
                 _output.WriteLine();
                 _output.WriteLine();
+            }
+
+            if (state.RopeWars.Any())
+            {
                 _output.WriteLine("Existing rope wars:");
 
                 foreach (var ropeWarInfo in state.RopeWars)

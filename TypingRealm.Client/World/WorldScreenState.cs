@@ -6,8 +6,7 @@ namespace TypingRealm.Client.World
     public sealed record LocationInfo(
         string LocationId,
         string Name,
-        string Description,
-        bool CanStartRopeWar);
+        string Description);
 
     public sealed record LocationEntrance(
         string LocationId,
@@ -48,5 +47,7 @@ namespace TypingRealm.Client.World
         public Typer? CreateRopeWarTyper { get; set; }
         public HashSet<RopeWarInfo> RopeWars { get; set; } = new HashSet<RopeWarInfo>();
         public JoinedRopeWar? CurrentRopeWar { get; set; }
+
+        public bool CanStartRopeWar => CurrentRopeWar == null && CreateRopeWarTyper != null;
     }
 }
