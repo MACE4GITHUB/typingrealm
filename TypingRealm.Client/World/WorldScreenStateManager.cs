@@ -87,10 +87,14 @@ namespace TypingRealm.Client.World
         {
             lock (_updateStateLock)
             {
-                _currentState.CurrentLocation = new LocationInfo(
-                    state.LocationId,
-                    "TODO: get location name from cache",
-                    "TODO: get location description from cache");
+                if (state.LocationId != _currentState.CurrentLocation?.LocationId)
+                {
+                    // Update current location details only when moving to another location.
+                    _currentState.CurrentLocation = new LocationInfo(
+                        state.LocationId,
+                        "TODO: get location name from cache",
+                        "TODO: get location description from cache");
+                }
 
                 if (state.AllowedActivityTypes.Contains(ActivityType.RopeWar)
                     && _currentState.CreateRopeWarTyper == null)
