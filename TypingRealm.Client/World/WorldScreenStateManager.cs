@@ -102,6 +102,12 @@ namespace TypingRealm.Client.World
                     _currentState.CreateRopeWarTyper = _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString());
                 }
 
+                if (!state.AllowedActivityTypes.Contains(ActivityType.RopeWar)
+                    && _currentState.CreateRopeWarTyper != null)
+                {
+                    // TODO: Remove CreateRopeWarTyper from typer pool.
+                }
+
                 // TODO: Dispose all previous location entrances - sync up like at character selection screen.
                 _currentState.LocationEntrances = new HashSet<LocationEntrance>(state.Locations.Select(
                     x => new LocationEntrance(x, x, _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()))));
