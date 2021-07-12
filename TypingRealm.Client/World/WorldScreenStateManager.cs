@@ -105,7 +105,8 @@ namespace TypingRealm.Client.World
                 if (!state.AllowedActivityTypes.Contains(ActivityType.RopeWar)
                     && _currentState.CreateRopeWarTyper != null)
                 {
-                    // TODO: Remove CreateRopeWarTyper from typer pool.
+                    _typerPool.RemoveTyper(_currentState.CreateRopeWarTyper);
+                    _currentState.CreateRopeWarTyper = null;
                 }
 
                 // TODO: Dispose all previous location entrances - sync up like at character selection screen.
