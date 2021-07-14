@@ -26,6 +26,11 @@ namespace TypingRealm.Client.Typing
             Typed = _text.Substring(0, progress);
         }
 
+        /// <summary>
+        /// For convenient typers mapping.
+        /// </summary>
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+
         public string Typed { get; private set; }
         public string Error { get; private set; }
         public string NotTyped => _text[Typed.Length..];
