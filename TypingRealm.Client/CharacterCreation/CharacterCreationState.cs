@@ -9,8 +9,8 @@ namespace TypingRealm.Client.CharacterCreation
             ComponentPool componentPool)
         {
             CharacterNameInput = componentPool.MakeInputComponent();
-            (BackToMainMenu, _) = typerPool.MakeUniqueTyper();
-            (CreateCharacter, _) = typerPool.MakeUniqueTyper();
+            BackToMainMenu = typerPool.MakeUniqueTyper();
+            CreateCharacter = typerPool.MakeUniqueTyper();
         }
 
         public Typer BackToMainMenu { get; }

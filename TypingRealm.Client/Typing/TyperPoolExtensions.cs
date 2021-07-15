@@ -4,12 +4,13 @@ namespace TypingRealm.Client.Typing
 {
     public static class TyperPoolExtensions
     {
-        public static (Typer Typer, string id) MakeUniqueTyper(this ITyperPool typerPool)
+        public static Typer MakeUniqueTyper(this ITyperPool typerPool)
         {
             var id = Guid.NewGuid().ToString();
             var typer = typerPool.MakeUniqueTyper(id);
+            typer.Id = id;
 
-            return (typer, id);
+            return typer;
         }
 
         public static void RemoveTyper(this ITyperPool typerPool, string id)

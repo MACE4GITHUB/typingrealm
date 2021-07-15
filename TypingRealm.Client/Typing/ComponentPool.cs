@@ -29,7 +29,7 @@ namespace TypingRealm.Client.Typing
 
         public InputComponent MakeInputComponent()
         {
-            (var typer, _) = _focusTyperPool.MakeUniqueTyper();
+            var typer = _focusTyperPool.MakeUniqueTyper();
 
             var component = new InputComponent(typer);
             _components.Add(typer, component);
