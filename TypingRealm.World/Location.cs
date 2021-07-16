@@ -42,10 +42,8 @@ namespace TypingRealm.World
         string ActivityId,
         ActivityType ActivityType);
 
-#pragma warning disable IDE0032
     public sealed class Location
     {
-        private readonly string _locationId;
         private readonly HashSet<string> _locations;
         private readonly HashSet<ActivityType> _allowedActivityTypes;
         private readonly HashSet<Activity> _activities = new HashSet<Activity>();
@@ -64,7 +62,7 @@ namespace TypingRealm.World
 
         private Location(LocationPersistenceState persistenceState)
         {
-            _locationId = persistenceState.LocationId;
+            LocationId = persistenceState.LocationId;
             _locations = persistenceState.Locations;
             _allowedActivityTypes = persistenceState.AllowedActivityTypes;
             _activities = persistenceState.Activities;
@@ -80,7 +78,7 @@ namespace TypingRealm.World
         {
             return new LocationPersistenceState
             {
-                LocationId = _locationId,
+                LocationId = LocationId,
                 Locations = _locations,
                 Activities = _activities,
                 Characters = _characters,
@@ -93,12 +91,12 @@ namespace TypingRealm.World
             HashSet<string> locations,
             HashSet<ActivityType> allowedActivityTypes)
         {
-            _locationId = locationId;
+            LocationId = locationId;
             _locations = locations;
             _allowedActivityTypes = allowedActivityTypes;
         }
 
-        public string LocationId => _locationId;
+        public string LocationId { get; }
         public bool CanProposeRopeWar => _allowedActivityTypes.Contains(ActivityType.RopeWar);
 
         public IEnumerable<string> Characters => _characters;
@@ -137,7 +135,7 @@ namespace TypingRealm.World
 
             if (ropeWar.HasStarted)
             {
-                _domainEvents.Enqueue(new DomainEvent(DomainEventType.ActivityStarted, _locationId, characterId, ropeWar.ActivityId, ActivityType.RopeWar));
+                _domainEvents.Enqueue(new DomainEvent(DomainEventType.ActivityStarted, LocationId, characterId, ropeWar.ActivityId, ActivityType.RopeWar));
             }
         }
 
@@ -249,5 +247,4 @@ namespace TypingRealm.World
             return _activities.Any(activity => activity.HasParticipant(characterId));
         }
     }
-#pragma warning restore IDE0032 // Use auto property
 }
