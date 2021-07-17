@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TypingRealm.Messaging;
 using TypingRealm.Profiles.Activities;
 using TypingRealm.World.Activities;
 using TypingRealm.World.Activities.RopeWar;
@@ -9,17 +8,6 @@ using TypingRealm.World.Activities.RopeWar;
 namespace TypingRealm.World
 {
 #pragma warning disable CS8618
-    [Message]
-    public sealed class WorldState
-    {
-        public string LocationId { get; set; }
-        public List<string> Locations { get; set; }
-        public List<ActivityType> AllowedActivityTypes { get; set; } = new List<ActivityType>();
-        public List<string> Characters { get; set; }
-
-        public List<RopeWarActivityState> RopeWarActivities { get; set; } = new List<RopeWarActivityState>();
-    }
-
     public sealed class LocationPersistenceState
     {
         public string LocationId { get; set; }
