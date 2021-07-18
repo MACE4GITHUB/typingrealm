@@ -3,11 +3,11 @@ using TypingRealm.Messaging;
 
 namespace TypingRealm.World
 {
-    public static class LocationStoreExtensions
+    public static class LocationRepositoryExtensions
     {
-        public static Location FindLocationForClient(this ILocationRepository locationStore, ConnectedClient sender)
+        public static Location FindLocationForClient(this ILocationRepository locationRepository, ConnectedClient sender)
         {
-            var location = locationStore.FindLocationForCharacter(sender.ClientId);
+            var location = locationRepository.FindLocationForCharacter(sender.ClientId);
             if (location == null)
                 throw new InvalidOperationException("Character never joined the world.");
 
