@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Subjects;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Typing;
-using TypingRealm.Messaging.Client;
 using TypingRealm.Profiles.Activities;
 
 namespace TypingRealm.Client.World
@@ -18,7 +17,6 @@ namespace TypingRealm.Client.World
         private readonly BehaviorSubject<WorldScreenState> _stateSubject;
 
         private readonly HashSet<string> _subscriptions = new HashSet<string>();
-        private IMessageProcessor? _worldConnection;
         private readonly string _characterId;
 
         // TODO: Rewrite this whole logic so that all these dependencies are created PER PAGE when it opens, and are disposed when the page closes.
@@ -30,28 +28,16 @@ namespace TypingRealm.Client.World
             _characterId = connectionManager.CharacterId;
             _typerPool = typerPool;
 
-            connectionManager.WorldConnectionObservable.Subscribe(worldConnection =>
+            connectionManager.WorldStateObservable.Subscribe(state =>
             {
-                // TODO: Cleanup - remove and dispose all subscriptions / previous connection.
+                if (state == null)
+                    return; // TODO: Show loading screen?
 
-                if (worldConnection == null)
-                    return;
-
-                _worldConnection = worldConnection;
-
-                _subscriptions.Add(_worldConnection.Subscribe<TypingRealm.World.WorldState>(state =>
+                lock (_updateStateLock)
                 {
-                    // TODO: This is VERY bad, potential issue if this action is awaited.
-                    // Sync lock doesn't work with async api.
-                    lock (_updateStateLock)
-                    {
-                        UpdateState(state);
-                        return default;
-                    }
-                }));
+                    UpdateState(state);
+                }
             });
-
-            _worldConnection = connectionManager.WorldConnection;
 
             _currentState = state;
             _stateSubject = new BehaviorSubject<WorldScreenState>(_currentState);
@@ -75,11 +61,6 @@ namespace TypingRealm.Client.World
 
         protected override void DisposeManagedResources()
         {
-            foreach (var subscription in _subscriptions)
-            {
-                _worldConnection?.Unsubscribe(subscription);
-            }
-
             _stateSubject.Dispose();
         }
 

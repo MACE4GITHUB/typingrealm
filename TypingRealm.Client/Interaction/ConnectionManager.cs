@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Messages;
+using TypingRealm.World;
 
 namespace TypingRealm.Client.Interaction
 {
     public sealed class ConnectionManager : IConnectionManager
     {
+        private string? _worldStateSubscription;
         private readonly IMessageProcessorFactory _messageProcessorFactory;
         private readonly BehaviorSubject<IMessageProcessor?> _worldConnectionSubject
             = new BehaviorSubject<IMessageProcessor?>(null);
+
+        private readonly BehaviorSubject<WorldState?> _worldStateSubject
+            = new BehaviorSubject<WorldState?>(null);
 
         public ConnectionManager(IMessageProcessorFactory messageProcessorFactory)
         {
@@ -20,6 +26,7 @@ namespace TypingRealm.Client.Interaction
 
         public IMessageProcessor? WorldConnection { get; private set; }
         public IObservable<IMessageProcessor?> WorldConnectionObservable => _worldConnectionSubject;
+        public IObservable<WorldState?> WorldStateObservable => _worldStateSubject.AsObservable();
 
         public string CharacterId { get; private set; } = string.Empty;
 
@@ -32,6 +39,12 @@ namespace TypingRealm.Client.Interaction
                 .ConfigureAwait(false);
 
             _worldConnectionSubject.OnNext(WorldConnection);
+
+            _worldStateSubscription = WorldConnection.Subscribe<WorldState>(message =>
+            {
+                _worldStateSubject.OnNext(message);
+                return default;
+            });
         }
 
         public void DisconnectFromWorld()
@@ -41,7 +54,14 @@ namespace TypingRealm.Client.Interaction
             // we are (probably?) waiting for AcknowledgeHandled and this thing fails.
             _ = WorldConnection?.SendAsync(new Disconnect(), default);
             //WorldConnection.Disconnect();
+
+            if (_worldStateSubscription != null)
+                WorldConnection?.Unsubscribe(_worldStateSubscription);
+
             WorldConnection = null;
+
+            _worldConnectionSubject.OnNext(null);
+            _worldStateSubject.OnNext(null);
         }
     }
 }
