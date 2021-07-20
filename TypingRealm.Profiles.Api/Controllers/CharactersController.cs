@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Authorization;
 using TypingRealm.Profiles.Api.Resources;
 using TypingRealm.Profiles.Api.Resources.Data;
 

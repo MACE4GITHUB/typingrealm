@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace TypingRealm.Profiles.Api.Controllers
+namespace TypingRealm.Authorization
 {
     public class TyrAuthorizeAttribute : TypeFilterAttribute
     {
