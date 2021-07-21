@@ -18,6 +18,11 @@ namespace TypingRealm.Data.Infrastructure
         internal readonly Dictionary<string, Location> _cache
             = new Dictionary<string, Location>();
 
+        public InMemoryLocationRepository()
+        {
+            _cache.Add("1", new Location());
+        }
+
         public ValueTask<Location?> FindAsync(string locationId, CancellationToken cancellationToken)
         {
             _cache.TryGetValue(locationId, out var location);
