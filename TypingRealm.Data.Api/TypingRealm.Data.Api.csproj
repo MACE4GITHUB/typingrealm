@@ -16,6 +16,7 @@
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
     <ProjectReference Include="..\TypingRealm.Data.Infrastructure\TypingRealm.Data.Infrastructure.csproj" />
+    <ProjectReference Include="..\TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Api.Resources\TypingRealm.Profiles.Api.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Infrastructure\TypingRealm.Profiles.Infrastructure.csproj" />

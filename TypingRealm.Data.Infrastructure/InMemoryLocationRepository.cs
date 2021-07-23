@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Data.Resources;
 
 namespace TypingRealm.Data.Infrastructure
 {
-    public sealed class Location
-    {
-    }
-
     public interface ILocationRepository
     {
         ValueTask<Location?> FindAsync(string locationId, CancellationToken cancellationToken);
