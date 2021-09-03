@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using TypingRealm.Client.Interaction;
 using TypingRealm.Client.Typing;
+using TypingRealm.Data.Api.Client;
 using TypingRealm.Profiles.Activities;
 
 namespace TypingRealm.Client.World
@@ -16,6 +17,8 @@ namespace TypingRealm.Client.World
         private readonly WorldScreenState _currentState;
         private readonly BehaviorSubject<WorldScreenState> _stateSubject;
 
+        private readonly ILocationsClient _locationsClient;
+
         private readonly HashSet<string> _subscriptions = new HashSet<string>();
         private readonly string _characterId;
 
@@ -23,10 +26,12 @@ namespace TypingRealm.Client.World
         public WorldScreenStateManager(
             ITyperPool typerPool,
             IConnectionManager connectionManager,
-            WorldScreenState state)
+            WorldScreenState state,
+            ILocationsClient locationsClient)
         {
             _characterId = connectionManager.CharacterId;
             _typerPool = typerPool;
+            _locationsClient = locationsClient;
 
             connectionManager.WorldStateObservable.Subscribe(state =>
             {
@@ -70,11 +75,17 @@ namespace TypingRealm.Client.World
             {
                 if (state.LocationId != _currentState.CurrentLocation?.LocationId)
                 {
+                    // Very crude implementation, goes to API all the time and blocks the thread.
+                    var locationData = _locationsClient.GetLocationAsync(state.LocationId, default)
+                        .GetAwaiter().GetResult();
+
                     // Update current location details only when moving to another location.
                     _currentState.CurrentLocation = new LocationInfo(
                         state.LocationId,
-                        "TODO: get location name from cache",
-                        "TODO: get location description from cache");
+                        locationData.Name,
+                        locationData.Description);
+                    /*"TODO: get location name from cache",
+                    "TODO: get location description from cache");*/
                 }
 
                 if (state.AllowedActivityTypes.Contains(ActivityType.RopeWar)
@@ -92,7 +103,7 @@ namespace TypingRealm.Client.World
 
                 // TODO: Dispose all previous location entrances - sync up like at character selection screen.
                 _currentState.LocationEntrances = new HashSet<LocationEntrance>(state.Locations.Select(
-                    x => new LocationEntrance(x, x, _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()))));
+                    x => new LocationEntrance(x, GetLocationName(x), _typerPool.MakeUniqueTyper(Guid.NewGuid().ToString()))));
 
                 // TODO: Dispose all previous things - sync up like at character selection screen.
                 _currentState.RopeWars = new HashSet<RopeWarInfo>(state.RopeWarActivities.Select(
@@ -114,6 +125,14 @@ namespace TypingRealm.Client.World
 
                 _stateSubject.OnNext(_currentState);
             }
+        }
+
+        private string GetLocationName(string locationId)
+        {
+            var location = _locationsClient.GetLocationAsync(locationId, default)
+                .GetAwaiter().GetResult();
+
+            return location.Name;
         }
     }
 }

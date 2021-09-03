@@ -12,7 +12,8 @@ namespace TypingRealm.Communication
         private readonly Dictionary<string, string> _serviceAddresses
             = new Dictionary<string, string>
             {
-                ["profile"] = "http://127.0.0.1:30103"
+                ["profile"] = "http://127.0.0.1:30103",
+                ["data"] = "http://127.0.0.1:30400"
             };
 
         private readonly IHttpClient _httpClient;

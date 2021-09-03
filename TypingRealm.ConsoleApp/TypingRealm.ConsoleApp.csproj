@@ -21,6 +21,8 @@
     <ProjectReference Include="..\TypingRealm.Client\TypingRealm.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
+    <ProjectReference Include="..\TypingRealm.Data.Api.Client\TypingRealm.Data.Api.Client.csproj" />
+    <ProjectReference Include="..\TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Client\TypingRealm.Messaging.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />

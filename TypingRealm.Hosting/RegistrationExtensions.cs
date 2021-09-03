@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
 using TypingRealm.Authentication.ConsoleClient;
 using TypingRealm.Communication;
+using TypingRealm.Data.Api.Client;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Serialization;
@@ -123,6 +124,7 @@ namespace TypingRealm.Hosting
                 .RegisterClientMessaging() // Client-specific. TODO: use RegisterClientMessagingBase instead.
                 .AddSignalRConnectionFactory()
                 .AddProfileApiClients()
+                .AddLocationApiClients()
                 .RegisterClientConnectionFactoryFactory<SignalRClientConnectionFactoryFactory>()
                 .AddAuth0ProfileTokenProvider();
 

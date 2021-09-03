@@ -129,6 +129,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Data.Infrastruc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Data.Resources", "TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj", "{884E1E64-4063-4243-9C21-BF02C7CE8DF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Data.Api.Client", "TypingRealm.Data.Api.Client\TypingRealm.Data.Api.Client.csproj", "{B44B3DC4-EA62-49FC-B91C-AA153FE16995}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -323,6 +325,10 @@ Global
 		{884E1E64-4063-4243-9C21-BF02C7CE8DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{884E1E64-4063-4243-9C21-BF02C7CE8DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{884E1E64-4063-4243-9C21-BF02C7CE8DF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B44B3DC4-EA62-49FC-B91C-AA153FE16995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B44B3DC4-EA62-49FC-B91C-AA153FE16995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B44B3DC4-EA62-49FC-B91C-AA153FE16995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B44B3DC4-EA62-49FC-B91C-AA153FE16995}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -374,6 +380,7 @@ Global
 		{920621FF-6362-4022-B63B-459D88D311D8} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
 		{328850DA-B1B1-41D1-BDEE-E2D49232BC40} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
 		{884E1E64-4063-4243-9C21-BF02C7CE8DF4} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
+		{B44B3DC4-EA62-49FC-B91C-AA153FE16995} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

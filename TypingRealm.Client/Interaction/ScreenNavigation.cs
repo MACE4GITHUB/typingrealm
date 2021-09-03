@@ -8,6 +8,7 @@ using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
 using TypingRealm.Client.World;
+using TypingRealm.Data.Api.Client;
 using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Client.Interaction
@@ -48,6 +49,7 @@ namespace TypingRealm.Client.Interaction
         private readonly ITextGenerator _textGenerator;
         private readonly IConnectionManager _connectionManager;
         private readonly ICharactersClient _charactersClient;
+        private readonly ILocationsClient _locationsClient;
         private readonly IOutput _output;
 
         // TODO: Refactor to be generic.
@@ -62,6 +64,7 @@ namespace TypingRealm.Client.Interaction
             ITextGenerator textGenerator,
             IConnectionManager connectionManager,
             ICharactersClient charactersClient,
+            ILocationsClient locationsClient,
             IOutput output,
             IPrinter<MainMenuState> mainMenuPrinter,
             IPrinter<CharacterCreationState> characterCreationPrinter,
@@ -70,6 +73,7 @@ namespace TypingRealm.Client.Interaction
             _textGenerator = textGenerator;
             _connectionManager = connectionManager;
             _charactersClient = charactersClient;
+            _locationsClient = locationsClient;
             _output = output;
             _mainMenuPrinter = mainMenuPrinter;
             _characterCreationPrinter = characterCreationPrinter;
@@ -182,7 +186,8 @@ namespace TypingRealm.Client.Interaction
             var worldStateManager = new WorldScreenStateManager(
                 typerPool,
                 _connectionManager,
-                state);
+                state,
+                _locationsClient);
 
             var printer = new StatePrinter<WorldScreenState>(
                 _printLock,
