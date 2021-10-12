@@ -26,6 +26,9 @@ namespace TypingRealm.Typing
 
                 if (previousEvent == null)
                 {
+                    if (@event.Key == "backspace")
+                        throw new InvalidOperationException("Cannot have backspace as first symbol.");
+
                     previousEvent = @event;
 
                     if (previousEvent.Delay != 0)
@@ -34,9 +37,7 @@ namespace TypingRealm.Typing
                     if (previousEvent.Index != 0)
                         throw new InvalidOperationException("First event's index should be 0.");
 
-                    if (text.Value[0].ToString() == @event.Key)
-                        nextSupposedIndex++;
-
+                    nextSupposedIndex++;
                     continue;
                 }
 
