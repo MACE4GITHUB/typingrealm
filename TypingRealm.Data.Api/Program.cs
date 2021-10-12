@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using TypingRealm.Hosting;
 using TypingRealm.Data.Infrastructure;
 using TypingRealm.Data.Api.Controllers;
+using TypingRealm.Typing;
 
 [assembly: ApiController]
 namespace TypingRealm.Data.Api
@@ -15,6 +16,8 @@ namespace TypingRealm.Data.Api
             using var host = HostFactory.CreateWebApiHostBuilder(typeof(LocationsController).Assembly, services =>
             {
                 services.RegisterDataApi();
+
+                services.AddTyping();
             }).Build();
 
             await host.RunAsync();
