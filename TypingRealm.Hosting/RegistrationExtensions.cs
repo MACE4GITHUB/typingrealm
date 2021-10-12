@@ -25,6 +25,8 @@ namespace TypingRealm.Hosting
         private const string CorsPolicyName = "CorsPolicy";
         private static readonly string[] _corsAllowedOrigins = new[]
         {
+            "http://127.0.0.1:4200",
+            "https://127.0.0.1:4200",
             "http://localhost:4200",
             "https://localhost:4200",
             "http://typingrealm.com:4200",
