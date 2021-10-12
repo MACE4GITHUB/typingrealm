@@ -18,11 +18,13 @@ namespace TypingRealm.Typing
 
             foreach (var @event in text.Events)
             {
-                if (nextSupposedIndex == text.Value.Length)
+                // TODO: Check that there shouldn't be any key presses after the whole text was typed AND no more errors remain.
+                // This logic should be different for a mode that allows errors.
+                /*if (nextSupposedIndex == text.Value.Length)
                 {
                     // We typed the whole text, but there were more events.
                     throw new InvalidOperationException("Some events were trailing after the whole text has been typed.");
-                }
+                }*/
 
                 if (previousEvent == null)
                 {
