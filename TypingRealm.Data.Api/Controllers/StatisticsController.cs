@@ -14,15 +14,26 @@ namespace TypingRealm.Data.Api.Controllers
         private readonly ITypedTextProcessor _typedTextProcessor;
         private readonly ITextStore _textStore;
         private readonly ITextTypingStatisticsCalculator _statisticsCalculator;
+        private readonly ITextGenerator _textGenerator;
 
         public StatisticsController(
             ITypedTextProcessor typedTextProcessor,
             ITextStore textStore,
-            ITextTypingStatisticsCalculator statisticsCalculator)
+            ITextTypingStatisticsCalculator statisticsCalculator,
+            ITextGenerator textGenerator)
         {
             _typedTextProcessor = typedTextProcessor;
             _textStore = textStore;
             _statisticsCalculator = statisticsCalculator;
+            _textGenerator = textGenerator;
+        }
+
+        [HttpGet]
+        [Route("newText")]
+        public async ValueTask<string> GetNewText()
+        {
+            return await _textGenerator.GetTextAsync()
+                .ConfigureAwait(false);
         }
 
         [HttpPost]

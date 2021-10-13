@@ -35,6 +35,8 @@ namespace TypingRealm.Hosting
 
         public static MessageTypeCacheBuilder UseTcpHost(this IServiceCollection services, int port)
         {
+            services.SetupCommonDependencies();
+
             services
                 .AddProtobuf()
                 .AddTcpServer(port);
@@ -56,6 +58,8 @@ namespace TypingRealm.Hosting
 
         public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services)
         {
+            services.SetupCommonDependencies();
+
             services.AddSignalR();
 
             services.AddCors(options => options.AddPolicy(
@@ -87,6 +91,8 @@ namespace TypingRealm.Hosting
 
         public static IServiceCollection UseWebApiHost(this IServiceCollection services, Assembly controllersAssembly)
         {
+            services.SetupCommonDependencies();
+
             services.AddCors(options => options.AddPolicy(
                 CorsPolicyName,
                 builder => builder
@@ -112,6 +118,8 @@ namespace TypingRealm.Hosting
         /// </summary>
         public static MessageTypeCacheBuilder UseConsoleAppHost(this IServiceCollection services)
         {
+            services.SetupCommonDependencies();
+
             var builder = services.AddSerializationCore();
 
             builder
@@ -131,6 +139,13 @@ namespace TypingRealm.Hosting
                 .AddAuth0ProfileTokenProvider();
 
             return builder;
+        }
+
+        private static IServiceCollection SetupCommonDependencies(this IServiceCollection services)
+        {
+            services.AddHttpClient();
+
+            return services;
         }
     }
 }

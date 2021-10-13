@@ -11,6 +11,7 @@ namespace TypingRealm.Data.Infrastructure
 
             // Typing.
             services.AddSingleton<ITextStore, InMemoryTextStore>();
+            services.AddTransient<ITextGenerator, TextGenerator>();
 
             return services;
         }
