@@ -4,6 +4,9 @@ namespace TypingRealm.Typing
 {
     public interface ITextGenerator
     {
-        ValueTask<string> GetTextAsync();
+        /// <summary>
+        /// Generates text based on configuration.
+        /// </summary>
+        ValueTask<string> GenerateTextAsync(TextConfiguration configuration);
     }
 }

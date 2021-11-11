@@ -7,7 +7,7 @@ using TypingRealm.Data.Resources;
 namespace TypingRealm.Data.Api.Controllers
 {
     [Route("api/[controller]")]
-    public sealed class LocationsController : ControllerBase
+    public sealed class LocationsController : TyrController
     {
         private readonly ILocationRepository _locationRepository;
 

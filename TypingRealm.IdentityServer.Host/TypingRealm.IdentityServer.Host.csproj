@@ -8,8 +8,4 @@
     <PackageReference Include="Duende.IdentityServer" Version="5.0.0-preview.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
-  </ItemGroup>
-
 </Project>

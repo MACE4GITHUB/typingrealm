@@ -10,7 +10,6 @@ namespace TypingRealm.Data.Infrastructure
             services.AddSingleton<ILocationRepository, InMemoryLocationRepository>();
 
             // Typing.
-            services.AddSingleton<ITextStore, InMemoryTextStore>();
             services.AddTransient<ITextGenerator, TextGenerator>();
 
             return services;

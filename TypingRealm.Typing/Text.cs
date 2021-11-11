@@ -1,31 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
+using TypingRealm.Typing.Framework;
 
 namespace TypingRealm.Typing
 {
-    public sealed class Text
+    /// <summary>
+    /// Aggregate root. User-defined text or randomly generated one. We can reuse
+    /// the same text only if we are sure it will never change. Either we don't
+    /// allow to change the value of the text, or we need to generate new texts
+    /// every time.
+    /// </summary>
+    public sealed class Text : IIdentifiable
     {
-        public Text(
-            Guid textId,
-            string value,
-            decimal totalTimeMs,
-            DateTimeOffset startedTypingAt,
-            DateTime submittedAtUtc,
-            IEnumerable<KeyPressEvent> events)
+        private readonly string _textId;
+        private readonly string _value;
+        private readonly string _createdByUser;
+        private readonly DateTime _createdUtc;
+        private bool _isPublic;
+
+        public Text(string textId, string value, string createdByUser, DateTime createdUtc, bool isPublic)
         {
-            TextId = textId;
-            Value = value;
-            TotalTimeMs = totalTimeMs;
-            StartedTypingAt = startedTypingAt;
-            SubmittedAtUtc = submittedAtUtc;
-            Events = events;
+            _textId = textId;
+            _value = value;
+            _createdByUser = createdByUser;
+            _createdUtc = createdUtc;
+            _isPublic = isPublic;
         }
 
-        public Guid TextId { get; }
-        public string Value { get; }
-        public decimal TotalTimeMs { get; }
-        public DateTimeOffset StartedTypingAt { get; }
-        public DateTime SubmittedAtUtc { get; }
-        public IEnumerable<KeyPressEvent> Events { get; }
+        public string Id => _textId;
+        public string Value => _value;
+
+        public void MakePublic()
+        {
+            _isPublic = true;
+        }
+
+        public void MakePrivate()
+        {
+            _isPublic = false;
+        }
     }
 }

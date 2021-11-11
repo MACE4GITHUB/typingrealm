@@ -24,8 +24,11 @@ namespace TypingRealm.Data.Infrastructure
             _httpClientFactory = httpClientFactory;
         }
 
-        public async ValueTask<string> GetTextAsync()
+        public async ValueTask<string> GenerateTextAsync(TextConfiguration configuration)
         {
+            if (configuration.Length != 0)
+                throw new NotImplementedException("You can only request default (zero) text length for now.");
+
             var minLength = 10;
             var builder = new StringBuilder();
 
