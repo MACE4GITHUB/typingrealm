@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Typing;
 
@@ -12,12 +13,20 @@ namespace TypingRealm.Data.Api.Controllers
 
         public static TextDto From(Text text)
         {
+            var state = text.GetState();
+
             return new TextDto
             {
-                Id = text.Id,
-                Value = text.Value
+                Id = state.TextId,
+                Value = state.Value
             };
         }
+    }
+
+    public sealed class CreateTextDto
+    {
+        public string Value { get; set; }
+        public bool IsPublic { get; set; }
     }
 #pragma warning restore CS8618
 
@@ -40,6 +49,20 @@ namespace TypingRealm.Data.Api.Controllers
                 return NotFound();
 
             return TextDto.From(text);
+        }
+
+        [HttpPost]
+        public async ValueTask<ActionResult> Post(CreateTextDto dto)
+        {
+            var textId = await _textRepository.NextIdAsync();
+
+            var text = new Text(textId, dto.Value, ProfileId, DateTime.UtcNow, dto.IsPublic);
+
+            await _textRepository.SaveAsync(text);
+
+            var result = new { textId };
+
+            return CreatedAtAction(nameof(GetById), result, result);
         }
     }
 }
