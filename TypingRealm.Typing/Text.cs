@@ -16,7 +16,8 @@ namespace TypingRealm.Typing
             string Value,
             string CreatedByUser,
             DateTime CreatedUtc,
-            bool IsPublic) : IIdentifiable
+            bool IsPublic,
+            bool IsArchived) : IIdentifiable
         {
             string IIdentifiable.Id => TextId;
         }
@@ -27,7 +28,7 @@ namespace TypingRealm.Typing
         {
             // TODO: Validate.
 
-            _state = new State(textId, value, createdByUser, createdUtc, isPublic);
+            _state = new State(textId, value, createdByUser, createdUtc, isPublic, false);
         }
 
         string IIdentifiable.Id => _state.TextId;
@@ -48,9 +49,13 @@ namespace TypingRealm.Typing
         #endregion
 
         public string Value => _state.Value;
+        public bool IsArchived => _state.IsArchived;
 
         public void MakePublic()
         {
+            if (_state.IsArchived)
+                throw new InvalidOperationException("The text is archived.");
+
             if (_state.IsPublic)
                 throw new InvalidOperationException("Text is already public.");
 
@@ -59,10 +64,21 @@ namespace TypingRealm.Typing
 
         public void MakePrivate()
         {
+            if (_state.IsArchived)
+                throw new InvalidOperationException("The text is archived.");
+
             if (!_state.IsPublic)
                 throw new InvalidOperationException("Test is already private.");
 
             _state = _state with { IsPublic = false };
+        }
+
+        public void Archive()
+        {
+            if (_state.IsPublic)
+                throw new InvalidOperationException("Cannot archive public text.");
+
+            _state = _state with { IsArchived = true };
         }
     }
 }

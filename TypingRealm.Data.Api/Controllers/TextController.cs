@@ -10,6 +10,7 @@ namespace TypingRealm.Data.Api.Controllers
     {
         public string Id { get; set; }
         public string Value { get; set; }
+        public bool IsPublic { get; set; }
 
         public static TextDto From(Text text)
         {
@@ -18,7 +19,8 @@ namespace TypingRealm.Data.Api.Controllers
             return new TextDto
             {
                 Id = state.TextId,
-                Value = state.Value
+                Value = state.Value,
+                IsPublic = state.IsPublic
             };
         }
     }
@@ -45,7 +47,7 @@ namespace TypingRealm.Data.Api.Controllers
         public async ValueTask<ActionResult<TextDto>> GetById(string textId)
         {
             var text = await _textRepository.FindAsync(textId);
-            if (text == null)
+            if (text == null || text.IsArchived)
                 return NotFound();
 
             return TextDto.From(text);
@@ -63,6 +65,48 @@ namespace TypingRealm.Data.Api.Controllers
             var result = new { textId };
 
             return CreatedAtAction(nameof(GetById), result, result);
+        }
+
+        [HttpDelete]
+        [Route("{textId}")]
+        public async ValueTask<ActionResult> Delete(string textId)
+        {
+            var text = await _textRepository.FindAsync(textId);
+            if (text == null || text.IsArchived)
+                return NotFound();
+
+            text.Archive();
+            await _textRepository.SaveAsync(text);
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        [Route("{textId}/public")]
+        public async ValueTask<ActionResult> MakePublic(string textId)
+        {
+            var text = await _textRepository.FindAsync(textId);
+            if (text == null || text.IsArchived)
+                return NotFound();
+
+            text.MakePublic();
+            await _textRepository.SaveAsync(text);
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        [Route("{textId}/private")]
+        public async ValueTask<ActionResult> MakePrivate(string textId)
+        {
+            var text = await _textRepository.FindAsync(textId);
+            if (text == null || text.IsArchived)
+                return NotFound();
+
+            text.MakePrivate();
+            await _textRepository.SaveAsync(text);
+
+            return NoContent();
         }
     }
 }
