@@ -32,7 +32,7 @@ namespace TypingRealm.IdentityServer.Host
                     {
                         "service"
                     },
-                    AccessTokenLifetime = 90
+                    AccessTokenLifetime = 3600
                 }
             };
     }
