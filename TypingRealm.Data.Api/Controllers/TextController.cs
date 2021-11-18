@@ -8,7 +8,7 @@ namespace TypingRealm.Data.Api.Controllers
 #pragma warning disable CS8618
     public sealed class TextDto
     {
-        public string Id { get; set; }
+        public string TextId { get; set; }
         public string Value { get; set; }
         public bool IsPublic { get; set; }
 
@@ -18,7 +18,7 @@ namespace TypingRealm.Data.Api.Controllers
 
             return new TextDto
             {
-                Id = state.TextId,
+                TextId = state.TextId,
                 Value = state.Value,
                 IsPublic = state.IsPublic
             };

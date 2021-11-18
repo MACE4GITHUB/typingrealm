@@ -17,11 +17,17 @@ namespace TypingRealm.Typing
     /// </summary>
     public sealed class TypingSession : IIdentifiable
     {
-        private readonly Dictionary<int, TypingSessionText> _texts = new Dictionary<int, TypingSessionText>();
-        private readonly string _typingSessionId;
-        private readonly DateTime _createdAtUtc;
-        private readonly string _createdByUser;
-        private readonly TypingSessionConfiguration _configuration;
+        public sealed record State(
+            Dictionary<int, TypingSessionText> Texts,
+            string TypingSessionId,
+            DateTime CreatedAtUtc,
+            string CreatedByUser,
+            TypingSessionConfiguration Configuration) : IIdentifiable
+        {
+            string IIdentifiable.Id => TypingSessionId;
+        }
+
+        private readonly State _state;
 
         public TypingSession(
             string typingSessionId,
@@ -29,28 +35,53 @@ namespace TypingRealm.Typing
             DateTime createdAtUtc,
             TypingSessionConfiguration configuration)
         {
-            _typingSessionId = typingSessionId;
-            _createdAtUtc = createdAtUtc;
-            _createdByUser = createdByUser;
-            _configuration = configuration;
+            // TODO: Validate.
+
+            _state = new State(
+                new Dictionary<int, TypingSessionText>(),
+                typingSessionId,
+                createdAtUtc,
+                createdByUser,
+                configuration);
         }
 
-        public string Id => _typingSessionId;
+        string IIdentifiable.Id => _state.TypingSessionId;
+
+        #region State
+
+        private TypingSession(State state)
+        {
+            // TODO: Validate.
+
+            _state = state with
+            {
+                Texts = new Dictionary<int, TypingSessionText>(state.Texts)
+            };
+        }
+
+        public static TypingSession FromState(State state) => new TypingSession(state);
+
+        public State GetState() => _state with
+        {
+            Texts = new Dictionary<int, TypingSessionText>(_state.Texts)
+        };
+
+        #endregion
 
         public int AddText(TypingSessionText text)
         {
-            var nextIndex = _texts.Count + 1;
-            _texts.Add(nextIndex, text);
+            var nextIndex = _state.Texts.Count + 1;
+            _state.Texts.Add(nextIndex, text);
 
             return nextIndex;
         }
 
         public TypingSessionText? GetTypingSessionTextAtIndexOrDefault(int index)
         {
-            if (!_texts.ContainsKey(index))
+            if (!_state.Texts.ContainsKey(index))
                 return null;
 
-            return _texts[index];
+            return _state.Texts[index];
         }
     }
 }
