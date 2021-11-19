@@ -9,12 +9,18 @@ namespace TypingRealm.Typing
     /// </summary>
     public sealed class UserSession : IIdentifiable
     {
-        private readonly string _userSessionId;
-        private readonly string _userId;
-        private readonly string _typingSessionId;
-        private readonly DateTime _createdUtc;
-        private readonly TimeZoneInfo _userTimeZone;
-        private readonly List<TextTypingResult> _textTypingResults = new List<TextTypingResult>();
+        public sealed record State(
+            string UserSessionId,
+            string UserId,
+            string TypingSessionId,
+            DateTime CreatedUtc,
+            TimeZoneInfo userTimeZone,
+            List<TextTypingResult> TextTypingResults) : IIdentifiable
+        {
+            string IIdentifiable.Id => UserSessionId;
+        }
+
+        private readonly State _state;
 
         public UserSession(
             string userSessionId,
@@ -23,15 +29,35 @@ namespace TypingRealm.Typing
             DateTime createdUtc,
             TimeZoneInfo userTimeZone)
         {
-            _userSessionId = userSessionId;
-            _userId = userId;
-            _typingSessionId = typingSessionId;
-            _createdUtc = createdUtc;
-            _userTimeZone = userTimeZone;
+            // TODO: Validate.
+
+            _state = new State(userSessionId, userId, typingSessionId, createdUtc, userTimeZone, new List<TextTypingResult>());
         }
 
-        public string Id => _userSessionId;
-        public string TypingSessionId => _typingSessionId;
+        string IIdentifiable.Id => _state.UserSessionId;
+
+        #region State
+
+        private UserSession(State state)
+        {
+            // TODO: Validate.
+
+            _state = state with
+            {
+                TextTypingResults = new List<TextTypingResult>(state.TextTypingResults)
+            };
+        }
+
+        public static UserSession FromState(State state) => new UserSession(state);
+
+        public State GetState() => _state with
+        {
+            TextTypingResults = new List<TextTypingResult>(_state.TextTypingResults)
+        };
+
+        #endregion
+
+        public string TypingSessionId => _state.TypingSessionId;
 
         public void LogResult(TextTypingResult textTypingResult)
         {
@@ -39,7 +65,7 @@ namespace TypingRealm.Typing
             // Consider allowing logging different results from different texts: like you can type 6th text
             // in the beginning, and then type 2nd text two times, everything will be logged.
 
-            _textTypingResults.Add(textTypingResult);
+            _state.TextTypingResults.Add(textTypingResult);
         }
     }
 }

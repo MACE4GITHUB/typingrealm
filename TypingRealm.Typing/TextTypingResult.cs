@@ -11,9 +11,10 @@ namespace TypingRealm.Typing
     /// and invalid / cheated entries are discarded.
     /// </summary>
     public sealed record TextTypingResult(
-            int TypingSessionTextIndex,
-            decimal TotalTimeMs,
-            DateTime StartedTypingUtc,
-            DateTime SubmittedResultsUtc,
-            IEnumerable<KeyPressEvent> Events);
+        string TextTypingResultId, // A hack to distinguish text typing result uniquely.
+        int TypingSessionTextIndex,
+        decimal TotalTimeMs,
+        DateTime StartedTypingUtc,
+        DateTime SubmittedResultsUtc,
+        IEnumerable<KeyPressEvent> Events);
 }
