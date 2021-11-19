@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Typing;
 
@@ -36,10 +37,14 @@ namespace TypingRealm.Data.Api.Controllers
     public sealed class TextsController : TyrController
     {
         private readonly ITextRepository _textRepository;
+        private readonly ITextGenerator _textGenerator;
 
-        public TextsController(ITextRepository textRepository)
+        public TextsController(
+            ITextRepository textRepository,
+            ITextGenerator textGenerator)
         {
             _textRepository = textRepository;
+            _textGenerator = textGenerator;
         }
 
         [HttpGet]
@@ -51,6 +56,16 @@ namespace TypingRealm.Data.Api.Controllers
                 return NotFound();
 
             return TextDto.From(text);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("generate")]
+        public async ValueTask<ActionResult<string>> GenerateTextValue()
+        {
+            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(0));
+
+            return Ok(text);
         }
 
         [HttpPost]
