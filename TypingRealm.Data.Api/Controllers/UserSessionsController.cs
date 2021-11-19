@@ -9,7 +9,7 @@ namespace TypingRealm.Data.Api.Controllers
     public sealed class StartUserSessionDto
     {
         public string TypingSessionId { get; set; }
-        public TimeZoneInfo UserTimeZone { get; set; }
+        public int UserTimeZoneOffsetMinutes { get; set; }
     }
 
     public sealed class UserSessionDto
@@ -62,7 +62,7 @@ namespace TypingRealm.Data.Api.Controllers
 
             var userSessionId = await _userSessionRepository.NextIdAsync();
 
-            var userSession = new UserSession(userSessionId, ProfileId, dto.TypingSessionId, DateTime.UtcNow, dto.UserTimeZone);
+            var userSession = new UserSession(userSessionId, ProfileId, dto.TypingSessionId, DateTime.UtcNow, TimeSpan.FromMinutes(dto.UserTimeZoneOffsetMinutes));
             await _userSessionRepository.SaveAsync(userSession);
 
             var result = new { userSessionId };
@@ -85,6 +85,20 @@ namespace TypingRealm.Data.Api.Controllers
             await _typingResultProcessor.AddTypingResultAsync(userSessionId, typingResult);
 
             var result = new { textTypingResultId = typingResult.TextTypingResultId };
+
+            return CreatedAtAction(nameof(SubmitTypingResult), result, result);
+        }
+
+        // TODO: Consider moving to a separate controller.
+        [HttpPost]
+        [Route("result")]
+        public async ValueTask<ActionResult> SubmitTypingResult(TypedText typedText)
+        {
+            // TODO: Use a separate DTO class, do not accept business entities here.
+
+            var textTypingResultId = await _typingResultProcessor.AddTypingResultAsync(typedText, ProfileId);
+
+            var result = new { textTypingResultId };
 
             return CreatedAtAction(nameof(SubmitTypingResult), result, result);
         }

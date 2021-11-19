@@ -16,6 +16,7 @@ namespace TypingRealm.Typing
         /// <param name="userSessionId">Active user session.</param>
         /// <param name="textTypingResult">Result of typing one text.</param>
         ValueTask AddTypingResultAsync(string userSessionId, TextTypingResult textTypingResult);
+        ValueTask<string> AddTypingResultAsync(TypedText typedText, string userId);
     }
 
     public sealed class TypingResultProcessor : ITypingResultProcessor
@@ -77,6 +78,44 @@ namespace TypingRealm.Typing
             userSession.LogResult(textTypingResult);
             await _userSessionRepository.SaveAsync(userSession)
                 .ConfigureAwait(false);
+        }
+
+        public async ValueTask<string> AddTypingResultAsync(TypedText typedText, string userId)
+        {
+            var textId = await _textRepository.NextIdAsync()
+                .ConfigureAwait(false);
+
+            var text = new Text(textId, typedText.Value, userId, DateTime.UtcNow, false);
+            await _textRepository.SaveAsync(text)
+                .ConfigureAwait(false);
+
+            var typingSessionId = await _typingSessionRepository.NextIdAsync()
+                .ConfigureAwait(false);
+
+            var typingSession = new TypingSession(typingSessionId, userId, DateTime.UtcNow, new TypingSessionConfiguration());
+            var typingSessionTextIndex = typingSession.AddText(new TypingSessionText(textId, text.Value));
+            await _typingSessionRepository.SaveAsync(typingSession)
+                .ConfigureAwait(false);
+
+            var userSessionId = await _userSessionRepository.NextIdAsync()
+                .ConfigureAwait(false);
+
+            var userSession = new UserSession(userSessionId, userId, typingSessionId, DateTime.UtcNow, TimeSpan.FromMinutes(typedText.UserTimeZoneOffsetMinutes));
+            await _userSessionRepository.SaveAsync(userSession)
+                .ConfigureAwait(false);
+
+            var typingResultId = Guid.NewGuid().ToString();
+
+            await AddTypingResultAsync(userSessionId, new TextTypingResult(
+                typingResultId,
+                typingSessionTextIndex,
+                typedText.TotalTimeMs,
+                typedText.StartedTypingUtc,
+                DateTime.UtcNow,
+                typedText.Events))
+                .ConfigureAwait(false);
+
+            return typingResultId;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace TypingRealm.Typing
             string UserId,
             string TypingSessionId,
             DateTime CreatedUtc,
-            TimeZoneInfo userTimeZone,
+            TimeSpan userTimeZoneOffset,
             List<TextTypingResult> TextTypingResults) : IIdentifiable
         {
             string IIdentifiable.Id => UserSessionId;
@@ -27,11 +27,11 @@ namespace TypingRealm.Typing
             string userId,
             string typingSessionId,
             DateTime createdUtc,
-            TimeZoneInfo userTimeZone)
+            TimeSpan userTimeZoneOffset)
         {
             // TODO: Validate.
 
-            _state = new State(userSessionId, userId, typingSessionId, createdUtc, userTimeZone, new List<TextTypingResult>());
+            _state = new State(userSessionId, userId, typingSessionId, createdUtc, userTimeZoneOffset, new List<TextTypingResult>());
         }
 
         string IIdentifiable.Id => _state.UserSessionId;
