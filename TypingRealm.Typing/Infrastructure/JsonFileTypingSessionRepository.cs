@@ -2,9 +2,10 @@
 
 namespace TypingRealm.Typing.Infrastructure
 {
-    public sealed class InMemoryTypingSessionRepository : StateBasedRepository<TypingSession, TypingSession.State>, ITypingSessionRepository
+    public sealed class JsonFileTypingSessionRepository : StateBasedRepository<TypingSession, TypingSession.State>, ITypingSessionRepository
     {
-        public InMemoryTypingSessionRepository() : base(new InMemoryRepository<TypingSession.State>()) { }
+        public JsonFileTypingSessionRepository()
+            : base(new JsonFileRepository<TypingSession.State>("typing-sessions.json")) { }
 
         protected override TypingSession CreateFromState(TypingSession.State state) => TypingSession.FromState(state);
         protected override TypingSession.State GetFromEntity(TypingSession entity) => entity.GetState();
