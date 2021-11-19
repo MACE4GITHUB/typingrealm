@@ -34,7 +34,7 @@ namespace TypingRealm.Authentication
                 new Claim("sub", subClaimValue)
             };
 
-            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
+            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(60), _signingCredentials));
         }
 
         public static string GenerateServiceAccessToken(string subClaimValue)
@@ -45,7 +45,7 @@ namespace TypingRealm.Authentication
                 new Claim("scope", TyrScopes.Service)
             };
 
-            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(2), _signingCredentials));
+            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(60), _signingCredentials));
         }
     }
 }
