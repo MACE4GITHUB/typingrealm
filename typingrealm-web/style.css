@@ -1,0 +1,45 @@
+body {
+  background-color: #eee;
+  color: #444;
+  font-family: monospace;
+}
+
+#text {
+  font-size: 3em;
+  position: absolute;
+  top: 40%;
+  margin: 0 20%;
+  text-align: left;
+}
+
+.wrong {
+    color: #a55;
+    background-color: #fdd;
+}
+
+.was-wrong {
+    color: #a5a;
+}
+
+.space-was-wrong {
+    text-decoration: underline #d9d;
+}
+
+.corrected {
+    color: #999;
+    background-color: #ede;
+}
+
+.typed {
+    color: #999;
+    background-color: #ddd;
+}
+
+.cursor {
+    text-decoration: underline;
+    text-decoration-color: #99f;
+}
+
+.hidden {
+    display: none;
+}
