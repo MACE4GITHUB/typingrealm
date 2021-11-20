@@ -47,10 +47,10 @@ namespace TypingRealm.Typing
                     continue;
                 }
 
-                if (@event.Delay <= 0)
-                    throw new InvalidOperationException("Event's Delay should have positive value.");
+                // TODO: Make this check more strict: check that for some corner cases it shouldn't be zero and can only be positive.
+                if (@event.Delay < 0)
+                    throw new InvalidOperationException("Event's Delay should have positive or zero value.");
 
-                // TODO: Allow zero delay if it's pressing different keys or pressing and releasing different keys simultaneously.
                 // Do not validate delays but validate AbsoluteDelays. Do not accept Delays from the frontend, it will send only Absolute delays.
 
                 if (@event.Delay > MaxDelayMs)
