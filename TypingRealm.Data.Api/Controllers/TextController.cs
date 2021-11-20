@@ -61,9 +61,9 @@ namespace TypingRealm.Data.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("generate")]
-        public async ValueTask<ActionResult<string>> GenerateTextValue()
+        public async ValueTask<ActionResult<string>> GenerateTextValue(int length)
         {
-            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(0));
+            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(length));
 
             return Ok(text);
         }

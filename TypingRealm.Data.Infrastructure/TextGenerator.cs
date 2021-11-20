@@ -26,10 +26,13 @@ namespace TypingRealm.Data.Infrastructure
 
         public async ValueTask<string> GenerateTextAsync(TextConfiguration configuration)
         {
-            if (configuration.Length != 0)
-                throw new NotImplementedException("You can only request default (zero) text length for now.");
+            if (configuration.Length < 0)
+                throw new InvalidOperationException("Cannot have negative length.");
 
-            var minLength = 10;
+            var minLength = configuration.Length == 0
+                ? 10 // Default value.
+                : configuration.Length;
+
             var builder = new StringBuilder();
 
             var client = _httpClientFactory.CreateClient();
