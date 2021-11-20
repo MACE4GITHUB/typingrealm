@@ -100,7 +100,7 @@ namespace TypingRealm.Typing
             var userSessionId = await _userSessionRepository.NextIdAsync()
                 .ConfigureAwait(false);
 
-            var userSession = new UserSession(userSessionId, userId, typingSessionId, DateTime.UtcNow, TimeSpan.FromMinutes(typedText.UserTimeZoneOffsetMinutes));
+            var userSession = new UserSession(userSessionId, userId, typingSessionId, DateTime.UtcNow, typedText.UserTimeZoneOffsetMinutes);
             await _userSessionRepository.SaveAsync(userSession)
                 .ConfigureAwait(false);
 

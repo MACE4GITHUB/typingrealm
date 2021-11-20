@@ -62,7 +62,7 @@ namespace TypingRealm.Data.Api.Controllers
 
             var userSessionId = await _userSessionRepository.NextIdAsync();
 
-            var userSession = new UserSession(userSessionId, ProfileId, dto.TypingSessionId, DateTime.UtcNow, TimeSpan.FromMinutes(dto.UserTimeZoneOffsetMinutes));
+            var userSession = new UserSession(userSessionId, ProfileId, dto.TypingSessionId, DateTime.UtcNow, dto.UserTimeZoneOffsetMinutes);
             await _userSessionRepository.SaveAsync(userSession);
 
             var result = new { userSessionId };
