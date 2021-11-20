@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.Typing
+﻿using System.Text.Json.Serialization;
+
+namespace TypingRealm.Typing
 {
     /// <summary>
     /// Entity of TextTypingResult, which is an entity of UserSession.
@@ -17,6 +19,15 @@
     /// this one, in milliseconds with decimal point (micro-second precision).</param>
     public sealed record KeyPressEvent(
         int Index,
+        KeyAction KeyAction,
         string Key,
-        decimal Delay);
+        decimal Delay,
+        decimal AbsoluteDelay);
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum KeyAction
+    {
+        Press = 1,
+        Release = 2
+    }
 }

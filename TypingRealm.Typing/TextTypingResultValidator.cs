@@ -15,6 +15,9 @@ namespace TypingRealm.Typing
 
         public ValueTask ValidateAsync(string textValue, TextTypingResult textTypingResult)
         {
+            // TODO: Validate shift keys and caps keys: caps keys can only be pressed within shift key window.
+            // TODO: If I'm going to accept both Delay and AbsoluteDelay, make sure they are validated towards each other.
+
             KeyPressEvent? previousEvent = null;
             var index = 0;
             var errors = textValue.Select(character => false).ToList();
@@ -28,11 +31,14 @@ namespace TypingRealm.Typing
 
                     previousEvent = @event;
 
-                    if (previousEvent.Delay != 0)
+                    if (@event.Delay != 0)
                         throw new InvalidOperationException("First event should have 0 delay.");
 
-                    if (previousEvent.Index != 0)
+                    if (@event.Index != 0)
                         throw new InvalidOperationException("First event's index should be 0.");
+
+                    if (@event.Key == "shift" || @event.KeyAction == KeyAction.Release)
+                        continue;
 
                     if (textValue[index].ToString() != @event.Key)
                         errors[index] = true;
@@ -44,11 +50,17 @@ namespace TypingRealm.Typing
                 if (@event.Delay <= 0)
                     throw new InvalidOperationException("Event's Delay should have positive value.");
 
+                // TODO: Allow zero delay if it's pressing different keys or pressing and releasing different keys simultaneously.
+                // Do not validate delays but validate AbsoluteDelays. Do not accept Delays from the frontend, it will send only Absolute delays.
+
                 if (@event.Delay > MaxDelayMs)
                     throw new InvalidOperationException("Event's Delay is too big.");
 
                 if (index != @event.Index)
                     throw new InvalidOperationException("Sequence of keyboard events is corrupted: invalid order.");
+
+                if (@event.Key == "shift" || @event.KeyAction == KeyAction.Release)
+                    continue;
 
                 switch (@event.Key)
                 {
