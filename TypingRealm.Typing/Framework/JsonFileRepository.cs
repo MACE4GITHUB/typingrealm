@@ -65,5 +65,24 @@ namespace TypingRealm.Typing.Framework
                 return default;
             }
         }
+
+        async IAsyncEnumerable<T> IRepository<T>.LoadAllAsync(Func<T, bool> predicate)
+        {
+            lock (_lock)
+            {
+                if (!File.Exists(_filePath))
+                    File.WriteAllText(_filePath, "[]");
+
+                var content = File.ReadAllText(_filePath);
+                var deserialized = JsonSerializer.Deserialize<IEnumerable<T>>(content);
+                if (deserialized == null)
+                    throw new InvalidOperationException("Could not deserialize data from the json file.");
+
+                foreach (var entity in deserialized.Where(x => predicate(x)))
+                {
+                    yield return entity;
+                }
+            }
+        }
     }
 }

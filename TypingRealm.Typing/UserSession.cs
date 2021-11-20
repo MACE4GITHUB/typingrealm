@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TypingRealm.Typing.Framework;
 
 namespace TypingRealm.Typing
@@ -14,7 +15,7 @@ namespace TypingRealm.Typing
             string UserId,
             string TypingSessionId,
             DateTime CreatedUtc,
-            int userTimeZoneOffsetMinutes,
+            int UserTimeZoneOffsetMinutes,
             List<TextTypingResult> TextTypingResults) : IIdentifiable
         {
             string IIdentifiable.Id => UserSessionId;
@@ -58,6 +59,8 @@ namespace TypingRealm.Typing
         #endregion
 
         public string TypingSessionId => _state.TypingSessionId;
+
+        public IEnumerable<TextTypingResult> GetTextTypingResults() => _state.TextTypingResults.ToList();
 
         public void LogResult(TextTypingResult textTypingResult)
         {

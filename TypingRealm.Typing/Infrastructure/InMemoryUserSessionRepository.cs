@@ -1,4 +1,5 @@
-﻿using TypingRealm.Typing.Framework;
+﻿using System.Collections.Generic;
+using TypingRealm.Typing.Framework;
 
 namespace TypingRealm.Typing.Infrastructure
 {
@@ -6,9 +7,10 @@ namespace TypingRealm.Typing.Infrastructure
     {
         public InMemoryUserSessionRepository() : base(new InMemoryRepository<UserSession.State>()) { }
 
+        public IAsyncEnumerable<UserSession> FindAllForUser(string userId)
+            => LoadAllAsync(x => x.UserId == userId);
+
         protected override UserSession CreateFromState(UserSession.State state) => UserSession.FromState(state);
         protected override UserSession.State GetFromEntity(UserSession entity) => entity.GetState();
     }
-
-
 }

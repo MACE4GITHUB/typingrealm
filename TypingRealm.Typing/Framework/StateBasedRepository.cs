@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TypingRealm.Typing.Framework
 {
@@ -36,6 +38,24 @@ namespace TypingRealm.Typing.Framework
             var state = GetFromEntity(entity);
 
             return _repository.SaveAsync(state);
+        }
+
+        protected async IAsyncEnumerable<TEntity> LoadAllAsync(Func<TState, bool> predicate)
+        {
+            await foreach (var state in _repository.LoadAllAsync(predicate))
+            {
+                yield return CreateFromState(state);
+            }
+        }
+
+        async IAsyncEnumerable<TEntity> IRepository<TEntity>.LoadAllAsync(Func<TEntity, bool> predicate)
+        {
+            bool StatePredicate(TState state) => predicate(CreateFromState(state));
+
+            await foreach (var state in _repository.LoadAllAsync(StatePredicate))
+            {
+                yield return CreateFromState(state);
+            }
         }
     }
 }

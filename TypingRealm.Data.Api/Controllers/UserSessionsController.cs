@@ -25,15 +25,18 @@ namespace TypingRealm.Data.Api.Controllers
         private readonly IUserSessionRepository _userSessionRepository;
         private readonly ITypingSessionRepository _typingSessionRepository;
         private readonly ITypingResultProcessor _typingResultProcessor;
+        private readonly ITypingReportGenerator _typingReportGenerator;
 
         public UserSessionsController(
             IUserSessionRepository userSessionRepository,
             ITypingSessionRepository typingSessionRepository,
-            ITypingResultProcessor typingResultProcessor)
+            ITypingResultProcessor typingResultProcessor,
+            ITypingReportGenerator typingReportGenerator)
         {
             _userSessionRepository = userSessionRepository;
             _typingSessionRepository = typingSessionRepository;
             _typingResultProcessor = typingResultProcessor;
+            _typingReportGenerator = typingReportGenerator;
         }
 
         [HttpGet]
@@ -101,6 +104,15 @@ namespace TypingRealm.Data.Api.Controllers
             var result = new { textTypingResultId };
 
             return CreatedAtAction(nameof(SubmitTypingResult), result, result);
+        }
+
+        [HttpGet]
+        [Route("statistics")]
+        public async ValueTask<ActionResult<TypingReport>> GetTypingReport()
+        {
+            var report = await _typingReportGenerator.GenerateReportAsync(ProfileId);
+
+            return Ok(report);
         }
     }
 }

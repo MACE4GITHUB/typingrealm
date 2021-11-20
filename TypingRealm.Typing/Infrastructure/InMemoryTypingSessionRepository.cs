@@ -9,6 +9,4 @@ namespace TypingRealm.Typing.Infrastructure
         protected override TypingSession CreateFromState(TypingSession.State state) => TypingSession.FromState(state);
         protected override TypingSession.State GetFromEntity(TypingSession entity) => entity.GetState();
     }
-
-
 }

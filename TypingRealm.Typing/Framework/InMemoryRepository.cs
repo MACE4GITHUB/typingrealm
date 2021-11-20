@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TypingRealm.Typing.Framework
@@ -31,6 +32,14 @@ namespace TypingRealm.Typing.Framework
         public ValueTask<string> NextIdAsync()
         {
             return new ValueTask<string>(Guid.NewGuid().ToString());
+        }
+
+        async IAsyncEnumerable<T> IRepository<T>.LoadAllAsync(Func<T, bool> predicate)
+        {
+            foreach (var entity in _entities.Values.Where(x => predicate(x)))
+            {
+                yield return entity;
+            }
         }
     }
 }

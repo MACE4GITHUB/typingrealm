@@ -9,6 +9,7 @@ namespace TypingRealm.Typing
         {
             services.AddTransient<ITextTypingResultValidator, TextTypingResultValidator>();
             services.AddTransient<ITypingResultProcessor, TypingResultProcessor>();
+            services.AddTransient<ITypingReportGenerator, TypingReportGenerator>();
 
             /*services.AddSingleton<ITextRepository, InMemoryTextRepository>();
             services.AddSingleton<ITypingSessionRepository, InMemoryTypingSessionRepository>();
