@@ -62,7 +62,12 @@ namespace TypingRealm.Data.Infrastructure
                 }
 
                 if (allowed)
+                {
+                    if (builder.Length > 0)
+                        builder.Append(" ");
+
                     builder.Append(quotableResponse);
+                }
             }
 
             return builder.ToString();
