@@ -62,7 +62,7 @@ namespace TypingRealm.Typing
                     delay = 0; // For other key presses disable delay metrics.
                 }
 
-                if (handled.Count == 0)
+                if (!handled.Any(e => IsCharacter(e.Key)))
                 {
                     if (@event.Key == "backspace")
                         throw new InvalidOperationException("Cannot have backspace as first symbol.");
@@ -70,7 +70,7 @@ namespace TypingRealm.Typing
                     /*if (@event.Delay != 0)
                         throw new InvalidOperationException("First event should have 0 delay.");*/
 
-                    if (@event.AbsoluteDelay != 0)
+                    if (handled.Count == 0 && @event.AbsoluteDelay != 0)
                         throw new InvalidOperationException("First event should have 0 delay.");
 
                     if (@event.Index != 0)
