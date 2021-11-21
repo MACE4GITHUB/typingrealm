@@ -15,7 +15,7 @@ namespace TypingRealm.Typing
     }
 
     public sealed record KeyPairAggregatedData(
-        string FromKey,
+        string? FromKey,
         string ToKey,
         decimal AverageDelay,
         decimal MinDelay,

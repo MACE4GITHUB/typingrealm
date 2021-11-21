@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TypingRealm.Typing
 {
     public sealed record KeyPair(
-        string FromKey,
+        string? FromKey, // If it's null - then it's the first character of the string.
         string ToKey,
         decimal Delay);
 
@@ -49,20 +49,12 @@ namespace TypingRealm.Typing
             var errors = textValue.Select(character => false).ToList();
 
             decimal lastAbsoluteDelay = 0;
+            KeyPressEvent? previousKeyPressEvent = null;
             foreach (var @event in events)
             {
-                decimal delay = 0;
-                if (IsCharacter(@event.Key) || (IsBackspace(@event.Key) && @event.KeyAction == KeyAction.Press))
-                {
-                    delay = @event.AbsoluteDelay - lastAbsoluteDelay;
-                    lastAbsoluteDelay = @event.AbsoluteDelay;
-                }
-                else
-                {
-                    delay = 0; // For other key presses disable delay metrics.
-                }
+                var delay = @event.AbsoluteDelay - previousKeyPressEvent?.AbsoluteDelay ?? 0;
 
-                if (!handled.Any(e => IsCharacter(e.Key)))
+                if (previousKeyPressEvent == null)
                 {
                     if (@event.Key == "backspace")
                         throw new InvalidOperationException("Cannot have backspace as first symbol.");
@@ -81,11 +73,16 @@ namespace TypingRealm.Typing
                         if (textValue[index].ToString() != @event.Key)
                         {
                             errors[index] = true;
-                            // TODO: Add error to statistics.
+
+                            // TODO: Think about accounting for backspaces before the first character.
+                            errorKeyPairs.Add(new KeyPair(null, @event.Key, delay));
+                            previousKeyPressEvent = @event;
                         }
                         else
                         {
-                            // TODO: Add correctly typed symbol to statistics.
+                            // TODO: Think about accounting for backspaces before the first character.
+                            successKeyPairs.Add(new KeyPair(null, @event.Key, delay));
+                            previousKeyPressEvent = @event;
                         }
 
                         index++;
@@ -118,13 +115,19 @@ namespace TypingRealm.Typing
                     {
                         errors[index] = true;
 
-                        if (index > 0 && !errors[index - 1])
-                            errorKeyPairs.Add(new KeyPair(handled[^1].Key, @event.Key, delay));
+                        if (!errors[index - 1])
+                        {
+                            errorKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
+                            previousKeyPressEvent = @event;
+                        }
                     }
                     else
                     {
-                        if (index > 0 && !errors[index - 1])
-                            successKeyPairs.Add(new KeyPair(handled[^1].Key, @event.Key, delay));
+                        if (!errors[index - 1])
+                        {
+                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
+                            previousKeyPressEvent = @event;
+                        }
                     }
 
                     index++;
@@ -138,11 +141,13 @@ namespace TypingRealm.Typing
                         if (errors[index])
                         {
                             errors[index] = false;
-                            // TODO: Add corrected error to statistics.
+                            previousKeyPressEvent = @event;
+                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
                         }
                         else
                         {
-                            // TODO: Add backspace pressed on the correct character to statistics.
+                            previousKeyPressEvent = @event;
+                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
                         }
                     }
                 }
