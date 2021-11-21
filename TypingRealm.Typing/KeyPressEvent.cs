@@ -21,7 +21,6 @@ namespace TypingRealm.Typing
         int Index,
         KeyAction KeyAction,
         string Key,
-        decimal Delay,
         decimal AbsoluteDelay);
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

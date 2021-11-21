@@ -6,37 +6,41 @@ using System.Threading.Tasks;
 namespace TypingRealm.Typing
 {
     public sealed record TypingReport(
-        IDictionary<string, List<KeyDelayData>> KeyDelays,
-        IEnumerable<KeyValuePair<string, KeyDelayData>> averageKeyDelays,
-        IEnumerable<KeyValuePair<string, KeyDelayData>> maxKeyDelays,
-        IEnumerable<KeyValuePair<string, KeyDelayData>> minKeyDelays);
+        TextAnalysisResult Result,
+        IEnumerable<KeyPairAggregatedData> AggregatedData);
 
     public interface ITypingReportGenerator
     {
         ValueTask<TypingReport> GenerateReportAsync(string userId);
     }
 
-    public sealed record KeyDelayData(
-        decimal Delay,
-        string KeyPair);
+    public sealed record KeyPairAggregatedData(
+        string FromKey,
+        string ToKey,
+        decimal AverageDelay,
+        decimal MinDelay,
+        decimal MaxDelay,
+        int SuccessfullyTyped);
 
     public sealed class TypingReportGenerator : ITypingReportGenerator
     {
         private readonly IUserSessionRepository _userSessionRepository;
         private readonly ITypingSessionRepository _typingSessionRepository;
+        private readonly ITextTypingResultValidator _textTypingResultValidator;
 
         public TypingReportGenerator(
             IUserSessionRepository userSessionRepository,
-            ITypingSessionRepository typingSessionRepository)
+            ITypingSessionRepository typingSessionRepository,
+            ITextTypingResultValidator textTypingResultValidator)
         {
             _userSessionRepository = userSessionRepository;
             _typingSessionRepository = typingSessionRepository;
+            _textTypingResultValidator = textTypingResultValidator;
         }
 
         public async ValueTask<TypingReport> GenerateReportAsync(string userId)
         {
-            var keyDelays = new Dictionary<string, List<KeyDelayData>>();
-            var keyErrors = new Dictionary<string, List<KeyDelayData>>();
+            var results = new List<TextAnalysisResult>();
 
             await foreach (var userSession in _userSessionRepository.FindAllForUser(userId))
             {
@@ -51,60 +55,27 @@ namespace TypingRealm.Typing
                     if (text == null)
                         throw new InvalidOperationException("Text is not found in typing session.");
 
-                    var previousEvent = textTypingResult.Events.First();
-                    foreach (var @event in textTypingResult.Events.Skip(1))
-                    {
-                        if (@event.KeyAction != KeyAction.Press || @event.Key == "shift")
-                            continue;
+                    var textAnalysisResult = await _textTypingResultValidator.ValidateAsync(text.Value, textTypingResult)
+                        .ConfigureAwait(false);
 
-                        if (@event.Key.Length == 1 /* character */ && @event.Key != text.Value[@event.Index].ToString())
-                        {
-                            // Wrong key. Do not include in delays, include in errors.
-                            if (!keyErrors.ContainsKey(@event.Key))
-                                keyErrors.Add(@event.Key, new List<KeyDelayData>());
-
-                            keyErrors[@event.Key].Add(new KeyDelayData(@event.AbsoluteDelay - previousEvent.AbsoluteDelay, $"{previousEvent.Key} -> {@event.Key}"));
-                            previousEvent = @event;
-
-                            continue;
-                        }
-
-                        if (!keyDelays.ContainsKey(@event.Key))
-                            keyDelays.Add(@event.Key, new List<KeyDelayData>());
-
-                        keyDelays[@event.Key].Add(new KeyDelayData(@event.AbsoluteDelay - previousEvent.AbsoluteDelay, $"{previousEvent.Key} -> {@event.Key}"));
-                        previousEvent = @event;
-                    }
+                    results.Add(textAnalysisResult);
                 }
             }
 
-            foreach (var item in keyDelays)
-            {
-                var list = item.Value.ToList();
+            var aggregatedResult = new TextAnalysisResult(
+                results.Sum(x => x.SpeedCpm) / results.Count,
+                results.SelectMany(x => x.SuccessKeyPairs),
+                results.SelectMany(x => x.ErrorKeyPairs));
 
-                item.Value.Clear();
-                item.Value.AddRange(list.OrderBy(x => x.Delay));
-            }
+            var specificKeys = aggregatedResult.SuccessKeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
+            var aggregatedData = specificKeys.Select(x => new KeyPairAggregatedData(
+                x.Key.FromKey, x.Key.ToKey,
+                x.Average(y => y.Delay),
+                x.Min(y => y.Delay),
+                x.Max(y => y.Delay),
+                x.Count()));
 
-            var averageKeyDelays = keyDelays.ToDictionary(
-                x => x.Key,
-                x => new KeyDelayData(x.Value.Average(y => y.Delay), ""))
-                .OrderBy(x => x.Value.Delay)
-                .ToList();
-
-            var shortestKeyDelays = keyDelays.ToDictionary(
-                x => x.Key,
-                x => x.Value.OrderBy(y => y.Delay).First())
-                .OrderBy(x => x.Value.Delay)
-                .ToList();
-
-            var longestKeyDelays = keyDelays.ToDictionary(
-                x => x.Key,
-                x => x.Value.OrderByDescending(y => y.Delay).First())
-                .OrderBy(x => x.Value.Delay)
-                .ToList();
-
-            return new TypingReport(keyDelays, averageKeyDelays, longestKeyDelays, shortestKeyDelays);
+            return new TypingReport(aggregatedResult, aggregatedData);
         }
     }
 }
