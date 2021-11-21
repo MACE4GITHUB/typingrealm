@@ -11,6 +11,7 @@ namespace TypingRealm.Typing
     /// and invalid / cheated entries are discarded.
     /// </summary>
     public sealed record TextTypingResult(
+        // TODO: Consider making it an AR and include foreing key to UserSession, so that we can query everything just by text typing result id.
         string TextTypingResultId, // A hack to distinguish text typing result uniquely.
         int TypingSessionTextIndex,
         decimal TotalTimeMs,
