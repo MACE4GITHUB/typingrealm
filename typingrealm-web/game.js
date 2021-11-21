@@ -399,9 +399,26 @@ async function simulateTyping() {
     allowInput = false;
     isSimulation = true;
 
+    if (simulationEvents.length == 0) {
+        // Fill it only once when starting simulation first time, then just reuse.
+
+        let lastAbsoluteDelay = 0;
+        for (var i = 0; i < events.length; i++) {
+            let event = events[i];
+
+            simulationEvents.push({
+                key: event.key,
+                delay: event.absoluteDelay - lastAbsoluteDelay,
+                index: event.index,
+                keyAction: event.keyAction
+            });
+
+            lastAbsoluteDelay = event.absoluteDelay;
+        }
+    }
+
     await renderAgain();
 
-    let previousPerf = 0;
     for (const e of simulationEvents) {
         await new Promise(resolve => setTimeout(resolve, e.delay));
 
@@ -427,11 +444,6 @@ async function simulateTyping() {
 }
 
 async function renderAgain() {
-    if (simulationEvents.length == 0) {
-        // Fill it only once, with the initial events.
-        simulationEvents = events;
-    }
-
     textData = {
         text: textData.text
     };
@@ -506,15 +518,10 @@ function makeSaveDataRequest() {
         })
     };
 
-    var lastPerf = 0;
     for (var i = 0; i < request.events.length; i++) {
         let event = request.events[i];
 
-        event.delay = event.perf - lastPerf;
-        lastPerf = event.perf;
         event.absoluteDelay = event.perf;
-
-        // TODO: Do not send delay, just send the absolute delay. The server will calculate everything.
 
         delete event.perf;
     }
