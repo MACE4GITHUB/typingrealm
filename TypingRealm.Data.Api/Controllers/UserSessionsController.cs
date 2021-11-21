@@ -99,9 +99,7 @@ namespace TypingRealm.Data.Api.Controllers
         {
             // TODO: Use a separate DTO class, do not accept business entities here.
 
-            var textTypingResultId = await _typingResultProcessor.AddTypingResultAsync(typedText, ProfileId);
-
-            var result = new { textTypingResultId };
+            var result = await _typingResultProcessor.AddTypingResultAsync(typedText, ProfileId);
 
             return CreatedAtAction(nameof(SubmitTypingResult), result, result);
         }
@@ -114,5 +112,15 @@ namespace TypingRealm.Data.Api.Controllers
 
             return Ok(report);
         }
+
+        [HttpGet]
+        [Route("{userSessionId}/statistics")]
+        public async ValueTask<ActionResult<TypingReport>> GetTypingReport(string userSessionId)
+        {
+            var report = await _typingReportGenerator.GenerateReportForUserSessionAsync(userSessionId);
+
+            return Ok(report);
+        }
+
     }
 }

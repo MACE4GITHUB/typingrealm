@@ -3,6 +3,12 @@ using System.Threading.Tasks;
 
 namespace TypingRealm.Typing
 {
+    public sealed record TypingResultSubmitData(
+        string TextId,
+        string TypingSessionId,
+        string UserSessionId,
+        string TextTypingResultId);
+
     /// <summary>
     /// Validates the text typing result and adds it to user session if
     /// everything is valid.
@@ -16,7 +22,7 @@ namespace TypingRealm.Typing
         /// <param name="userSessionId">Active user session.</param>
         /// <param name="textTypingResult">Result of typing one text.</param>
         ValueTask AddTypingResultAsync(string userSessionId, TextTypingResult textTypingResult);
-        ValueTask<string> AddTypingResultAsync(TypedText typedText, string userId);
+        ValueTask<TypingResultSubmitData> AddTypingResultAsync(TypedText typedText, string userId);
     }
 
     public sealed class TypingResultProcessor : ITypingResultProcessor
@@ -80,7 +86,7 @@ namespace TypingRealm.Typing
                 .ConfigureAwait(false);
         }
 
-        public async ValueTask<string> AddTypingResultAsync(TypedText typedText, string userId)
+        public async ValueTask<TypingResultSubmitData> AddTypingResultAsync(TypedText typedText, string userId)
         {
             var textId = await _textRepository.NextIdAsync()
                 .ConfigureAwait(false);
@@ -115,7 +121,7 @@ namespace TypingRealm.Typing
                 typedText.Events))
                 .ConfigureAwait(false);
 
-            return typingResultId;
+            return new TypingResultSubmitData(textId, typingSessionId, userSessionId, typingResultId);
         }
     }
 }

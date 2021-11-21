@@ -12,6 +12,7 @@ namespace TypingRealm.Typing
     public interface ITypingReportGenerator
     {
         ValueTask<TypingReport> GenerateReportAsync(string userId);
+        ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId);
     }
 
     public sealed record KeyPairAggregatedData(
@@ -60,6 +61,48 @@ namespace TypingRealm.Typing
 
                     results.Add(textAnalysisResult);
                 }
+            }
+
+            var aggregatedResult = new TextAnalysisResult(
+                results.Sum(x => x.SpeedCpm) / results.Count,
+                results.SelectMany(x => x.SuccessKeyPairs),
+                results.SelectMany(x => x.ErrorKeyPairs));
+
+            var specificKeys = aggregatedResult.SuccessKeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
+            var aggregatedData = specificKeys.Select(x => new KeyPairAggregatedData(
+                x.Key.FromKey, x.Key.ToKey,
+                x.Average(y => y.Delay),
+                x.Min(y => y.Delay),
+                x.Max(y => y.Delay),
+                x.Count()));
+
+            return new TypingReport(aggregatedResult, aggregatedData);
+        }
+
+        public async ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId)
+        {
+            var results = new List<TextAnalysisResult>();
+
+            var userSession = await _userSessionRepository.FindAsync(userSessionId)
+                .ConfigureAwait(false);
+            if (userSession == null)
+                throw new InvalidOperationException("Could not find user session.");
+
+            var typingSession = await _typingSessionRepository.FindAsync(userSession.TypingSessionId)
+                .ConfigureAwait(false);
+            if (typingSession == null)
+                throw new InvalidOperationException("Typing session is not found.");
+
+            foreach (var textTypingResult in userSession.GetTextTypingResults())
+            {
+                var text = typingSession.GetTypingSessionTextAtIndexOrDefault(textTypingResult.TypingSessionTextIndex);
+                if (text == null)
+                    throw new InvalidOperationException("Text is not found in typing session.");
+
+                var textAnalysisResult = await _textTypingResultValidator.ValidateAsync(text.Value, textTypingResult)
+                    .ConfigureAwait(false);
+
+                results.Add(textAnalysisResult);
             }
 
             var aggregatedResult = new TextAnalysisResult(

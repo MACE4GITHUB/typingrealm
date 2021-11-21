@@ -115,7 +115,7 @@ namespace TypingRealm.Typing
                     {
                         errors[index] = true;
 
-                        if (!errors[index - 1])
+                        if (index > 0 && !errors[index - 1])
                         {
                             errorKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
                             previousKeyPressEvent = @event;
@@ -123,7 +123,7 @@ namespace TypingRealm.Typing
                     }
                     else
                     {
-                        if (!errors[index - 1])
+                        if (index > 0 && !errors[index - 1])
                         {
                             successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
                             previousKeyPressEvent = @event;
