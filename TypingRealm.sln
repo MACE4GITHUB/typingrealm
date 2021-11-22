@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8668EAB-6602-4560-8C38-86C84FA9124C}"
 	ProjectSection(SolutionItems) = preProject
@@ -131,7 +131,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Data.Resources"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Data.Api.Client", "TypingRealm.Data.Api.Client\TypingRealm.Data.Api.Client.csproj", "{B44B3DC4-EA62-49FC-B91C-AA153FE16995}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Typing", "TypingRealm.Typing\TypingRealm.Typing.csproj", "{9F9467F3-14D2-4391-AF61-804A446BB578}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Typing", "TypingRealm.Typing\TypingRealm.Typing.csproj", "{9F9467F3-14D2-4391-AF61-804A446BB578}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Typing.Tests", "Tests\TypingRealm.Typing.Tests\TypingRealm.Typing.Tests.csproj", "{0D794D01-B841-4028-B00F-994FC44A66BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -335,6 +337,10 @@ Global
 		{9F9467F3-14D2-4391-AF61-804A446BB578}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F9467F3-14D2-4391-AF61-804A446BB578}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F9467F3-14D2-4391-AF61-804A446BB578}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D794D01-B841-4028-B00F-994FC44A66BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D794D01-B841-4028-B00F-994FC44A66BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D794D01-B841-4028-B00F-994FC44A66BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D794D01-B841-4028-B00F-994FC44A66BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -388,6 +394,7 @@ Global
 		{884E1E64-4063-4243-9C21-BF02C7CE8DF4} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
 		{B44B3DC4-EA62-49FC-B91C-AA153FE16995} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
 		{9F9467F3-14D2-4391-AF61-804A446BB578} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
+		{0D794D01-B841-4028-B00F-994FC44A66BE} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

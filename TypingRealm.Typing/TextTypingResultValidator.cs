@@ -52,7 +52,7 @@ namespace TypingRealm.Typing
             KeyPressEvent? previousKeyPressEvent = null;
             foreach (var @event in events)
             {
-                var delay = @event.AbsoluteDelay - previousKeyPressEvent?.AbsoluteDelay ?? 0;
+                var delay = @event.AbsoluteDelay - (previousKeyPressEvent?.AbsoluteDelay ?? 0);
 
                 if (previousKeyPressEvent == null)
                 {
