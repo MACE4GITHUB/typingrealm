@@ -57,6 +57,9 @@ namespace TypingRealm.Typing
 
             decimal lastAbsoluteDelay = 0;
             KeyPressEvent? previousKeyPressEvent = null;
+            var missedKeyIndex = -1;
+            var missedKey = "";
+
             foreach (var @event in events)
             {
                 var delay = @event.AbsoluteDelay - (previousKeyPressEvent?.AbsoluteDelay ?? 0);
@@ -85,13 +88,13 @@ namespace TypingRealm.Typing
                         {
                             errors[index] = true;
 
-                            // TODO: Think about accounting for backspaces before the first character.
                             successKeyPairs.Add(new KeyPair("", @event.Key, delay, KeyPairType.Mistake, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
+                            missedKeyIndex = @event.Index;
+                            missedKey = textValue[index].ToString();
                         }
                         else
                         {
-                            // TODO: Think about accounting for backspaces before the first character.
                             successKeyPairs.Add(new KeyPair("", @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                         }
@@ -124,17 +127,22 @@ namespace TypingRealm.Typing
                 {
                     if (textValue[index].ToString() != @event.Key)
                     {
-                        errors[index] = true;
-
                         if (index > 0 && !errors[index - 1])
                         {
-                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Mistake, shiftToKeyDelay));
-                            previousKeyPressEvent = @event;
+                            errors[index] = true;
+
+                            if (missedKeyIndex == -1)
+                            {
+                                successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Mistake, shiftToKeyDelay));
+                                previousKeyPressEvent = @event;
+                                missedKeyIndex = @event.Index;
+                                missedKey = @event.Key;
+                            }
                         }
                     }
                     else
                     {
-                        if (index > 0 && !errors[index - 1])
+                        if (index > 0 && !errors[index - 1] && missedKeyIndex == -1)
                         {
                             successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
@@ -152,13 +160,25 @@ namespace TypingRealm.Typing
                         if (errors[index])
                         {
                             errors[index] = false;
-                            previousKeyPressEvent = @event;
-                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correction, 0));
+                            if (missedKeyIndex == -1 || missedKeyIndex == index)
+                            {
+                                successKeyPairs.Add(new KeyPair(missedKey, @event.Key, delay, KeyPairType.Correction, 0));
+                                previousKeyPressEvent = @event;
+
+                                if (missedKeyIndex == index)
+                                {
+                                    missedKeyIndex = -1;
+                                    missedKey = "";
+                                }
+                            }
                         }
                         else
                         {
-                            previousKeyPressEvent = @event;
-                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correction, 0));
+                            if (missedKeyIndex == -1)
+                            {
+                                successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correction, 0));
+                                previousKeyPressEvent = @event;
+                            }
                         }
                     }
                 }
