@@ -65,10 +65,9 @@ namespace TypingRealm.Typing
 
             var aggregatedResult = new TextAnalysisResult(
                 results.Sum(x => x.SpeedCpm) / results.Count,
-                results.SelectMany(x => x.SuccessKeyPairs),
-                results.SelectMany(x => x.ErrorKeyPairs));
+                results.SelectMany(x => x.KeyPairs));
 
-            var specificKeys = aggregatedResult.SuccessKeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
+            var specificKeys = aggregatedResult.KeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
             var aggregatedData = specificKeys.Select(x => new KeyPairAggregatedData(
                 x.Key.FromKey, x.Key.ToKey,
                 x.Average(y => y.Delay),
@@ -107,10 +106,9 @@ namespace TypingRealm.Typing
 
             var aggregatedResult = new TextAnalysisResult(
                 results.Sum(x => x.SpeedCpm) / results.Count,
-                results.SelectMany(x => x.SuccessKeyPairs),
-                results.SelectMany(x => x.ErrorKeyPairs));
+                results.SelectMany(x => x.KeyPairs));
 
-            var specificKeys = aggregatedResult.SuccessKeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
+            var specificKeys = aggregatedResult.KeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
             var aggregatedData = specificKeys.Select(x => new KeyPairAggregatedData(
                 x.Key.FromKey, x.Key.ToKey,
                 x.Average(y => y.Delay),

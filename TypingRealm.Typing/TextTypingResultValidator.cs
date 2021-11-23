@@ -5,15 +5,23 @@ using System.Threading.Tasks;
 
 namespace TypingRealm.Typing
 {
+    public enum KeyPairType
+    {
+        Correct = 1,
+        Mistake = 2,
+        Correction = 3
+    }
+
     public sealed record KeyPair(
-        string? FromKey, // If it's null - then it's the first character of the string.
+        string FromKey, // If it's null - then it's the first character of the string.
         string ToKey,
-        decimal Delay);
+        decimal Delay,
+        KeyPairType Type,
+        decimal ShiftToKeyDelay);
 
     public sealed record TextAnalysisResult(
         decimal SpeedCpm,
-        IEnumerable<KeyPair> SuccessKeyPairs,
-        IEnumerable<KeyPair> ErrorKeyPairs);
+        IEnumerable<KeyPair> KeyPairs);
 
     public interface ITextTypingResultValidator
     {
@@ -42,7 +50,6 @@ namespace TypingRealm.Typing
 
             // Statistical data.
             var successKeyPairs = new List<KeyPair>();
-            var errorKeyPairs = new List<KeyPair>();
 
             var handled = new List<KeyPressEvent>();
             var index = 0;
@@ -53,6 +60,10 @@ namespace TypingRealm.Typing
             foreach (var @event in events)
             {
                 var delay = @event.AbsoluteDelay - (previousKeyPressEvent?.AbsoluteDelay ?? 0);
+
+                var shiftToKeyDelay = IsCharacter(@event.Key) && char.IsUpper(@event.Key[0])
+                    ? @event.AbsoluteDelay - handled.Last(x => x.Key == "shift" && x.KeyAction == KeyAction.Press).AbsoluteDelay
+                    : 0;
 
                 if (previousKeyPressEvent == null)
                 {
@@ -75,13 +86,13 @@ namespace TypingRealm.Typing
                             errors[index] = true;
 
                             // TODO: Think about accounting for backspaces before the first character.
-                            errorKeyPairs.Add(new KeyPair(null, @event.Key, delay));
+                            successKeyPairs.Add(new KeyPair("", @event.Key, delay, KeyPairType.Mistake, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                         }
                         else
                         {
                             // TODO: Think about accounting for backspaces before the first character.
-                            successKeyPairs.Add(new KeyPair(null, @event.Key, delay));
+                            successKeyPairs.Add(new KeyPair("", @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                         }
 
@@ -117,7 +128,7 @@ namespace TypingRealm.Typing
 
                         if (index > 0 && !errors[index - 1])
                         {
-                            errorKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
+                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Mistake, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                         }
                     }
@@ -125,7 +136,7 @@ namespace TypingRealm.Typing
                     {
                         if (index > 0 && !errors[index - 1])
                         {
-                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
+                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                         }
                     }
@@ -142,12 +153,12 @@ namespace TypingRealm.Typing
                         {
                             errors[index] = false;
                             previousKeyPressEvent = @event;
-                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
+                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correction, 0));
                         }
                         else
                         {
                             previousKeyPressEvent = @event;
-                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay));
+                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correction, 0));
                         }
                     }
                 }
@@ -167,8 +178,7 @@ namespace TypingRealm.Typing
 
             return new TextAnalysisResult(
                 speedCpm,
-                successKeyPairs,
-                errorKeyPairs);
+                successKeyPairs);
         }
 
         private bool IsCharacter(string key)

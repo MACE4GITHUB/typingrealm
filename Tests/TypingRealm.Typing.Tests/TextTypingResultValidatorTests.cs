@@ -24,8 +24,7 @@ namespace TypingRealm.Typing.Tests
                 var result = await _sut.ValidateAsync(data.Key.TextValue, data.Key.TextTypingResult);
 
                 Assert.Equal(Math.Floor(data.Value.SpeedCpm), Math.Floor(result.SpeedCpm));
-                Assert.True(data.Value.SuccessKeyPairs.SequenceEqual(result.SuccessKeyPairs));
-                Assert.True(data.Value.ErrorKeyPairs.SequenceEqual(result.ErrorKeyPairs));
+                Assert.True(data.Value.KeyPairs.SequenceEqual(result.KeyPairs));
             }
         }
 
@@ -45,11 +44,11 @@ namespace TypingRealm.Typing.Tests
                         new KeyPressEvent(3, KeyAction.Press, "t", 60)
                     })), new TextAnalysisResult(4000, new[]
                     {
-                        new KeyPair(null, "t", 0),
-                        new KeyPair("t", "e", 20),
-                        new KeyPair("e", "s", 20),
-                        new KeyPair("s", "t", 20)
-                    }, new KeyPair[] { })),
+                        new KeyPair("", "t", 0, KeyPairType.Correct, 0),
+                        new KeyPair("t", "e", 20, KeyPairType.Correct, 0),
+                        new KeyPair("e", "s", 20, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", 20, KeyPairType.Correct, 0)
+                    })),
 
                 new KeyValuePair<Input, TextAnalysisResult>(
                     new Input("Test", MakeTextTypingResult(new[]
@@ -65,11 +64,11 @@ namespace TypingRealm.Typing.Tests
                         new KeyPressEvent(3, KeyAction.Press, "t", 80)
                     })), new TextAnalysisResult(3000, new[]
                     {
-                        new KeyPair(null, "T", 10),
-                        new KeyPair("T", "e", 30),
-                        new KeyPair("e", "s", 20),
-                        new KeyPair("s", "t", 20)
-                    }, new KeyPair[] { }))
+                        new KeyPair("", "T", 10, KeyPairType.Correct, 10),
+                        new KeyPair("T", "e", 30, KeyPairType.Correct, 0),
+                        new KeyPair("e", "s", 20, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", 20, KeyPairType.Correct, 0)
+                    }))
             };
         }
 
