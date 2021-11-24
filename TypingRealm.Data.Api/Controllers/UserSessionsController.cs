@@ -121,6 +121,5 @@ namespace TypingRealm.Data.Api.Controllers
 
             return Ok(report);
         }
-
     }
 }

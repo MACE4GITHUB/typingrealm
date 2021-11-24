@@ -15,6 +15,7 @@ namespace TypingRealm.Typing
     public sealed record KeyPair(
         string FromKey, // If it's null - then it's the first character of the string.
         string ToKey,
+        string ShouldBeKey,
         decimal Delay,
         KeyPairType Type,
         decimal ShiftToKeyDelay);
@@ -59,6 +60,7 @@ namespace TypingRealm.Typing
             KeyPressEvent? previousKeyPressEvent = null;
             var missedKeyIndex = -1;
             var missedKey = "";
+            var uselessBackspace = false;
 
             foreach (var @event in events)
             {
@@ -88,14 +90,14 @@ namespace TypingRealm.Typing
                         {
                             errors[index] = true;
 
-                            successKeyPairs.Add(new KeyPair("", @event.Key, delay, KeyPairType.Mistake, shiftToKeyDelay));
+                            successKeyPairs.Add(new KeyPair("", @event.Key, textValue[index].ToString(), delay, KeyPairType.Mistake, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                             missedKeyIndex = @event.Index;
                             missedKey = textValue[index].ToString();
                         }
                         else
                         {
-                            successKeyPairs.Add(new KeyPair("", @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
+                            successKeyPairs.Add(new KeyPair("", @event.Key, @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                         }
 
@@ -133,7 +135,10 @@ namespace TypingRealm.Typing
 
                             if (missedKeyIndex == -1)
                             {
-                                successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Mistake, shiftToKeyDelay));
+                                var previousKey = uselessBackspace ? "" : previousKeyPressEvent.Key;
+                                uselessBackspace = false;
+
+                                successKeyPairs.Add(new KeyPair(previousKey, @event.Key, textValue[index].ToString(), delay, KeyPairType.Mistake, shiftToKeyDelay));
                                 previousKeyPressEvent = @event;
                                 missedKeyIndex = @event.Index;
                                 missedKey = @event.Key;
@@ -142,9 +147,18 @@ namespace TypingRealm.Typing
                     }
                     else
                     {
+                        var previousKey = uselessBackspace ? "" : previousKeyPressEvent.Key;
+                        uselessBackspace = false;
+
                         if (index > 0 && !errors[index - 1] && missedKeyIndex == -1)
                         {
-                            successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
+                            successKeyPairs.Add(new KeyPair(previousKey, @event.Key, @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
+                            previousKeyPressEvent = @event;
+                        }
+
+                        if (index == 0)
+                        {
+                            successKeyPairs.Add(new KeyPair(previousKey, @event.Key, @event.Key, delay, KeyPairType.Correct, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                         }
                     }
@@ -162,7 +176,8 @@ namespace TypingRealm.Typing
                             errors[index] = false;
                             if (missedKeyIndex == -1 || missedKeyIndex == index)
                             {
-                                successKeyPairs.Add(new KeyPair(missedKey, @event.Key, delay, KeyPairType.Correction, 0));
+                                uselessBackspace = false;
+                                successKeyPairs.Add(new KeyPair(missedKey, @event.Key, "", delay, KeyPairType.Correction, 0));
                                 previousKeyPressEvent = @event;
 
                                 if (missedKeyIndex == index)
@@ -174,11 +189,8 @@ namespace TypingRealm.Typing
                         }
                         else
                         {
-                            if (missedKeyIndex == -1)
-                            {
-                                successKeyPairs.Add(new KeyPair(previousKeyPressEvent.Key, @event.Key, delay, KeyPairType.Correction, 0));
-                                previousKeyPressEvent = @event;
-                            }
+                            uselessBackspace = true;
+                            // Do not log backspace when there are no errors.
                         }
                     }
                 }

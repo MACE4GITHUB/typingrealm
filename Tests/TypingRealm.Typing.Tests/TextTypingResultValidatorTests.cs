@@ -28,6 +28,19 @@ namespace TypingRealm.Typing.Tests
             }
         }
 
+        [Fact]
+        public async Task ShouldHandleJustBackspaces()
+        {
+            var data = GetTestData(3);
+            var result = await _sut.ValidateAsync(data.Key.TextValue, data.Key.TextTypingResult);
+
+            Assert.Equal(Math.Floor(data.Value.SpeedCpm), Math.Floor(result.SpeedCpm));
+            Assert.True(data.Value.KeyPairs.SequenceEqual(result.KeyPairs));
+        }
+
+        private KeyValuePair<Input, TextAnalysisResult> GetTestData(int index)
+            => GetTestData().ToList()[index];
+
         private IEnumerable<KeyValuePair<Input, TextAnalysisResult>> GetTestData()
         {
             return new[]
@@ -44,10 +57,10 @@ namespace TypingRealm.Typing.Tests
                         new KeyPressEvent(3, KeyAction.Press, "t", 60)
                     })), new TextAnalysisResult(4000, new[]
                     {
-                        new KeyPair("", "t", 0, KeyPairType.Correct, 0),
-                        new KeyPair("t", "e", 20, KeyPairType.Correct, 0),
-                        new KeyPair("e", "s", 20, KeyPairType.Correct, 0),
-                        new KeyPair("s", "t", 20, KeyPairType.Correct, 0)
+                        new KeyPair("", "t", "t", 0, KeyPairType.Correct, 0),
+                        new KeyPair("t", "e", "e", 20, KeyPairType.Correct, 0),
+                        new KeyPair("e", "s", "s", 20, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0)
                     })),
 
                 new KeyValuePair<Input, TextAnalysisResult>(
@@ -64,10 +77,10 @@ namespace TypingRealm.Typing.Tests
                         new KeyPressEvent(3, KeyAction.Press, "t", 80)
                     })), new TextAnalysisResult(3000, new[]
                     {
-                        new KeyPair("", "T", 10, KeyPairType.Correct, 10),
-                        new KeyPair("T", "e", 30, KeyPairType.Correct, 0),
-                        new KeyPair("e", "s", 20, KeyPairType.Correct, 0),
-                        new KeyPair("s", "t", 20, KeyPairType.Correct, 0)
+                        new KeyPair("", "T", "T", 10, KeyPairType.Correct, 10),
+                        new KeyPair("T", "e", "e", 30, KeyPairType.Correct, 0),
+                        new KeyPair("e", "s", "s", 20, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0)
                     })),
 
                 new KeyValuePair<Input, TextAnalysisResult>(
@@ -98,16 +111,53 @@ namespace TypingRealm.Typing.Tests
                         new KeyPressEvent(3, KeyAction.Press, "t", 150)
                     })), new TextAnalysisResult(1600, new[]
                     {
-                        new KeyPair("", "T", 10, KeyPairType.Correct, 10),
-                        new KeyPair("T", "e", 30, KeyPairType.Correct, 0),
+                        new KeyPair("", "T", "T", 10, KeyPairType.Correct, 10),
+                        new KeyPair("T", "e", "e", 30, KeyPairType.Correct, 0),
 
-                        new KeyPair("e", "x", 20, KeyPairType.Mistake, 0),
-                        new KeyPair("x", "backspace", 50, KeyPairType.Correction, 0),
+                        new KeyPair("e", "x", "s", 20, KeyPairType.Mistake, 0),
+                        new KeyPair("x", "backspace", "", 50, KeyPairType.Correction, 0),
 
-                        new KeyPair("backspace", "s", 20, KeyPairType.Correct, 0),
-                        new KeyPair("s", "t", 20, KeyPairType.Correct, 0)
+                        new KeyPair("backspace", "s", "s", 20, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0)
+                    })),
+
+                // Do not get just backspaces on correct keys to statistics.
+                // After a backspace was pressed without any corrections, start analytics from scratch (no FromKey).
+                new KeyValuePair<Input, TextAnalysisResult>(
+                    new Input("Test", MakeTextTypingResult(new[]
+                    {
+                        new KeyPressEvent(0, KeyAction.Press, "shift", 0),
+                        new KeyPressEvent(0, KeyAction.Press, "T", 10),
+                        new KeyPressEvent(1, KeyAction.Release, "T", 20),
+                        new KeyPressEvent(1, KeyAction.Release, "shift", 30),
+                        new KeyPressEvent(1, KeyAction.Press, "e", 40),
+                        new KeyPressEvent(2, KeyAction.Release, "e", 50),
+
+                        new KeyPressEvent(2, KeyAction.Press, "backspace", 60),
+                        new KeyPressEvent(1, KeyAction.Press, "backspace", 70),
+                        new KeyPressEvent(0, KeyAction.Release, "backspace", 80),
+
+                        new KeyPressEvent(0, KeyAction.Press, "shift", 90),
+                        new KeyPressEvent(0, KeyAction.Press, "T", 100),
+                        new KeyPressEvent(1, KeyAction.Release, "T", 110),
+                        new KeyPressEvent(1, KeyAction.Release, "shift", 120),
+                        new KeyPressEvent(1, KeyAction.Press, "e", 130),
+                        new KeyPressEvent(2, KeyAction.Release, "e", 140),
+
+                        new KeyPressEvent(2, KeyAction.Press, "s", 150),
+                        new KeyPressEvent(3, KeyAction.Release, "s", 160),
+                        new KeyPressEvent(3, KeyAction.Press, "t", 170)
+                    })), new TextAnalysisResult(1411, new[]
+                    {
+                        new KeyPair("", "T", "T", 10, KeyPairType.Correct, 10),
+                        new KeyPair("T", "e", "e", 30, KeyPairType.Correct, 0),
+
+                        new KeyPair("", "T", "T", 60, KeyPairType.Correct, 10),
+                        new KeyPair("T", "e", "e", 30, KeyPairType.Correct, 0),
+
+                        new KeyPair("e", "s", "s", 20, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0)
                     }))
-
             };
         }
 
