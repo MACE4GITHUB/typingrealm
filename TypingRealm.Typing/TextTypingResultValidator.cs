@@ -43,8 +43,11 @@ namespace TypingRealm.Typing
         private TextAnalysisResult AnalyzeText(string textValue, IEnumerable<KeyPressEvent> events)
         {
             // TODO: Valitade totalTime here (should be close to the last event absolutedelay).
-            var totalTimeMs = events.Last().AbsoluteDelay;
+            var totalTimeMs = events.Last().AbsoluteDelay; // Last event should be the last key press of the text. If it's not - we throw validation error later on.
             var speedCpm = textValue.Length / (totalTimeMs / 60000);
+
+            if (events.Last().Key != textValue[^1].ToString() || events.Last().KeyAction != KeyAction.Press)
+                throw new InvalidOperationException("Last event key doesn't match the last character of the text.");
 
             // TODO: Validate shift keys and caps keys: caps keys can only be pressed within shift key window.
             // TODO: If I'm going to accept both Delay and AbsoluteDelay, make sure they are validated towards each other.
@@ -64,6 +67,9 @@ namespace TypingRealm.Typing
 
             foreach (var @event in events)
             {
+                if (@event.Index == textValue.Length && !errors.Any(error => error))
+                    throw new InvalidOperationException("Text has been typing to the end but there are still some events present.");
+
                 var delay = @event.AbsoluteDelay - (previousKeyPressEvent?.AbsoluteDelay ?? 0);
 
                 var shiftToKeyDelay = IsCharacter(@event.Key) && char.IsUpper(@event.Key[0])

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TypingRealm.Typing
 {
@@ -14,8 +15,10 @@ namespace TypingRealm.Typing
         // TODO: Consider making it an AR and include foreing key to UserSession, so that we can query everything just by text typing result id.
         string TextTypingResultId, // A hack to distinguish text typing result uniquely.
         int TypingSessionTextIndex,
-        decimal TotalTimeMs,
         DateTime StartedTypingUtc,
         DateTime SubmittedResultsUtc,
-        IEnumerable<KeyPressEvent> Events);
+        IEnumerable<KeyPressEvent> Events)
+    {
+        public decimal TotalTimeMs => Events.Last().AbsoluteDelay;
+    }
 }

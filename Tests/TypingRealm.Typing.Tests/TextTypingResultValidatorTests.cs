@@ -205,7 +205,7 @@ namespace TypingRealm.Typing.Tests
 
         private TextTypingResult MakeTextTypingResult(IEnumerable<KeyPressEvent> events)
         {
-            return new TextTypingResult("", 1, 1, DateTime.UtcNow, DateTime.UtcNow, events);
+            return new TextTypingResult("", 1, DateTime.UtcNow, DateTime.UtcNow, events);
         }
     }
 }

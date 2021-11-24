@@ -115,7 +115,6 @@ namespace TypingRealm.Typing
             await AddTypingResultAsync(userSessionId, new TextTypingResult(
                 typingResultId,
                 typingSessionTextIndex,
-                typedText.TotalTimeMs,
                 typedText.StartedTypingUtc,
                 DateTime.UtcNow,
                 typedText.Events))

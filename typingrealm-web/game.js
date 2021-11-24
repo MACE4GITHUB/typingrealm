@@ -508,7 +508,6 @@ function sendData(data) {
 function makeSaveDataRequest() {
     let request = {
         value: textData.text,
-        totalTimeMs: events.at(-1).perf - textData.startPerf,
         startedTypingUtc: new Date(textData.startTime).toISOString(),
         userTimeZoneOffsetMinutes: new Date(textData.startTime).getTimezoneOffset() * -1,
 

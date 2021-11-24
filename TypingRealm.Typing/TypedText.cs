@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TypingRealm.Typing
 {
@@ -8,8 +9,10 @@ namespace TypingRealm.Typing
     /// </summary>
     public sealed record TypedText(
         string Value,
-        decimal TotalTimeMs,
         DateTime StartedTypingUtc,
         int UserTimeZoneOffsetMinutes,
-        IEnumerable<KeyPressEvent> Events);
+        IEnumerable<KeyPressEvent> Events)
+    {
+        public decimal TotalTimeMs => Events.Last().AbsoluteDelay;
+    }
 }
