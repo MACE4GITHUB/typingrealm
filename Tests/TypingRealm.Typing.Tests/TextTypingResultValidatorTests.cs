@@ -88,26 +88,26 @@ namespace TypingRealm.Typing.Tests
                     {
                         new KeyPressEvent(0, KeyAction.Press, "shift", 0),
                         new KeyPressEvent(0, KeyAction.Press, "T", 10),
-                        //new KeyPressEvent(1, KeyAction.Release, "T", 20),
-                        //new KeyPressEvent(1, KeyAction.Release, "shift", 30),
+                        new KeyPressEvent(1, KeyAction.Release, "T", 20),
+                        new KeyPressEvent(1, KeyAction.Release, "shift", 30),
                         new KeyPressEvent(1, KeyAction.Press, "e", 40),
-                        //new KeyPressEvent(2, KeyAction.Release, "e", 50),
+                        new KeyPressEvent(2, KeyAction.Release, "e", 50),
 
                         // Mistake.
                         new KeyPressEvent(2, KeyAction.Press, "x", 60),
-                        //new KeyPressEvent(3, KeyAction.Release, "x", 70),
+                        new KeyPressEvent(3, KeyAction.Release, "x", 70),
 
                         // Correct, but it shouldn't be logged.
                         new KeyPressEvent(3, KeyAction.Press, "t", 80),
-                        //new KeyPressEvent(4, KeyAction.Release, "t", 90),
+                        new KeyPressEvent(4, KeyAction.Release, "t", 90),
 
                         // Corrections.
                         new KeyPressEvent(4, KeyAction.Press, "backspace", 100),
                         new KeyPressEvent(3, KeyAction.Press, "backspace", 110),
-                        //new KeyPressEvent(2, KeyAction.Release, "backspace", 120),
+                        new KeyPressEvent(2, KeyAction.Release, "backspace", 120),
 
                         new KeyPressEvent(2, KeyAction.Press, "s", 130),
-                        //new KeyPressEvent(3, KeyAction.Release, "s", 140),
+                        new KeyPressEvent(3, KeyAction.Release, "s", 140),
                         new KeyPressEvent(3, KeyAction.Press, "t", 150)
                     })), new TextAnalysisResult(1600, new[]
                     {
