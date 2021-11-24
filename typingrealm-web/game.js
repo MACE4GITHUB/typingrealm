@@ -68,6 +68,7 @@ let simulationEvents = [];
 // When simulation is happening - this is set to true.
 let isSimulation = false;
 let stopSimulation = false; // This is a flag to set when we want to interrupt simulation.
+let simulationSpeedMultiplier = 1;
 
 
 
@@ -175,8 +176,50 @@ async function renderNewText() {
 }
 
 function processKeyDown(event, simulation) {
-    if (isKeyEnter(event) && isSimulation && !allowInput) {
-        stopSimulation = true;
+    if (isSimulation && !allowInput) {
+        if (isKeyEnter(event)) {
+            stopSimulation = true;
+        }
+
+        // 1 - regular speed.
+        // 1.5 - 1.5x times slower.
+        // 2 - 2x times slower.
+        // 2.5 - 2.5x times slower.
+        // 3 - 3x times slower.
+        if (event.key == 's') {
+            simulationSpeedMultiplier = calculateSlowerMultiplier(simulationSpeedMultiplier);
+        }
+
+        // 1 - regular speed.
+        // 0.9 - 11% faster.
+        // 0.8 - 25% faster.
+        // 0.666 - 50% faster.
+        // 0.5 - 2x times faster.
+        if (event.key == 'f') {
+            simulationSpeedMultiplier = calculateFasterMultiplier(simulationSpeedMultiplier);
+        }
+
+        function calculateFasterMultiplier(simulationSpeedMultiplier) {
+            if (simulationSpeedMultiplier == 1) return 0.9;
+            if (simulationSpeedMultiplier == 0.9) return 0.8;
+            if (simulationSpeedMultiplier == 0.8) return 0.666;
+            if (simulationSpeedMultiplier == 0.666) return 0.5;
+
+            if (simulationSpeedMultiplier > 1) return simulationSpeedMultiplier - 0.5;
+
+            return simulationSpeedMultiplier;
+        }
+
+        function calculateSlowerMultiplier(simulationSpeedMultiplier) {
+            if (simulationSpeedMultiplier == 0.5) return 0.666;
+            if (simulationSpeedMultiplier == 0.666) return 0.8;
+            if (simulationSpeedMultiplier == 0.8) return 0.9;
+            if (simulationSpeedMultiplier == 0.9) return 1;
+
+            if (simulationSpeedMultiplier >= 1 && simulationSpeedMultiplier < 3) return simulationSpeedMultiplier + 0.5;
+
+            return simulationSpeedMultiplier;
+        }
     }
 
     if (!allowInput && !simulation) {
@@ -438,7 +481,7 @@ async function simulateTyping() {
     await renderAgain();
 
     for (const e of simulationEvents) {
-        await new Promise(resolve => setTimeout(resolve, e.delay));
+        await new Promise(resolve => setTimeout(resolve, e.delay * simulationSpeedMultiplier));
 
         if (e.keyAction == "Press") {
             processKeyDown({
