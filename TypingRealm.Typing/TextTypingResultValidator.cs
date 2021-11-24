@@ -99,7 +99,7 @@ namespace TypingRealm.Typing
                             successKeyPairs.Add(new KeyPair("", @event.Key, textValue[index].ToString(), delay, KeyPairType.Mistake, shiftToKeyDelay));
                             previousKeyPressEvent = @event;
                             missedKeyIndex = @event.Index;
-                            missedKey = textValue[index].ToString();
+                            missedKey = @event.Key;
                         }
                         else
                         {

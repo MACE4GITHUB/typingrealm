@@ -40,6 +40,9 @@ namespace TypingRealm.Typing.Tests
         [Fact]
         public Task ShouldHandleCapitalCharactersInTheMiddle() => TestData(4);
 
+        [Fact]
+        public Task ShouldHandleMistakeInFirstCharacter() => TestData(5);
+
         private async Task TestData(int index)
         {
             var data = GetTestData(index);
@@ -199,6 +202,37 @@ namespace TypingRealm.Typing.Tests
                         new KeyPair("t", " ", " ", 20, KeyPairType.Correct, 0),
                         new KeyPair(" ", "O", "O", 30, KeyPairType.Correct, 20),
                         new KeyPair("O", "n", "n", 20, KeyPairType.Correct, 0)
+                    })),
+
+                new KeyValuePair<Input, TextAnalysisResult>(
+                    new Input("test", MakeTextTypingResult(new[]
+                    {
+                        new KeyPressEvent(0, KeyAction.Press, " ", 0),
+                        new KeyPressEvent(1, KeyAction.Release, " ", 10),
+                        new KeyPressEvent(1, KeyAction.Press, "e", 20),
+                        new KeyPressEvent(2, KeyAction.Release, "e", 30),
+
+                        new KeyPressEvent(2, KeyAction.Press, "backspace", 40),
+                        new KeyPressEvent(1, KeyAction.Release, "backspace", 50),
+                        new KeyPressEvent(1, KeyAction.Press, "backspace", 60),
+                        new KeyPressEvent(0, KeyAction.Release, "backspace", 70),
+                        new KeyPressEvent(0, KeyAction.Press, "t", 80),
+                        new KeyPressEvent(1, KeyAction.Press, "e", 90),
+                        new KeyPressEvent(2, KeyAction.Release, "t", 100),
+                        new KeyPressEvent(2, KeyAction.Release, "e", 110),
+
+
+                        new KeyPressEvent(2, KeyAction.Press, "s", 120),
+                        new KeyPressEvent(3, KeyAction.Release, "s", 130),
+                        new KeyPressEvent(3, KeyAction.Press, "t", 140)
+                    })), new TextAnalysisResult(1714, new[]
+                    {
+                        new KeyPair("", " ", "t", 0, KeyPairType.Mistake, 0),
+                        new KeyPair(" ", "backspace", "", 60, KeyPairType.Correction, 0),
+                        new KeyPair("backspace", "t", "t", 20, KeyPairType.Correct, 0),
+                        new KeyPair("t", "e", "e", 10, KeyPairType.Correct, 0),
+                        new KeyPair("e", "s", "s", 30, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0)
                     }))
             };
         }
