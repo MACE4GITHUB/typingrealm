@@ -101,6 +101,9 @@ namespace TypingRealm.Data.Infrastructure
                             builder.Append(" ");
 
                         builder.Append(chunk);
+
+                        if (builder.Length >= minLength)
+                            return builder.ToString();
                     }
                 }
             }
