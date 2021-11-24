@@ -15,8 +15,7 @@ if (textType != 'words' && textType != 'text') {
 if (!profile || !length)
     throw new Error("Cannot continue without specifying 'profile' and 'length'.");
 
-if (!confirm(`Using profile "${profile}" and minimum text length ${length}.`))
-    throw new Error("Canceled by user.");
+console.log(`Using profile "${profile}" and minimum text length ${length}. ${textType} mode.`);
 
 
 
@@ -24,6 +23,8 @@ if (!confirm(`Using profile "${profile}" and minimum text length ${length}.`))
 
 const textElement = document.getElementById('text');
 const speedElement = document.getElementById('speed');
+const simulationSpeedMultiplierElement = document.getElementById('simulationSpeedMultiplier');
+const hintElement = document.getElementById('hint');
 const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}`;
 const authTokenRequestUrl = `http://localhost:30103/api/local-auth/profile-token?sub=${profile}`;
 const dataSubmitUrl = 'http://localhost:30400/api/usersessions/result';
@@ -142,7 +143,9 @@ async function renderNewText() {
     simulationEvents = [];
 
     textElement.innerHTML = '';
-    speedElement.innerHTML = ''
+    speedElement.innerHTML = '';
+    simulationSpeedMultiplierElement.innerHTML = '';
+    hintElement.classList.add('hidden');
 
     textData.text = await getText();
 
@@ -175,6 +178,32 @@ async function renderNewText() {
     allowInput = true;
 }
 
+function getTextSimulationSpeedMultiplier() {
+    if (simulationSpeedMultiplier == 1) {
+        return "Normal speed"
+    }
+
+    if (simulationSpeedMultiplier > 1) {
+        return `${simulationSpeedMultiplier}x times slower`;
+    }
+
+    if (simulationSpeedMultiplier == 0.9) {
+        return '11% faster';
+    }
+
+    if (simulationSpeedMultiplier == 0.8) {
+        return '25% faster';
+    }
+
+    if (simulationSpeedMultiplier == 0.666) {
+        return '50% faster';
+    }
+
+    if (simulationSpeedMultiplier == 0.5) {
+        return '2x faster';
+    }
+}
+
 function processKeyDown(event, simulation) {
     if (isSimulation && !allowInput) {
         if (isKeyEnter(event)) {
@@ -186,8 +215,9 @@ function processKeyDown(event, simulation) {
         // 2 - 2x times slower.
         // 2.5 - 2.5x times slower.
         // 3 - 3x times slower.
-        if (event.key == 's') {
+        if (event.key == 's' && !simulation) {
             simulationSpeedMultiplier = calculateSlowerMultiplier(simulationSpeedMultiplier);
+            simulationSpeedMultiplierElement.innerHTML = getTextSimulationSpeedMultiplier();
         }
 
         // 1 - regular speed.
@@ -195,8 +225,9 @@ function processKeyDown(event, simulation) {
         // 0.8 - 25% faster.
         // 0.666 - 50% faster.
         // 0.5 - 2x times faster.
-        if (event.key == 'f') {
+        if (event.key == 'f' && !simulation) {
             simulationSpeedMultiplier = calculateFasterMultiplier(simulationSpeedMultiplier);
+            simulationSpeedMultiplierElement.innerHTML = getTextSimulationSpeedMultiplier();
         }
 
         function calculateFasterMultiplier(simulationSpeedMultiplier) {
@@ -356,7 +387,9 @@ function typeSymbol(symbol, perf) {
         var speedCpm = (60000 * statistics.value.length / statistics.events.at(-1).absoluteDelay).toFixed(2);
         var speedWpm = (speedCpm / 5).toFixed(2);
 
-        speedElement.innerHTML = `<div>${speedCpm} CPM</div><div>${speedWpm} WPM</div>`;
+        speedElement.innerHTML = `${speedCpm} CPM (${speedWpm})`;
+        simulationSpeedMultiplierElement.innerHTML = getTextSimulationSpeedMultiplier();
+        hintElement.classList.remove('hidden');
 
         simulateTyping();
 
