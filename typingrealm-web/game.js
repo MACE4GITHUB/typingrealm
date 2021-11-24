@@ -19,6 +19,7 @@ if (!confirm(`Using profile "${profile}" and minimum text length ${length}.`))
 /* Global variables */
 
 const textElement = document.getElementById('text');
+const speedElement = document.getElementById('speed');
 const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}`;
 const authTokenRequestUrl = `http://localhost:30103/api/local-auth/profile-token?sub=${profile}`;
 const dataSubmitUrl = 'http://localhost:30400/api/usersessions/result';
@@ -136,6 +137,7 @@ async function renderNewText() {
     simulationEvents = [];
 
     textElement.innerHTML = '';
+    speedElement.innerHTML = ''
 
     textData.text = await getText();
 
@@ -303,6 +305,11 @@ function typeSymbol(symbol, perf) {
 
         const statistics = makeSaveDataRequest();
         sendData(statistics);
+
+        var speedCpm = (60000 * statistics.value.length / statistics.events.at(-1).absoluteDelay).toFixed(2);
+        var speedWpm = (speedCpm / 5).toFixed(2);
+
+        speedElement.innerHTML = `<div>${speedCpm} CPM</div><div>${speedWpm} WPM</div>`;
 
         simulateTyping();
 

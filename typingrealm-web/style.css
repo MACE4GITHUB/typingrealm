@@ -12,6 +12,13 @@ body {
   text-align: left;
 }
 
+#speed {
+    font-size: 4em;
+    margin: 0 20%;
+    top: 20%;
+    text-align: center;
+}
+
 .wrong {
     color: #a55;
     background-color: #fdd;
