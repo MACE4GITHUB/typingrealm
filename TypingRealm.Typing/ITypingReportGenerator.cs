@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace TypingRealm.Typing
@@ -13,6 +14,9 @@ namespace TypingRealm.Typing
     {
         ValueTask<TypingReport> GenerateReportAsync(string userId);
         ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId);
+
+        // Fun little method with experimentation.
+        ValueTask<string> GenerateHumanReadableReportAsync(string userId);
     }
 
     public sealed record KeyPairAggregatedData(
@@ -132,6 +136,29 @@ namespace TypingRealm.Typing
                 x.Count(y => y.Type == KeyPairType.Mistake)));
 
             return new TypingReport(aggregatedResult, aggregatedData);
+        }
+
+        public async ValueTask<string> GenerateHumanReadableReportAsync(string userId)
+        {
+            var data = await GenerateReportAsync(userId)
+                .ConfigureAwait(false);
+
+            var builder = new StringBuilder();
+            builder.Append("You've made most mistakes when typing ");
+            builder.Append(string.Join(", ", data.AggregatedData
+                .OrderByDescending(x => x.MadeMistakes)
+                .Take(3)
+                .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.MadeMistakes})")));
+
+            builder.Append(". Your slowest lowercase key pairs are ");
+            builder.Append(string.Join(", ", data.AggregatedData
+                .Where(x => (x.ToKey.Length == 1 && char.IsLower(x.ToKey[0])) || x.ToKey.Length > 1)
+                .OrderByDescending(x => x.AverageDelay)
+                .Take(3)
+                .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.AverageDelay.ToString("0.###")} ms average)")));
+
+            builder.Append(".");
+            return builder.ToString();
         }
     }
 }

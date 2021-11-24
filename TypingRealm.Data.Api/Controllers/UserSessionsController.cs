@@ -121,5 +121,14 @@ namespace TypingRealm.Data.Api.Controllers
 
             return Ok(report);
         }
+
+        [HttpGet]
+        [Route("statistics/readable")]
+        public async ValueTask<ActionResult<string>> GetReadableStatistics()
+        {
+            var response = await _typingReportGenerator.GenerateHumanReadableReportAsync(ProfileId);
+
+            return Ok(response);
+        }
     }
 }
