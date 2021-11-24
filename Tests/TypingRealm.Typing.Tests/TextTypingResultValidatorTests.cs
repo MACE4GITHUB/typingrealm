@@ -19,19 +19,30 @@ namespace TypingRealm.Typing.Tests
         [Fact]
         public async Task ShouldProduceCorrectResults()
         {
-            foreach (var data in GetTestData())
+            for (var i = 0; i < GetTestData().Count(); i++)
             {
-                var result = await _sut.ValidateAsync(data.Key.TextValue, data.Key.TextTypingResult);
-
-                Assert.Equal(Math.Floor(data.Value.SpeedCpm), Math.Floor(result.SpeedCpm));
-                Assert.True(data.Value.KeyPairs.SequenceEqual(result.KeyPairs));
+                await TestData(i);
             }
         }
 
         [Fact]
-        public async Task ShouldHandleJustBackspaces()
+        public Task ShouldHandleSimpleText() => TestData(0);
+
+        [Fact]
+        public Task ShouldHandleFirstCapitalCharacter() => TestData(1);
+
+        [Fact]
+        public Task ShouldHandleCorrections() => TestData(2);
+
+        [Fact]
+        public Task ShouldHandleJustBackspaces() => TestData(3);
+
+        [Fact]
+        public Task ShouldHandleCapitalCharactersInTheMiddle() => TestData(4);
+
+        private async Task TestData(int index)
         {
-            var data = GetTestData(3);
+            var data = GetTestData(index);
             var result = await _sut.ValidateAsync(data.Key.TextValue, data.Key.TextTypingResult);
 
             Assert.Equal(Math.Floor(data.Value.SpeedCpm), Math.Floor(result.SpeedCpm));
@@ -157,6 +168,37 @@ namespace TypingRealm.Typing.Tests
 
                         new KeyPair("e", "s", "s", 20, KeyPairType.Correct, 0),
                         new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0)
+                    })),
+
+                // Shift in the middle.
+                new KeyValuePair<Input, TextAnalysisResult>(
+                    new Input("Test On", MakeTextTypingResult(new[]
+                    {
+                        new KeyPressEvent(0, KeyAction.Press, "shift", 0),
+                        new KeyPressEvent(0, KeyAction.Press, "T", 10),
+                        new KeyPressEvent(1, KeyAction.Release, "T", 20),
+                        new KeyPressEvent(1, KeyAction.Release, "shift", 30),
+                        new KeyPressEvent(1, KeyAction.Press, "e", 40),
+                        new KeyPressEvent(2, KeyAction.Release, "e", 50),
+                        new KeyPressEvent(2, KeyAction.Press, "s", 60),
+                        new KeyPressEvent(3, KeyAction.Release, "s", 70),
+                        new KeyPressEvent(3, KeyAction.Press, "t", 80),
+                        new KeyPressEvent(4, KeyAction.Release, "t", 90),
+                        new KeyPressEvent(4, KeyAction.Press, " ", 100),
+                        new KeyPressEvent(5, KeyAction.Press, "shift", 110),
+                        new KeyPressEvent(5, KeyAction.Release, " ", 120),
+                        new KeyPressEvent(5, KeyAction.Press, "O", 130),
+                        new KeyPressEvent(6, KeyAction.Release, "shift", 140),
+                        new KeyPressEvent(6, KeyAction.Press, "n", 150)
+                    })), new TextAnalysisResult(2800, new[]
+                    {
+                        new KeyPair("", "T", "T", 10, KeyPairType.Correct, 10),
+                        new KeyPair("T", "e", "e", 30, KeyPairType.Correct, 0),
+                        new KeyPair("e", "s", "s", 20, KeyPairType.Correct, 0),
+                        new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0),
+                        new KeyPair("t", " ", " ", 20, KeyPairType.Correct, 0),
+                        new KeyPair(" ", "O", "O", 30, KeyPairType.Correct, 20),
+                        new KeyPair("O", "n", "n", 20, KeyPairType.Correct, 0)
                     }))
             };
         }
