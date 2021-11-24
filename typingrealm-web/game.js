@@ -7,6 +7,10 @@ const url_string = window.location.href;
 const url = new URL(url_string);
 const profile = url.searchParams.get('profile');
 const length = url.searchParams.get('length');
+let textType = url.searchParams.get('textType');
+if (textType != 'words' && textType != 'text') {
+    textType = 'text';
+}
 
 if (!profile || !length)
     throw new Error("Cannot continue without specifying 'profile' and 'length'.");
@@ -20,7 +24,7 @@ if (!confirm(`Using profile "${profile}" and minimum text length ${length}.`))
 
 const textElement = document.getElementById('text');
 const speedElement = document.getElementById('speed');
-const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}`;
+const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}`;
 const authTokenRequestUrl = `http://localhost:30103/api/local-auth/profile-token?sub=${profile}`;
 const dataSubmitUrl = 'http://localhost:30400/api/usersessions/result';
 

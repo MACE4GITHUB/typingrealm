@@ -52,36 +52,56 @@ namespace TypingRealm.Data.Infrastructure
                 if (quotableResponse == null)
                     throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
 
-                var allowed = true;
-                foreach (var letter in quotableResponse)
+                var chunks = configuration.TextType == TextType.Words
+                    ? quotableResponse.Split(' ')
+                    : new[] { quotableResponse };
+
+                // TODO: Account for spaces.
+                foreach (var chunk in chunks)
                 {
-                    if (!_allowedLetters.Contains(letter))
+                    var allowed = true;
+                    foreach (var letter in chunk)
+                    {
+                        if (!_allowedLetters.Contains(letter))
+                        {
+                            allowed = false;
+                            break;
+                        }
+                    }
+
+                    if (configuration.ShouldContain.Any())
                     {
                         allowed = false;
-                        break;
                     }
-                }
 
-                if (configuration.ShouldContain.Any())
-                {
-                    allowed = false;
-                }
-
-                foreach (var keyPair in configuration.ShouldContain)
-                {
-                    if (!quotableResponse.Contains(keyPair))
+                    static bool ChunkHasKeyPair(string chunk, string keyPair)
                     {
-                        allowed = true;
-                        break;
+                        if (chunk.Contains(keyPair))
+                            return true;
+
+                        if ((keyPair[0] == ' ' && chunk.StartsWith(keyPair[1]))
+                            || (keyPair[1] == ' ' && chunk.EndsWith(keyPair[0])))
+                            return true;
+
+                        return false;
                     }
-                }
 
-                if (allowed)
-                {
-                    if (builder.Length > 0)
-                        builder.Append(" ");
+                    foreach (var keyPair in configuration.ShouldContain)
+                    {
+                        if (ChunkHasKeyPair(chunk, keyPair))
+                        {
+                            allowed = true;
+                            break;
+                        }
+                    }
 
-                    builder.Append(quotableResponse);
+                    if (allowed)
+                    {
+                        if (builder.Length > 0)
+                            builder.Append(" ");
+
+                        builder.Append(chunk);
+                    }
                 }
             }
 

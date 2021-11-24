@@ -67,7 +67,7 @@ namespace TypingRealm.Data.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("generate")]
-        public async ValueTask<ActionResult<string>> GenerateTextValue(int length)
+        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, TextType textType = TextType.Text)
         {
             var shouldContain = new List<string>();
 
@@ -80,16 +80,16 @@ namespace TypingRealm.Data.Api.Controllers
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
                     .OrderByDescending(x => x.MadeMistakes)
                     .Select(x => $"{x.FromKey}{x.ToKey}")
-                    .Take(5));
+                    .Take(10));
 
                 shouldContain.AddRange(data.AggregatedData
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
                     .OrderByDescending(x => x.AverageDelay)
                     .Select(x => $"{x.FromKey}{x.ToKey}")
-                    .Take(5));
+                    .Take(10));
             }
 
-            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(length, shouldContain));
+            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(length, shouldContain, textType));
 
             return Ok(text);
         }
