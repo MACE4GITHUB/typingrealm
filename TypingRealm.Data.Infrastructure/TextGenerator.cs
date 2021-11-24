@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -57,6 +58,20 @@ namespace TypingRealm.Data.Infrastructure
                     if (!_allowedLetters.Contains(letter))
                     {
                         allowed = false;
+                        break;
+                    }
+                }
+
+                if (configuration.ShouldContain.Any())
+                {
+                    allowed = false;
+                }
+
+                foreach (var keyPair in configuration.ShouldContain)
+                {
+                    if (!quotableResponse.Contains(keyPair))
+                    {
+                        allowed = true;
                         break;
                     }
                 }

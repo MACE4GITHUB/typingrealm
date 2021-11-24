@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Profiles;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Api.Controllers
@@ -38,13 +41,16 @@ namespace TypingRealm.Data.Api.Controllers
     {
         private readonly ITextRepository _textRepository;
         private readonly ITextGenerator _textGenerator;
+        private readonly ITypingReportGenerator _typingReportGerenator;
 
         public TextsController(
             ITextRepository textRepository,
-            ITextGenerator textGenerator)
+            ITextGenerator textGenerator,
+            ITypingReportGenerator typingReportGenerator)
         {
             _textRepository = textRepository;
             _textGenerator = textGenerator;
+            _typingReportGerenator = typingReportGenerator;
         }
 
         [HttpGet]
@@ -63,7 +69,27 @@ namespace TypingRealm.Data.Api.Controllers
         [Route("generate")]
         public async ValueTask<ActionResult<string>> GenerateTextValue(int length)
         {
-            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(length));
+            var shouldContain = new List<string>();
+
+            if (ProfileId.Value != ProfileType.Anonymous)
+            {
+                // Personalize text generation.
+                var data = await _typingReportGerenator.GenerateReportAsync(ProfileId);
+
+                shouldContain.AddRange(data.AggregatedData
+                    .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
+                    .OrderByDescending(x => x.MadeMistakes)
+                    .Select(x => $"{x.FromKey}{x.ToKey}")
+                    .Take(5));
+
+                shouldContain.AddRange(data.AggregatedData
+                    .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
+                    .OrderByDescending(x => x.AverageDelay)
+                    .Select(x => $"{x.FromKey}{x.ToKey}")
+                    .Take(5));
+            }
+
+            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(length, shouldContain));
 
             return Ok(text);
         }

@@ -111,10 +111,17 @@ function GetKeyCode(key) {
     return 50;
 }
 
-function getText() {
-    return fetch(textRequestUrl)
-        .then(response => response.text());
+async function getText() {
+    let token = await getToken();
+
+    let response = await fetch(textRequestUrl, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return response.text();
 }
+
 
 async function renderNewText() {
     if (allowInput) {
