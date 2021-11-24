@@ -21,7 +21,8 @@ namespace TypingRealm.Typing
         decimal AverageDelay,
         decimal MinDelay,
         decimal MaxDelay,
-        int SuccessfullyTyped);
+        int SuccessfullyTyped,
+        int MadeMistakes);
 
     public sealed class TypingReportGenerator : ITypingReportGenerator
     {
@@ -67,13 +68,20 @@ namespace TypingRealm.Typing
                 results.Sum(x => x.SpeedCpm) / results.Count,
                 results.SelectMany(x => x.KeyPairs));
 
-            var specificKeys = aggregatedResult.KeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
+            var specificKeys = aggregatedResult.KeyPairs.GroupBy(x => new { x.FromKey, x.ShouldBeKey });
             var aggregatedData = specificKeys.Select(x => new KeyPairAggregatedData(
-                x.Key.FromKey, x.Key.ToKey,
-                x.Average(y => y.Delay),
-                x.Min(y => y.Delay),
-                x.Max(y => y.Delay),
-                x.Count()));
+                x.Key.FromKey, x.Key.ShouldBeKey,
+                x.Where(y => y.Type == KeyPairType.Correct).Any()
+                    ? x.Where(y => y.Type == KeyPairType.Correct).Average(y => y.Delay)
+                    : 0,
+                x.Where(y => y.Type == KeyPairType.Correct).Any()
+                    ? x.Where(y => y.Type == KeyPairType.Correct).Min(y => y.Delay)
+                    : 0,
+                x.Where(y => y.Type == KeyPairType.Correct).Any()
+                    ? x.Where(y => y.Type == KeyPairType.Correct).Max(y => y.Delay)
+                    : 0,
+                x.Count(y => y.Type == KeyPairType.Correct),
+                x.Count(y => y.Type == KeyPairType.Mistake)));
 
             return new TypingReport(aggregatedResult, aggregatedData);
         }
@@ -108,13 +116,20 @@ namespace TypingRealm.Typing
                 results.Sum(x => x.SpeedCpm) / results.Count,
                 results.SelectMany(x => x.KeyPairs));
 
-            var specificKeys = aggregatedResult.KeyPairs.GroupBy(x => new { x.FromKey, x.ToKey });
+            var specificKeys = aggregatedResult.KeyPairs.GroupBy(x => new { x.FromKey, x.ShouldBeKey });
             var aggregatedData = specificKeys.Select(x => new KeyPairAggregatedData(
-                x.Key.FromKey, x.Key.ToKey,
-                x.Average(y => y.Delay),
-                x.Min(y => y.Delay),
-                x.Max(y => y.Delay),
-                x.Count()));
+                x.Key.FromKey, x.Key.ShouldBeKey,
+                x.Where(y => y.Type == KeyPairType.Correct).Any()
+                    ? x.Where(y => y.Type == KeyPairType.Correct).Average(y => y.Delay)
+                    : 0,
+                x.Where(y => y.Type == KeyPairType.Correct).Any()
+                    ? x.Where(y => y.Type == KeyPairType.Correct).Min(y => y.Delay)
+                    : 0,
+                x.Where(y => y.Type == KeyPairType.Correct).Any()
+                    ? x.Where(y => y.Type == KeyPairType.Correct).Max(y => y.Delay)
+                    : 0,
+                x.Count(y => y.Type == KeyPairType.Correct),
+                x.Count(y => y.Type == KeyPairType.Mistake)));
 
             return new TypingReport(aggregatedResult, aggregatedData);
         }
