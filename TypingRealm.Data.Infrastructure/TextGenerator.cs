@@ -68,6 +68,10 @@ namespace TypingRealm.Data.Infrastructure
                             break;
                         }
                     }
+                    if (!allowed)
+                    {
+                        continue;
+                    }
 
                     if (configuration.ShouldContain.Any())
                     {
