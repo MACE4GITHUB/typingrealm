@@ -68,6 +68,12 @@ namespace TypingRealm.Typing
                 }
             }
 
+            if (results.Count == 0)
+            {
+                // No data yet.
+                return new TypingReport(new TextAnalysisResult(0, Enumerable.Empty<KeyPair>()), Enumerable.Empty<KeyPairAggregatedData>());
+            }
+
             var aggregatedResult = new TextAnalysisResult(
                 results.Sum(x => x.SpeedCpm) / results.Count,
                 results.SelectMany(x => x.KeyPairs));
@@ -114,6 +120,12 @@ namespace TypingRealm.Typing
                     .ConfigureAwait(false);
 
                 results.Add(textAnalysisResult);
+            }
+
+            if (results.Count == 0)
+            {
+                // No data yet.
+                return new TypingReport(new TextAnalysisResult(0, Enumerable.Empty<KeyPair>()), Enumerable.Empty<KeyPairAggregatedData>());
             }
 
             var aggregatedResult = new TextAnalysisResult(
