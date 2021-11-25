@@ -1,4 +1,4 @@
-﻿{
+{
   "profiles": {
     "TypingRealm.Data.Api": {
       "commandName": "Project",
@@ -6,6 +6,10 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://0.0.0.0:30400"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}"
     }
   }
 }

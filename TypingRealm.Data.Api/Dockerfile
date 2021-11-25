@@ -4,7 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["TypingRealm.Profiles.Api/TypingRealm.Profiles.Api.csproj", "TypingRealm.Profiles.Api/"]
+COPY ["TypingRealm.Data.Api/TypingRealm.Data.Api.csproj", "TypingRealm.Data.Api/"]
 COPY ["TypingRealm.Profiles.Infrastructure/TypingRealm.Profiles.Infrastructure.csproj", "TypingRealm.Profiles.Infrastructure/"]
 COPY ["TypingRealm.Common/TypingRealm.Common.csproj", "TypingRealm.Common/"]
 COPY ["TypingRealm.Profiles.Api.Resources/TypingRealm.Profiles.Api.Resources.csproj", "TypingRealm.Profiles.Api.Resources/"]
@@ -26,15 +26,17 @@ COPY ["TypingRealm.Authentication.ConsoleClient/TypingRealm.Authentication.Conso
 COPY ["TypingRealm.Data.Api.Client/TypingRealm.Data.Api.Client.csproj", "TypingRealm.Data.Api.Client/"]
 COPY ["TypingRealm.Data.Resources/TypingRealm.Data.Resources.csproj", "TypingRealm.Data.Resources/"]
 COPY ["TypingRealm.RopeWar/TypingRealm.RopeWar.csproj", "TypingRealm.RopeWar/"]
-RUN dotnet restore "TypingRealm.Profiles.Api/TypingRealm.Profiles.Api.csproj"
+COPY ["TypingRealm.Data.Infrastructure/TypingRealm.Data.Infrastructure.csproj", "TypingRealm.Data.Infrastructure/"]
+COPY ["TypingRealm.Typing/TypingRealm.Typing.csproj", "TypingRealm.Typing/"]
+RUN dotnet restore "TypingRealm.Data.Api/TypingRealm.Data.Api.csproj"
 COPY . .
-WORKDIR "/src/TypingRealm.Profiles.Api"
-RUN dotnet build "TypingRealm.Profiles.Api.csproj" -c Release -o /app/build
+WORKDIR "/src/TypingRealm.Data.Api"
+RUN dotnet build "TypingRealm.Data.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "TypingRealm.Profiles.Api.csproj" -c Release -o /app/publish
+RUN dotnet publish "TypingRealm.Data.Api.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "TypingRealm.Profiles.Api.dll"]
+ENTRYPOINT ["dotnet", "TypingRealm.Data.Api.dll"]
