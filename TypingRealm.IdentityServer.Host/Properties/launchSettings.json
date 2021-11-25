@@ -3,7 +3,7 @@
     "TypingRealm.IdentityServer.Host": {
       "commandName": "Project",
       "launchBrowser": false,
-      "applicationUrl": "https://localhost:30000",
+      "applicationUrl": "https://0.0.0.0:30000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
