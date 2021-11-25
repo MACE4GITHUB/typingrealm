@@ -1,6 +1,10 @@
 /* INITIALIZATION */
 
-const DATA_API_URL = 'http://localhost:30400';
+// Use 'localhost' for local development, 'typingrealm.com' for the main hosting environment.
+// Or you can add '127.0.0.1 typingrealm.com' entry to your hosts file.
+const DOMAIN = 'http://typingrealm.com';
+
+const DATA_API_URL = `${DOMAIN}:30400`;
 const TEXT_GENERATION_URL = `${DATA_API_URL}/api/texts/generate`;
 
 const url_string = window.location.href;
@@ -26,8 +30,8 @@ const speedElement = document.getElementById('speed');
 const simulationSpeedMultiplierElement = document.getElementById('simulationSpeedMultiplier');
 const hintElement = document.getElementById('hint');
 const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}`;
-const authTokenRequestUrl = `http://localhost:30103/api/local-auth/profile-token?sub=${profile}`;
-const dataSubmitUrl = 'http://localhost:30400/api/usersessions/result';
+const authTokenRequestUrl = `${DOMAIN}:30103/api/local-auth/profile-token?sub=${profile}`;
+const dataSubmitUrl = `${DOMAIN}:30400/api/usersessions/result`;
 
 // If it's false - any input doesn't affect the state.
 let allowInput = false;
