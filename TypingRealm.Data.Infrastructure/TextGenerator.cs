@@ -10,6 +10,7 @@ namespace TypingRealm.Data.Infrastructure
 {
     public sealed class TextGenerator : ITextGenerator
     {
+        private const int MaxTextLength = 5000; // So that user cannot request 50000 characters.
         private const int ShouldContainMinCount = 15; // If there's not enough data - generate default text.
 
 #pragma warning disable CS8618
@@ -40,7 +41,7 @@ namespace TypingRealm.Data.Infrastructure
 
             var client = _httpClientFactory.CreateClient();
 
-            while (builder.Length < minLength)
+            while (builder.Length < Math.Min(minLength, MaxTextLength))
             {
                 var response = await client.GetAsync("http://api.quotable.io/random")
                     .ConfigureAwait(false);
