@@ -10,6 +10,8 @@ namespace TypingRealm.Data.Infrastructure
 {
     public sealed class TextGenerator : ITextGenerator
     {
+        private const int ShouldContainMinCount = 15; // If there's not enough data - generate default text.
+
 #pragma warning disable CS8618
         private sealed class QuotableResponse
         {
@@ -73,29 +75,32 @@ namespace TypingRealm.Data.Infrastructure
                         continue;
                     }
 
-                    if (configuration.ShouldContain.Any())
+                    if (configuration.ShouldContain.Count() > ShouldContainMinCount)
                     {
                         allowed = false;
                     }
 
-                    static bool ChunkHasKeyPair(string chunk, string keyPair)
+                    if (!allowed)
                     {
-                        if (chunk.Contains(keyPair))
-                            return true;
-
-                        if ((keyPair[0] == ' ' && chunk.StartsWith(keyPair[1]))
-                            || (keyPair[1] == ' ' && chunk.EndsWith(keyPair[0])))
-                            return true;
-
-                        return false;
-                    }
-
-                    foreach (var keyPair in configuration.ShouldContain)
-                    {
-                        if (ChunkHasKeyPair(chunk, keyPair))
+                        static bool ChunkHasKeyPair(string chunk, string keyPair)
                         {
-                            allowed = true;
-                            break;
+                            if (chunk.Contains(keyPair))
+                                return true;
+
+                            if ((keyPair[0] == ' ' && chunk.StartsWith(keyPair[1]))
+                                || (keyPair[1] == ' ' && chunk.EndsWith(keyPair[0])))
+                                return true;
+
+                            return false;
+                        }
+
+                        foreach (var keyPair in configuration.ShouldContain)
+                        {
+                            if (ChunkHasKeyPair(chunk, keyPair))
+                            {
+                                allowed = true;
+                                break;
+                            }
                         }
                     }
 
