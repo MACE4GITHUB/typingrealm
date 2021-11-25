@@ -171,9 +171,6 @@ async function renderNewText() {
     textElement.appendChild(endCaret);
     characterSpans.push(endCaret);
 
-    // Put a caret on the first character.
-    characterSpans[index].classList.add('cursor');
-
     // Indicates that everything has been set up and now user input can start to be processed.
     allowInput = true;
 }
@@ -320,6 +317,9 @@ function processKeyUp(event, simulation) {
 function startTyping(perf) {
     textData.startTime = Date.now();
     textData.startPerf = perf;
+
+    // Put a caret on the first character.
+    characterSpans[index].classList.add('cursor');
 }
 
 function typeSymbol(symbol, perf) {
