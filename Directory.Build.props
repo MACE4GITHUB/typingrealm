@@ -2,14 +2,14 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  <ItemDefinitionGroup>
+  <!--<ItemDefinitionGroup>
     <PackageReference>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
-  </ItemDefinitionGroup>
+  </ItemDefinitionGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
       <PrivateAssets>all</PrivateAssets>
