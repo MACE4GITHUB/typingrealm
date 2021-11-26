@@ -22,6 +22,10 @@ namespace TypingRealm.Hosting
                     endpoints.MapControllers().RequireAuthorization();
                 });
 
+                // TODO: Check whether it's Development environment and only then enable swagger.
+                app.UseSwagger();
+                app.UseSwaggerUI();
+
                 next(app);
             };
         }

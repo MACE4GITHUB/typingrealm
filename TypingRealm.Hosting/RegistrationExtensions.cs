@@ -110,6 +110,8 @@ namespace TypingRealm.Hosting
 
             services.AddTransient<IStartupFilter, WebApiStartupFilter>();
 
+            services.AddSwaggerGen();
+
             return services;
         }
 
