@@ -18,6 +18,41 @@ might help you improve your typing speed.
 These are the instructions on how to run the typing tool (both backend and
 frontend).
 
+### Docker instructions
+
+All the services have been dockerized, and now you can run them all as simply
+as clicking one button. If you want to run everything on your machine, follow
+the instructions of the next chapter.
+
+First, you've got to have Docker installed on your machine (Docker Desktop for
+Windows).
+
+If you have Docker installed (docker desktop on windows), you can follow these
+simple instructions to run the project:
+
+1. Get the project, open it in Visual Studio
+
+```
+git clone https://github.com/ewancoder/typingrealm
+cd typingrealm
+explorer TypingRealm.sln
+```
+
+2. Right click "docker-compose" project, select "Set at Startup Project"
+
+3. Start the project by clicking "Docker Compose" (above, on the green start
+button)
+
+4. To run frontend, go to "typingrealm-web" folder inside the project, and run
+`docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build`
+
+You will have frontend running on 4200 port, and backend running on 30000,
+30400 and 30103 ports.
+
+You can also access swagger documentation pages by navigating to
+service/swagger URL, for example: http://localhost:30400/swagger.
+IdentityServer (30000) doesn't have swagger.
+
 ### Backend services
 
 You need to run the following services:
