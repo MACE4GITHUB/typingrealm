@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Authentication;
+using TypingRealm.Authorization;
 
 namespace TypingRealm.Profiles.Api.Controllers
 {
@@ -36,6 +37,16 @@ namespace TypingRealm.Profiles.Api.Controllers
             {
                 access_token = LocalAuthentication.GenerateServiceAccessToken(request.client_id)
             };
+        }
+
+        [Authorize]
+        [ServiceScoped]
+        [Route("service")]
+        public ActionResult TryServiceToService()
+        {
+            // Should work only with service-to-service tokens.
+
+            return Ok();
         }
     }
 }
