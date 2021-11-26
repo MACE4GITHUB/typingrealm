@@ -9,12 +9,33 @@ namespace TypingRealm.Communication
 {
     public sealed class InMemoryServiceClient : IServiceClient
     {
+        // HACK: Make sure when proper configuration is implemented we are not getting environment variables here.
+        // And also in IdentityServerAuthenticationConfiguration.
+
         private readonly Dictionary<string, string> _serviceAddresses
             = new Dictionary<string, string>
             {
-                ["profiles"] = "http://127.0.0.1:30103",
-                ["data"] = "http://127.0.0.1:30400"
+                ["profiles"] = GetProfilesHost(),
+                ["data"] = GetDataHost()
             };
+
+        private static string GetProfilesHost()
+        {
+            var profilesHost = Environment.GetEnvironmentVariable("PROFILES_URL");
+            if (profilesHost == null)
+                return "http://127.0.0.1:30103";
+
+            return profilesHost;
+        }
+
+        private static string GetDataHost()
+        {
+            var dataHost = Environment.GetEnvironmentVariable("DATA_URL");
+            if (dataHost == null)
+                return "http://127.0.0.1:30400";
+
+            return dataHost;
+        }
 
         private readonly IHttpClient _httpClient;
         private readonly IAccessTokenProvider _accessTokenProvider;

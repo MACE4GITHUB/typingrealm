@@ -1,10 +1,11 @@
-﻿namespace TypingRealm.Authentication
+﻿using System;
+
+namespace TypingRealm.Authentication
 {
     public sealed record IdentityServerAuthenticationConfiguration : AuthenticationProviderConfiguration
     {
-        private const string LocalhostIssuer = "http://localhost:30000/";
-
-        public IdentityServerAuthenticationConfiguration() : this(LocalhostIssuer) { }
+        private const string LocalhostAuthority = "http://localhost:30000/";
+        public IdentityServerAuthenticationConfiguration() : this(GetIdentityServerIssuer()) { }
 
         /// <summary>
         /// Issuer should have slash at the end.
@@ -24,6 +25,18 @@
             // Currently since we are using it only for in-cluster service-to-service
             // communication, this can be set to false.
             RequireHttpsMetadata = false;
+        }
+
+        private static string GetIdentityServerIssuer()
+        {
+            // HACK: Make sure when proper configuration is implemented we are not getting environment variables here.
+            // And also in service discovery.
+            var serviceAuthority = Environment.GetEnvironmentVariable("SERVICE_AUTHORITY");
+
+            if (serviceAuthority == null)
+                return LocalhostAuthority;
+
+            return serviceAuthority;
         }
     }
 }

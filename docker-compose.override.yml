@@ -2,15 +2,24 @@ version: '3.4'
 
 services:
   typingrealm-identityserver:
+    container_name: typingrealm-identityserver-dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "30000:80"
 
   typingrealm-profiles:
+    container_name: typingrealm-profiles-dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - SERVICE_AUTHORITY=http://host.docker.internal:30000/
+      - PROFILES_URL=http://host.docker.internal:30103
+      - DATA_URL=http://host.docker.internal:30400
 
   typingrealm-data:
+    container_name: typingrealm-data-dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - SERVICE_AUTHORITY=http://host.docker.internal:30000/
+      - PROFILES_URL=http://host.docker.internal:30103
+      - DATA_URL=http://host.docker.internal:30400

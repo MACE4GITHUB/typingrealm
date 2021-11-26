@@ -23,6 +23,10 @@ services:
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
+    environment:
+      - SERVICE_AUTHORITY=http://typingrealm-identityserver/
+      - PROFILES_URL=http://typingrealm-profiles
+      - DATA_URL=http://typingrealm-data
 
   typingrealm-data:
     image: ${DOCKER_REGISTRY-}typingrealm-data
@@ -34,3 +38,7 @@ services:
     build:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile
+    environment:
+      - SERVICE_AUTHORITY=http://typingrealm-identityserver/
+      - PROFILES_URL=http://typingrealm-profiles
+      - DATA_URL=http://typingrealm-data
