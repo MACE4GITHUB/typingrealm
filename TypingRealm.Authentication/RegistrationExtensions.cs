@@ -126,7 +126,7 @@ namespace TypingRealm.Authentication
             };
 
             var authenticationBuilder = services
-                .AddAuthentication()
+                .AddAuthentication(TyrAuthenticationSchemes.ProfileAuthenticationScheme) // Sets default authentication scheme.
                 .AddJwtBearer(TyrAuthenticationSchemes.ProfileAuthenticationScheme, options => ConfigureOptions(options, profileAuthentication));
 
             if (serviceAuthentication != null)
