@@ -1,0 +1,36 @@
+version: '3.4'
+
+networks:
+  typingrealm-net:
+
+services:
+  typingrealm-identityserver:
+    image: ${DOCKER_REGISTRY-}typingrealm-identityserver
+    container_name: typingrealm-identityserver
+    networks:
+      - typingrealm-net
+    build:
+      context: .
+      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
+
+  typingrealm-profiles:
+    image: ${DOCKER_REGISTRY-}typingrealm-profiles
+    container_name: typingrealm-profiles
+    networks:
+      - typingrealm-net
+    ports:
+      - "30103:80"
+    build:
+      context: .
+      dockerfile: TypingRealm.Profiles.Api/Dockerfile
+
+  typingrealm-data:
+    image: ${DOCKER_REGISTRY-}typingrealm-data
+    container_name: typingrealm-data
+    networks:
+      - typingrealm-net
+    ports:
+      - "30400:80"
+    build:
+      context: .
+      dockerfile: TypingRealm.Data.Api/Dockerfile
