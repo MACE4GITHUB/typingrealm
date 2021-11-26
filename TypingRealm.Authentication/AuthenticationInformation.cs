@@ -14,6 +14,9 @@ namespace TypingRealm.Authentication
         public string? ServiceClientId { get; set; }
         public string? ServiceClientSecret { get; set; }
 
+        // This can be set for false for local IdentityServer that will not be exposed outside the Docker/Cluster network.
+        public bool RequireHttpsMetadata { get; set; }
+
         public TokenValidationParameters TokenValidationParameters { get; }
             = new TokenValidationParameters
             {

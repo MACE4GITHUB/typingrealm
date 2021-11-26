@@ -16,6 +16,8 @@ namespace TypingRealm.Authentication
             builder.AuthenticationInformation.AuthorizationEndpoint = configuration.AuthorizationEndpoint;
             builder.AuthenticationInformation.TokenEndpoint = configuration.TokenEndpoint;
 
+            builder.AuthenticationInformation.RequireHttpsMetadata = configuration.RequireHttpsMetadata;
+
             builder.AuthenticationInformation.ServiceClientId = configuration.ServiceClientId;
             builder.AuthenticationInformation.ServiceClientSecret = configuration.ServiceClientSecret;
 
@@ -24,7 +26,14 @@ namespace TypingRealm.Authentication
             parameters.IssuerSigningKey = null;
             parameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
             {
-                var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>($"{parameters.ValidIssuer}.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
+                var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                    $"{parameters.ValidIssuer}.well-known/openid-configuration",
+                    new OpenIdConnectConfigurationRetriever(),
+                    new HttpDocumentRetriever
+                    {
+                        RequireHttps = configuration.RequireHttpsMetadata
+                    });
+
                 var openIdConfig = configurationManager.GetConfigurationAsync(CancellationToken.None).GetAwaiter().GetResult();
 
                 return openIdConfig.SigningKeys;

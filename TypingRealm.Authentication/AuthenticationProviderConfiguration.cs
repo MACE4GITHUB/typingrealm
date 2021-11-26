@@ -7,5 +7,8 @@
         string AuthorizationEndpoint,
         string PkceClientId,
         string ServiceClientId,
-        string ServiceClientSecret);
+        string ServiceClientSecret)
+    {
+        public bool RequireHttpsMetadata { get; set; } = true;
+    }
 }

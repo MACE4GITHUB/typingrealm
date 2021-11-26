@@ -151,6 +151,7 @@ namespace TypingRealm.Authentication
 
         private static void ConfigureOptions(JwtBearerOptions options, AuthenticationInformation authenticationInformation)
         {
+            options.RequireHttpsMetadata = authenticationInformation.RequireHttpsMetadata;
             options.Audience = authenticationInformation.TokenValidationParameters.ValidAudiences.First();
             options.TokenValidationParameters = authenticationInformation.TokenValidationParameters;
             options.Authority = options.TokenValidationParameters.ValidIssuer;
