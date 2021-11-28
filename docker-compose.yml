@@ -18,8 +18,6 @@ services:
     container_name: typingrealm-profiles
     networks:
       - typingrealm-net
-    ports:
-      - "30103:80"
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
@@ -33,8 +31,6 @@ services:
     container_name: typingrealm-data
     networks:
       - typingrealm-net
-    ports:
-      - "30400:80"
     build:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile

@@ -1,1 +1,24 @@
 version: '3.4'
+
+services:
+  reverse-proxy:
+    image: caddy
+    container_name: tyr-caddy
+    networks:
+      - typingrealm-net
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ./reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
+      - ./reverse-proxy/caddy_data:/data
+
+  typingrealm-identityserver:
+    restart: unless-stopped
+
+  typingrealm-profiles:
+    restart: unless-stopped
+
+  typingrealm-data:
+    restart: unless-stopped

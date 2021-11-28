@@ -15,6 +15,8 @@ services:
       - SERVICE_AUTHORITY=http://host.docker.internal:30000/
       - PROFILES_URL=http://host.docker.internal:30103
       - DATA_URL=http://host.docker.internal:30400
+    ports:
+      - "30103:80"
 
   typingrealm-data:
     container_name: typingrealm-data-dev
@@ -23,3 +25,5 @@ services:
       - SERVICE_AUTHORITY=http://host.docker.internal:30000/
       - PROFILES_URL=http://host.docker.internal:30103
       - DATA_URL=http://host.docker.internal:30400
+    ports:
+      - "30400:80"

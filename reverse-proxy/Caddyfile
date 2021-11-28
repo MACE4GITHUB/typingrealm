@@ -1,0 +1,14 @@
+{
+    email typingrealm@gmail.com
+
+    # Uncomment for Staging LetsEncrypt
+    #acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+data.typingrealm.com {
+    reverse_proxy typingrealm-data:80
+}
+
+profiles.typingrealm.com {
+    reverse_proxy typingrealm-profiles:80
+}
