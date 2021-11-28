@@ -2,6 +2,7 @@ version: '3.4'
 
 services:
   typingrealm-identityserver:
+    image: ${DOCKER_REGISTRY-}typingrealm-identityserver:dev
     container_name: typingrealm-identityserver-dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -9,6 +10,7 @@ services:
       - "30000:80"
 
   typingrealm-profiles:
+    image: ${DOCKER_REGISTRY-}typingrealm-profiles:dev
     container_name: typingrealm-profiles-dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -19,6 +21,7 @@ services:
       - "30103:80"
 
   typingrealm-data:
+    image: ${DOCKER_REGISTRY-}typingrealm-data:dev
     container_name: typingrealm-data-dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
