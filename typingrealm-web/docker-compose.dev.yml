@@ -1,7 +1,0 @@
-version: '3.4'
-
-services:
-  typingrealm-web-typing-page:
-    ports:
-      - "4200:80"
-

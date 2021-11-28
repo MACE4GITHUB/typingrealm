@@ -1,7 +1,14 @@
 version: '3.4'
 
+# TODO: Make sure networks don't collaps in PROD and DEV flows.
+# Needs to be created separately if you use production yml.
+networks:
+  typingrealm-net:
+    external:
+      name: typingrealm-net
+
 services:
-  reverse-proxy:
+  tyr-caddy:
     image: caddy
     container_name: tyr-caddy
     networks:
@@ -22,3 +29,12 @@ services:
 
   typingrealm-data:
     restart: unless-stopped
+
+  typingrealm-web-typing-page:
+    image: ${DOCKER_REGISTRY-}typingrealm-web-typing-page
+    container_name: typingrealm-web-typing-page
+    networks:
+      - typingrealm-net
+    build:
+      context: ./typingrealm-web
+      dockerfile: Dockerfile

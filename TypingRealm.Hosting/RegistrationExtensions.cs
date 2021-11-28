@@ -30,7 +30,9 @@ namespace TypingRealm.Hosting
             "http://localhost:4200",
             "https://localhost:4200",
             "http://typingrealm.com:4200",
-            "https://typingrealm.com:4200"
+            "https://typingrealm.com:4200",
+            "http://typingrealm.com",
+            "https://typingrealm.com"
         };
 
         public static MessageTypeCacheBuilder UseTcpHost(this IServiceCollection services, int port)
