@@ -1,6 +1,9 @@
 <Project>
   <PropertyGroup>
     <Nullable>enable</Nullable>
+
+    <!-- Enables ALL analyzers instead of deprecated FxCop. -->
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
   <!--<ItemDefinitionGroup>
     <PackageReference>
@@ -11,10 +14,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>-->
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>$(AssemblyName).Tests</_Parameter1>
     </AssemblyAttribute>
