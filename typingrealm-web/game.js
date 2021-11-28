@@ -1,56 +1,52 @@
-/* AUTHENTICATION */
+async function main() {
 
-let auth0 = undefined;
-const createAuth0Client = window.createAuth0Client;
+    /* INITIALIZATION */
 
-/* ENV variable */
+    const createAuth0Client = window.createAuth0Client;
+    let auth0 = undefined;
 
-const env = 'prod'; // Change for 'prod' for prod.
+    const url_string = window.location.href;
+    const url = new URL(url_string);
+    let profile = url.searchParams.get('profile');
+    const env = profile ? 'dev' : 'prod';
 
-const PROFILES_URL = env == 'prod'
-    ? 'https://profiles.typingrealm.com'
-    : 'http://localhost:30103';
+    const PROFILES_URL = env == 'prod'
+        ? 'https://profiles.typingrealm.com'
+        : 'http://localhost:30103';
 
-const DATA_URL = env == 'prod'
-    ? 'https://data.typingrealm.com'
-    : 'http://localhost:30400';
+    const DATA_URL = env == 'prod'
+        ? 'https://data.typingrealm.com'
+        : 'http://localhost:30400';
 
-/* INITIALIZATION */
+    const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
 
-const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
+    const length = url.searchParams.get('length');
+    let textType = url.searchParams.get('textType');
+    if (textType != 'words' && textType != 'text') {
+        textType = 'text';
+    }
 
-const url_string = window.location.href;
-const url = new URL(url_string);
-let profile = url.searchParams.get('profile');
-const length = url.searchParams.get('length');
-let textType = url.searchParams.get('textType');
-if (textType != 'words' && textType != 'text') {
-    textType = 'text';
-}
+    async function forceLogin() {
+        await auth0.loginWithPopup();
+    }
 
-async function login() {
-    await auth0.loginWithPopup();
+    async function getProfileFromToken() {
+        const user = await auth0.getUser();
+        profile = user.sub;
 
-    const user = await auth0.getUser();
-    profile = user.sub;
-}
+        return profile;
+    }
 
-if (!profile) {
-    createAuth0Client({
-        domain: 'typingrealm.us.auth0.com',
-        client_id: 'usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck'
-    }).then(a => {
-        auth0 = a;
-
-        login().then(_ => {
-            everythingElse();
+    if (!profile) {
+        auth0 = await createAuth0Client({
+            domain: 'typingrealm.us.auth0.com',
+            client_id: 'usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck',
+            useRefreshTokens: true
         });
-    });
-} else {
-    everythingElse();
-}
 
-function everythingElse() {
+        await forceLogin();
+        profile = await getProfileFromToken();
+    }
 
     if (!profile || !length)
         throw new Error("Cannot continue without specifying 'profile' and 'length'.");
@@ -615,7 +611,12 @@ function everythingElse() {
 
     async function getToken() {
         if (auth0) {
-            return await auth0.getTokenSilently();
+            try {
+                return await auth0.getTokenSilently();
+            } catch {
+                await forceLogin();
+                return await auth0.getTokenSilently();
+            }
         }
 
         let response = await fetch(authTokenRequestUrl, {
@@ -666,3 +667,5 @@ function everythingElse() {
         return request;
     }
 }
+
+main();
