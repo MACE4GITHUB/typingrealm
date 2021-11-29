@@ -1,12 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
-    <ProjectReference Include="..\TypingRealm.Profiles\TypingRealm.Profiles.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj" />
   </ItemGroup>
 
 </Project>

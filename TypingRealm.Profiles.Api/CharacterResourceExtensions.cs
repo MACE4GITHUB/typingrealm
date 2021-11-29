@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.Profiles.Api.Resources
+﻿using TypingRealm.Profiles.Api.Resources;
+
+namespace TypingRealm.Profiles.Api
 {
     public static class CharacterResourceExtensions
     {

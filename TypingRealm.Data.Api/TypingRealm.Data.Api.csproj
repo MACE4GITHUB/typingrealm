@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -19,9 +19,9 @@
     <ProjectReference Include="..\TypingRealm.Data.Infrastructure\TypingRealm.Data.Infrastructure.csproj" />
     <ProjectReference Include="..\TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles.Api.Client\TypingRealm.Profiles.Api.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Api.Resources\TypingRealm.Profiles.Api.Resources.csproj" />
-    <ProjectReference Include="..\TypingRealm.Profiles.Infrastructure\TypingRealm.Profiles.Infrastructure.csproj" />
-    <ProjectReference Include="..\TypingRealm.Profiles\TypingRealm.Profiles.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Typing\TypingRealm.Typing.csproj" />
   </ItemGroup>
 

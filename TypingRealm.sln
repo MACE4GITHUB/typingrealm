@@ -137,6 +137,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Typing.Tests", 
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D364E50A-9E79-41D7-B537-B9058ABFC068}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Profiles.Core", "TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj", "{EB707EB2-A180-4D54-8C16-50ED8BC5781F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -347,6 +349,10 @@ Global
 		{D364E50A-9E79-41D7-B537-B9058ABFC068}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D364E50A-9E79-41D7-B537-B9058ABFC068}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D364E50A-9E79-41D7-B537-B9058ABFC068}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB707EB2-A180-4D54-8C16-50ED8BC5781F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB707EB2-A180-4D54-8C16-50ED8BC5781F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB707EB2-A180-4D54-8C16-50ED8BC5781F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB707EB2-A180-4D54-8C16-50ED8BC5781F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -401,6 +407,7 @@ Global
 		{B44B3DC4-EA62-49FC-B91C-AA153FE16995} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
 		{9F9467F3-14D2-4391-AF61-804A446BB578} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
 		{0D794D01-B841-4028-B00F-994FC44A66BE} = {D58A09EC-1247-4839-95AA-3B8C9E649839}
+		{EB707EB2-A180-4D54-8C16-50ED8BC5781F} = {5878711F-092A-4204-A260-F3C9D4576A63}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}
