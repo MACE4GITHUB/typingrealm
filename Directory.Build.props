@@ -5,14 +5,14 @@
     <!-- Enables ALL analyzers instead of deprecated FxCop. -->
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
-  <!--<ItemDefinitionGroup>
-    <PackageReference>
+  <ItemDefinitionGroup>
+    <!--<PackageReference>
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    </PackageReference>-->
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
-  </ItemDefinitionGroup>-->
+  </ItemDefinitionGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>$(AssemblyName).Tests</_Parameter1>
