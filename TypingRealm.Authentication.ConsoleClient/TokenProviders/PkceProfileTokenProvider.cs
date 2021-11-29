@@ -39,7 +39,7 @@ namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
 
         public async ValueTask<string> SignInAsync(CancellationToken cancellationToken)
         {
-            await using var @lock = await _lock.UseWaitAsync(default).ConfigureAwait(false);
+            await using var @lock = (await _lock.UseWaitAsync(default).ConfigureAwait(false)).ConfigureAwait(false);
 
             // TODO: Use UTC.
             if (_accessTokenExpiration > DateTime.Now.AddMinutes(1) && _accessToken != null)
