@@ -13,15 +13,23 @@ services:
     volumes:
       - ./reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
       - ./reverse-proxy/caddy_data:/data
+    mem_limit: 1g
+    mem_reservation: 750m
 
   typingrealm-identityserver:
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
 
   typingrealm-profiles:
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
 
   typingrealm-data:
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
 
   typingrealm-web-ui:
     image: ${DOCKER_REGISTRY-}typingrealm-web-ui
@@ -32,3 +40,5 @@ services:
       context: ./typingrealm-web
       dockerfile: Dockerfile
     restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m

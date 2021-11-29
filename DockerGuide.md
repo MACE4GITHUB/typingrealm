@@ -65,6 +65,8 @@ This needs to be added to every .NET project RUN (except IdentityServer):
     -e SERVICE_AUTHORITY=https://typingrealm-identityserver/
     -e PROFILES_URL=https://typingrealm-profiles
     -e DATA_URL=https://typingrealm-data
+
+    --memory="1g" --memory-reservation="750m"
 ```
 
 ```
@@ -73,10 +75,10 @@ docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingre
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-data typingrealm-data
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-web-ui typingrealm-web-ui
 
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-identityserver typingrealm-identityserver
-docker run -d --net tyr_typingrealm-net --restart unless-stopped -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-profiles typingrealm-profiles
-docker run -d --net tyr_typingrealm-net --restart unless-stopped -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-data typingrealm-data
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-web-ui typingrealm-web-ui
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-identityserver typingrealm-identityserver
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-profiles typingrealm-profiles
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-data typingrealm-data
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-web-ui typingrealm-web-ui
 ```
 
 
@@ -91,6 +93,7 @@ docker run -d
     -p 80:80 -p 443:443
     --net tyr_typingrealm-net
     --restart unless-stopped
+    --memory="1g" --memory-reservation="750m"
     -v (ABSOLUTE_PATH_TO_REPOSITORY)/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
     -v (ABSOLUTE_PATH_TO_REPOSITORY)/reverse-proxy/caddy_data:/data
     --name typingrealm-caddy caddy
@@ -99,6 +102,7 @@ docker run -d
     -p 80:80 -p 443:443
     --net tyr_typingrealm-net
     --restart unless-stopped
+    --memory="1g" --memory-reservation="750m"
     -v /d/Projects/typingrealm/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
     -v /d/Projects/typingrealm/reverse-proxy/caddy_data:/data
     --name typingrealm-caddy caddy
