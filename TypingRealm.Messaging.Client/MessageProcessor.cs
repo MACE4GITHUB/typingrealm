@@ -392,8 +392,8 @@ namespace TypingRealm.Messaging.Client
 
             var resource = GetConnectionResource();
 
-            await using var _ = await _reconnectLock.UseWaitAsync(resource.OriginalCancellationToken)
-                .ConfigureAwait(false);
+            await using var _ = (await _reconnectLock.UseWaitAsync(resource.OriginalCancellationToken)
+                .ConfigureAwait(false)).ConfigureAwait(false);
 
             if (IsConnected)
                 return;
@@ -416,7 +416,7 @@ namespace TypingRealm.Messaging.Client
 
         private async ValueTask WaitForReconnectAsync(CancellationToken cancellationToken)
         {
-            await using var _ = await _reconnectLock.UseWaitAsync(cancellationToken).ConfigureAwait(false);
+            await using var _ = (await _reconnectLock.UseWaitAsync(cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
         }
     }
 }
