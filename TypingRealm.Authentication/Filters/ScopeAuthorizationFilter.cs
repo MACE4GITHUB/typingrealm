@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace TypingRealm.Authorization
+namespace TypingRealm.Authentication
 {
-    public class ScopeAuthorizationFilter : IAuthorizationFilter
+    public sealed class ScopeAuthorizationFilter : IAuthorizationFilter
     {
         private readonly string _scope;
 

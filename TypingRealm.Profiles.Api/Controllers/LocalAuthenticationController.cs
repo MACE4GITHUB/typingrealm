@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Authentication;
-using TypingRealm.Authorization;
 
 namespace TypingRealm.Profiles.Api.Controllers
 {

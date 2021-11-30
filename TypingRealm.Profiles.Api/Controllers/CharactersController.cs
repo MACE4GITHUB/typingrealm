@@ -1,27 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TypingRealm.Authorization;
+using TypingRealm.Authentication;
+using TypingRealm.Hosting;
 using TypingRealm.Profiles.Api.Resources;
 using TypingRealm.Profiles.Api.Resources.Data;
 
 namespace TypingRealm.Profiles.Api.Controllers
 {
+    [UserScoped]
     [Route("api/[controller]")]
     public sealed class CharactersController : OwnerResourceControllerBase<Character, CharacterResource>
     {
-        private readonly IAuthorizationService _authService;
         private readonly ICharacterResourceQuery _characterResourceQuery;
         private readonly ICharacterRepository _characterRepository;
 
         public CharactersController(
-            IAuthorizationService authService,
             ICharacterResourceQuery characterResourceQuery,
             ICharacterRepository characterRepository)
             : base(x => x.ProfileId, x => x.ProfileId)
         {
-            _authService = authService;
             _characterResourceQuery = characterResourceQuery;
             _characterRepository = characterRepository;
         }
@@ -118,10 +116,21 @@ namespace TypingRealm.Profiles.Api.Controllers
 
             return IsOwner(character);
         }
+    }
+
+    [ServiceScoped]
+    [Route("api/characters")]
+    public sealed class CharactersServiceController : TyrController
+    {
+        private readonly ICharacterRepository _characterRepository;
+
+        public CharactersServiceController(ICharacterRepository characterRepository)
+        {
+            _characterRepository = characterRepository;
+        }
 
         [HttpPost]
         [Route("{characterId}/activities/{activityId}")]
-        [ServiceScoped]
         public async ValueTask<ActionResult> EnterActivity(string characterId, string activityId)
         {
             var character = await _characterRepository.FindAsync(new CharacterId(characterId));
@@ -135,7 +144,6 @@ namespace TypingRealm.Profiles.Api.Controllers
 
         [HttpGet]
         [Route("{characterId}/activities/{activityId}")]
-        [ServiceScoped]
         public async ValueTask<ActionResult<bool>> CanJoinActivity(string characterId, string activityId)
         {
             var character = await _characterRepository.FindAsync(new CharacterId(characterId));
@@ -147,7 +155,6 @@ namespace TypingRealm.Profiles.Api.Controllers
 
         [HttpDelete]
         [Route("{characterId}/activities/{activityId}")]
-        [ServiceScoped]
         public async ValueTask<ActionResult> LeaveActivity(string characterId, string activityId)
         {
             var character = await _characterRepository.FindAsync(new CharacterId(characterId));
@@ -164,7 +171,6 @@ namespace TypingRealm.Profiles.Api.Controllers
 
         [HttpGet]
         [Route("{characterId}/activities")]
-        [ServiceScoped]
         public async ValueTask<ActionResult<Stack<string>>> GetActivities(string characterId)
         {
             var character = await _characterRepository.FindAsync(new CharacterId(characterId));
