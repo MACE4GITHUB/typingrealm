@@ -12,7 +12,7 @@ namespace TypingRealm.Profiles
 
         private Profile(ProfileType type)
         {
-            if (type == Profiles.ProfileType.User)
+            if (type == ProfileType.User)
                 throw new InvalidOperationException("Cannot create User profile without ProfileId.");
 
             Type = type;

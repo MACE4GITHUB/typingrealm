@@ -76,14 +76,12 @@ namespace TypingRealm.ConsoleApp
             {
                 // Create a couple of characters.
                 var charactersClient = host.Services.GetRequiredService<ICharactersClient>();
-                await charactersClient.CreateAsync(new CreateCharacterDto
-                {
-                    Name = "my character"
-                }, default).ConfigureAwait(false);
-                await charactersClient.CreateAsync(new CreateCharacterDto
-                {
-                    Name = "my character 2"
-                }, default).ConfigureAwait(false);
+                await charactersClient.CreateAsync(
+                    new CreateCharacterDto("my character"),
+                    default).ConfigureAwait(false);
+                await charactersClient.CreateAsync(
+                    new CreateCharacterDto("my character 2"),
+                    default).ConfigureAwait(false);
             }
 
             RunApplication(

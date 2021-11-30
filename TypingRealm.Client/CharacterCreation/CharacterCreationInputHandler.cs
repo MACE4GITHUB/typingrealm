@@ -55,10 +55,9 @@ namespace TypingRealm.Client.CharacterCreation
 
         private void CreateCharacter()
         {
-            _charactersClient.CreateAsync(new CreateCharacterDto
-            {
-                Name = _state.CharacterNameInput.Value
-            }, default).GetAwaiter().GetResult();
+            _charactersClient.CreateAsync(
+                new CreateCharacterDto(_state.CharacterNameInput.Value),
+                default).GetAwaiter().GetResult();
 
             _screenNavigation.Screen = GameScreen.MainMenu;
         }
