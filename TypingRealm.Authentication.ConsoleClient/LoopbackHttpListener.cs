@@ -54,7 +54,7 @@ namespace TypingRealm.Authentication.ConsoleClient
                 }
                 else if (ctx.Request.Method == "POST")
                 {
-                    if (!ctx.Request.ContentType.Equals("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
+                    if (ctx.Request.ContentType != null && !ctx.Request.ContentType.Equals("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
                     {
                         ctx.Response.StatusCode = 415;
                     }

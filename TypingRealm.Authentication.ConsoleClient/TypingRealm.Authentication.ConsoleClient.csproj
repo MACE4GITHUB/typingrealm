@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="IdentityModel.OidcClient" Version="4.0.0-preview.8" />
+    <PackageReference Include="IdentityModel.OidcClient" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
