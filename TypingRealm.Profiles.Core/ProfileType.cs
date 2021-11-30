@@ -2,6 +2,8 @@
 {
     public enum ProfileType
     {
+        None,
+
         /// <summary>
         /// If user is not authenticated (no token, invalid token).
         /// </summary>
