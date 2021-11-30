@@ -4,7 +4,7 @@ using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Authentication
 {
-    internal static class CommonRegistrationExtensions
+    public static class CommonRegistrationExtensions
     {
         /// <summary>
         /// Shared code that is run both for API and Services.

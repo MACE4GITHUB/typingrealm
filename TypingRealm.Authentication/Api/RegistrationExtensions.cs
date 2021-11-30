@@ -34,7 +34,7 @@ namespace TypingRealm.Authentication.Api
         /// self-hosted services (e.g. with some custom TCP implementation).
         /// </summary>
         /// <returns></returns>
-        internal static IServiceCollection UseAspNetAuthentication(
+        public static IServiceCollection UseAspNetAuthentication(
             this IServiceCollection services,
             AuthenticationInformation profileAuthentication,
             AuthenticationInformation? serviceAuthentication = null)

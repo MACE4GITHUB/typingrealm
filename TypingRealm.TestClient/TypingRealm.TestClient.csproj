@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Authentication.ConsoleClient\TypingRealm.Authentication.ConsoleClient.csproj" />
+    <ProjectReference Include="..\TypingRealm.Authentication.Service\TypingRealm.Authentication.Service.csproj" />
     <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
     <ProjectReference Include="..\TypingRealm.Combat\TypingRealm.Combat.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
