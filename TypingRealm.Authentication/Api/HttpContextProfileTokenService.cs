@@ -15,7 +15,7 @@ namespace TypingRealm.Authentication.Api
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async ValueTask<string> GetProfileAccessTokenAsync(CancellationToken cancellationToken)
+        public ValueTask<string> GetProfileAccessTokenAsync(CancellationToken cancellationToken)
         {
             if (_httpContextAccessor.HttpContext == null)
                 throw new NotSupportedException("HttpContext is not available, cannot acquire profile access token.");
@@ -34,12 +34,12 @@ namespace TypingRealm.Authentication.Api
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"]
                 .FirstOrDefault();
 
-            if (token == null || !token.StartsWith("Bearer "))
+            if (token == null || !token.StartsWith("Bearer ", StringComparison.Ordinal))
                 throw new InvalidOperationException("Access token is not set on HTTP context or has invalid format.");
 
             token = token.Remove(0, 7);
 
-            return token;
+            return new ValueTask<string>(token);
         }
     }
 }
