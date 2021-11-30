@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Hosting;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Api.Controllers

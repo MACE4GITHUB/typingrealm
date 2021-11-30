@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Hosting;
 using TypingRealm.Profiles;
 using TypingRealm.Typing;
 
@@ -71,10 +72,10 @@ namespace TypingRealm.Data.Api.Controllers
         {
             var shouldContain = new List<string>();
 
-            if (ProfileId.Value != ProfileType.Anonymous)
+            if (Profile.Type == ProfileType.User)
             {
                 // Personalize text generation.
-                var data = await _typingReportGerenator.GenerateReportAsync(ProfileId);
+                var data = await _typingReportGerenator.GenerateReportAsync(Profile.ProfileId);
 
                 shouldContain.AddRange(data.AggregatedData
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
@@ -97,6 +98,8 @@ namespace TypingRealm.Data.Api.Controllers
         [HttpPost]
         public async ValueTask<ActionResult> Post(CreateTextDto dto)
         {
+            // TODO: Make a global attribute that will ensure that in order to
+            // execute endpoint we need USER-authentication and not SERVICE-authentication.
             var textId = await _textRepository.NextIdAsync();
 
             var text = new Text(textId, dto.Value, ProfileId, DateTime.UtcNow, dto.IsPublic);

@@ -1,8 +1,20 @@
 ﻿namespace TypingRealm.Profiles
 {
-    public static class ProfileType
+    public enum ProfileType
     {
-        public const string Anonymous = "Anonymous";
-        public const string Service = "Service";
+        /// <summary>
+        /// If user is not authenticated (no token, invalid token).
+        /// </summary>
+        Anonymous = 1,
+
+        /// <summary>
+        /// If user is authenticated, but there is no sub claim.
+        /// </summary>
+        Service = 2,
+
+        /// <summary>
+        /// If user is authenticated with valid user sub claim.
+        /// </summary>
+        User = 3
     }
 }

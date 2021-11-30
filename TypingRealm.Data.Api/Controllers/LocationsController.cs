@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Data.Infrastructure;
 using TypingRealm.Data.Resources;
+using TypingRealm.Hosting;
 
 namespace TypingRealm.Data.Api.Controllers
 {
