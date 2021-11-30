@@ -65,6 +65,7 @@ namespace TypingRealm.Authentication
                 throw new InvalidOperationException("Access token is null, invalid conversion from token endpoint response.");
 
             // TODO: Cache this token and renew only when expired / about to expire.
+            // Make sure caching is registered as singletone as this class is transient as of now.
             return tokenData.access_token;
         }
     }

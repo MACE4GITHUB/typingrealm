@@ -2,11 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Authentication.OAuth;
+using TypingRealm.Authentication.Service.Messages;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Service
 {
     public sealed class AuthenticateConnectionInitializer : IConnectionInitializer
     {

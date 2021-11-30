@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using TypingRealm.Profiles;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Api.Filters
 {
     public sealed class ProfileTypeAuthorizationFilter : IAuthorizationFilter
     {

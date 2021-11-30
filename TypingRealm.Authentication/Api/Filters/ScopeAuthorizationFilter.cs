@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Api.Filters
 {
     public sealed class ScopeAuthorizationFilter : IAuthorizationFilter
     {

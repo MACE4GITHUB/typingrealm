@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Service
 {
     public interface IConnectedClientContext
     {

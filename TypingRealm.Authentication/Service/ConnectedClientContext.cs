@@ -3,9 +3,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Authentication.Service.Messages;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Service
 {
     public sealed class ConnectedClientContext : AsyncManagedDisposable, IConnectedClientContext
     {

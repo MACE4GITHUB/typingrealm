@@ -1,6 +1,6 @@
 ﻿using TypingRealm.Messaging;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Service.Messages
 {
     [Message]
     public sealed class TokenExpired

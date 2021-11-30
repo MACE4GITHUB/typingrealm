@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Api
 {
     public sealed class HttpContextProfileTokenService : IProfileTokenService
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using TypingRealm.Authentication;
+using TypingRealm.Authentication.Service.Messages;
 using TypingRealm.Messaging.Client.Handling;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Messaging.Messages;

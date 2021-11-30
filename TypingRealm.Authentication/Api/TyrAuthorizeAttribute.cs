@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Authentication.Api.Filters;
 using TypingRealm.Profiles;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Api
 {
     public abstract class TyrAuthorizeAttribute : TypeFilterAttribute
     {

@@ -5,7 +5,7 @@ using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
 using TypingRealm.Profiles.Api.Client;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Service
 {
     public sealed class AuthorizeConnectHook : IConnectHook
     {

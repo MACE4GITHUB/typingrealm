@@ -1,13 +1,13 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Service
 {
-    public sealed class ProfileTokenService : IProfileTokenService
+    public sealed class ConnectedClientProfileTokenService : IProfileTokenService
     {
         private readonly IConnectedClientContext _connectedClientContext;
 
-        public ProfileTokenService(IConnectedClientContext connectedClientContext)
+        public ConnectedClientProfileTokenService(IConnectedClientContext connectedClientContext)
         {
             _connectedClientContext = connectedClientContext;
         }

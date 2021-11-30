@@ -1,9 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Authentication.OAuth;
+using TypingRealm.Authentication.Service.Messages;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.Service.Handlers
 {
     public sealed class AuthenticateHandler : IMessageHandler<Authenticate>
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TypingRealm.Authentication;
 using TypingRealm.Authentication.ConsoleClient;
+using TypingRealm.Authentication.Service;
 using TypingRealm.Communication;
 using TypingRealm.Data.Api.Client;
 using TypingRealm.Messaging.Client;

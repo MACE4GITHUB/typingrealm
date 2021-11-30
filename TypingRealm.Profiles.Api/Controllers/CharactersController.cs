@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TypingRealm.Authentication;
+using TypingRealm.Authentication.Api;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles.Api.Resources;
 using TypingRealm.Profiles.Api.Resources.Data;

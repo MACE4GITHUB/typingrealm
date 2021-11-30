@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
+using TypingRealm.Authentication.Api;
+using TypingRealm.Authentication.Service;
 using TypingRealm.Communication;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
@@ -73,7 +75,7 @@ namespace TypingRealm.Hosting
                 .RegisterMessaging();
             var builder = services.AddSerializationCore();
             builder
-                .AddTyrWebServiceAuthentication();
+                .AddTyrServiceAuthentication();
                 //.UseLocalProvider();
 
             services.AddTransient<IStartupFilter, SignalRStartupFilter>();
