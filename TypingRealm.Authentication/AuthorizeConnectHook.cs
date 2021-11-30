@@ -3,21 +3,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
+using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Authentication
 {
     public sealed class AuthorizeConnectHook : IConnectHook
     {
-        private readonly IProfileService _profileService;
+        private readonly ICharactersClient _charactersClient;
 
-        public AuthorizeConnectHook(IProfileService profileService)
+        public AuthorizeConnectHook(ICharactersClient charactersClient)
         {
-            _profileService = profileService;
+            _charactersClient = charactersClient;
         }
 
         public async ValueTask HandleAsync(Connect connect, CancellationToken cancellationToken)
         {
-            var characterBelongsToCurrentProfile = await _profileService.CharacterBelongsToCurrentProfileAsync(connect.ClientId, cancellationToken)
+            var characterBelongsToCurrentProfile = await _charactersClient.BelongsToCurrentProfileAsync(connect.ClientId, cancellationToken)
                 .ConfigureAwait(false);
 
             if (!characterBelongsToCurrentProfile)

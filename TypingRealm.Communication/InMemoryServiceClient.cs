@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Authentication;
 
 namespace TypingRealm.Communication
 {
@@ -38,12 +39,17 @@ namespace TypingRealm.Communication
         }
 
         private readonly IHttpClient _httpClient;
-        private readonly IAccessTokenProvider _accessTokenProvider;
+        private readonly IProfileTokenService _profileTokenService;
+        private readonly IServiceTokenService _serviceTokenService;
 
-        public InMemoryServiceClient(IHttpClient httpClient, IAccessTokenProvider accessTokenProvider)
+        public InMemoryServiceClient(
+            IHttpClient httpClient,
+            IProfileTokenService profileTokenService,
+            IServiceTokenService serviceTokenService)
         {
             _httpClient = httpClient;
-            _accessTokenProvider = accessTokenProvider;
+            _profileTokenService = profileTokenService;
+            _serviceTokenService = serviceTokenService;
         }
 
         public async ValueTask<T> GetAsync<T>(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, CancellationToken cancellationToken)
@@ -55,8 +61,8 @@ namespace TypingRealm.Communication
 
             var accessToken = endpointAuthenticationType switch
             {
-                EndpointAuthenticationType.Profile => await _accessTokenProvider.GetProfileTokenAsync(cancellationToken).ConfigureAwait(false),
-                EndpointAuthenticationType.Service => await _accessTokenProvider.GetServiceTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
                 _ => null
             };
 
@@ -85,8 +91,8 @@ namespace TypingRealm.Communication
 
             var accessToken = endpointAuthenticationType switch
             {
-                EndpointAuthenticationType.Profile => await _accessTokenProvider.GetProfileTokenAsync(cancellationToken).ConfigureAwait(false),
-                EndpointAuthenticationType.Service => await _accessTokenProvider.GetServiceTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
                 _ => null
             };
 
@@ -103,8 +109,8 @@ namespace TypingRealm.Communication
 
             var accessToken = endpointAuthenticationType switch
             {
-                EndpointAuthenticationType.Profile => await _accessTokenProvider.GetProfileTokenAsync(cancellationToken).ConfigureAwait(false),
-                EndpointAuthenticationType.Service => await _accessTokenProvider.GetServiceTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
                 _ => null
             };
 

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using TypingRealm.Authentication.OAuth.Configuration;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.OAuth
 {
     public static class LocalAuthentication
     {
@@ -24,7 +25,7 @@ namespace TypingRealm.Authentication
         }
 #pragma warning restore S3963, CA1810
 
-        internal static string Issuer => _authenticationConfiguration.Issuer;
+        public static string Issuer => _authenticationConfiguration.Issuer;
         internal static SecurityKey SecurityKey { get; }
 
         public static string GenerateProfileAccessToken(string subClaimValue)
@@ -37,11 +38,10 @@ namespace TypingRealm.Authentication
             return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(60), _signingCredentials));
         }
 
-        public static string GenerateServiceAccessToken(string subClaimValue)
+        public static string GenerateServiceAccessToken()
         {
             var claims = new List<Claim>
             {
-                new Claim("sub", subClaimValue),
                 new Claim("scope", TyrScopes.Service)
             };
 

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Authentication.Core\TypingRealm.Authentication.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />

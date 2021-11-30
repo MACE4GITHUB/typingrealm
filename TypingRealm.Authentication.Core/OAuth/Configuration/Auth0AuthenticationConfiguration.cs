@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.Authentication
+﻿namespace TypingRealm.Authentication.OAuth.Configuration
 {
     public sealed record Auth0AuthenticationConfiguration : AuthenticationProviderConfiguration
     {

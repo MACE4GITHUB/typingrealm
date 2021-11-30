@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Authentication.OAuth;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;

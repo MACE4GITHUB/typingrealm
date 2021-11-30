@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.OAuth.Configuration
 {
     public sealed record IdentityServerAuthenticationConfiguration : AuthenticationProviderConfiguration
     {

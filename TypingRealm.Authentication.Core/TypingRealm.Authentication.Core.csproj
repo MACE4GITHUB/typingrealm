@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>TypingRealm.Authentication</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Install this instead of Microsoft.IdentityModel.* -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>

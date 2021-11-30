@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.Authentication
+﻿namespace TypingRealm.Authentication.OAuth.Configuration
 {
     public sealed record LocalAuthenticationConfiguration : AuthenticationProviderConfiguration
     {
@@ -12,5 +12,4 @@
             ServiceClientSecret: "local-secret")
         { }
     }
-
 }

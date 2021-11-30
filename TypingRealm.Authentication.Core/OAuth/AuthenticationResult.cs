@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.OAuth
 {
     public sealed class AuthenticationResult
     {

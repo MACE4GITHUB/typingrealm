@@ -1,8 +1,9 @@
 ﻿using System.Threading;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using TypingRealm.Authentication.OAuth.Configuration;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication.OAuth
 {
     public static class AuthenticationInformationBuilderExtensions
     {

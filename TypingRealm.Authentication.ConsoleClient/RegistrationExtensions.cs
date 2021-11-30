@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication.ConsoleClient.TokenProviders;
-using TypingRealm.Communication;
+using TypingRealm.Authentication.OAuth.Configuration;
 using TypingRealm.Messaging.Client;
 
 namespace TypingRealm.Authentication.ConsoleClient
@@ -41,7 +41,7 @@ namespace TypingRealm.Authentication.ConsoleClient
 
         private static IServiceCollection AddAccessTokenProvider(this IServiceCollection services)
         {
-            services.AddTransient<IAccessTokenProvider, AccessTokenProvider>();
+            services.AddTransient<IProfileTokenService, ProfileTokenService>();
 
             return services;
         }

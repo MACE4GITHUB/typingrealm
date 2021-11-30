@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using TypingRealm.Authentication.Adapters;
-using TypingRealm.Communication;
+using TypingRealm.Authentication.OAuth;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Serialization;
@@ -16,44 +15,6 @@ using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Authentication
 {
-    public interface IAuthenticationInformationProvider
-    {
-        AuthenticationInformation GetProfileAuthenticationInformation();
-        AuthenticationInformation GetServiceAuthenticationInformation();
-    }
-
-    public sealed class AuthenticationInformationProvider : IAuthenticationInformationProvider
-    {
-        private readonly AuthenticationInformation _profileAuthenticationInformation;
-        private readonly AuthenticationInformation _serviceAuthenticationInformation;
-
-        public AuthenticationInformationProvider(
-            AuthenticationInformation profileAuthenticationInformation,
-            AuthenticationInformation serviceAuthenticationInformation)
-        {
-            _profileAuthenticationInformation = profileAuthenticationInformation;
-            _serviceAuthenticationInformation = serviceAuthenticationInformation;
-        }
-
-        public AuthenticationInformation GetProfileAuthenticationInformation()
-        {
-            return _profileAuthenticationInformation;
-        }
-
-        public AuthenticationInformation GetServiceAuthenticationInformation()
-        {
-            return _serviceAuthenticationInformation;
-        }
-    }
-
-    public sealed class AuthenticationInformationBuilder
-    {
-        public AuthenticationInformation AuthenticationInformation { get; }
-            = new AuthenticationInformation();
-
-        public AuthenticationInformation Build() => AuthenticationInformation;
-    }
-
     public static class RegistrationExtensions
     {
         public static IServiceCollection AddTypingRealmAuthentication(
@@ -61,7 +22,10 @@ namespace TypingRealm.Authentication
             AuthenticationInformation profileAuthentication,
             AuthenticationInformation? serviceAuthentication = null)
         {
-            services.AddTransient<IAccessTokenProvider, AccessTokenProvider>();
+            // ConnectedClients (realtime) Profile token service.
+            // Cannot add it here because this method is also called for Web APIs.
+            //services.AddTransient<IProfileTokenService, ProfileTokenService>();
+
             services.AddTransient<IServiceTokenService, ServiceTokenService>();
             services.AddProfileApiClients();
 
@@ -77,6 +41,10 @@ namespace TypingRealm.Authentication
             AuthenticationInformation? serviceAuthentication = null)
         {
             builder.AddTyrAuthenticationMessages();
+
+            // Adding ConnectedClient (realtime) token service for realtime servers.
+            builder.Services.AddTransient<IProfileTokenService, ProfileTokenService>();
+
             builder.Services.AddTypingRealmAuthentication(profileAuthentication, serviceAuthentication);
 
             return builder;
@@ -218,7 +186,7 @@ namespace TypingRealm.Authentication
 
         public static IServiceCollection UseCharacterAuthorizationOnConnect(this IServiceCollection services)
         {
-            services.AddTransient<IProfileService, ProfileServiceAdapter>();
+            services.AddTransient<IProfileTokenService, ProfileTokenService>();
             services.AddTransient<IConnectHook, AuthorizeConnectHook>();
 
             return services;

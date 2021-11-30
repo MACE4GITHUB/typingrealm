@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Authentication.OAuth;
 using TypingRealm.Messaging.Client;
 
 namespace TypingRealm.Authentication.ConsoleClient.TokenProviders

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Authentication;
+using TypingRealm.Authentication.OAuth;
 
 namespace TypingRealm.Profiles.Api.Controllers
 {
@@ -34,7 +35,7 @@ namespace TypingRealm.Profiles.Api.Controllers
 
             return new TokenResponse
             {
-                access_token = LocalAuthentication.GenerateServiceAccessToken(request.client_id)
+                access_token = LocalAuthentication.GenerateServiceAccessToken()
             };
         }
 

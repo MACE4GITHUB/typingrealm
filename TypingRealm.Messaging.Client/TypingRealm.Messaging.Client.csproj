@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Authentication.Core\TypingRealm.Authentication.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
