@@ -1,34 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="IdentityModel.OidcClient" Version="4.0.0-preview.8" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="protobuf-net" Version="3.0.52" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Authentication.ConsoleClient\TypingRealm.Authentication.ConsoleClient.csproj" />
     <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
-    <ProjectReference Include="..\TypingRealm.Client\TypingRealm.Client.csproj" />
-    <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
     <ProjectReference Include="..\TypingRealm.Data.Api.Client\TypingRealm.Data.Api.Client.csproj" />
-    <ProjectReference Include="..\TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj" />
-    <ProjectReference Include="..\TypingRealm.Hosting.ConsoleClient\TypingRealm.Hosting.ConsoleClient.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Client\TypingRealm.Messaging.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Protobuf.Core\TypingRealm.Messaging.Serialization.Protobuf.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Api.Client\TypingRealm.Profiles.Api.Client.csproj" />
-    <ProjectReference Include="..\TypingRealm.Profiles.Api.Resources\TypingRealm.Profiles.Api.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.RopeWar\TypingRealm.RopeWar.csproj" />
     <ProjectReference Include="..\TypingRealm.SignalR.Client\TypingRealm.SignalR.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.SignalR\TypingRealm.SignalR.csproj" />

@@ -3,7 +3,6 @@ using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging.Serialization;
 
 namespace TypingRealm.Hosting
@@ -47,23 +46,6 @@ namespace TypingRealm.Hosting
                     });
 
                     webBuilder.Configure(app => { });
-                });
-        }
-
-        public static IHostBuilder CreateConsoleAppHostBuilder(Action<MessageTypeCacheBuilder>? configure = null)
-        {
-            return Host.CreateDefaultBuilder()
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-
-                    // TODO: Add some non-console logging provider to accumulate logs.
-                    // (like user's TEMP folder)
-                })
-                .ConfigureServices(services =>
-                {
-                    var messageTypeCacheBuilder = services.UseConsoleAppHost();
-                    configure?.Invoke(messageTypeCacheBuilder);
                 });
         }
     }

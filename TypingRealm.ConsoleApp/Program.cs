@@ -10,7 +10,7 @@ using TypingRealm.Client.MainMenu;
 using TypingRealm.Client.Output;
 using TypingRealm.Client.Typing;
 using TypingRealm.Client.World;
-using TypingRealm.Hosting;
+using TypingRealm.Hosting.ConsoleClient;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources.Data;
 
