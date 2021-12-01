@@ -426,13 +426,14 @@ async function main() {
             allowInput = false; // As soon as we finish typing - do not allow input anymore.
 
             const statistics = makeSaveDataRequest();
-            await sendData(statistics);
 
             reportElement.innerHTML = '<div class="loader"></div>';
-            getOverallReport().then(data => {
-                reportElement.innerHTML = data;
-            }, err => {
-                reportElement.innerHTML = '';
+            sendData(statistics).then(() => {
+                getOverallReport().then(data => {
+                    reportElement.innerHTML = data;
+                }, err => {
+                    reportElement.innerHTML = '';
+                });
             });
 
             var speedCpm = (60000 * statistics.value.length / statistics.events.at(-1).absoluteDelay).toFixed(2);
