@@ -74,7 +74,7 @@ docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingre
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-profiles typingrealm-profiles
 
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-data typingrealm-data
-    --e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
+    -e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
     --name typingrealm-data typingrealm-data
 
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-web-ui typingrealm-web-ui
@@ -83,7 +83,7 @@ docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingre
 
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-identityserver typingrealm-identityserver
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-profiles typingrealm-profiles
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data" --name typingrealm-data typingrealm-data
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data -e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data" --name typingrealm-data typingrealm-data
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-web-ui typingrealm-web-ui
 
 /* Infrastructure */
@@ -160,6 +160,7 @@ docker run -d
     -e SERVICE_AUTHORITY=http://host.docker.internal:30000/
     -e PROFILES_URL=http://host.docker.internal:30103
     -e DATA_URL=http://host.docker.internal:30400
+    -e ConnectionStrings:DataConnection="Server=host.docker.internal; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
     -e ASPNETCORE_ENVIRONMENT=Development
     --name dev-typingrealm-data typingrealm-data:dev
 
