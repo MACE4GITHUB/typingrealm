@@ -21,6 +21,8 @@ docker system prune -a
 docker kill $(docker ps -q)
 
 docker exec -it CONTAINER_NAME /bin/sh
+
+docker exec CONTAINER_NAME env
 ```
 
 
@@ -62,28 +64,14 @@ docker build -t typingrealm-data:dev -f TypingRealm.Data.Api/Dockerfile .
 This needs to be added to every .NET project RUN (except IdentityServer):
 
 ```
-    -e SERVICE_AUTHORITY=https://typingrealm-identityserver/
-    -e PROFILES_URL=https://typingrealm-profiles
-    -e DATA_URL=https://typingrealm-data
-
+    --env-file .env.prod
     --memory="1g" --memory-reservation="750m"
 ```
 
 ```
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-identityserver typingrealm-identityserver
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-profiles typingrealm-profiles
-
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-data typingrealm-data
-    -e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
-    --name typingrealm-data typingrealm-data
-
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-web-ui typingrealm-web-ui
-
-
-
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-identityserver typingrealm-identityserver
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-profiles typingrealm-profiles
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data -e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data" --name typingrealm-data typingrealm-data
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --env-file .env.prod --name typingrealm-identityserver typingrealm-identityserver
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --env-file .env.prod --name typingrealm-profiles typingrealm-profiles
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --env-file .env.prod --name typingrealm-data typingrealm-data
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-web-ui typingrealm-web-ui
 
 /* Infrastructure */
@@ -142,26 +130,19 @@ docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml up 
 docker run -d
     --net dev-tyr_typingrealm-net
     -p 30000:80
-    -e ASPNETCORE_ENVIRONMENT=Development
+    --env-file .env.dev
     --name dev-typingrealm-identityserver typingrealm-identityserver:dev
 
 docker run -d
     --net dev-tyr_typingrealm-net
     -p 30103:80
-    -e SERVICE_AUTHORITY=http://host.docker.internal:30000/
-    -e PROFILES_URL=http://host.docker.internal:30103
-    -e DATA_URL=http://host.docker.internal:30400
-    -e ASPNETCORE_ENVIRONMENT=Development
+    --env-file=.env.dev
     --name dev-typingrealm-profiles typingrealm-profiles:dev
 
 docker run -d
     --net dev-tyr_typingrealm-net
     -p 30400:80
-    -e SERVICE_AUTHORITY=http://host.docker.internal:30000/
-    -e PROFILES_URL=http://host.docker.internal:30103
-    -e DATA_URL=http://host.docker.internal:30400
-    -e ConnectionStrings:DataConnection="Server=host.docker.internal; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
-    -e ASPNETCORE_ENVIRONMENT=Development
+    --env-file=.env.dev
     --name dev-typingrealm-data typingrealm-data:dev
 
 docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml up -d --build

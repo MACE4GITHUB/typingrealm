@@ -20,16 +20,22 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    env_file:
+      - .env.prod
 
   typingrealm-profiles:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    env_file:
+      - .env.prod
 
   typingrealm-data:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    env_file:
+      - .env.prod
 
   typingrealm-web-ui:
     image: ${DOCKER_REGISTRY-}typingrealm-web-ui

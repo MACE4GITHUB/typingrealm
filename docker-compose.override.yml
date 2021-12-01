@@ -4,30 +4,23 @@ services:
   typingrealm-identityserver:
     image: ${DOCKER_REGISTRY-}typingrealm-identityserver:dev
     container_name: typingrealm-identityserver-dev
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "30000:80"
+    env_file:
+      - .env.dev
 
   typingrealm-profiles:
     image: ${DOCKER_REGISTRY-}typingrealm-profiles:dev
     container_name: typingrealm-profiles-dev
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - SERVICE_AUTHORITY=http://host.docker.internal:30000/
-      - PROFILES_URL=http://host.docker.internal:30103
-      - DATA_URL=http://host.docker.internal:30400
     ports:
       - "30103:80"
+    env_file:
+      - .env.dev
 
   typingrealm-data:
     image: ${DOCKER_REGISTRY-}typingrealm-data:dev
     container_name: typingrealm-data-dev
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - SERVICE_AUTHORITY=http://host.docker.internal:30000/
-      - PROFILES_URL=http://host.docker.internal:30103
-      - DATA_URL=http://host.docker.internal:30400
-      - ConnectionStrings:DataConnection="Server=host.docker.internal; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
     ports:
       - "30400:80"
+    env_file:
+      - .env.dev
