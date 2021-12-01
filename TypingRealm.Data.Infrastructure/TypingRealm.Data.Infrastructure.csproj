@@ -5,11 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.0" />
+    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.Typing\TypingRealm.Typing.csproj" />
   </ItemGroup>

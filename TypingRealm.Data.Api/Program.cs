@@ -1,26 +1,42 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using TypingRealm.Hosting;
-using TypingRealm.Data.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TypingRealm.Data.Api.Controllers;
-using TypingRealm.Typing;
+using TypingRealm.Data.Infrastructure;
+using TypingRealm.Hosting;
 
 [assembly: ApiController]
-namespace TypingRealm.Data.Api
+namespace TypingRealm.Data.Api;
+
+public static class Program
 {
-    public static class Program
+    public static async Task Main()
     {
-        public static async Task Main()
+        var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(LocationsController).Assembly);
+
+        var dataConnectionString = builder.Configuration.GetConnectionString("DataConnection");
+        builder.Services.RegisterDataApi(dataConnectionString);
+
+        var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
         {
-            using var host = HostFactory.CreateWebApiHostBuilder(typeof(LocationsController).Assembly, services =>
-            {
-                services.RegisterDataApi();
-
-                services.AddTyping();
-            }).Build();
-
-            await host.RunAsync();
+            await OnAppStartup(scope.ServiceProvider);
         }
+
+        await app.RunAsync();
+    }
+
+    private class Startup { }
+    private static async Task OnAppStartup(IServiceProvider serviceProvider)
+    {
+        var infrastructureDeploymentService = serviceProvider.GetRequiredService<IInfrastructureDeploymentService>();
+        var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
+
+        await infrastructureDeploymentService.DeployInfrastructureAsync();
+        logger.LogInformation("Database is successfully migrated.");
     }
 }

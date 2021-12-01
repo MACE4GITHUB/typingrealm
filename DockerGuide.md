@@ -72,13 +72,25 @@ This needs to be added to every .NET project RUN (except IdentityServer):
 ```
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-identityserver typingrealm-identityserver
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-profiles typingrealm-profiles
+
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-data typingrealm-data
+    --e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
+    --name typingrealm-data typingrealm-data
+
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --name typingrealm-web-ui typingrealm-web-ui
+
+
 
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-identityserver typingrealm-identityserver
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-profiles typingrealm-profiles
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --name typingrealm-data typingrealm-data
+docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" -e SERVICE_AUTHORITY=http://typingrealm-identityserver/ -e PROFILES_URL=http://typingrealm-profiles -e DATA_URL=http://typingrealm-data --e ConnectionStrings:DataConnection="Server=typingrealm-postgres; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data" --name typingrealm-data typingrealm-data
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-web-ui typingrealm-web-ui
+
+/* Infrastructure */
+docker run -d --net tyr_typingrealm-net -e POSTGRES_PASSWORD=admin --name typingrealm-postgres postgres
+
+/* For debugging - add a port to be able to attach to the database & make backups of data */
+docker run -d --net tyr_typingrealm-net -p 5430:5432 -e POSTGRES_PASSWORD=admin --name typingrealm-postgres postgres
 ```
 
 
@@ -117,6 +129,9 @@ docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml up 
 docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml up -d
 
 docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml down
+
+/* Restart service */
+docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml up -d --build SERVICE_NAME
 ```
 
 
@@ -153,6 +168,11 @@ docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml d
 
 docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml up -d
 docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml down -d
+
+
+
+/* Infrastructure */
+docker run -d --net dev-tyr_typingrealm-net -p 5432:5432 -e POSTGRES_PASSWORD=admin --name typingrealm-postgres-dev postgres
 ```
 
 ### When running separate Docker containers from VS

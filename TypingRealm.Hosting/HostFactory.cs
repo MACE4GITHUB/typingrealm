@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,7 +10,9 @@ namespace TypingRealm.Hosting
 {
     public static class HostFactory
     {
-        public static IHostBuilder CreateSignalRHostBuilder(Action<MessageTypeCacheBuilder> configure)
+        public static IHostBuilder CreateSignalRHostBuilder(
+            Action<MessageTypeCacheBuilder> configureServices,
+            Action<IApplicationBuilder>? configureApp = null)
         {
             return Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -17,10 +20,13 @@ namespace TypingRealm.Hosting
                     webBuilder.ConfigureServices(services =>
                     {
                         var messageTypeCacheBuilder = services.UseSignalRHost();
-                        configure(messageTypeCacheBuilder);
+                        configureServices(messageTypeCacheBuilder);
                     });
 
-                    webBuilder.Configure(app => { });
+                    webBuilder.Configure(app =>
+                    {
+                        configureApp?.Invoke(app);
+                    });
                 });
         }
 
@@ -34,7 +40,18 @@ namespace TypingRealm.Hosting
                 });
         }
 
-        public static IHostBuilder CreateWebApiHostBuilder(Assembly controllersAssembly, Action<IServiceCollection> configure)
+        public static WebApplicationBuilder CreateWebApiApplicationBuilder(Assembly controllersAssembly)
+        {
+            var builder = WebApplication.CreateBuilder();
+            builder.Services.UseWebApiHost(controllersAssembly);
+
+            return builder;
+        }
+
+        public static IHostBuilder CreateWebApiHostBuilder(
+            Assembly controllersAssembly,
+            Action<IServiceCollection> configureServices,
+            Action<IApplicationBuilder>? configureApp = null)
         {
             return Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -42,10 +59,13 @@ namespace TypingRealm.Hosting
                     webBuilder.ConfigureServices(services =>
                     {
                         services.UseWebApiHost(controllersAssembly);
-                        configure(services);
+                        configureServices(services);
                     });
 
-                    webBuilder.Configure(app => { });
+                    webBuilder.Configure(app =>
+                    {
+                        configureApp?.Invoke(app);
+                    });
                 });
         }
     }

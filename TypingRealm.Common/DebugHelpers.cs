@@ -7,9 +7,16 @@
         /// </summary>
         public static bool UseLocalAuthentication =>
 #if DEBUG
-                true;
+            true;
 #else
-                false;
+            false;
+#endif
+
+        public static bool UseInfrastructure =>
+#if DEBUG
+            false;
+#else
+            true;
 #endif
     }
 }

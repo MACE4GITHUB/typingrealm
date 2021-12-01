@@ -20,7 +20,7 @@ namespace TypingRealm.Typing
         public sealed record State(
             Dictionary<int, TypingSessionText> Texts,
             string TypingSessionId,
-            DateTime CreatedAtUtc,
+            DateTime CreatedUtc,
             string CreatedByUser,
             TypingSessionConfiguration Configuration) : IIdentifiable
         {

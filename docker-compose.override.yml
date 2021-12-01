@@ -28,5 +28,6 @@ services:
       - SERVICE_AUTHORITY=http://host.docker.internal:30000/
       - PROFILES_URL=http://host.docker.internal:30103
       - DATA_URL=http://host.docker.internal:30400
+      - ConnectionStrings:DataConnection="Server=host.docker.internal; Port=5432; User Id=postgres; Password=admin; Database=typingrealm_data"
     ports:
       - "30400:80"
