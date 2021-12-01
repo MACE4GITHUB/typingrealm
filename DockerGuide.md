@@ -90,7 +90,7 @@ docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" -
 docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="2g" --memory-reservation="1.75g" -e POSTGRES_PASSWORD=admin --name typingrealm-postgres postgres
 
 /* For debugging - add a port to be able to attach to the database & make backups of data */
-docker run -d --net tyr_typingrealm-net -p 5430:5432 -e POSTGRES_PASSWORD=admin --name typingrealm-postgres postgres
+docker run -d --net tyr_typingrealm-net -p 5430:5432 --restart unless-stopped --memory="2g" --memory-reservation="1.75g" -e POSTGRES_PASSWORD=admin --name typingrealm-postgres postgres
 ```
 
 
