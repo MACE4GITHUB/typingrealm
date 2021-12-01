@@ -64,9 +64,11 @@ async function main() {
     const speedElement = document.getElementById('speed');
     const simulationSpeedMultiplierElement = document.getElementById('simulationSpeedMultiplier');
     const hintElement = document.getElementById('hint');
+    const reportElement = document.getElementById('report');
     const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}`;
     const authTokenRequestUrl = `${PROFILES_URL}/api/local-auth/profile-token?sub=${profile}`;
     const dataSubmitUrl = `${DATA_URL}/api/usersessions/result`;
+    const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable`;
 
     // If it's false - any input doesn't affect the state.
     let allowInput = false;
@@ -242,7 +244,7 @@ async function main() {
         }
     }
 
-    function processKeyDown(event, simulation) {
+    async function processKeyDown(event, simulation) {
         if (isSimulation && !allowInput) {
             if (isKeyEnter(event)) {
                 stopSimulation = true;
@@ -304,7 +306,7 @@ async function main() {
                 startTyping(perf);
             }
 
-            typeSymbol(event.key, perf);
+            await typeSymbol(event.key, perf);
             return;
         }
 
@@ -363,7 +365,7 @@ async function main() {
         characterSpans[index].classList.add('cursor');
     }
 
-    function typeSymbol(symbol, perf) {
+    async function typeSymbol(symbol, perf) {
         if (index == textToType.length) {
             return; // Do not log any character presses once the text has been typed till the end.
         }
@@ -423,7 +425,10 @@ async function main() {
             allowInput = false; // As soon as we finish typing - do not allow input anymore.
 
             const statistics = makeSaveDataRequest();
-            sendData(statistics);
+            await sendData(statistics);
+
+            const report = await getOverallReport();
+            reportElement.innerHTML = report;
 
             var speedCpm = (60000 * statistics.value.length / statistics.events.at(-1).absoluteDelay).toFixed(2);
             var speedWpm = (speedCpm / 5).toFixed(2);
@@ -558,7 +563,7 @@ async function main() {
             await new Promise(resolve => setTimeout(resolve, e.delay * simulationSpeedMultiplier));
 
             if (e.keyAction == "Press") {
-                processKeyDown({
+                await processKeyDown({
                     key: e.key,
                     keyCode: GetKeyCode(e.key)
                 }, true);
@@ -632,21 +637,33 @@ async function main() {
         return response.access_token;
     }
 
-    function sendData(data) {
-        getToken().then(token => {
-            console.log(data);
-            fetch(dataSubmitUrl, {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(data => console.log(JSON.stringify(data)));
-        });
+    async function sendData(data) {
+        let token = await getToken();
+
+        console.log(data);
+        const response = await fetch(dataSubmitUrl, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        }).then(r => r.json());
+
+        console.log('Successfully submitted typing result.');
+    }
+
+    async function getOverallReport() {
+        let token = await getToken();
+
+        const response = await fetch(getOverallReportUrl, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(x => x.text());
+
+        return response;
     }
 
     function makeSaveDataRequest() {

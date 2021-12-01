@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Authentication.Api;
 using TypingRealm.Hosting;
 using TypingRealm.Typing;
 
@@ -20,6 +21,7 @@ namespace TypingRealm.Data.Api.Controllers
     }
 #pragma warning restore CS8618
 
+    [UserScoped]
     [Route("api/[controller]")]
     public sealed class UserSessionsController : TyrController
     {
