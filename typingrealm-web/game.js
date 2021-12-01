@@ -185,7 +185,7 @@ async function main() {
         events = [];
         simulationEvents = [];
 
-        textElement.innerHTML = '';
+        textElement.innerHTML = '<div class="loader"></div>';
         speedElement.innerHTML = '';
         reportElement.innerHTML = '';
         simulationSpeedMultiplierElement.innerHTML = '';
@@ -193,6 +193,7 @@ async function main() {
 
         textData.text = await getText();
 
+        textElement.innerHTML = '';
         textData.text.split('').forEach((character, index) => {
             const characterSpan = document.createElement('span');
             characterSpan.innerText = character;
