@@ -187,6 +187,7 @@ async function main() {
 
         textElement.innerHTML = '';
         speedElement.innerHTML = '';
+        reportElement.innerHTML = '';
         simulationSpeedMultiplierElement.innerHTML = '';
         hintElement.classList.add('hidden');
 
@@ -427,8 +428,12 @@ async function main() {
             const statistics = makeSaveDataRequest();
             await sendData(statistics);
 
-            const report = await getOverallReport();
-            reportElement.innerHTML = report;
+            reportElement.innerHTML = '<div class="loader"></div>';
+            getOverallReport().then(data => {
+                reportElement.innerHTML = data;
+            }, err => {
+                reportElement.innerHTML = '';
+            });
 
             var speedCpm = (60000 * statistics.value.length / statistics.events.at(-1).absoluteDelay).toFixed(2);
             var speedWpm = (speedCpm / 5).toFixed(2);
