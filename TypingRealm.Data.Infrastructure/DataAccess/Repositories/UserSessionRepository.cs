@@ -14,11 +14,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Repositories
         {
             // TODO: Include everything I need everywhere especially in merges.
             // Or enable lazy loading (might cause performance issues).
-            var asyncEnumerable = Context.UserSession
-                .Include(x => x.TextTypingResults)
-                .ThenInclude(x => x.Events)
-                .Include(x => x.TypingSession)
-                .ThenInclude(x => x.Texts)
+            var userSessions = await IncludeAllChildren(Context.UserSession)
                 .Where(us => us.UserId == userId)
                 .AsAsyncEnumerable()
                 .Select(us =>
@@ -27,12 +23,11 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Repositories
                     var userSession = UserSession.FromState(state);
 
                     return userSession;
-                });
+                }).ToListAsync().ConfigureAwait(false);
 
-            // Unfortunately we need to materialize it here because in foreach we are querying database again.
-            foreach (var item in await asyncEnumerable.ToListAsync().ConfigureAwait(false))
+            foreach (var userSession in userSessions)
             {
-                yield return item;
+                yield return userSession;
             }
         }
 
