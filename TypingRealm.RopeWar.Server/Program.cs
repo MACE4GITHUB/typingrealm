@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using TypingRealm.Hosting;
+using TypingRealm.Hosting.Service;
 
 namespace TypingRealm.RopeWar.Server
 {

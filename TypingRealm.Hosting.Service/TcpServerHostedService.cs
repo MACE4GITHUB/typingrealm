@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Tcp;
 
-namespace TypingRealm.Hosting
+namespace TypingRealm.Hosting.Service
 {
     public sealed class TcpServerHostedService : IHostedService
     {

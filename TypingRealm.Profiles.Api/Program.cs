@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles.Api.Controllers;
 using TypingRealm.Profiles.Infrastructure;
@@ -12,12 +11,11 @@ namespace TypingRealm.Profiles.Api
     {
         public static async Task Main()
         {
-            using var host = HostFactory.CreateWebApiHostBuilder(typeof(CharactersController).Assembly, services =>
-            {
-                services.RegisterProfilesApi();
-            }).Build();
+            var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(CharactersController).Assembly);
+            builder.Services.RegisterProfilesApi();
 
-            await host.RunAsync();
+            var app = builder.Build();
+            await app.RunAsync();
         }
     }
 }

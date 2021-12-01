@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using TypingRealm.SignalR;
 
-namespace TypingRealm.Hosting
+namespace TypingRealm.Hosting.Service
 {
     public sealed class SignalRStartupFilter : IStartupFilter
     {

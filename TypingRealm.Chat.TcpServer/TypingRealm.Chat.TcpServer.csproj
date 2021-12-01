@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Chat\TypingRealm.Chat.csproj" />
-    <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
+    <ProjectReference Include="..\TypingRealm.Hosting.Service\TypingRealm.Hosting.Service.csproj" />
     <ProjectReference Include="..\TypingRealm.Messaging.Serialization.Core\TypingRealm.Messaging.Serialization.Core.csproj" />
   </ItemGroup>
 

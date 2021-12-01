@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using TypingRealm.Hosting;
+using TypingRealm.Hosting.Service;
 
 namespace TypingRealm.Chat.TcpServer
 {
@@ -18,5 +18,4 @@ namespace TypingRealm.Chat.TcpServer
             await host.RunAsync().ConfigureAwait(false);
         }
     }
-
 }
