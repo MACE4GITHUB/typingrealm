@@ -20,7 +20,7 @@ async function main() {
 
     const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
 
-    const length = url.searchParams.get('length');
+    let length = url.searchParams.get('length');
     let textType = url.searchParams.get('textType');
     if (textType != 'words' && textType != 'text') {
         textType = 'text';
@@ -46,6 +46,11 @@ async function main() {
 
         await forceLogin();
         profile = await getProfileFromToken();
+    }
+
+    if (!length) {
+        // Set default length as 100 characters.
+        length = 100;
     }
 
     if (!profile || !length)
