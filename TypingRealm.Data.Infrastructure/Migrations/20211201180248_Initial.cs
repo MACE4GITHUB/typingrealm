@@ -115,6 +115,7 @@ namespace TypingRealm.Data.Infrastructure.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    order = table.Column<int>(type: "integer", nullable: false),
                     index = table.Column<int>(type: "integer", nullable: false),
                     key_action = table.Column<int>(type: "integer", nullable: false),
                     key = table.Column<string>(type: "text", nullable: false),
@@ -131,6 +132,11 @@ namespace TypingRealm.Data.Infrastructure.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_key_press_event_order",
+                table: "key_press_event",
+                column: "order");
 
             migrationBuilder.CreateIndex(
                 name: "ix_key_press_event_text_typing_result_id",

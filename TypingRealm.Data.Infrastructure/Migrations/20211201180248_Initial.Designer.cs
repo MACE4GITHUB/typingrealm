@@ -12,7 +12,7 @@ using TypingRealm.Data.Infrastructure.DataAccess;
 namespace TypingRealm.Data.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20211201090456_Initial")]
+    [Migration("20211201180248_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,10 @@ namespace TypingRealm.Data.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("key_action");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
+
                     b.Property<string>("TextTypingResultId")
                         .IsRequired()
                         .HasColumnType("text")
@@ -57,6 +61,9 @@ namespace TypingRealm.Data.Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_key_press_event");
+
+                    b.HasIndex("Order")
+                        .HasDatabaseName("ix_key_press_event_order");
 
                     b.HasIndex("TextTypingResultId")
                         .HasDatabaseName("ix_key_press_event_text_typing_result_id");

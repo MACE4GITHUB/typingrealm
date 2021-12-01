@@ -33,7 +33,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 StartedTypingUtc = state.StartedTypingUtc,
                 SubmittedResultsUtc = state.SubmittedResultsUtc,
                 Events = state.Events
-                    .Select(e => KeyPressEvent.ToDbo(e, state.TextTypingResultId))
+                    .Select((e, index) => KeyPressEvent.ToDbo(e, state.TextTypingResultId, index))
                     .ToList(),
                 UserSessionId = userSessionId
             };
@@ -46,7 +46,9 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 TypingSessionTextIndex,
                 StartedTypingUtc,
                 SubmittedResultsUtc,
-                Events.Select(e => e.ToState())
+                Events
+                    .OrderBy(e => e.Order)
+                    .Select(e => e.ToState())
                     .ToList());
         }
 

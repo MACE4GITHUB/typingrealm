@@ -7,10 +7,12 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
 {
 #pragma warning disable CS8618
     [Index(nameof(TextTypingResultId))]
+    [Index(nameof(Order))]
     public class KeyPressEvent
     {
         [Key]
         public long Id { get; set; }
+        public int Order { get; set; }
 
         public int Index { get; set; }
         public KeyAction KeyAction { get; set; }
@@ -20,11 +22,12 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
         public string TextTypingResultId { get; set; }
         public TextTypingResult TextTypingResult { get; set; }
 
-        public static KeyPressEvent ToDbo(Typing.KeyPressEvent state, string textTypingResultId)
+        public static KeyPressEvent ToDbo(Typing.KeyPressEvent state, string textTypingResultId, int order)
         {
             return new KeyPressEvent
             {
                 Id = 0,
+                Order = order,
                 Index = state.Index,
                 KeyAction = state.KeyAction,
                 Key = state.Key,
