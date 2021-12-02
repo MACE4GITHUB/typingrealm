@@ -7,7 +7,7 @@ namespace TypingRealm.Profiles.Api.Client
 {
     public sealed class ServiceToServiceClient : IServiceToServiceClient
     {
-        public static readonly string RoutePrefix = "api/local-auth";
+        public static readonly string RoutePrefix = "api/diagnostics-downstream";
         private readonly IServiceClient _serviceClient;
 
         public ServiceToServiceClient(IServiceClient serviceClient)

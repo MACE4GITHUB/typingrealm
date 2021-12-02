@@ -75,6 +75,9 @@ namespace TypingRealm.Communication
             {
                 // TODO: Consider placing it in some other place of code, like IHttpClient.
                 // TODO: Fix the issue that if endpoint return STRUCT - we return default value when it's not found!
+                // TODO: What if URL is incorrect - it shouldn't return default value.
+                // TODO: If object is valueobject - we cannot return default value. We always need to return NULL.
+                // Consider wrapping response in some kind of Result object.
                 if (exception.StatusCode == HttpStatusCode.NotFound)
                     return default!;
 

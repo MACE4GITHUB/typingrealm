@@ -19,6 +19,12 @@ namespace TypingRealm.Data.Api.Controllers
             _s2sClient = s2sClient;
         }
 
+        /// <summary>
+        /// Calls Profiles API Service-protected endpoint.
+        /// Accepts any anonymous calls - should be hidden from external API in
+        /// future so that there's no DDOS possibility.
+        /// Should always give 200.
+        /// </summary>
         [HttpGet]
         [AllowAnonymous]
         [Route("service")]
@@ -27,8 +33,14 @@ namespace TypingRealm.Data.Api.Controllers
             return Ok(await _s2sClient.GetServiceToServiceCurrentDateAsync(default));
         }
 
+        /// <summary>
+        /// Calls Profiles API User-protected endpoint with current token.
+        /// Accepts both Service and User tokens.
+        /// Should give 200 for User token, 403 for Service token (returned from
+        /// downstream service).
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        [Authorize]
         [Route("profile")]
         public async ValueTask<ActionResult<DateTime>> TryProfileToService()
         {
