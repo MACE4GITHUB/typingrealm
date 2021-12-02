@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles.Api.Client;
 
-namespace TypingRealm.Data.Api.Controllers
+namespace TypingRealm.Data.Api
 {
-    // TODO: Add this to all TYR controllers.
     [Authorize]
     [Route("api/diagnostics")]
     public sealed class DiagnosticsController : TyrController
@@ -30,7 +29,9 @@ namespace TypingRealm.Data.Api.Controllers
         [Route("service")]
         public async ValueTask<ActionResult<DateTime>> TryServiceToService()
         {
-            return Ok(await _s2sClient.GetServiceToServiceCurrentDateAsync(default));
+            return Ok(
+                await _s2sClient.GetServiceToServiceCurrentDateAsync(default)
+                    .ConfigureAwait(false));
         }
 
         /// <summary>
@@ -44,7 +45,9 @@ namespace TypingRealm.Data.Api.Controllers
         [Route("profile")]
         public async ValueTask<ActionResult<DateTime>> TryProfileToService()
         {
-            return Ok(await _s2sClient.GetProfileToServiceCurrentDateAsync(default));
+            return Ok(
+                await _s2sClient.GetProfileToServiceCurrentDateAsync(default)
+                    .ConfigureAwait(false));
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
+using TypingRealm.Data.Api;
 
 namespace TypingRealm.Hosting
 {
@@ -37,8 +38,9 @@ namespace TypingRealm.Hosting
             services.AddCommunication();
             services.AddTyrApiAuthentication();
 
-            services.AddControllers()
-                .PartManager.ApplicationParts.Add(new AssemblyPart(controllersAssembly));
+            var mvcBuilder = services.AddControllers();
+            mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(controllersAssembly));
+            mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(DiagnosticsController).Assembly));
 
             services.AddTransient<IStartupFilter, WebApiStartupFilter>();
 
