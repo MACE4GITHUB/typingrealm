@@ -161,15 +161,24 @@ namespace TypingRealm.Typing
             var builder = new StringBuilder();
             builder.Append("You've made most mistakes when typing ");
             builder.Append(string.Join(", ", data.AggregatedData
+                .Where(x => x.MadeMistakes > 0)
                 .OrderByDescending(x => x.MadeMistakes)
-                .Take(3)
+                .Take(5)
                 .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.MadeMistakes})")));
+
+            builder.Append(". Your worst mistake-to-correct ratio key pairs are ");
+            builder.Append(string.Join(", ", data.AggregatedData
+                .Where(x => x.MistakesToSuccessRatio > 0)
+                .OrderByDescending(x => x.MistakesToSuccessRatio)
+                .Take(5)
+                .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.MistakesToSuccessRatio})")));
 
             builder.Append(". Your slowest lowercase key pairs are ");
             builder.Append(string.Join(", ", data.AggregatedData
+                .Where(x => x.AverageDelay > 0)
                 .Where(x => (x.ToKey.Length == 1 && char.IsLower(x.ToKey[0])) || x.ToKey.Length > 1)
                 .OrderByDescending(x => x.AverageDelay)
-                .Take(3)
+                .Take(5)
                 .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.AverageDelay.ToString("0.###")} ms average)")));
 
             builder.Append(".");
