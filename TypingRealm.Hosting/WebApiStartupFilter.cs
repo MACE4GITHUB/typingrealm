@@ -24,6 +24,7 @@ namespace TypingRealm.Hosting
                         var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                         if (contextFeature?.Error is HttpRequestException exception)
                         {
+                            // TODO: Consider forwarding only 403, 400 or 404 forwarding might be undesired.
                             context.Response.StatusCode = (int)(exception.StatusCode ?? HttpStatusCode.InternalServerError);
                         }
 
