@@ -79,7 +79,7 @@ namespace TypingRealm.Data.Api.Controllers
 
                 shouldContain.AddRange(data.AggregatedData
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
-                    .OrderByDescending(x => x.MadeMistakes)
+                    .OrderByDescending(x => x.MistakesToSuccessRatio)
                     .Select(x => $"{x.FromKey}{x.ToKey}")
                     .Take(10));
 

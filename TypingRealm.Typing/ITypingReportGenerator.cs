@@ -26,7 +26,10 @@ namespace TypingRealm.Typing
         decimal MinDelay,
         decimal MaxDelay,
         int SuccessfullyTyped,
-        int MadeMistakes);
+        int MadeMistakes)
+    {
+        public double MistakesToSuccessRatio => SuccessfullyTyped == 0 ? 0 : (double)MadeMistakes / SuccessfullyTyped;
+    }
 
     public sealed class TypingReportGenerator : ITypingReportGenerator
     {
