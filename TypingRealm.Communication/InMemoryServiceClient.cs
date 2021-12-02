@@ -38,16 +38,16 @@ namespace TypingRealm.Communication
             return dataHost;
         }
 
-        private readonly IHttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IProfileTokenService _profileTokenService;
         private readonly IServiceTokenService _serviceTokenService;
 
         public InMemoryServiceClient(
-            IHttpClient httpClient,
+            IHttpClientFactory httpClientFactory,
             IProfileTokenService profileTokenService,
             IServiceTokenService serviceTokenService)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
             _profileTokenService = profileTokenService;
             _serviceTokenService = serviceTokenService;
         }
@@ -68,7 +68,9 @@ namespace TypingRealm.Communication
 
             try
             {
-                return await _httpClient.GetAsync<T>(uri, accessToken, cancellationToken)
+                using var message = new HttpRequestMessage(HttpMethod.Get, uri);
+                var httpClient = _httpClientFactory.CreateClient();
+                return await httpClient.SendMessageAsync<T>(message, accessToken, cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (HttpRequestException exception)
@@ -99,7 +101,9 @@ namespace TypingRealm.Communication
                 _ => null
             };
 
-            await _httpClient.PostAsync(uri, accessToken, content, cancellationToken)
+            using var message = new HttpRequestMessage(HttpMethod.Post, uri);
+            var httpClient = _httpClientFactory.CreateClient();
+            await httpClient.SendMessageAsync(message, accessToken, content, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -117,7 +121,9 @@ namespace TypingRealm.Communication
                 _ => null
             };
 
-            await _httpClient.DeleteAsync(uri, accessToken, cancellationToken)
+            using var message = new HttpRequestMessage(HttpMethod.Delete, uri);
+            var httpClient = _httpClientFactory.CreateClient();
+            await httpClient.SendMessageAsync(message, accessToken, cancellationToken)
                 .ConfigureAwait(false);
         }
     }

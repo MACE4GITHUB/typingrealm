@@ -11,9 +11,6 @@ namespace TypingRealm.Communication
             services.TryAddTransient<IProfileTokenService, AnonymousProfileTokenService>();
             services.TryAddTransient<IServiceTokenService, AnonymousServiceTokenService>();
 
-            // Register as scoped so that we have one http client per connection.
-            services.AddScoped<IHttpClient, HttpClient>();
-
             services.AddTransient<IServiceClient, InMemoryServiceClient>();
 
             return services;
