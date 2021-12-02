@@ -13,6 +13,7 @@ namespace TypingRealm.Hosting
         public static readonly string CorsPolicyName = "CorsPolicy";
         public static readonly string[] CorsAllowedOrigins = new[]
         {
+#if DEBUG
             "http://127.0.0.1:4200",
             "https://127.0.0.1:4200",
             "http://localhost:4200",
@@ -20,6 +21,7 @@ namespace TypingRealm.Hosting
             "http://typingrealm.com:4200",
             "https://typingrealm.com:4200",
             "http://typingrealm.com",
+#endif
             "https://typingrealm.com"
         };
 
