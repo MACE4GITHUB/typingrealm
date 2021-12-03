@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TypingRealm.Typing;
 
@@ -29,6 +31,33 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Repositories
             {
                 yield return userSession;
             }
+        }
+
+        public async ValueTask<IEnumerable<UserSession>> FindAllForUserAsync(string userId)
+        {
+            // TODO: Use async api.
+            return IncludeAllChildren(Context.UserSession)
+                .AsEnumerable()
+                .Select(x =>
+                {
+                    var state = x.ToState();
+                    return UserSession.FromState(state);
+                })
+                .ToList();
+        }
+
+        public async ValueTask<IEnumerable<UserSession>> FindAllForUserFromTypingResultsAsync(string userId, DateTime fromTypingResultUtc)
+        {
+            // TODO: Use async api.
+            return IncludeAllChildren(Context.UserSession)
+                .Where(x => x.TextTypingResults.Any(y => y.SubmittedResultsUtc > fromTypingResultUtc))
+                .AsEnumerable()
+                .Select(x =>
+                {
+                    var state = x.ToState();
+                    return UserSession.FromState(state);
+                })
+                .ToList();
         }
 
         protected override IQueryable<Entities.UserSession> IncludeAllChildren(

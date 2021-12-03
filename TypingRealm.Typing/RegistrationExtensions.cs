@@ -15,6 +15,8 @@ namespace TypingRealm.Typing
             services.AddSingleton<ITypingSessionRepository, InMemoryTypingSessionRepository>();
             services.AddSingleton<IUserSessionRepository, InMemoryUserSessionRepository>();*/
 
+            services.AddSingleton<IUserTypingStatisticsStore, InMemoryUserTypingStatisticsStore>();
+
             services.AddSingleton<ITextRepository, JsonFileTextRepository>();
             services.AddSingleton<ITypingSessionRepository, JsonFileTypingSessionRepository>();
             services.AddSingleton<IUserSessionRepository, JsonFileUserSessionRepository>();

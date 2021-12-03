@@ -75,15 +75,15 @@ namespace TypingRealm.Data.Api.Controllers
             if (Profile.Type == ProfileType.User)
             {
                 // Personalize text generation.
-                var data = await _typingReportGerenator.GenerateReportAsync(Profile.ProfileId);
+                var data = await _typingReportGerenator.GenerateUserStatisticsAsync(Profile.ProfileId);
 
-                shouldContain.AddRange(data.AggregatedData
+                shouldContain.AddRange(data.KeyPairs
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
                     .OrderByDescending(x => x.MistakesToSuccessRatio)
                     .Select(x => $"{x.FromKey}{x.ToKey}")
                     .Take(10));
 
-                shouldContain.AddRange(data.AggregatedData
+                shouldContain.AddRange(data.KeyPairs
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
                     .OrderByDescending(x => x.AverageDelay)
                     .Select(x => $"{x.FromKey}{x.ToKey}")

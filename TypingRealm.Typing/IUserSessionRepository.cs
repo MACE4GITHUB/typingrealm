@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TypingRealm.Typing
@@ -9,6 +10,7 @@ namespace TypingRealm.Typing
         ValueTask SaveAsync(UserSession userSession);
         ValueTask<string> NextIdAsync();
 
-        IAsyncEnumerable<UserSession> FindAllForUser(string userId);
+        ValueTask<IEnumerable<UserSession>> FindAllForUserAsync(string userId);
+        ValueTask<IEnumerable<UserSession>> FindAllForUserFromTypingResultsAsync(string userId, DateTime fromTypingResultUtc);
     }
 }
