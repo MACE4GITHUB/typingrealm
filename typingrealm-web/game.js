@@ -431,7 +431,14 @@ async function main() {
             reportElement.innerHTML = '<div class="loader"></div>';
             sendData(statistics).then(() => {
                 getOverallReport().then(data => {
-                    reportElement.innerHTML = data;
+                    reportElement.innerHTML = '';
+                    let lines = data.split('\n');
+                    for (let i =0; i < lines.length; i++) {
+                        const lineDiv = document.createElement('div');
+                        const line = lines[i];
+                        lineDiv.innerHTML = line;
+                        reportElement.appendChild(lineDiv);
+                    }
                 }, err => {
                     reportElement.innerHTML = '';
                 });

@@ -287,29 +287,32 @@ namespace TypingRealm.Typing
                 .ConfigureAwait(false);
 
             var builder = new StringBuilder();
+            builder.AppendLine($"Your average speed throughout all the time: {statistics.SpeedCpm.ToString("0.###")} CPM ({(statistics.SpeedCpm / 5).ToString("0.###")}).");
             builder.Append("You've made most mistakes when typing ");
             builder.Append(string.Join(", ", statistics.KeyPairs
                 .Where(x => x.MadeMistakes > 0)
                 .OrderByDescending(x => x.MadeMistakes)
-                .Take(5)
+                .Take(4)
                 .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.MadeMistakes})")));
+            builder.AppendLine();
 
-            builder.Append(". Your worst mistake-to-correct ratio key pairs are ");
+            builder.Append("Your worst mistake-to-correct ratio key pairs are ");
             builder.Append(string.Join(", ", statistics.KeyPairs
                 .Where(x => x.MistakesToSuccessRatio > 0)
                 .OrderByDescending(x => x.MistakesToSuccessRatio)
-                .Take(5)
-                .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.MistakesToSuccessRatio})")));
+                .Take(4)
+                .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.MistakesToSuccessRatio.ToString("0.###")})")));
+            builder.AppendLine();
 
-            builder.Append(". Your slowest lowercase key pairs are ");
+            builder.Append("Your slowest lowercase key pairs are (with average times)");
             builder.Append(string.Join(", ", statistics.KeyPairs
                 .Where(x => x.AverageDelay > 0)
                 .Where(x => (x.ToKey.Length == 1 && char.IsLower(x.ToKey[0])) || x.ToKey.Length > 1)
                 .OrderByDescending(x => x.AverageDelay)
-                .Take(5)
-                .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.AverageDelay.ToString("0.###")} ms average)")));
+                .Take(4)
+                .Select(x => $"['{x.FromKey}' -> '{x.ToKey}'] ({x.AverageDelay.ToString("0.###")} ms)")));
+            builder.AppendLine();
 
-            builder.Append(".");
             return builder.ToString();
         }
     }
