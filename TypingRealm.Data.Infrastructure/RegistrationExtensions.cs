@@ -16,7 +16,7 @@ namespace TypingRealm.Data.Infrastructure
             services.AddSingleton<ILocationRepository, InMemoryLocationRepository>();
 
             // Typing.
-            services.AddTransient<ITextGenerator, TextGenerator>();
+            services.AddSingleton<ITextGenerator, TextGenerator>();
 
             // Repositories.
             if (DebugHelpers.UseInfrastructure)
