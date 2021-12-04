@@ -22,7 +22,8 @@ namespace TypingRealm.Hosting
             "https://typingrealm.com:4200",
             "http://typingrealm.com",
 #endif
-            "https://typingrealm.com"
+            "https://typingrealm.com",
+            "https://slava.typingrealm.com"
         };
 
         public static IServiceCollection UseWebApiHost(this IServiceCollection services, Assembly controllersAssembly)
