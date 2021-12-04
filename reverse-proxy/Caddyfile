@@ -16,3 +16,13 @@ data.typingrealm.com {
 profiles.typingrealm.com {
     reverse_proxy typingrealm-profiles:80
 }
+
+api.typingrealm.com {
+    handle_path /data/* {
+        reverse_proxy typingrealm-data:80
+    }
+
+    handle_path /profiles/* {
+        reverse_proxy typingrealm-profiles:80
+    }
+}
