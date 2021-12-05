@@ -9,10 +9,8 @@ services:
     container_name: local-typingrealm-identityserver
     networks:
       - local-typingrealm-net
-    ports:
-      - "30000:80"
     env_file:
-      - .env.dev
+      - .env.local
     mem_limit: 1g
     mem_reservation: 750m
     build:
@@ -24,10 +22,8 @@ services:
     container_name: local-typingrealm-profiles
     networks:
       - local-typingrealm-net
-    ports:
-      - "30103:80"
     env_file:
-      - .env.dev
+      - .env.local
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -40,10 +36,8 @@ services:
     container_name: local-typingrealm-data
     networks:
       - local-typingrealm-net
-    ports:
-      - "30400:80"
     env_file:
-      - .env.dev
+      - .env.local
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -73,10 +67,8 @@ services:
     container_name: local-typingrealm-postgres
     networks:
       - local-typingrealm-net
-    ports:
-      - 5432:5432
     env_file:
-      - .env.dev
+      - .env.local
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
