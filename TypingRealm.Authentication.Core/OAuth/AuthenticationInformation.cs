@@ -10,6 +10,8 @@ namespace TypingRealm.Authentication.OAuth
     /// </summary>
     public sealed class AuthenticationInformation
     {
+        public string? SchemeName { get; set; }
+
         public string? Issuer { get; set; }
         public string? AuthorizationEndpoint { get; set; }
         public string? TokenEndpoint { get; set; }
@@ -37,9 +39,12 @@ namespace TypingRealm.Authentication.OAuth
         public AuthenticationInformation AuthenticationInformation { get; }
             = new AuthenticationInformation();
 
-        public AuthenticationInformation Build()
+        public AuthenticationInformation Build(string schemeName)
         {
-            if (string.IsNullOrEmpty(AuthenticationInformation.Issuer)
+            AuthenticationInformation.SchemeName = schemeName;
+
+            if (string.IsNullOrEmpty(AuthenticationInformation.SchemeName)
+                || string.IsNullOrEmpty(AuthenticationInformation.Issuer)
                 || string.IsNullOrEmpty(AuthenticationInformation.AuthorizationEndpoint)
                 || string.IsNullOrEmpty(AuthenticationInformation.TokenEndpoint)
                 || string.IsNullOrEmpty(AuthenticationInformation.ServiceClientId)

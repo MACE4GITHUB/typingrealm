@@ -21,9 +21,7 @@ namespace TypingRealm.Authentication.Api
         public static IServiceCollection AddTyrApiAuthentication(this IServiceCollection services)
         {
             var authInfoProvider = services.AddTyrCommonAuthentication();
-            services.UseAspNetAuthentication(
-                authInfoProvider.GetProfileAuthenticationInformation(),
-                authInfoProvider.GetServiceAuthenticationInformation());
+            services.UseAspNetAuthentication(authInfoProvider);
 
             return services;
         }
@@ -36,27 +34,40 @@ namespace TypingRealm.Authentication.Api
         /// <returns></returns>
         public static IServiceCollection UseAspNetAuthentication(
             this IServiceCollection services,
-            AuthenticationInformation profileAuthentication,
-            AuthenticationInformation? serviceAuthentication = null)
+            IAuthenticationInformationProvider authenticationInformationProvider)
         {
+            var profileAuthentication = authenticationInformationProvider.GetProfileAuthenticationInformation();
+            var serviceAuthentication = authenticationInformationProvider.GetServiceAuthenticationInformation();
+            var additionalProfileAuthentications = authenticationInformationProvider.GetAdditionalProfileAuthenticationInformations();
+
             if (profileAuthentication.TokenValidationParameters.ValidAudiences?.FirstOrDefault() == null
-                || (serviceAuthentication != null && serviceAuthentication.TokenValidationParameters.ValidAudiences?.FirstOrDefault() == null))
+                || (serviceAuthentication != null && serviceAuthentication.TokenValidationParameters.ValidAudiences?.FirstOrDefault() == null)
+                || additionalProfileAuthentications.Any(x => x.TokenValidationParameters.ValidAudiences?.FirstOrDefault() == null))
                 throw new InvalidOperationException("Call UseSomeProvider method on AuthenticationInformationBuilder before calling this method, so that ValidAudiences parameter is set up.");
 
             var authenticationSchemes = new List<string>
             {
-                TyrAuthenticationSchemes.ProfileAuthenticationScheme
+                profileAuthentication.SchemeName ?? throw new InvalidOperationException("Scheme name is empty.")
             };
 
             var authenticationBuilder = services
                 .AddAuthentication(TyrAuthenticationSchemes.ProfileAuthenticationScheme) // Sets default authentication scheme.
-                .AddJwtBearer(TyrAuthenticationSchemes.ProfileAuthenticationScheme, options => ConfigureOptions(options, profileAuthentication));
+                .AddJwtBearer(profileAuthentication.SchemeName, options => ConfigureOptions(options, profileAuthentication));
+
+            foreach (var additionalAuthentication in additionalProfileAuthentications)
+            {
+                authenticationSchemes.Add(additionalAuthentication.SchemeName ?? throw new InvalidOperationException("Scheme name is empty."));
+                authenticationBuilder.AddJwtBearer(additionalAuthentication.SchemeName, options => ConfigureOptions(options, additionalAuthentication));
+            }
 
             if (serviceAuthentication != null)
             {
-                authenticationSchemes.Add(TyrAuthenticationSchemes.ServiceAuthenticationScheme);
-                authenticationBuilder.AddJwtBearer(TyrAuthenticationSchemes.ServiceAuthenticationScheme, options => ConfigureOptions(options, serviceAuthentication));
+                authenticationSchemes.Add(serviceAuthentication.SchemeName ?? throw new InvalidOperationException("Scheme name is empty."));
+                authenticationBuilder.AddJwtBearer(serviceAuthentication.SchemeName, options => ConfigureOptions(options, serviceAuthentication));
             }
+
+            if (authenticationSchemes.Distinct().Count() != authenticationSchemes.Count)
+                throw new InvalidOperationException("Duplicate authentication schemes found.");
 
             services.AddAuthorization(options =>
             {

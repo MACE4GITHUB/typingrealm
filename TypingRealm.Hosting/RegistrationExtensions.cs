@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,20 +13,34 @@ namespace TypingRealm.Hosting
     public static class RegistrationExtensions
     {
         public static readonly string CorsPolicyName = "CorsPolicy";
-        public static readonly string[] CorsAllowedOrigins = new[]
+        public static readonly string[] CorsAllowedOrigins = DebugHelpers.IsDevelopment()
+            ? GetDevelopmentAllowedOrigins().ToArray()
+            : new[] { "https://typingrealm.com" };
+
+        private static IEnumerable<string> GetDevelopmentAllowedOrigins()
         {
-#if DEBUG
-            "http://127.0.0.1:4200",
-            "https://127.0.0.1:4200",
-            "http://localhost:4200",
-            "https://localhost:4200",
-            "http://typingrealm.com:4200",
-            "https://typingrealm.com:4200",
-            "http://typingrealm.com",
-#endif
-            "https://typingrealm.com",
-            "https://slava.typingrealm.com"
-        };
+            var hosts = new[]
+            {
+                "127.0.0.1",
+                "localhost",
+                "typingrealm.com"
+            };
+
+            var ports = new[]
+            {
+                "",
+                ":4200"
+            };
+
+            foreach (var host in hosts)
+            {
+                foreach (var port in ports)
+                {
+                    yield return $"http://{host}{port}";
+                    yield return $"https://{host}{port}";
+                }
+            }
+        }
 
         public static IServiceCollection UseWebApiHost(this IServiceCollection services, Assembly controllersAssembly)
         {

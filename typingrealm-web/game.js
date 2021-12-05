@@ -8,15 +8,16 @@ async function main() {
     const url_string = window.location.href;
     const url = new URL(url_string);
     let profile = url.searchParams.get('profile');
-    const env = profile ? 'dev' : 'prod';
+    const useProxy = url.searchParams.get('proxy');
+    const env = (profile || useProxy) ? 'dev' : 'prod';
 
     const PROFILES_URL = env == 'prod'
-        ? 'https://profiles.typingrealm.com'
-        : 'http://localhost:30103';
+        ? 'https://api.typingrealm.com/profiles'
+        : useProxy ? 'https://api.localhost/profiles' : 'http://localhost:30103';
 
     const DATA_URL = env == 'prod'
-        ? 'https://data.typingrealm.com'
-        : 'http://localhost:30400';
+        ? 'https://api.typingrealm.com/data'
+        : useProxy ? 'https://api.localhost/data' : 'http://localhost:30400';
 
     const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
 
@@ -666,6 +667,7 @@ async function main() {
         }).then(r => r.json());
 
         console.log('Successfully submitted typing result.');
+        console.log(response);
     }
 
     async function getOverallReport() {

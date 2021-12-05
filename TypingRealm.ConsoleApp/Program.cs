@@ -21,7 +21,7 @@ namespace TypingRealm.ConsoleApp
         public static async Task Main()
         {
             string? localProfile = null;
-            if (DebugHelpers.UseLocalAuthentication)
+            if (DebugHelpers.UseDevelopmentAuthentication)
             {
                 Console.Write("Profile for local token: ");
                 localProfile = Console.ReadLine() ?? "default";
@@ -46,7 +46,7 @@ namespace TypingRealm.ConsoleApp
             {
                 var services = messageTypes.Services;
 
-                if (localProfile != null && DebugHelpers.UseLocalAuthentication)
+                if (localProfile != null && DebugHelpers.UseDevelopmentAuthentication)
                     services.AddLocalProfileTokenProvider(localProfile);
 
                 // For every singleton screen handler - it's own typer pool.

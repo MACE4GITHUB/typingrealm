@@ -25,21 +25,38 @@ namespace TypingRealm.Authentication.OAuth
 
         public ValueTask<AuthenticationResult> AuthenticateAsync(string accessToken, CancellationToken cancellationToken)
         {
-            var validationParameters = _authenticationInformationProvider.GetProfileAuthenticationInformation().TokenValidationParameters;
+            var authInfo = _authenticationInformationProvider.GetProfileAuthenticationInformation();
+            var result = TryValidateToken(accessToken, authInfo);
+            if (result != null)
+                return new ValueTask<AuthenticationResult>(result);
 
-            var handler = new JwtSecurityTokenHandler();
-            var user = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
-            if (!(validatedToken is JwtSecurityToken jwtSecurityToken))
+            foreach (var additionalAuthInfo in _authenticationInformationProvider.GetAdditionalProfileAuthenticationInformations())
             {
-                var serviceValidationParameters = _authenticationInformationProvider.GetServiceAuthenticationInformation().TokenValidationParameters;
-                user = handler.ValidateToken(accessToken, serviceValidationParameters, out validatedToken);
-                if (!(validatedToken is JwtSecurityToken))
-                    throw new NotSupportedException("Security token is not a valid JWT token.");
-
-                jwtSecurityToken = (JwtSecurityToken)validatedToken;
+                result = TryValidateToken(accessToken, additionalAuthInfo);
+                if (result != null)
+                    return new ValueTask<AuthenticationResult>(result);
             }
 
-            return new ValueTask<AuthenticationResult>(new AuthenticationResult(user, jwtSecurityToken));
+            var serviceAuthInfo = _authenticationInformationProvider.GetServiceAuthenticationInformation();
+            result = TryValidateToken(accessToken, serviceAuthInfo);
+            if (result != null)
+                return new ValueTask<AuthenticationResult>(result);
+
+            throw new NotSupportedException("Security token is not a valid JWT token.");
+        }
+
+        private static AuthenticationResult? TryValidateToken(string accessToken, AuthenticationInformation authenticationInformation)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var user = handler.ValidateToken(
+                accessToken,
+                authenticationInformation.TokenValidationParameters,
+                out var validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwtSecurityToken)
+                return new AuthenticationResult(user, jwtSecurityToken);
+
+            return null;
         }
     }
 }

@@ -11,13 +11,9 @@ namespace TypingRealm.Authentication
         /// </summary>
         public static IAuthenticationInformationProvider AddTyrCommonAuthentication(this IServiceCollection services)
         {
-            var profileAuthentication = BuildAuth0OrLocal();
+            var authentication = BuildAuthenticationInformationProvider();
 
-            var serviceAuthentication = new AuthenticationInformationBuilder()
-                .UseIdentityServerProvider()
-                .Build();
-
-            return services.AddTyrCommonAuthentication(profileAuthentication, serviceAuthentication);
+            return services.AddTyrCommonAuthentication(authentication);
         }
 
         /// <summary>
@@ -25,8 +21,7 @@ namespace TypingRealm.Authentication
         /// </summary>
         private static IAuthenticationInformationProvider AddTyrCommonAuthentication(
             this IServiceCollection services,
-            AuthenticationInformation profileAuthentication,
-            AuthenticationInformation? serviceAuthentication = null)
+            AuthenticationInformationProvider authenticationInformationProvider)
         {
             // S2S token issuer.
             services.AddTransient<IServiceTokenService, ServiceTokenService>();
@@ -35,8 +30,6 @@ namespace TypingRealm.Authentication
             services.AddProfileApiClients();
 
             // Registers authentication data that is used by S2S token issuer and validation.
-            var authenticationInformationProvider = new AuthenticationInformationProvider(
-                profileAuthentication, serviceAuthentication ?? profileAuthentication);
             services.AddSingleton<IAuthenticationInformationProvider>(authenticationInformationProvider);
 
             // Validates token and creates Principal and Security objects.
@@ -46,18 +39,36 @@ namespace TypingRealm.Authentication
             return authenticationInformationProvider;
         }
 
-        private static AuthenticationInformation BuildAuth0OrLocal()
+        private static AuthenticationInformationProvider BuildAuthenticationInformationProvider()
         {
-            if (DebugHelpers.UseLocalAuthentication)
+            var serviceAuthentication = new AuthenticationInformationBuilder()
+                .UseIdentityServerProvider()
+                .Build(TyrAuthenticationSchemes.ServiceAuthenticationScheme);
+
+            if (DebugHelpers.UseDevelopmentAuthentication)
             {
-                return new AuthenticationInformationBuilder()
+                var profileAuthentication = new AuthenticationInformationBuilder()
+                    .UseAuth0Provider(isDevelopment: true)
+                    .Build(TyrAuthenticationSchemes.ProfileAuthenticationScheme);
+
+                var localProfileAuthentication = new AuthenticationInformationBuilder()
                     .UseLocalProvider()
-                    .Build();
+                    .Build(TyrAuthenticationSchemes.LocalProfileAuthenticationScheme);
+
+                return new AuthenticationInformationProvider(
+                    localProfileAuthentication,
+                    new[] { profileAuthentication },
+                    serviceAuthentication);
             }
 
-            return new AuthenticationInformationBuilder()
-                .UseAuth0Provider()
-                .Build();
+            {
+                var profileAuthentication = new AuthenticationInformationBuilder()
+                    .UseAuth0Provider(isDevelopment: false)
+                    .Build(TyrAuthenticationSchemes.ProfileAuthenticationScheme);
+
+                return new AuthenticationInformationProvider(
+                    profileAuthentication, serviceAuthentication);
+            }
         }
     }
 }

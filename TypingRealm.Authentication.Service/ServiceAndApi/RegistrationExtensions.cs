@@ -10,9 +10,7 @@ namespace TypingRealm.Authentication
         {
             var services = builder.Services;
             var authInfoProvider = services.AddTyrCommonAuthentication();
-            services.UseAspNetAuthentication(
-                authInfoProvider.GetProfileAuthenticationInformation(),
-                authInfoProvider.GetServiceAuthenticationInformation());
+            services.UseAspNetAuthentication(authInfoProvider);
 
             builder.AddMessagingServiceAuthentication();
 

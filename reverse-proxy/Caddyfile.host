@@ -39,27 +39,10 @@ localhost {
 
 api.localhost {
     handle_path /data/* {
-        reverse_proxy dev-typingrealm-data:80
+        reverse_proxy local-typingrealm-data:80
     }
 
     handle_path /profiles/* {
-        reverse_proxy dev-typingrealm-profiles:80
+        reverse_proxy local-typingrealm-profiles:80
     }
-}
-
-
-
-# Obsolete entry, remove it after upgrading the code.
-data.typingrealm.com {
-    reverse_proxy typingrealm-data:80
-}
-
-# Obsolete entry, remove it after upgrading the code.
-profiles.typingrealm.com {
-    reverse_proxy typingrealm-profiles:80
-}
-
-# Temporary endpoint for development, shouldn't be committed.
-slava.typingrealm.com {
-    reverse_proxy 86.57.193.93:4200
 }

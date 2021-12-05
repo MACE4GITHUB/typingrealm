@@ -49,7 +49,7 @@ namespace TypingRealm.TestClient
             var services = new ServiceCollection();
 
             services.AddAuth0ProfileTokenProvider();
-            if (DebugHelpers.UseLocalAuthentication)
+            if (DebugHelpers.UseDevelopmentAuthentication)
             {
                 Console.Write("Profile for local token: ");
                 var profile = Console.ReadLine() ?? "default";
@@ -91,7 +91,7 @@ namespace TypingRealm.TestClient
             var services = new ServiceCollection();
 
             services.AddAuth0ProfileTokenProvider();
-            if (DebugHelpers.UseLocalAuthentication)
+            if (DebugHelpers.UseDevelopmentAuthentication)
             {
                 Console.Write("Profile for local token: ");
                 var profile = Console.ReadLine() ?? "default";
@@ -134,7 +134,7 @@ namespace TypingRealm.TestClient
             var services = new ServiceCollection();
 
             services.AddAuth0ProfileTokenProvider();
-            if (DebugHelpers.UseLocalAuthentication)
+            if (DebugHelpers.UseDevelopmentAuthentication)
             {
                 Console.Write("Profile for local token: ");
                 var profile = Console.ReadLine() ?? "default";

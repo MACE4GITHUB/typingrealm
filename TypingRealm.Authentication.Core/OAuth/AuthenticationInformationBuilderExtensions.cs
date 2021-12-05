@@ -43,8 +43,11 @@ namespace TypingRealm.Authentication.OAuth
             return builder;
         }
 
-        public static AuthenticationInformationBuilder UseAuth0Provider(this AuthenticationInformationBuilder builder)
+        public static AuthenticationInformationBuilder UseAuth0Provider(this AuthenticationInformationBuilder builder, bool isDevelopment = false)
         {
+            if (isDevelopment)
+                return builder.UseAuthenticationProvider(new DevelopmentAuth0AuthenticationConfiguration());
+
             return builder.UseAuthenticationProvider(new Auth0AuthenticationConfiguration());
         }
 
