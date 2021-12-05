@@ -1,0 +1,65 @@
+{
+    email typingrealm@gmail.com
+
+    # Uncomment for Staging LetsEncrypt
+    #acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+typingrealm.com {
+    reverse_proxy typingrealm-web-ui:80
+}
+
+api.typingrealm.com {
+    handle_path /data/* {
+        reverse_proxy typingrealm-data:80
+    }
+
+    handle_path /profiles/* {
+        reverse_proxy typingrealm-profiles:80
+    }
+}
+
+dev.typingrealm.com {
+    reverse_proxy dev-typingrealm-web-ui:80
+}
+
+dev.api.typingrealm.com {
+    handle_path /data/* {
+        reverse_proxy dev-typingrealm-data:80
+    }
+
+    handle_path /profiles/* {
+        reverse_proxy dev-typingrealm-profiles:80
+    }
+}
+
+localhost {
+    reverse_proxy host.docker.internal:4200
+}
+
+api.localhost {
+    handle_path /data/* {
+        reverse_proxy dev-typingrealm-data:80
+    }
+
+    handle_path /profiles/* {
+        reverse_proxy dev-typingrealm-profiles:80
+    }
+}
+
+
+
+# Obsolete entry, remove it after upgrading the code.
+data.typingrealm.com {
+    reverse_proxy typingrealm-data:80
+}
+
+# Obsolete entry, remove it after upgrading the code.
+profiles.typingrealm.com {
+    reverse_proxy typingrealm-profiles:80
+}
+
+# Temporary endpoint for development, shouldn't be committed.
+slava.typingrealm.com {
+    reverse_proxy 86.57.193.93:4200
+}

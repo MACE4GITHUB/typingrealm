@@ -11,7 +11,7 @@ services:
       - 443:443
     restart: unless-stopped
     volumes:
-      - ./reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
+      - ./reverse-proxy/Caddyfile.host:/etc/caddy/Caddyfile
       - ./reverse-proxy/caddy_data:/data
     mem_limit: 1g
     mem_reservation: 750m

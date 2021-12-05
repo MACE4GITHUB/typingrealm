@@ -1,0 +1,13 @@
+localhost {
+    reverse_proxy host.docker.internal:4200
+}
+
+api.localhost {
+    handle_path /data/* {
+        reverse_proxy dev-typingrealm-data:80
+    }
+
+    handle_path /profiles/* {
+        reverse_proxy dev-typingrealm-profiles:80
+    }
+}
