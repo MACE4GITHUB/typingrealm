@@ -1,0 +1,84 @@
+version: '3.4'
+
+networks:
+  local-typingrealm-net:
+
+services:
+  typingrealm-identityserver:
+    image: ${DOCKER_REGISTRY-}typingrealm-identityserver:dev
+    container_name: local-typingrealm-identityserver
+    networks:
+      - local-typingrealm-net
+    ports:
+      - "30000:80"
+    env_file:
+      - .env.dev
+    mem_limit: 1g
+    mem_reservation: 750m
+    build:
+      context: .
+      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
+
+  typingrealm-profiles:
+    image: ${DOCKER_REGISTRY-}typingrealm-profiles:dev
+    container_name: local-typingrealm-profiles
+    networks:
+      - local-typingrealm-net
+    ports:
+      - "30103:80"
+    env_file:
+      - .env.dev
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    build:
+      context: .
+      dockerfile: TypingRealm.Profiles.Api/Dockerfile
+
+  typingrealm-data:
+    image: ${DOCKER_REGISTRY-}typingrealm-data:dev
+    container_name: local-typingrealm-data
+    networks:
+      - local-typingrealm-net
+    ports:
+      - "30400:80"
+    env_file:
+      - .env.dev
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    build:
+      context: .
+      dockerfile: TypingRealm.Data.Api/Dockerfile
+
+  typingrealm-caddy:
+    image: caddy
+    container_name: local-typingrealm-caddy
+    networks:
+      - local-typingrealm-net
+    ports:
+      - 80:80
+      - 443:443
+    env_file:
+      - .env.dev
+    restart: unless-stopped
+    volumes:
+      - ./reverse-proxy/Caddyfile.local:/etc/caddy/Caddyfile
+      - ./infrastructure-data/local/caddy_data:/data
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  typingrealm-postgres:
+    image: postgres
+    container_name: local-typingrealm-postgres
+    networks:
+      - local-typingrealm-net
+    ports:
+      - 5432:5432
+    env_file:
+      - .env.dev
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    environment:
+      - POSTGRES_PASSWORD=admin

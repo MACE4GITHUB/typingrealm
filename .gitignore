@@ -5,7 +5,8 @@
 *.json
 
 # Caddy (reverse proxy) data files
-reverse-proxy/caddy_data
+reverse-proxy/caddy_data/
+infrastructure-data/
 
 # Certs
 *.pem

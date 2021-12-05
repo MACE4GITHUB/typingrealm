@@ -4,10 +4,10 @@ localhost {
 
 api.localhost {
     handle_path /data/* {
-        reverse_proxy dev-typingrealm-data:80
+        reverse_proxy local-typingrealm-data:80
     }
 
     handle_path /profiles/* {
-        reverse_proxy dev-typingrealm-profiles:80
+        reverse_proxy local-typingrealm-profiles:80
     }
 }
