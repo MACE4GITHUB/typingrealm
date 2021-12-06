@@ -10,8 +10,8 @@
             TokenEndpoint: $"{Auth0Issuer}oauth/token",
             AuthorizationEndpoint: $"{Auth0Issuer}authorize",
             PkceClientId: "usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck",
-            ServiceClientId: "QEYu5cQ7etxQyUARibsLFJwh5HBNOcjv",
-            ServiceClientSecret: "uFj6pnafZFYZbabfub_5fdSZC2aQ-Sgw4VP7jsEWgWZQjv4OVMvkFqk25BBpC1Me")
+            ServiceClientId: "no_client_id",
+            ServiceClientSecret: "no_client_secret")
         { }
     }
 }

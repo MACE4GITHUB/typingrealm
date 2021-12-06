@@ -1,0 +1,44 @@
+version: '3.4'
+
+networks:
+  debug-typingrealm-net:
+
+services:
+  debug-typingrealm-identityserver:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-identityserver
+    container_name: debug-typingrealm-identityserver
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30000:80
+    build:
+      context: .
+      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
+    env_file:
+      - .env.debug
+
+  debug-typingrealm-profiles:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-profiles
+    container_name: debug-typingrealm-profiles
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30103:80
+    build:
+      context: .
+      dockerfile: TypingRealm.Profiles.Api/Dockerfile
+    env_file:
+      - .env.debug
+
+  debug-typingrealm-data:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-data
+    container_name: debug-typingrealm-data
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30400:80
+    build:
+      context: .
+      dockerfile: TypingRealm.Data.Api/Dockerfile
+    env_file:
+      - .env.debug

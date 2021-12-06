@@ -1,26 +1,79 @@
 version: '3.4'
 
+networks:
+  dev-typingrealm-net:
+
 services:
-  typingrealm-identityserver:
-    image: ${DOCKER_REGISTRY-}typingrealm-identityserver:dev
-    container_name: typingrealm-identityserver-dev
-    ports:
-      - "30000:80"
+  dev-typingrealm-identityserver:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-identityserver
+    container_name: dev-typingrealm-identityserver
+    networks:
+      - dev-typingrealm-net
+    build:
+      context: .
+      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
     env_file:
       - .env.dev
 
-  typingrealm-profiles:
-    image: ${DOCKER_REGISTRY-}typingrealm-profiles:dev
-    container_name: typingrealm-profiles-dev
-    ports:
-      - "30103:80"
+  dev-typingrealm-profiles:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-profiles
+    container_name: dev-typingrealm-profiles
+    networks:
+      - dev-typingrealm-net
+    build:
+      context: .
+      dockerfile: TypingRealm.Profiles.Api/Dockerfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
     env_file:
       - .env.dev
 
-  typingrealm-data:
-    image: ${DOCKER_REGISTRY-}typingrealm-data:dev
-    container_name: typingrealm-data-dev
+  dev-typingrealm-data:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-data
+    container_name: dev-typingrealm-data
+    networks:
+      - dev-typingrealm-net
+    build:
+      context: .
+      dockerfile: TypingRealm.Data.Api/Dockerfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - .env.dev
+
+  # === Infrastructure ===
+
+  dev-typingrealm-postgres:
+    image: postgres
+    container_name: dev-typingrealm-postgres
+    networks:
+      - dev-typingrealm-net
     ports:
-      - "30400:80"
+      - 5432:5432
+    volumes:
+      - ./infrastructure-data/dev/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.dev
+
+  # Simple local UI test page to facilitate BackEnd development.
+  dev-typingrealm-web-ui:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-web-ui
+    container_name: dev-typingrealm-web-ui
+    networks:
+      - dev-typingrealm-net
+    build:
+      context: ./typingrealm-web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
     env_file:
       - .env.dev

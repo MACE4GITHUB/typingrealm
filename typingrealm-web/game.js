@@ -8,16 +8,34 @@ async function main() {
     const url_string = window.location.href;
     const url = new URL(url_string);
     let profile = url.searchParams.get('profile');
-    const useProxy = url.searchParams.get('proxy');
-    const env = (profile || useProxy) ? 'dev' : 'prod';
 
-    const PROFILES_URL = env == 'prod'
-        ? 'https://api.typingrealm.com/profiles'
-        : useProxy ? 'https://api.localhost/profiles' : 'http://localhost:30103';
+    let PROFILES_URL = 'https://api.typingrealm.com/profiles';
+    let DATA_URL = 'https://api.typingrealm.com/data';
+    let useDevAuth0Client = true;
+    setUrls();
 
-    const DATA_URL = env == 'prod'
-        ? 'https://api.typingrealm.com/data'
-        : useProxy ? 'https://api.localhost/data' : 'http://localhost:30400';
+    function setUrls() {
+        const env = url.searchParams.get('env');
+        if (!env || env == 'prod') {
+            useDevAuth0Client = false;
+            return;
+        }
+
+        if (env == 'dev') {
+            PROFILES_URL = 'https://dev.api.typingrealm.com/profiles';
+            DATA_URL = 'https://dev.api.typingrealm.com/data';
+        }
+
+        if (env == 'local') {
+            PROFILES_URL = 'https://api.localhost/profiles';
+            DATA_URL = 'https://api.localhost/data';
+        }
+
+        if (env == 'local-ports') {
+            PROFILES_URL = 'http://localhost:30103';
+            DATA_URL = 'http://localhost:30400';
+        }
+    }
 
     const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
 
@@ -40,8 +58,8 @@ async function main() {
 
     if (!profile) {
         auth0 = await createAuth0Client({
-            domain: 'typingrealm.us.auth0.com',
-            client_id: 'usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck',
+            domain: useDevAuth0Client ? 'dev-typingrealm.eu.auth0.com' : 'typingrealm.us.auth0.com',
+            client_id: useDevAuth0Client ? 'MmL3eIAJPW7wweAWajjqgWRM8xaVqRn2' : 'usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck',
             useRefreshTokens: true
         });
 
@@ -164,6 +182,7 @@ async function main() {
 
     async function getText() {
         let token = await getToken();
+        console.log(token);
 
         let response = await fetch(textRequestUrl, {
             headers: {

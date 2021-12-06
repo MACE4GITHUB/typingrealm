@@ -23,7 +23,8 @@ namespace TypingRealm.Hosting
             {
                 "127.0.0.1",
                 "localhost",
-                "typingrealm.com"
+                "typingrealm.com",
+                "dev.typingrealm.com"
             };
 
             var ports = new[]
