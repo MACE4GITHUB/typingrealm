@@ -57,6 +57,9 @@ services:
     container_name: typingrealm-postgres
     networks:
       - typingrealm-net
+    # Should be disabled in production. This is for conveniency of connecting to prod DB.
+    ports:
+      - 5430:5432
     volumes:
       - ./infrastructure-data/prod/postgres:/var/lib/postgresql/data
     restart: unless-stopped
