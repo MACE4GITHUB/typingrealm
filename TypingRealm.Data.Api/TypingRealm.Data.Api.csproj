@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileTag>debug-typingrealm-data</DockerfileTag>
+    <DockerfileRunEnvironmentFiles>../.env.debug</DockerfileRunEnvironmentFiles>
   </PropertyGroup>
 
   <ItemGroup>

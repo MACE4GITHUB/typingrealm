@@ -9,12 +9,7 @@
     },
     "Docker": {
       "commandName": "Docker",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "environmentVariables": {
-        "SERVICE_AUTHORITY": "http://host.docker.internal:30000/",
-        "PROFILES_URL": "http://host.docker.internal:30103",
-        "DATA_URL": "http://host.docker.internal:30400"
-      }
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}"
     }
   }
 }

@@ -4,6 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <UserSecretsId>2bff9dd6-a7c5-4c5d-8e90-b358fe259725</UserSecretsId>
+    <DockerfileTag>debug-typingrealm-identityserver</DockerfileTag>
+    <DockerfileRunEnvironmentFiles>../.env.debug</DockerfileRunEnvironmentFiles>
   </PropertyGroup>
 
   <ItemGroup>
