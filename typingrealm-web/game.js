@@ -31,7 +31,7 @@ async function main() {
             DATA_URL = 'https://api.localhost/data';
         }
 
-        if (env == 'local-ports') {
+        if (env == 'debug') {
             PROFILES_URL = 'http://localhost:30103';
             DATA_URL = 'http://localhost:30400';
         }
