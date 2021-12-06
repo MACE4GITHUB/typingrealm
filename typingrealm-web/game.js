@@ -12,10 +12,10 @@ async function main() {
     let PROFILES_URL = 'https://api.typingrealm.com/profiles';
     let DATA_URL = 'https://api.typingrealm.com/data';
     let useDevAuth0Client = true;
+    const env = url.searchParams.get('env');
     setUrls();
 
     function setUrls() {
-        const env = url.searchParams.get('env');
         if (!env || env == 'prod') {
             useDevAuth0Client = false;
             return;
@@ -57,11 +57,19 @@ async function main() {
     }
 
     if (!profile) {
-        auth0 = await createAuth0Client({
-            domain: useDevAuth0Client ? 'dev-typingrealm.eu.auth0.com' : 'typingrealm.us.auth0.com',
-            client_id: useDevAuth0Client ? 'MmL3eIAJPW7wweAWajjqgWRM8xaVqRn2' : 'usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck',
-            useRefreshTokens: true
-        });
+        if (env == 'prod') {
+            auth0 = await createAuth0Client({
+                domain: 'typingrealm.us.auth0.com',
+                client_id: 'usmQTpTvmVrxC4QtYMYj6R7aIa6Ambck',
+                useRefreshTokens: true
+            });
+        } else {
+            auth0 = await createAuth0Client({
+                domain: 'dev-typingrealm.eu.auth0.com',
+                client_id: 'MmL3eIAJPW7wweAWajjqgWRM8xaVqRn2',
+                useRefreshTokens: true
+            });
+        }
 
         await forceLogin();
         profile = await getProfileFromToken();
