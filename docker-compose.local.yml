@@ -4,7 +4,7 @@ networks:
   local-typingrealm-net:
 
 services:
-  typingrealm-identityserver:
+  local-typingrealm-identityserver:
     image: ${DOCKER_REGISTRY-}typingrealm-identityserver:local
     container_name: local-typingrealm-identityserver
     networks:
@@ -18,7 +18,7 @@ services:
     env_file:
       - .env.local
 
-  typingrealm-profiles:
+  local-typingrealm-profiles:
     image: ${DOCKER_REGISTRY-}typingrealm-profiles:local
     container_name: local-typingrealm-profiles
     networks:
@@ -32,7 +32,7 @@ services:
     env_file:
       - .env.local
 
-  typingrealm-data:
+  local-typingrealm-data:
     image: ${DOCKER_REGISTRY-}typingrealm-data:local
     container_name: local-typingrealm-data
     networks:
@@ -48,7 +48,7 @@ services:
 
   # === Infrastructure ===
 
-  typingrealm-postgres:
+  local-typingrealm-postgres:
     image: postgres
     container_name: local-typingrealm-postgres
     networks:
@@ -61,7 +61,7 @@ services:
     env_file:
       - .env.local
 
-  typingrealm-caddy:
+  local-typingrealm-caddy:
     image: caddy
     container_name: local-typingrealm-caddy
     networks:
