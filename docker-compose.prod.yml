@@ -68,6 +68,22 @@ services:
     env_file:
       - .env.prod
 
+  typingrealm-redis:
+    image: redis
+    container_name: typingrealm-redis
+    networks:
+      - typingrealm-net
+    # Should be disabled in production. This is for conveniency of connecting to prod DB.
+    ports:
+      - 6370:6379
+    volumes:
+      - ./infrastructure-data/prod/redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.prod
+
   # This is Caddy both for PROD, DEV and LOCAL routing.
   # In the final PROD configuration another Caddyfile should be deployed.
   typingrealm-caddy:

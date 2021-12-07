@@ -31,6 +31,7 @@ namespace TypingRealm.Data.Infrastructure
                         .UseSnakeCaseNamingConvention());
 
                 services.AddTransient<IInfrastructureDeploymentService, InfrastructureDeploymentService>();
+                services.AddTransient<IUserTypingStatisticsStore, UserTypingStatisticsStore>();
             }
             else
             {
