@@ -32,6 +32,11 @@ namespace TypingRealm.Data.Infrastructure
 
                 services.AddTransient<IInfrastructureDeploymentService, InfrastructureDeploymentService>();
                 services.AddTransient<IUserTypingStatisticsStore, UserTypingStatisticsStore>();
+
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = "host.docker.internal:6379";
+                });
             }
             else
             {

@@ -1,35 +1,35 @@
 ﻿using System.Text.Json;
 using System.Threading.Tasks;
-using StackExchange.Redis;
+using Microsoft.Extensions.Caching.Distributed;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Infrastructure
 {
     public sealed class UserTypingStatisticsStore : IUserTypingStatisticsStore
     {
-        private readonly ConnectionMultiplexer _redis = ConnectionMultiplexer.Connect(
-            new ConfigurationOptions
-            {
-                EndPoints = { "host.docker.internal:6379" }
-            });
+        private readonly IDistributedCache _cache;
+
+        public UserTypingStatisticsStore(IDistributedCache cache)
+        {
+            _cache = cache;
+        }
 
         public async ValueTask<UserTypingStatistics?> GetUserTypingStatisticsAsync(string userId)
         {
-            var db = _redis.GetDatabase();
-            var data = await db.StringGetAsync(new RedisKey($"typingrealm-data-user-statistics-{userId}"))
+            var stringData = await _cache.GetStringAsync($"typingrealm-data-user-statistics-{userId}")
                 .ConfigureAwait(false);
 
-            if (!data.HasValue)
+            if (stringData == null || stringData.Length == 0)
                 return null;
 
-            return JsonSerializer.Deserialize<UserTypingStatistics>(data);
+            return JsonSerializer.Deserialize<UserTypingStatistics>(stringData);
         }
 
         public async ValueTask SaveAsync(string userId, UserTypingStatistics userTypingStatistics)
         {
-            var data = JsonSerializer.Serialize(userTypingStatistics);
-            var db = _redis.GetDatabase();
-            await db.StringSetAsync(new RedisKey($"typingrealm-data-user-statistics-{userId}"), new RedisValue(data))
+            var stringData = JsonSerializer.Serialize(userTypingStatistics);
+
+            await _cache.SetStringAsync($"typingrealm-data-user-statistics-{userId}", stringData)
                 .ConfigureAwait(false);
         }
     }
