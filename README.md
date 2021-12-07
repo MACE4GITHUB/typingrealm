@@ -20,6 +20,26 @@ frontend).
 
 ### Docker instructions
 
+#### Fast startup
+
+To simply start everything for Web UI development, just run
+
+```
+docker-compose -p local-tyr -f docker-compose.local.yml -d --build
+```
+
+It will start all backend services and a reverse-proxy that is pointing to the services & local web app that you can host at 4200 port. The following URL mapping applies:
+
+```
+https://localhost/ -> http://localhost:4200/
+https://api.localhost/data/ -> data API
+https://api.localhost/profiles/ -> profiles API
+```
+
+For more detailed information on environment-specific Docker Compose files, see DockerGuide.MD in this project.
+
+#### Detailed instructions
+
 All the services have been dockerized, and now you can run them all as simply
 as clicking one button. If you want to run everything on your machine, follow
 the instructions of the next chapter.
@@ -44,7 +64,7 @@ explorer TypingRealm.sln
 button)
 
 4. To run frontend, go to "typingrealm-web" folder inside the project, and run
-`docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build`
+`http-server -p 4200` after installing http-server globally (`npm install -g http-server`).
 
 You will have frontend running on 4200 port, and backend running on 30000,
 30400 and 30103 ports.

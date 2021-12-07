@@ -27,7 +27,9 @@ docker exec CONTAINER_NAME env
 
 
 
-## Build
+## Manual Build & Run
+
+Since anyone who has Docker can also have Docker-Compose, I have opted out to have Compose profiles as a single source of truth. Any Docker build / run commands can be reverse-engineered from there, so here we only have a short list of useful commands to build and run images manually.
 
 By default tag is "latest".
 
@@ -36,152 +38,129 @@ By default tag is "latest".
 -t IMAGE_NAME:TAG (-t typingrealm-profiles:dev)
 ```
 
-### Production
-
 ```
 docker network create tyr_typingrealm-net
 docker build -t typingrealm-identityserver -f TypingRealm.IdentityServer.Host/Dockerfile .
-docker build -t typingrealm-profiles -f TypingRealm.Profiles.Api/Dockerfile .
-docker build -t typingrealm-data -f TypingRealm.Data.Api/Dockerfile .
-docker build -t typingrealm-web-ui -f typingrealm-web/Dockerfile ./typingrealm-web
+```
+
+This needs to be added to every .NET project RUN:
+
+```
+    --net NETWORK_NAME
+    -p PORT:80
+    --env-file .env.prod | .env.dev | .env.debug | .env.local
+    --memory="1g" --memory-reservation="750m"
+    --restart unless-stopped
+    --name PROJECT_NAME
+    -v (volumes if needed) ./local-folder-or-file:/container-folder-or-file
+```
+
+
+
+## Docker Compose and Environments
+
+There are 5 types of build currently:
+
+- Strict Prod (production)
+- Prod (or Host)
+- Dev (development)
+- Local
+- Debug
+
+### Strict production
+
+```.env.prod```
+
+Total production mode, no debug features, no open ports. Should be deployed to the final production cluster, the only way to troubleshoot issues is logging.
+
+It requires a host with open 80, 443 ports and domain typingrealm.com mapped to it.
+
+```
+docker-compose -p tyr -f docker-compose.strict-prod.yml -d --build
+docker-compose -p tyr down
+```
+
+URLs:
+
+```
+https://typingrealm.com - DEV Web UI
+https://api.localhost/data/ - Data API
+https://api.localhost/profiles/ - Profiles API
+```
+
+### Production / Host
+
+```.env.prod```
+
+This is the version of compose that is deployed to my local machine (typingrealm.com). It has some relaxations around network (like opened port on postgres database so that it can be accessed from local machine), and it has reverse-proxy that also handles requests to DEV and Local environments so that we can have multiple environments. In future, this environment can be called Staging. It uses production Auth0 environment though so users are shared between prod-strict and prod/host envs.
+
+It requires a host with open 80, 443 ports and domain typingrealm.com mapped to it.
+
+```
+docker-compose -p tyr -f docker-compose.prod.yml -d --build
+docker-compose -p tyr down
+```
+
+URLs:
+
+```
+https://typingrealm.com - DEV Web UI
+https://api.localhost/data/ - Data API
+https://api.localhost/profiles/ - Profiles API
 ```
 
 ### Development
 
-```
-docker network create dev-tyr_typingrealm-net
-docker build -t typingrealm-identityserver:dev -f TypingRealm.IdentityServer.Host/Dockerfile .
-docker build -t typingrealm-profiles:dev -f TypingRealm.Profiles.Api/Dockerfile .
-docker build -t typingrealm-data:dev -f TypingRealm.Data.Api/Dockerfile .
-```
+```.env.dev```
 
-
-
-## Run
-
-### Production
-
-This needs to be added to every .NET project RUN (except IdentityServer):
+The development environment accepts requests from URLs like localhost and ports like 4200. This environment uses separate Auth0 connection and accepts locally generated tokens as well. It should be used for all development.
 
 ```
-    --env-file .env.prod
-    --memory="1g" --memory-reservation="750m"
+docker-compose -p dev-tyr -f docker-compose.dev.yml -d --build
+docker-compose -p dev-tyr down
 ```
 
-```
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --env-file .env.prod --name typingrealm-identityserver typingrealm-identityserver
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --env-file .env.prod --name typingrealm-profiles typingrealm-profiles
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --env-file .env.prod --name typingrealm-data typingrealm-data
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="1g" --memory-reservation="750m" --name typingrealm-web-ui typingrealm-web-ui
-
-/* Infrastructure */
-docker run -d --net tyr_typingrealm-net --restart unless-stopped --memory="2g" --memory-reservation="1.75g" -e POSTGRES_PASSWORD=admin --name typingrealm-postgres postgres
-
-/* For debugging - add a port to be able to attach to the database & make backups of data */
-docker run -d --net tyr_typingrealm-net -p 5430:5432 --restart unless-stopped --memory="2g" --memory-reservation="1.75g" -e POSTGRES_PASSWORD=admin --name typingrealm-postgres postgres
-```
-
-
-
-#### Reverse proxy
+URLs:
 
 ```
-(Need to check this)
-${PWD} should work on Windows in Powershell.
-
-docker run -d
-    -p 80:80 -p 443:443
-    --net tyr_typingrealm-net
-    --restart unless-stopped
-    --memory="1g" --memory-reservation="750m"
-    -v (ABSOLUTE_PATH_TO_REPOSITORY)/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
-    -v (ABSOLUTE_PATH_TO_REPOSITORY)/reverse-proxy/caddy_data:/data
-    --name typingrealm-caddy caddy
-
-docker run -d
-    -p 80:80 -p 443:443
-    --net tyr_typingrealm-net
-    --restart unless-stopped
-    --memory="1g" --memory-reservation="750m"
-    -v /d/Projects/typingrealm/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
-    -v /d/Projects/typingrealm/reverse-proxy/caddy_data:/data
-    --name typingrealm-caddy caddy
+https://dev.typingrealm.com - DEV Web UI
+https://dev.api.localhost/data/ - Data API
+https://dev.api.localhost/profiles/ - Profiles API
 ```
 
+### Local
 
+```.env.local```
 
-#### Docker Compose
-
-```
-docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml up -d --build
-docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml up -d
-
-docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml down
-
-/* Restart service */
-docker-compose -p tyr -f docker-compose.yml -f docker-compose.production.yml up -d --build SERVICE_NAME
-```
-
-
-
-### Development
+This environment should primarily be used for Web UI development whenever the main typingrealm.com server is unavailable, so you can run everything locally. It doesn't take any PC ports as well, you can just spin it up and it should work with local proxy ready to go (with self-signed SSL certs).
 
 ```
-docker run -d
-    --net dev-tyr_typingrealm-net
-    -p 30000:80
-    --env-file .env.dev
-    --name dev-typingrealm-identityserver typingrealm-identityserver:dev
-
-docker run -d
-    --net dev-tyr_typingrealm-net
-    -p 30103:80
-    --env-file=.env.dev
-    --name dev-typingrealm-profiles typingrealm-profiles:dev
-
-docker run -d
-    --net dev-tyr_typingrealm-net
-    -p 30400:80
-    --env-file=.env.dev
-    --name dev-typingrealm-data typingrealm-data:dev
-
-docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml up -d --build
-docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml down -d --build
-
-docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml up -d
-docker-compose -p dev-tyr -f docker-compose.yml -f docker-compose.override.yml down -d
-
-
-
-/* Infrastructure */
-docker run -d --net dev-tyr_typingrealm-net -p 5432:5432 -e POSTGRES_PASSWORD=admin --name typingrealm-postgres-dev postgres
+docker-compose -p local-tyr -f docker-compose.local.yml -d --build
+docker-compose -p local-tyr down
 ```
 
-### When running separate Docker containers from VS
-
-For example, for Profiles API project:
+URLs (when HOST reverse-proxy is spinned up):
 
 ```
-Image name: typingrealmprofilesapi:dev
-Container name: TypingRealm.Profiles.Api
+https://localhost - points to your http://localhost:4200
+https://api.localhost/data/ - Data API
+https://api.localhost/profiles/ - Profiles API
 ```
 
+### Debug
 
+```.env.debug```
 
-## URLs
+This profile is being used by Visual Studio when spinning up VS Docker-Compose project or running separate docker containers. You can also spin it up manually.
 
 ```
-=== For localhost debugging ===
-LocalhostIssuer: http://localhost:30000/
-ServiceDiscovery, Services: http://localhost:30500/, http://localhost:PORT/
+docker-compose -p debug-tyr -f docker-compose.yml -d --build
+docker-compose -p debug-tyr
+```
 
+URLs:
 
-=== For VS Docker (or VS Compose) debugging ===
-LocalhostIssuer: http://host.docker.internal:30000/
-ServiceDiscovery, Services: http://host.docker.internal:30500/, http://host.docker.internal:PORT/
-
-
-=== For Docker (or Compose) deployment ===
-LocalhostIssuer: http://typingrealm-identityserver/
-ServiceDiscovery, Services: http://typingrealm-servicediscovery/, http://typingrealm-SERVICENAME/
+```
+http://localhost:30400/ - Data API
+http://localhost:30103/ - Profiles API
 ```
