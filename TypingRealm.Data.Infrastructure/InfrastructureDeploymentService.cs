@@ -28,6 +28,7 @@ namespace TypingRealm.Data.Infrastructure
 
         public async ValueTask DeployInfrastructureAsync()
         {
+            // TODO: Try this until it succeeds (database can be down).
             await _context.Database.MigrateAsync()
                 .ConfigureAwait(false);
         }
