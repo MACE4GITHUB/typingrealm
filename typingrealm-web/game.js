@@ -12,11 +12,12 @@ async function main() {
     let PROFILES_URL = 'https://api.typingrealm.com/profiles';
     let DATA_URL = 'https://api.typingrealm.com/data';
     let useDevAuth0Client = true;
-    const env = url.searchParams.get('env');
+    let env = url.searchParams.get('env');
     setUrls();
 
     function setUrls() {
         if (!env || env == 'prod') {
+            env = 'prod';
             useDevAuth0Client = false;
             return;
         }
