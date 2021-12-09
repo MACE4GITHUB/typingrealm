@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using StackExchange.Redis;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Infrastructure
@@ -54,6 +55,83 @@ namespace TypingRealm.Data.Infrastructure
                 throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
 
             return textValue;
+        }
+    }
+
+    public sealed class RedisCachedTextRetriever : ITextRetriever
+    {
+        private const int CacheSize = 1000;
+        private readonly ITextRetriever _textRetriever;
+        private readonly IConnectionMultiplexer _connectionMultiplexer;
+        private Task _process;
+
+        public RedisCachedTextRetriever(ITextRetriever textRetriever, IConnectionMultiplexer connectionMultiplexer)
+        {
+            _textRetriever = textRetriever;
+            _connectionMultiplexer = connectionMultiplexer;
+            _process = StartGettingQuotesAsync();
+        }
+
+        public ValueTask<string> GetNextTextValue() => GetQuoteAsync();
+
+        private async ValueTask<string> GetQuoteAsync()
+        {
+            var db = _connectionMultiplexer.GetDatabase();
+            var count = await db.SetLengthAsync(new RedisKey("generated-texts"))
+                .ConfigureAwait(false);
+
+            if (_process.IsCompleted && count < CacheSize)
+                _process = StartGettingQuotesAsync();
+
+            while (true)
+            {
+                var quote = await TryGetQuoteAsync()
+                    .ConfigureAwait(false);
+
+                if (quote != null)
+                    return quote;
+
+                await Task.Delay(10)
+                    .ConfigureAwait(false);
+            }
+        }
+
+        private async ValueTask<string?> TryGetQuoteAsync()
+        {
+            var db = _connectionMultiplexer.GetDatabase();
+            var text = await db.SetPopAsync(new RedisKey("generated-texts"))
+                .ConfigureAwait(false);
+
+            if (!text.HasValue)
+                return null;
+
+            return text.ToString();
+        }
+
+        private async Task StartGettingQuotesAsync()
+        {
+            var db = _connectionMultiplexer.GetDatabase();
+
+            var iteration = 0;
+            var count = await db.SetLengthAsync(new RedisKey("generated-texts"))
+                .ConfigureAwait(false);
+
+            while (count < CacheSize)
+            {
+                var text = await _textRetriever.GetNextTextValue()
+                    .ConfigureAwait(false);
+
+                await db.SetAddAsync("generated-texts", text)
+                    .ConfigureAwait(false);
+
+                iteration++;
+
+                if (iteration > 50)
+                {
+                    count = await db.SetLengthAsync(new RedisKey("generated-texts"))
+                        .ConfigureAwait(false);
+                }
+            }
         }
     }
 

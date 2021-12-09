@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using TypingRealm.Data.Infrastructure.DataAccess;
 using TypingRealm.Data.Infrastructure.DataAccess.Repositories;
 using TypingRealm.Typing;
@@ -23,7 +24,6 @@ namespace TypingRealm.Data.Infrastructure
 
             // TODO: Register this as transient and decorate as singleton, allow changing lifetime when decorating.
             services.AddSingleton<ITextRetriever, QuotableTextRetriever>();
-            services.Decorate<ITextRetriever, InMemoryCachedTextRetriever>();
 
             // Repositories.
             if (DebugHelpers.UseInfrastructure)
@@ -44,10 +44,15 @@ namespace TypingRealm.Data.Infrastructure
                 {
                     options.Configuration = cacheConnectionString;
                 });
+
+                services.AddTransient<IConnectionMultiplexer>(
+                    provider => ConnectionMultiplexer.Connect(cacheConnectionString));
+                services.Decorate<ITextRetriever, RedisCachedTextRetriever>();
             }
             else
             {
                 services.AddTransient<IInfrastructureDeploymentService, NoInfrastructureService>();
+                services.Decorate<ITextRetriever, InMemoryCachedTextRetriever>();
             }
 
             return services;
