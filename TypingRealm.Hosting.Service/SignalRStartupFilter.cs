@@ -7,21 +7,13 @@ namespace TypingRealm.Hosting.Service
 {
     public sealed class SignalRStartupFilter : IStartupFilter
     {
-        private const string CorsPolicyName = "CorsPolicy";
-
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
         {
             return app =>
             {
-                app.UseRouting();
-                app.UseCors(CorsPolicyName);
-                app.UseAuthentication();
-                app.UseAuthorization();
-
-                app.UseEndpoints(endpoints =>
+                WebApiStartupFilter.ConfigureCommonTyrApp(app, endpoints =>
                 {
                     endpoints.MapHub<MessageHub>("/hub").RequireAuthorization();
-                    endpoints.MapHealthChecks("health");
                 });
 
                 next(app);

@@ -46,7 +46,34 @@ namespace TypingRealm.Hosting
         public static IServiceCollection UseWebApiHost(this IServiceCollection services, Assembly controllersAssembly)
         {
             SetupCommonDependencies(services);
+            SetupCommonAspNetDependencies<WebApiStartupFilter>(services, controllersAssembly);
 
+            // Authentication.
+            services.AddTyrApiAuthentication();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Used by Web API, SignalR and TCP hosts (by everything).
+        /// Registered before host-specific dependencies are added.
+        /// </summary>
+        /// <param name="services"></param>
+        public static IServiceCollection SetupCommonDependencies(IServiceCollection services)
+        {
+            services.AddHttpClient();
+            services.AddCommunication();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Used by Web API & SignalR hosts that use ASP.Net hosting framework.
+        /// Is not used by custom tools / console apps / TCP servers.
+        /// </summary>
+        public static IServiceCollection SetupCommonAspNetDependencies<TStartupFilter>(IServiceCollection services, Assembly? controllersAssembly = null)
+            where TStartupFilter : class, IStartupFilter
+        {
             services.AddCors(options => options.AddPolicy(
                 CorsPolicyName,
                 builder => builder
@@ -55,25 +82,24 @@ namespace TypingRealm.Hosting
                     .AllowAnyMethod()
                     .AllowCredentials()));
 
-            services.AddCommunication();
-            services.AddTyrApiAuthentication();
-
-            var mvcBuilder = services.AddControllers();
-            mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(controllersAssembly));
-            mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(DiagnosticsController).Assembly));
-
-            services.AddTransient<IStartupFilter, WebApiStartupFilter>();
-
+            // TODO: Consider how to add healthchecks for custom TCP hosts (ping address?).
             services.AddHealthChecks();
 
+            // Web API controllers.
+            var mvcBuilder = services.AddControllers();
+            mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(DiagnosticsController).Assembly));
+
+            // If host has custom APIs.
+            if (controllersAssembly != null)
+            {
+                mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(controllersAssembly));
+            }
+
+            // Swagger.
             services.AddSwaggerGen();
 
-            return services;
-        }
-
-        public static IServiceCollection SetupCommonDependencies(IServiceCollection services)
-        {
-            services.AddHttpClient();
+            // Web API or SingnalR or another custom Startup filter.
+            services.AddTransient<IStartupFilter, TStartupFilter>();
 
             return services;
         }

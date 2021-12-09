@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
 using TypingRealm.Authentication.Service;
-using TypingRealm.Communication;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
 using TypingRealm.Messaging.Serialization.Json;
@@ -17,21 +15,20 @@ namespace TypingRealm.Hosting.Service
         public static MessageTypeCacheBuilder UseTcpHost(this IServiceCollection services, int port)
         {
             Hosting.RegistrationExtensions.SetupCommonDependencies(services);
+            var builder = SetupCommonMessagingServiceDependencies(services);
 
+            // Authentication.
+            builder.AddTyrServiceWithoutAspNetAuthentication();
+
+            // TCP, Protobuf.
             services
-                .AddProtobuf()
-                .AddTcpServer(port);
+                .AddProtobuf() // Already has a call to AddProtobufMessageSerializer.
+                .AddTcpServer(port)
+                .AddHostedService<TcpServerHostedService>();
 
-            services
-                .AddCommunication()
-                .RegisterMessaging();
-            var builder = services.AddSerializationCore();
-
-            builder
-                .AddTyrServiceWithoutAspNetAuthentication();
-
-            services.AddHostedService<TcpServerHostedService>();
-            services.AddJson(); // Use this to serialize/deserialize messages in JSON instead of protobuf base64 string.
+            // Use this to serialize/deserialize messages in JSON instead of protobuf base64 string.
+            // This can be removed for total Protobuf serialization mode.
+            services.AddJson();
 
             return builder;
         }
@@ -39,33 +36,31 @@ namespace TypingRealm.Hosting.Service
         public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services)
         {
             Hosting.RegistrationExtensions.SetupCommonDependencies(services);
+            Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(services);
+            var builder = SetupCommonMessagingServiceDependencies(services);
 
+            // Authentication.
+            builder.AddTyrServiceAuthentication();
+
+            // SignalR.
             services.AddSignalR();
+            services.RegisterMessageHub();
 
-            services.AddCors(options => options.AddPolicy(
-                Hosting.RegistrationExtensions.CorsPolicyName,
-                builder => builder
-                    .WithOrigins(Hosting.RegistrationExtensions.CorsAllowedOrigins)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials()));
-
-            services
-                .RegisterMessageHub();
-
-            services
-                .AddCommunication()
-                .RegisterMessaging();
-            var builder = services.AddSerializationCore();
-            builder
-                .AddTyrServiceAuthentication();
-
-            services.AddTransient<IStartupFilter, SignalRStartupFilter>();
-
-            services.AddHealthChecks();
-
+            // Message serialization.
             services.AddJson();
-            services.AddProtobufMessageSerializer(); // Use this to enable protobuf base64 string message serializer instead of json.
+
+            // Use this to enable protobuf base64 string message serializer instead of json.
+            // This can be removed for total JSON serialization mode.
+            services.AddProtobufMessageSerializer();
+
+            return builder;
+        }
+
+        private static MessageTypeCacheBuilder SetupCommonMessagingServiceDependencies(IServiceCollection services)
+        {
+            services.RegisterMessaging();
+
+            var builder = services.AddSerializationCore();
 
             return builder;
         }
