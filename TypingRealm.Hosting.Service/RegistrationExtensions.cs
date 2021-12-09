@@ -62,6 +62,8 @@ namespace TypingRealm.Hosting.Service
 
             services.AddTransient<IStartupFilter, SignalRStartupFilter>();
 
+            services.AddHealthChecks();
+
             services.AddJson();
             services.AddProtobufMessageSerializer(); // Use this to enable protobuf base64 string message serializer instead of json.
 

@@ -21,6 +21,10 @@ public static class Program
         var cacheConnectionString = builder.Configuration.GetConnectionString("CacheConnection");
         builder.Services.RegisterDataApi(dataConnectionString, cacheConnectionString);
 
+        builder.Services.AddHealthChecks()
+            .AddRedis(cacheConnectionString)
+            .AddNpgSql(dataConnectionString);
+
         var app = builder.Build();
 
         using (var scope = app.Services.CreateScope())

@@ -21,6 +21,7 @@ namespace TypingRealm.Hosting.Service
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapHub<MessageHub>("/hub").RequireAuthorization();
+                    endpoints.MapHealthChecks("health");
                 });
 
                 next(app);

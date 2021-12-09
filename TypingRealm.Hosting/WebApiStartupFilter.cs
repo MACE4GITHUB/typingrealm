@@ -40,6 +40,7 @@ namespace TypingRealm.Hosting
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers().RequireAuthorization();
+                    endpoints.MapHealthChecks("health");
                 });
 
                 // TODO: Check whether it's Development environment and only then enable swagger.

@@ -64,6 +64,8 @@ namespace TypingRealm.Hosting
 
             services.AddTransient<IStartupFilter, WebApiStartupFilter>();
 
+            services.AddHealthChecks();
+
             services.AddSwaggerGen();
 
             return services;
