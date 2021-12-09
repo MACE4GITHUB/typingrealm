@@ -8,7 +8,10 @@ namespace TypingRealm.Data.Infrastructure
 {
     public static class RegistrationExtensions
     {
-        public static IServiceCollection RegisterDataApi(this IServiceCollection services, string dataConnectionString)
+        public static IServiceCollection RegisterDataApi(
+            this IServiceCollection services,
+            string dataConnectionString,
+            string cacheConnectionString)
         {
             // Typing Domain.
             services.AddTyping();
@@ -35,7 +38,7 @@ namespace TypingRealm.Data.Infrastructure
 
                 services.AddStackExchangeRedisCache(options =>
                 {
-                    options.Configuration = "host.docker.internal:6379";
+                    options.Configuration = cacheConnectionString;
                 });
             }
             else

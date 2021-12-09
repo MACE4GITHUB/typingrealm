@@ -18,7 +18,8 @@ public static class Program
         var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(LocationsController).Assembly);
 
         var dataConnectionString = builder.Configuration.GetConnectionString("DataConnection");
-        builder.Services.RegisterDataApi(dataConnectionString);
+        var cacheConnectionString = builder.Configuration.GetConnectionString("CacheConnection");
+        builder.Services.RegisterDataApi(dataConnectionString, cacheConnectionString);
 
         var app = builder.Build();
 
