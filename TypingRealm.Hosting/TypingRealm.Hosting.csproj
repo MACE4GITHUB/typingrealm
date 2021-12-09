@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Authentication\TypingRealm.Authentication.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
+    <ProjectReference Include="..\TypingRealm.Communication.Redis\TypingRealm.Communication.Redis.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Api.Client\TypingRealm.Profiles.Api.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj" />

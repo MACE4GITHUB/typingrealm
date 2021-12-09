@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
 using TypingRealm.Authentication.Service;
 using TypingRealm.Messaging;
@@ -12,9 +13,9 @@ namespace TypingRealm.Hosting.Service
 {
     public static class RegistrationExtensions
     {
-        public static MessageTypeCacheBuilder UseTcpHost(this IServiceCollection services, int port)
+        public static MessageTypeCacheBuilder UseTcpHost(this IServiceCollection services, IConfiguration configuration, int port)
         {
-            Hosting.RegistrationExtensions.SetupCommonDependencies(services);
+            Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
             var builder = SetupCommonMessagingServiceDependencies(services);
 
             // Authentication.
@@ -33,9 +34,9 @@ namespace TypingRealm.Hosting.Service
             return builder;
         }
 
-        public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services)
+        public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services, IConfiguration configuration)
         {
-            Hosting.RegistrationExtensions.SetupCommonDependencies(services);
+            Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
             Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(services);
             var builder = SetupCommonMessagingServiceDependencies(services);
 

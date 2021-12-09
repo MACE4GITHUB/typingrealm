@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Messaging.Serialization;
 
@@ -17,7 +19,9 @@ namespace TypingRealm.Hosting.Service
                 {
                     webBuilder.ConfigureServices(services =>
                     {
-                        var messageTypeCacheBuilder = services.UseSignalRHost();
+                        var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
+                        var messageTypeCacheBuilder = services.UseSignalRHost(configuration);
                         configureServices(messageTypeCacheBuilder);
                     });
 
@@ -33,7 +37,9 @@ namespace TypingRealm.Hosting.Service
             return Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
-                    var messageTypeCacheBuilder = services.UseTcpHost(port);
+                    var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
+                    var messageTypeCacheBuilder = services.UseTcpHost(configuration, port);
                     configure(messageTypeCacheBuilder);
                 });
         }

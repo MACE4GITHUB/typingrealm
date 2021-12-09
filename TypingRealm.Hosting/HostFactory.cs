@@ -8,7 +8,7 @@ namespace TypingRealm.Hosting
         public static WebApplicationBuilder CreateWebApiApplicationBuilder(Assembly controllersAssembly)
         {
             var builder = WebApplication.CreateBuilder();
-            builder.Services.UseWebApiHost(controllersAssembly);
+            builder.Services.UseWebApiHost(builder.Configuration, controllersAssembly);
 
             return builder;
         }

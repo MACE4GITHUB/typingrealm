@@ -3,9 +3,11 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
+using TypingRealm.Communication.Redis;
 using TypingRealm.Data.Api;
 
 namespace TypingRealm.Hosting
@@ -43,9 +45,10 @@ namespace TypingRealm.Hosting
             }
         }
 
-        public static IServiceCollection UseWebApiHost(this IServiceCollection services, Assembly controllersAssembly)
+        public static IServiceCollection UseWebApiHost(
+            this IServiceCollection services, IConfiguration configuration, Assembly controllersAssembly)
         {
-            SetupCommonDependencies(services);
+            SetupCommonDependencies(services, configuration);
             SetupCommonAspNetDependencies<WebApiStartupFilter>(services, controllersAssembly);
 
             // Authentication.
@@ -59,10 +62,14 @@ namespace TypingRealm.Hosting
         /// Registered before host-specific dependencies are added.
         /// </summary>
         /// <param name="services"></param>
-        public static IServiceCollection SetupCommonDependencies(IServiceCollection services)
+        public static IServiceCollection SetupCommonDependencies(
+            IServiceCollection services, IConfiguration configuration)
         {
             services.AddHttpClient();
             services.AddCommunication();
+
+            // Technology specific.
+            services.TryAddRedisGlobalCaching(configuration);
 
             return services;
         }

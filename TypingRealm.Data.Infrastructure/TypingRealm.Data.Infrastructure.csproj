@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
+    <ProjectReference Include="..\TypingRealm.Communication.Redis\TypingRealm.Communication.Redis.csproj" />
     <ProjectReference Include="..\TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.Typing\TypingRealm.Typing.csproj" />
   </ItemGroup>

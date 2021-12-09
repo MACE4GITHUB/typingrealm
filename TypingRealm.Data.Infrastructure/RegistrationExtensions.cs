@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
+using TypingRealm.Communication.Redis;
 using TypingRealm.Data.Infrastructure.DataAccess;
 using TypingRealm.Data.Infrastructure.DataAccess.Repositories;
 using TypingRealm.Typing;
@@ -49,6 +50,8 @@ namespace TypingRealm.Data.Infrastructure
                 services.AddTransient<IConnectionMultiplexer>(
                     provider => ConnectionMultiplexer.Connect(dataCacheConnectionString));
                 services.Decorate<ITextRetriever, RedisCachedTextRetriever>();
+
+                services.AddRedisServiceCaching(dataCacheConnectionString);
             }
             else
             {
