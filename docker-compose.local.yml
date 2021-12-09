@@ -74,6 +74,19 @@ services:
     env_file:
       - .env.local
 
+  local-typingrealm-data-redis:
+    image: redis
+    container_name: local-typingrealm-data-redis
+    networks:
+      - local-typingrealm-net
+    volumes:
+      - ./infrastructure-data/local/data-redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.local
+
   local-typingrealm-caddy:
     image: caddy
     container_name: local-typingrealm-caddy

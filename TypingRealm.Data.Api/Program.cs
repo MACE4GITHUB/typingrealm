@@ -19,7 +19,8 @@ public static class Program
 
         var dataConnectionString = builder.Configuration.GetConnectionString("DataConnection");
         var cacheConnectionString = builder.Configuration.GetConnectionString("CacheConnection");
-        builder.Services.RegisterDataApi(dataConnectionString, cacheConnectionString);
+        var dataCacheConnectionString = builder.Configuration.GetConnectionString("DataCacheConnection");
+        builder.Services.RegisterDataApi(dataConnectionString, cacheConnectionString, dataCacheConnectionString);
 
         builder.Services.AddHealthChecks()
             .AddRedis(cacheConnectionString)

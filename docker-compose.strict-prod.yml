@@ -74,6 +74,19 @@ services:
     env_file:
       - .env.prod
 
+  typingrealm-data-redis:
+    image: redis
+    container_name: typingrealm-data-redis
+    networks:
+      - typingrealm-net
+    volumes:
+      - ./infrastructure-data/prod/data-redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.prod
+
   typingrealm-caddy:
     image: caddy
     container_name: typingrealm-caddy

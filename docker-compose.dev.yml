@@ -78,6 +78,21 @@ services:
     env_file:
       - .env.dev
 
+  dev-typingrealm-data-redis:
+    image: redis
+    container_name: dev-typingrealm-data-redis
+    networks:
+      - dev-typingrealm-net
+    ports:
+      - 34379:6379
+    volumes:
+      - ./infrastructure-data/dev/data-redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.dev
+
   # Simple local UI test page to facilitate BackEnd development.
   dev-typingrealm-web-ui:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-web-ui

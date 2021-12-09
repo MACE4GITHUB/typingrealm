@@ -12,7 +12,8 @@ namespace TypingRealm.Data.Infrastructure
         public static IServiceCollection RegisterDataApi(
             this IServiceCollection services,
             string dataConnectionString,
-            string cacheConnectionString)
+            string cacheConnectionString,
+            string dataCacheConnectionString)
         {
             // Typing Domain.
             services.AddTyping();
@@ -46,7 +47,7 @@ namespace TypingRealm.Data.Infrastructure
                 });
 
                 services.AddTransient<IConnectionMultiplexer>(
-                    provider => ConnectionMultiplexer.Connect(cacheConnectionString));
+                    provider => ConnectionMultiplexer.Connect(dataCacheConnectionString));
                 services.Decorate<ITextRetriever, RedisCachedTextRetriever>();
             }
             else
