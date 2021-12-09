@@ -21,6 +21,10 @@ namespace TypingRealm.Data.Infrastructure
             // Typing.
             services.AddSingleton<ITextGenerator, TextGenerator>();
 
+            // TODO: Register this as transient and decorate as singleton, allow changing lifetime when decorating.
+            services.AddSingleton<ITextRetriever, QuotableTextRetriever>();
+            services.Decorate<ITextRetriever, InMemoryCachedTextRetriever>();
+
             // Repositories.
             if (DebugHelpers.UseInfrastructure)
             {

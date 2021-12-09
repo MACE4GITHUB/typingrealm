@@ -9,7 +9,7 @@ namespace TypingRealm
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection Decorate<TInterface, TDecorator>(this IServiceCollection services)
-          where TDecorator : TInterface
+            where TDecorator : TInterface
         {
             var wrappedDescriptor = services.LastOrDefault(
                 s => s.ServiceType == typeof(TInterface));

@@ -10,9 +10,18 @@ using TypingRealm.Typing;
 namespace TypingRealm.Data.Infrastructure
 {
     /// <summary>
-    /// Constantly gets new texts and caches result.
+    /// Retrieves text from third-party service. Can be cached.
     /// </summary>
-    public sealed class TextGeneratorCache
+    public interface ITextRetriever
+    {
+        /// <summary>
+        /// Gets arbitrary text value from third-party service.
+        /// </summary>
+        /// <returns></returns>
+        ValueTask<string> GetNextTextValue();
+    }
+
+    public sealed class QuotableTextRetriever : ITextRetriever
     {
 #pragma warning disable CS8618
         private sealed class QuotableResponse
@@ -21,18 +30,49 @@ namespace TypingRealm.Data.Infrastructure
         }
 #pragma warning restore CS8618
 
-        private const int CacheSize = 1000;
         private readonly IHttpClientFactory _httpClientFactory;
+
+        public QuotableTextRetriever(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
+        public async ValueTask<string> GetNextTextValue()
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+
+            using var response = await httpClient.GetAsync("http://api.quotable.io/random")
+                .ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync()
+                .ConfigureAwait(false);
+
+            var textValue = JsonSerializer.Deserialize<QuotableResponse>(content)?.content;
+            if (textValue == null)
+                throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
+
+            return textValue;
+        }
+    }
+
+    public sealed class InMemoryCachedTextRetriever : ITextRetriever
+    {
+        private const int CacheSize = 1000;
+        private readonly ITextRetriever _textRetriever;
         private readonly ConcurrentQueue<string> _quoteQueue = new ConcurrentQueue<string>();
         private Task _process;
 
-        public TextGeneratorCache(IHttpClientFactory httpClientFactory)
+        public InMemoryCachedTextRetriever(ITextRetriever textRetriever)
         {
-            _httpClientFactory = httpClientFactory;
+            _textRetriever = textRetriever;
             _process = StartGettingQuotesAsync();
         }
 
-        public async ValueTask<string> GetQuoteAsync()
+        public ValueTask<string> GetNextTextValue() => GetQuoteAsync();
+
+        private async ValueTask<string> GetQuoteAsync()
         {
             if (_process.IsCompleted && _quoteQueue.Count < CacheSize)
                 _process = StartGettingQuotesAsync();
@@ -50,7 +90,7 @@ namespace TypingRealm.Data.Infrastructure
             }
         }
 
-        public async ValueTask<string?> TryGetQuoteAsync()
+        private async ValueTask<string?> TryGetQuoteAsync()
         {
             if (_quoteQueue.TryDequeue(out var quote))
                 return quote;
@@ -58,25 +98,14 @@ namespace TypingRealm.Data.Infrastructure
             return null;
         }
 
-        public async Task StartGettingQuotesAsync()
+        private async Task StartGettingQuotesAsync()
         {
-            var httpClient = _httpClientFactory.CreateClient();
-
             while (_quoteQueue.Count < CacheSize)
             {
-                using var response = await httpClient.GetAsync("http://api.quotable.io/random")
+                var text = await _textRetriever.GetNextTextValue()
                     .ConfigureAwait(false);
 
-                response.EnsureSuccessStatusCode();
-
-                var content = await response.Content.ReadAsStringAsync()
-                    .ConfigureAwait(false);
-
-                var quotableResponse = JsonSerializer.Deserialize<QuotableResponse>(content)?.content;
-                if (quotableResponse == null)
-                    throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
-
-                _quoteQueue.Enqueue(quotableResponse);
+                _quoteQueue.Enqueue(text);
             }
         }
     }
@@ -87,11 +116,11 @@ namespace TypingRealm.Data.Infrastructure
         private const int ShouldContainMinCount = 15; // If there's not enough data - generate default text.
 
         private static readonly string _allowedLetters = "'\",<.>pPyYfFgGcCrRlL/?=+\\|aAoOeEuUiIdDhHtTnNsS-_;:qQjJkKxXbBmMwWvVzZ 1!2@3#4$5%6^7&8*9(0)[{]}`~";
-        private readonly TextGeneratorCache _cache;
+        private readonly ITextRetriever _textRetriever;
 
-        public TextGenerator(IHttpClientFactory httpClientFactory)
+        public TextGenerator(ITextRetriever textRetriever)
         {
-            _cache = new TextGeneratorCache(httpClientFactory);
+            _textRetriever = textRetriever;
         }
 
         public async ValueTask<string> GenerateTextAsync(TextConfiguration configuration)
@@ -107,7 +136,7 @@ namespace TypingRealm.Data.Infrastructure
 
             while (builder.Length < Math.Min(minLength, MaxTextLength))
             {
-                var quoteFromApi = await _cache.GetQuoteAsync()
+                var quoteFromApi = await _textRetriever.GetNextTextValue()
                     .ConfigureAwait(false);
 
                 var chunks = configuration.TextType == TextType.Words
