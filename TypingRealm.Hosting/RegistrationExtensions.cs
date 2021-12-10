@@ -70,6 +70,7 @@ namespace TypingRealm.Hosting
 
             // Technology specific.
             services.TryAddRedisGlobalCaching(configuration);
+            services.TryAddRedisServiceCaching(configuration);
 
             return services;
         }

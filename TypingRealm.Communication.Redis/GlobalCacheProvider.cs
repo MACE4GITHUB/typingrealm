@@ -136,6 +136,28 @@ namespace TypingRealm.Communication.Redis
             return services;
         }
 
+        public static IServiceCollection TryAddRedisServiceCaching(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var serviceCacheConnectionString = configuration.GetConnectionString("ServiceCacheConnection");
+            if (serviceCacheConnectionString == null)
+                return services;
+
+            return services.AddRedisServiceCaching(serviceCacheConnectionString);
+        }
+
+        public static IServiceCollection AddRedisServiceCaching(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var serviceCacheConnectionString = configuration.GetConnectionString("ServiceCacheConnection");
+            if (serviceCacheConnectionString == null)
+                throw new InvalidOperationException("ServiceCacheConnection connection string is not set.");
+
+            return services.AddRedisServiceCaching(serviceCacheConnectionString);
+        }
+
         public static IServiceCollection AddRedisServiceCaching(
             this IServiceCollection services,
             string serviceCacheConnectionString)

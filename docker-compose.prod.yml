@@ -2,6 +2,7 @@ version: '3.4'
 
 networks:
   typingrealm-net:
+  typingrealm-data-net:
   local-tyr_local-typingrealm-net:
     external: true
   dev-tyr_dev-typingrealm-net:
@@ -41,6 +42,7 @@ services:
     container_name: typingrealm-data
     networks:
       - typingrealm-net
+      - typingrealm-data-net
     build:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile
@@ -49,6 +51,8 @@ services:
     mem_reservation: 750m
     env_file:
       - .env.prod
+    environment:
+      - ConnectionStrings__ServiceCacheConnection=typingrealm-data-redis:6379
 
   # === Infrastructure ===
 
@@ -88,7 +92,7 @@ services:
     image: redis
     container_name: typingrealm-data-redis
     networks:
-      - typingrealm-net
+      - typingrealm-data-net
     # Should be disabled in production. This is for conveniency of connecting to prod DB.
     ports:
       - 34370:6379

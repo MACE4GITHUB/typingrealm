@@ -2,6 +2,7 @@ version: '3.4'
 
 networks:
   local-typingrealm-net:
+  local-typingrealm-data-net:
 
 services:
   local-typingrealm-identityserver:
@@ -37,6 +38,7 @@ services:
     container_name: local-typingrealm-data
     networks:
       - local-typingrealm-net
+      - local-typingrealm-data-net
     build:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile
@@ -45,6 +47,8 @@ services:
     mem_reservation: 750m
     env_file:
       - .env.local
+    environment:
+      - ConnectionStrings__ServiceCacheConnection=local-typingrealm-data-redis:6379
 
   # === Infrastructure ===
 
@@ -78,7 +82,7 @@ services:
     image: redis
     container_name: local-typingrealm-data-redis
     networks:
-      - local-typingrealm-net
+      - local-typingrealm-data-net
     volumes:
       - ./infrastructure-data/local/data-redis:/data
     restart: unless-stopped
