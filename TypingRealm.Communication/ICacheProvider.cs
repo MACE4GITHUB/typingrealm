@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using TypingRealm.Messaging.Connections;
 
 namespace TypingRealm.Communication
 {
@@ -8,6 +9,12 @@ namespace TypingRealm.Communication
             where T : class;
 
         ValueTask SetValueAsync<T>(string key, T value);
+
+        IDistributedLock AcquireDistributedLock();
+    }
+
+    public interface IDistributedLock : ILock
+    {
     }
 
     public static class TyrCacheExtensions
