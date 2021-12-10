@@ -11,12 +11,18 @@ namespace TypingRealm.Data.Api
     [Route("api/diagnostics")]
     public sealed class DiagnosticsController : TyrController
     {
+        private static readonly string _serviceId = Guid.NewGuid().ToString();
         private readonly IServiceToServiceClient _s2sClient;
 
         public DiagnosticsController(IServiceToServiceClient s2sClient)
         {
             _s2sClient = s2sClient;
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("service-id")]
+        public string GetUniqueServiceId() => _serviceId;
 
         /// <summary>
         /// Calls Profiles API Service-protected endpoint.
