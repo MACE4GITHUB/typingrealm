@@ -7,6 +7,6 @@ namespace TypingRealm.Typing
         /// <summary>
         /// Generates text based on configuration.
         /// </summary>
-        ValueTask<string> GenerateTextAsync(TextConfiguration configuration);
+        ValueTask<string> GenerateTextAsync(TextGenerationConfigurationDto configuration);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
 {
@@ -20,6 +21,12 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
         public bool IsPublic { get; set; }
         public bool IsArchived { get; set; }
 
+        // Text configuration.
+        public TextType TextType { get; set; }
+        public int? GenerationLength { get; set; }
+        public string? GenerationShouldContain { get; set; }
+        public GenerationTextType? GenerationTextType { get; set; }
+
         public static Text ToDbo(Typing.Text.State state)
         {
             return new Text
@@ -29,7 +36,12 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 CreatedByUser = state.CreatedByUser,
                 CreatedUtc = state.CreatedUtc,
                 IsPublic = state.IsPublic,
-                IsArchived = state.IsArchived
+                IsArchived = state.IsArchived,
+                TextType = state.Configuration.TextType,
+                GenerationLength = state.Configuration.TextGenerationConfiguration?.Length,
+                GenerationShouldContain = state.Configuration.TextGenerationConfiguration?.ShouldContain == null
+                    ? null : string.Join(',', state.Configuration.TextGenerationConfiguration.ShouldContain),
+                GenerationTextType = state.Configuration.TextGenerationConfiguration?.GenerationTextType
             };
         }
 
@@ -41,7 +53,11 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 CreatedByUser,
                 CreatedUtc,
                 IsPublic,
-                IsArchived);
+                IsArchived,
+                new TextConfiguration(TextType, GenerationLength == null ? null : new TextGenerationConfiguration(
+                    GenerationLength ?? throw new InvalidOperationException("GenerationLength is null in DB."),
+                    GenerationShouldContain?.Split(',') ?? throw new InvalidOperationException("GenerationShouldContain is null in DB."),
+                    GenerationTextType ?? throw new InvalidOperationException("GenerationTextType is null in DB."))));
         }
 
         public void MergeFrom(Text from)
@@ -61,6 +77,18 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
 
             if (IsArchived != from.IsArchived)
                 IsArchived = from.IsArchived;
+
+            if (TextType != from.TextType)
+                TextType = from.TextType;
+
+            if (GenerationLength != from.GenerationLength)
+                GenerationLength = from.GenerationLength;
+
+            if (GenerationShouldContain != from.GenerationShouldContain)
+                GenerationShouldContain = from.GenerationShouldContain;
+
+            if (GenerationTextType != from.GenerationTextType)
+                GenerationTextType = from.GenerationTextType;
         }
     }
 #pragma warning restore CS8618

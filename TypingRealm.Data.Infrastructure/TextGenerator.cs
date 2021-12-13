@@ -201,7 +201,7 @@ namespace TypingRealm.Data.Infrastructure
             _textRetriever = textRetriever;
         }
 
-        public async ValueTask<string> GenerateTextAsync(TextConfiguration configuration)
+        public async ValueTask<string> GenerateTextAsync(TextGenerationConfigurationDto configuration)
         {
             if (configuration.Length < 0)
                 throw new InvalidOperationException("Cannot have negative length.");
@@ -217,7 +217,7 @@ namespace TypingRealm.Data.Infrastructure
                 var quoteFromApi = await _textRetriever.GetNextTextValue()
                     .ConfigureAwait(false);
 
-                var chunks = configuration.TextType == TextType.Words
+                var chunks = configuration.TextType == GenerationTextType.Words
                     ? quoteFromApi.Split(' ')
                     : new[] { quoteFromApi };
 

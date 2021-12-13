@@ -2,15 +2,15 @@
 
 namespace TypingRealm.Typing
 {
-    public enum TextType
+    public enum GenerationTextType
     {
         Text = 1,
         Words = 2
     }
 
     /// <param name="Length">If it's 0 - generates text of default length.</param>
-    public sealed record TextConfiguration(
+    public sealed record TextGenerationConfigurationDto(
         int Length,
         IEnumerable<string> ShouldContain,
-        TextType TextType);
+        GenerationTextType TextType);
 }

@@ -1,8 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using TypingRealm.Typing.Framework;
 
 namespace TypingRealm.Typing
 {
+    public sealed record TextGenerationConfiguration(
+        int Length,
+        IEnumerable<string> ShouldContain,
+        GenerationTextType GenerationTextType);
+
+    public enum TextType
+    {
+        Generated = 1,
+        User = 2
+    }
+
+    public sealed record TextConfiguration(
+        TextType TextType,
+        TextGenerationConfiguration? TextGenerationConfiguration);
+
     /// <summary>
     /// Aggregate root. User-defined text or randomly generated one. We can reuse
     /// the same text only if we are sure it will never change. Either we don't
@@ -17,18 +33,22 @@ namespace TypingRealm.Typing
             string CreatedByUser,
             DateTime CreatedUtc,
             bool IsPublic,
-            bool IsArchived) : IIdentifiable
+            bool IsArchived,
+            TextConfiguration Configuration) : IIdentifiable
         {
             string IIdentifiable.Id => TextId;
         }
 
         private State _state;
 
-        public Text(string textId, string value, string createdByUser, DateTime createdUtc, bool isPublic)
+        public Text(string textId, string value, string createdByUser, DateTime createdUtc, bool isPublic, TextConfiguration configuration)
         {
             // TODO: Validate.
 
-            _state = new State(textId, value, createdByUser, createdUtc, isPublic, false);
+            if (configuration.TextType == TextType.Generated && configuration.TextGenerationConfiguration == null)
+                throw new InvalidOperationException("Text generation configuration cannot be null when text type is Generated.");
+
+            _state = new State(textId, value, createdByUser, createdUtc, isPublic, false, configuration);
         }
 
         string IIdentifiable.Id => _state.TextId;

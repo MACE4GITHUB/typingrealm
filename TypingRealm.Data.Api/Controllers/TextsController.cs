@@ -68,7 +68,7 @@ namespace TypingRealm.Data.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("generate")]
-        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, TextType textType = TextType.Text)
+        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, GenerationTextType textType = GenerationTextType.Text)
         {
             var shouldContain = new List<string>();
 
@@ -90,11 +90,15 @@ namespace TypingRealm.Data.Api.Controllers
                     .Take(10));
             }
 
-            var textValue = await _textGenerator.GenerateTextAsync(new TextConfiguration(length, shouldContain, textType));
+            var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType));
 
             var textId = await _textRepository.NextIdAsync();
 
-            var text = new Text(textId, textValue, ProfileId, DateTime.UtcNow, false);
+            var configuration = new TextConfiguration(
+                TextType.Generated,
+                new TextGenerationConfiguration(length, shouldContain, textType));
+
+            var text = new Text(textId, textValue, ProfileId, DateTime.UtcNow, false, configuration);
             await _textRepository.SaveAsync(text);
 
             return Ok(textId);
@@ -107,7 +111,10 @@ namespace TypingRealm.Data.Api.Controllers
             // execute endpoint we need USER-authentication and not SERVICE-authentication.
             var textId = await _textRepository.NextIdAsync();
 
-            var text = new Text(textId, dto.Value, ProfileId, DateTime.UtcNow, dto.IsPublic);
+            var configuration = new TextConfiguration(
+                TextType.User, null);
+
+            var text = new Text(textId, dto.Value, ProfileId, DateTime.UtcNow, dto.IsPublic, configuration);
 
             await _textRepository.SaveAsync(text);
 
