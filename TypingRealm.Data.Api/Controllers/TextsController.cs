@@ -90,9 +90,14 @@ namespace TypingRealm.Data.Api.Controllers
                     .Take(10));
             }
 
-            var text = await _textGenerator.GenerateTextAsync(new TextConfiguration(length, shouldContain, textType));
+            var textValue = await _textGenerator.GenerateTextAsync(new TextConfiguration(length, shouldContain, textType));
 
-            return Ok(text);
+            var textId = await _textRepository.NextIdAsync();
+
+            var text = new Text(textId, textValue, ProfileId, DateTime.UtcNow, false);
+            await _textRepository.SaveAsync(text);
+
+            return Ok(textId);
         }
 
         [HttpPost]

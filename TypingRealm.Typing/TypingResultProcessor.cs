@@ -88,18 +88,16 @@ namespace TypingRealm.Typing
 
         public async ValueTask<TypingResultSubmitData> AddTypingResultAsync(TypedText typedText, string userId)
         {
-            var textId = await _textRepository.NextIdAsync()
+            var text = await _textRepository.FindAsync(typedText.TextId)
                 .ConfigureAwait(false);
-
-            var text = new Text(textId, typedText.Value, userId, DateTime.UtcNow, false);
-            await _textRepository.SaveAsync(text)
-                .ConfigureAwait(false);
+            if (text == null)
+                throw new InvalidOperationException("Text was not found.");
 
             var typingSessionId = await _typingSessionRepository.NextIdAsync()
                 .ConfigureAwait(false);
 
             var typingSession = new TypingSession(typingSessionId, userId, DateTime.UtcNow, new TypingSessionConfiguration());
-            var typingSessionTextIndex = typingSession.AddText(new TypingSessionText(textId, text.Value));
+            var typingSessionTextIndex = typingSession.AddText(new TypingSessionText(typedText.TextId, text.Value));
             await _typingSessionRepository.SaveAsync(typingSession)
                 .ConfigureAwait(false);
 
@@ -120,7 +118,7 @@ namespace TypingRealm.Typing
                 typedText.Events))
                 .ConfigureAwait(false);
 
-            return new TypingResultSubmitData(textId, typingSessionId, userSessionId, typingResultId);
+            return new TypingResultSubmitData(typedText.TextId, typingSessionId, userSessionId, typingResultId);
         }
     }
 }

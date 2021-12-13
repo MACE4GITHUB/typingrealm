@@ -8,7 +8,7 @@ namespace TypingRealm.Typing
     /// An entity that can be submitted for automatic creation of text & sessions.
     /// </summary>
     public sealed record TypedText(
-        string Value,
+        string TextId,
         DateTime StartedTypingUtc,
         int UserTimeZoneOffsetMinutes,
         IEnumerable<KeyPressEvent> Events)

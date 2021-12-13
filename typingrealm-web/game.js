@@ -98,6 +98,10 @@ async function main() {
     const dataSubmitUrl = `${DATA_URL}/api/usersessions/result`;
     const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable`;
 
+    function getTextUrl(textId) {
+        return `${DATA_URL}/api/texts/${textId}`;
+    }
+
     // If it's false - any input doesn't affect the state.
     let allowInput = false;
 
@@ -198,7 +202,18 @@ async function main() {
                 'Authorization': `Bearer ${token}`
             }
         });
-        return response.text();
+
+        let textId = await response.text();
+
+        let textResponse = await fetch(getTextUrl(textId), {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        let text = await textResponse.json();
+
+        return text;
     }
 
 
@@ -223,7 +238,7 @@ async function main() {
         textData.text = await getText();
 
         textElement.innerHTML = '';
-        textData.text.split('').forEach((character, index) => {
+        textData.text.value.split('').forEach((character, index) => {
             const characterSpan = document.createElement('span');
             characterSpan.innerText = character;
             textElement.appendChild(characterSpan);
@@ -473,7 +488,7 @@ async function main() {
                 });
             });
 
-            var speedCpm = (60000 * statistics.value.length / statistics.events.at(-1).absoluteDelay).toFixed(2);
+            var speedCpm = (60000 * textToType.length / statistics.events.at(-1).absoluteDelay).toFixed(2);
             var speedWpm = (speedCpm / 5).toFixed(2);
 
             speedElement.innerHTML = `${speedCpm} CPM (${speedWpm})`;
@@ -638,7 +653,7 @@ async function main() {
 
         textElement.innerHTML = '';
 
-        textData.text.split('').forEach((character, index) => {
+        textData.text.value.split('').forEach((character, index) => {
             const characterSpan = document.createElement('span');
             characterSpan.innerText = character;
             textElement.appendChild(characterSpan);
@@ -712,7 +727,7 @@ async function main() {
 
     function makeSaveDataRequest() {
         let request = {
-            value: textData.text,
+            textId: textData.text.textId,
             startedTypingUtc: new Date(textData.startTime).toISOString(),
             userTimeZoneOffsetMinutes: new Date(textData.startTime).getTimezoneOffset() * -1,
 
