@@ -2,6 +2,9 @@ async function main() {
 
     /* INITIALIZATION */
 
+    // TODO: Make sure AbsoluteDelay is 0 before sending data to server.
+    // Data shouldn't be reset/modified after typing has been completed and before data has been sent.
+
     const createAuth0Client = window.createAuth0Client;
     let auth0 = undefined;
 
