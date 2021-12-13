@@ -8,24 +8,29 @@ namespace TypingRealm.Typing.Infrastructure
         private readonly IDictionary<string, UserTypingStatistics> _userTypingStatistics
             = new Dictionary<string, UserTypingStatistics>();
 
-        public async ValueTask<UserTypingStatistics?> GetUserTypingStatisticsAsync(string userId)
+        public async ValueTask<UserTypingStatistics?> GetUserTypingStatisticsAsync(string userId, string language)
         {
-            if (!_userTypingStatistics.ContainsKey(userId))
+            if (!_userTypingStatistics.ContainsKey(GetKey(userId, language)))
                 return null;
 
-            return _userTypingStatistics[userId];
+            return _userTypingStatistics[GetKey(userId, language)];
         }
 
-        public ValueTask SaveAsync(string userId, UserTypingStatistics userTypingStatistics)
+        public ValueTask SaveAsync(string userId, UserTypingStatistics userTypingStatistics, string language)
         {
-            if (_userTypingStatistics.ContainsKey(userId))
+            if (_userTypingStatistics.ContainsKey(GetKey(userId, language)))
             {
                 _userTypingStatistics[userId] = userTypingStatistics;
                 return default;
             }
 
-            _userTypingStatistics.Add(userId, userTypingStatistics);
+            _userTypingStatistics.Add(GetKey(userId, language), userTypingStatistics);
             return default;
+        }
+
+        private string GetKey(string userId, string language)
+        {
+            return $"{userId}_{language}";
         }
     }
 }

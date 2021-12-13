@@ -58,7 +58,7 @@ namespace TypingRealm.Typing
 
         public async ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId, string language)
         {
-            var existingStatistics = await _userTypingStatisticsStore.GetUserTypingStatisticsAsync(userId)
+            var existingStatistics = await _userTypingStatisticsStore.GetUserTypingStatisticsAsync(userId, language)
                 .ConfigureAwait(false);
 
             var userSessions = Enumerable.Empty<UserSession>();
@@ -134,7 +134,7 @@ namespace TypingRealm.Typing
                 x.Count(y => y.Type == KeyPairType.Mistake)));
 
             var result = MergeAndReturnNew(existingStatistics, new TypingReport(aggregatedResult, aggregatedData), textsTypedCount, lastHandledResultUtc);
-            await _userTypingStatisticsStore.SaveAsync(userId, result)
+            await _userTypingStatisticsStore.SaveAsync(userId, result, language)
                 .ConfigureAwait(false);
 
             return result;
