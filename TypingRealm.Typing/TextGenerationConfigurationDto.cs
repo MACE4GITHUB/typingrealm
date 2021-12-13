@@ -12,5 +12,6 @@ namespace TypingRealm.Typing
     public sealed record TextGenerationConfigurationDto(
         int Length,
         IEnumerable<string> ShouldContain,
-        GenerationTextType TextType);
+        GenerationTextType TextType,
+        string language);
 }

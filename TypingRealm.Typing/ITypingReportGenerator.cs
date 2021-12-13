@@ -12,14 +12,14 @@ namespace TypingRealm.Typing
 
     public interface ITypingReportGenerator
     {
-        ValueTask<TypingReport> GenerateReportAsync(string userId);
+        ValueTask<TypingReport> GenerateReportAsync(string userId, string language);
         ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId);
 
         // Fun little method with experimentation.
-        ValueTask<string> GenerateHumanReadableReportAsync(string userId);
+        ValueTask<string> GenerateHumanReadableReportAsync(string userId, string language);
 
         // Fast cached user statistics.
-        ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId);
+        ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId, string language);
     }
 
     public sealed record KeyPairAggregatedData(
@@ -40,20 +40,23 @@ namespace TypingRealm.Typing
         private readonly ITypingSessionRepository _typingSessionRepository;
         private readonly ITextTypingResultValidator _textTypingResultValidator;
         private readonly IUserTypingStatisticsStore _userTypingStatisticsStore;
+        private readonly ITextRepository _textRepository;
 
         public TypingReportGenerator(
             IUserSessionRepository userSessionRepository,
             ITypingSessionRepository typingSessionRepository,
             ITextTypingResultValidator textTypingResultValidator,
-            IUserTypingStatisticsStore userTypingStatisticsStore)
+            IUserTypingStatisticsStore userTypingStatisticsStore,
+            ITextRepository textRepository)
         {
             _userSessionRepository = userSessionRepository;
             _typingSessionRepository = typingSessionRepository;
             _textTypingResultValidator = textTypingResultValidator;
             _userTypingStatisticsStore = userTypingStatisticsStore;
+            _textRepository = textRepository;
         }
 
-        public async ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId)
+        public async ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId, string language)
         {
             var existingStatistics = await _userTypingStatisticsStore.GetUserTypingStatisticsAsync(userId)
                 .ConfigureAwait(false);
@@ -84,6 +87,14 @@ namespace TypingRealm.Typing
                     var text = typingSession.GetTypingSessionTextAtIndexOrDefault(textTypingResult.TypingSessionTextIndex);
                     if (text == null)
                         throw new InvalidOperationException("Text is not found in typing session.");
+
+                    var textEntity = await _textRepository.FindAsync(text.TextId)
+                        .ConfigureAwait(false);
+                    if (textEntity == null)
+                        throw new InvalidOperationException("Text is not found.");
+
+                    if (textEntity.Language != language)
+                        continue;
 
                     var textAnalysisResult = await _textTypingResultValidator.ValidateAsync(text.Value, textTypingResult)
                         .ConfigureAwait(false);
@@ -175,7 +186,7 @@ namespace TypingRealm.Typing
             return dict.Values;
         }
 
-        public async ValueTask<TypingReport> GenerateReportAsync(string userId)
+        public async ValueTask<TypingReport> GenerateReportAsync(string userId, string language)
         {
             var results = new List<TextAnalysisResult>();
 
@@ -191,6 +202,14 @@ namespace TypingRealm.Typing
                     var text = typingSession.GetTypingSessionTextAtIndexOrDefault(textTypingResult.TypingSessionTextIndex);
                     if (text == null)
                         throw new InvalidOperationException("Text is not found in typing session.");
+
+                    var textEntity = await _textRepository.FindAsync(text.TextId)
+                        .ConfigureAwait(false);
+                    if (textEntity == null)
+                        throw new InvalidOperationException("Text is not found.");
+
+                    if (textEntity.Language != language)
+                        continue;
 
                     var textAnalysisResult = await _textTypingResultValidator.ValidateAsync(text.Value, textTypingResult)
                         .ConfigureAwait(false);
@@ -281,9 +300,9 @@ namespace TypingRealm.Typing
             return new TypingReport(aggregatedResult, aggregatedData);
         }
 
-        public async ValueTask<string> GenerateHumanReadableReportAsync(string userId)
+        public async ValueTask<string> GenerateHumanReadableReportAsync(string userId, string language)
         {
-            var statistics = await GenerateUserStatisticsAsync(userId)
+            var statistics = await GenerateUserStatisticsAsync(userId, language)
                 .ConfigureAwait(false);
 
             var builder = new StringBuilder();

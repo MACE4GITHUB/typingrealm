@@ -10,6 +10,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
     [Index(nameof(CreatedUtc))]
     [Index(nameof(IsPublic))]
     [Index(nameof(IsArchived))]
+    [Index(nameof(Language))]
     public class Text : IDbo<Text>
     {
         [Key]
@@ -27,6 +28,9 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
         public string? GenerationShouldContain { get; set; }
         public GenerationTextType? GenerationTextType { get; set; }
 
+        [MaxLength(20)]
+        public string Language { get; set; }
+
         public static Text ToDbo(Typing.Text.State state)
         {
             return new Text
@@ -41,7 +45,8 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 GenerationLength = state.Configuration.TextGenerationConfiguration?.Length,
                 GenerationShouldContain = state.Configuration.TextGenerationConfiguration?.ShouldContain == null
                     ? null : string.Join(',', state.Configuration.TextGenerationConfiguration.ShouldContain),
-                GenerationTextType = state.Configuration.TextGenerationConfiguration?.GenerationTextType
+                GenerationTextType = state.Configuration.TextGenerationConfiguration?.GenerationTextType,
+                Language = state.Configuration.Language
             };
         }
 
@@ -57,7 +62,8 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 new TextConfiguration(TextType, GenerationLength == null ? null : new TextGenerationConfiguration(
                     GenerationLength ?? throw new InvalidOperationException("GenerationLength is null in DB."),
                     GenerationShouldContain?.Split(',') ?? throw new InvalidOperationException("GenerationShouldContain is null in DB."),
-                    GenerationTextType ?? throw new InvalidOperationException("GenerationTextType is null in DB."))));
+                    GenerationTextType ?? throw new InvalidOperationException("GenerationTextType is null in DB.")),
+                    Language));
         }
 
         public void MergeFrom(Text from)
@@ -89,6 +95,9 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
 
             if (GenerationTextType != from.GenerationTextType)
                 GenerationTextType = from.GenerationTextType;
+
+            if (Language != from.Language)
+                Language = from.Language;
         }
     }
 #pragma warning restore CS8618

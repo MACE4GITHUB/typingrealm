@@ -34,6 +34,7 @@ namespace TypingRealm.Data.Api.Controllers
     {
         public string Value { get; set; }
         public bool IsPublic { get; set; }
+        public string Language { get; set; }
     }
 #pragma warning restore CS8618
 
@@ -68,14 +69,17 @@ namespace TypingRealm.Data.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("generate")]
-        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, GenerationTextType textType = GenerationTextType.Text)
+        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, GenerationTextType textType = GenerationTextType.Text, string? language = "en")
         {
+            if (language == null)
+                language = "en";
+
             var shouldContain = new List<string>();
 
             if (Profile.Type == ProfileType.User)
             {
                 // Personalize text generation.
-                var data = await _typingReportGerenator.GenerateUserStatisticsAsync(Profile.ProfileId);
+                var data = await _typingReportGerenator.GenerateUserStatisticsAsync(Profile.ProfileId, language);
 
                 shouldContain.AddRange(data.KeyPairs
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
@@ -90,13 +94,14 @@ namespace TypingRealm.Data.Api.Controllers
                     .Take(10));
             }
 
-            var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType));
+            var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
 
             var textId = await _textRepository.NextIdAsync();
 
             var configuration = new TextConfiguration(
                 TextType.Generated,
-                new TextGenerationConfiguration(length, shouldContain, textType));
+                new TextGenerationConfiguration(length, shouldContain, textType),
+                language);
 
             var text = new Text(textId, textValue, ProfileId, DateTime.UtcNow, false, configuration);
             await _textRepository.SaveAsync(text);
@@ -112,7 +117,7 @@ namespace TypingRealm.Data.Api.Controllers
             var textId = await _textRepository.NextIdAsync();
 
             var configuration = new TextConfiguration(
-                TextType.User, null);
+                TextType.User, null, dto.Language);
 
             var text = new Text(textId, dto.Value, ProfileId, DateTime.UtcNow, dto.IsPublic, configuration);
 

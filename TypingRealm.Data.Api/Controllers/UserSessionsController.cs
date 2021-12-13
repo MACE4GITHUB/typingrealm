@@ -109,16 +109,19 @@ namespace TypingRealm.Data.Api.Controllers
 
         [HttpGet]
         [Route("statistics")]
-        public async ValueTask<ActionResult<TypingReport>> GetTypingReport()
+        public async ValueTask<ActionResult<TypingReport>> GetTypingReport(string? language = "en")
         {
-            var report = await _typingReportGenerator.GenerateReportAsync(ProfileId);
+            if (language == null)
+                language = "en";
+
+            var report = await _typingReportGenerator.GenerateReportAsync(ProfileId, language);
 
             return Ok(report);
         }
 
         [HttpGet]
         [Route("{userSessionId}/statistics")]
-        public async ValueTask<ActionResult<TypingReport>> GetTypingReport(string userSessionId)
+        public async ValueTask<ActionResult<TypingReport>> GetTypingReportForUserSession(string userSessionId)
         {
             var report = await _typingReportGenerator.GenerateReportForUserSessionAsync(userSessionId);
 
@@ -127,9 +130,12 @@ namespace TypingRealm.Data.Api.Controllers
 
         [HttpGet]
         [Route("statistics/readable")]
-        public async ValueTask<ActionResult<string>> GetReadableStatistics()
+        public async ValueTask<ActionResult<string>> GetReadableStatistics(string? language = "en")
         {
-            var response = await _typingReportGenerator.GenerateHumanReadableReportAsync(ProfileId);
+            if (language == null)
+                language = "en";
+
+            var response = await _typingReportGenerator.GenerateHumanReadableReportAsync(ProfileId, language);
 
             return Ok(response);
         }

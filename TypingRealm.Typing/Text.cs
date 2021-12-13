@@ -17,7 +17,8 @@ namespace TypingRealm.Typing
 
     public sealed record TextConfiguration(
         TextType TextType,
-        TextGenerationConfiguration? TextGenerationConfiguration);
+        TextGenerationConfiguration? TextGenerationConfiguration,
+        string Language);
 
     /// <summary>
     /// Aggregate root. User-defined text or randomly generated one. We can reuse
@@ -70,6 +71,7 @@ namespace TypingRealm.Typing
 
         public string Value => _state.Value;
         public bool IsArchived => _state.IsArchived;
+        public string Language => _state.Configuration.Language;
 
         public void MakePublic()
         {
