@@ -24,8 +24,7 @@ namespace TypingRealm.Data.Infrastructure
             // Typing.
             services.AddSingleton<ITextGenerator, TextGenerator>();
 
-            // TODO: Register this as transient and decorate as singleton, allow changing lifetime when decorating.
-            services.AddSingleton<ITextRetriever, QuotableTextRetriever>();
+            services.AddTransient<ITextRetriever, QuotableTextRetriever>();
 
             // Repositories.
             if (DebugHelpers.UseInfrastructure)
@@ -49,14 +48,14 @@ namespace TypingRealm.Data.Infrastructure
 
                 services.AddTransient<IConnectionMultiplexer>(
                     provider => ConnectionMultiplexer.Connect(dataCacheConnectionString));
-                services.Decorate<ITextRetriever, RedisCachedTextRetriever>();
+                services.Decorate<ITextRetriever, RedisCachedTextRetriever>(ServiceLifetime.Singleton);
 
                 services.AddRedisServiceCaching(dataCacheConnectionString);
             }
             else
             {
                 services.AddTransient<IInfrastructureDeploymentService, NoInfrastructureService>();
-                services.Decorate<ITextRetriever, InMemoryCachedTextRetriever>();
+                services.Decorate<ITextRetriever, InMemoryCachedTextRetriever>(ServiceLifetime.Singleton);
             }
 
             return services;
