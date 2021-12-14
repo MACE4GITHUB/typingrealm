@@ -16,6 +16,8 @@ async function main() {
     let DATA_URL = 'https://api.typingrealm.com/data';
     let useDevAuth0Client = true;
     let env = url.searchParams.get('env');
+    let language = url.searchParams.get('language');
+    if (language == undefined) language = "en";
     setUrls();
 
     function setUrls() {
@@ -96,10 +98,10 @@ async function main() {
     const simulationSpeedMultiplierElement = document.getElementById('simulationSpeedMultiplier');
     const hintElement = document.getElementById('hint');
     const reportElement = document.getElementById('report');
-    const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}`;
+    const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}&language=${language}`;
     const authTokenRequestUrl = `${PROFILES_URL}/api/local-auth/profile-token?sub=${profile}`;
     const dataSubmitUrl = `${DATA_URL}/api/usersessions/result`;
-    const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable`;
+    const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable?language=${language}`;
 
     function getTextUrl(textId) {
         return `${DATA_URL}/api/texts/${textId}`;
