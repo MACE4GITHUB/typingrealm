@@ -13,5 +13,5 @@ namespace TypingRealm.Typing
         int Length,
         IEnumerable<string> ShouldContain,
         GenerationTextType TextType,
-        string language);
+        string Language);
 }

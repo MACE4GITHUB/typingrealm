@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -19,7 +20,7 @@ namespace TypingRealm.Data.Infrastructure
         /// Gets arbitrary text value from third-party service.
         /// </summary>
         /// <returns></returns>
-        ValueTask<string> GetNextTextValue();
+        ValueTask<string> GetNextTextValue(string language);
     }
 
     public sealed class QuotableTextRetriever : ITextRetriever
@@ -38,54 +39,66 @@ namespace TypingRealm.Data.Infrastructure
             _httpClientFactory = httpClientFactory;
         }
 
-        public async ValueTask<string> GetNextTextValue()
+        public async ValueTask<string> GetNextTextValue(string language)
         {
-            var httpClient = _httpClientFactory.CreateClient();
+            if (language == "en")
+            {
+                var httpClient = _httpClientFactory.CreateClient();
 
-            using var response = await httpClient.GetAsync("http://api.quotable.io/random")
-                .ConfigureAwait(false);
+                using var response = await httpClient.GetAsync("http://api.quotable.io/random")
+                    .ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode();
 
-            var content = await response.Content.ReadAsStringAsync()
-                .ConfigureAwait(false);
+                var content = await response.Content.ReadAsStringAsync()
+                    .ConfigureAwait(false);
 
-            var textValue = JsonSerializer.Deserialize<QuotableResponse>(content)?.content;
-            if (textValue == null)
-                throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
+                var textValue = JsonSerializer.Deserialize<QuotableResponse>(content)?.content;
+                if (textValue == null)
+                    throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
 
-            return textValue;
+                return textValue;
+            }
+
+            throw new NotSupportedException($"Language {language} is not supported.");
         }
     }
 
+    // TODO: Make sure there are no endless loops when asked for non-supported language.
     public sealed class RedisCachedTextRetriever : ITextRetriever
     {
         private const int CacheSize = 1000;
         private readonly ITextRetriever _textRetriever;
         private readonly IConnectionMultiplexer _connectionMultiplexer;
-        private Task _process;
+        private readonly Dictionary<string, Task> _processes = new Dictionary<string, Task>();
 
-        public RedisCachedTextRetriever(ITextRetriever textRetriever, IConnectionMultiplexer connectionMultiplexer)
+        public RedisCachedTextRetriever(
+            ITextRetriever textRetriever,
+            IConnectionMultiplexer connectionMultiplexer)
         {
             _textRetriever = textRetriever;
             _connectionMultiplexer = connectionMultiplexer;
-            _process = StartGettingQuotesAsync();
+
+            _processes.Add("en", StartGettingQuotesAsync("en"));
         }
 
-        public ValueTask<string> GetNextTextValue() => GetQuoteAsync();
+        public ValueTask<string> GetNextTextValue(string language) => GetQuoteAsync(language);
 
-        private async ValueTask<string> GetQuoteAsync()
+        private async ValueTask<string> GetQuoteAsync(string language)
         {
             var db = _connectionMultiplexer.GetDatabase();
-            var count = await db.SetLengthAsync(new RedisKey("generated-texts"))
+            var count = await db.SetLengthAsync(GetRedisKey(language))
                 .ConfigureAwait(false);
 
-            if (_process.IsCompleted && count < CacheSize)
-                _process = StartGettingQuotesAsync();
+            foreach (var process in _processes)
+            {
+                if (process.Value.IsCompleted && count < CacheSize)
+                    _processes[process.Key] = StartGettingQuotesAsync(process.Key);
+            }
 
             while (true)
             {
-                var quote = await TryGetQuoteAsync()
+                var quote = await TryGetQuoteAsync(language)
                     .ConfigureAwait(false);
 
                 if (quote != null)
@@ -96,10 +109,10 @@ namespace TypingRealm.Data.Infrastructure
             }
         }
 
-        private async ValueTask<string?> TryGetQuoteAsync()
+        private async ValueTask<string?> TryGetQuoteAsync(string language)
         {
             var db = _connectionMultiplexer.GetDatabase();
-            var text = await db.SetPopAsync(new RedisKey("generated-texts"))
+            var text = await db.SetPopAsync(GetRedisKey(language))
                 .ConfigureAwait(false);
 
             if (!text.HasValue)
@@ -108,30 +121,35 @@ namespace TypingRealm.Data.Infrastructure
             return text.ToString();
         }
 
-        private async Task StartGettingQuotesAsync()
+        private async Task StartGettingQuotesAsync(string language)
         {
             var db = _connectionMultiplexer.GetDatabase();
 
             var iteration = 0;
-            var count = await db.SetLengthAsync(new RedisKey("generated-texts"))
+            var count = await db.SetLengthAsync(GetRedisKey(language))
                 .ConfigureAwait(false);
 
             while (count < CacheSize)
             {
-                var text = await _textRetriever.GetNextTextValue()
+                var text = await _textRetriever.GetNextTextValue(language)
                     .ConfigureAwait(false);
 
-                await db.SetAddAsync("generated-texts", text)
+                await db.SetAddAsync(GetRedisKey(language), text)
                     .ConfigureAwait(false);
 
                 iteration++;
 
                 if (iteration > 50)
                 {
-                    count = await db.SetLengthAsync(new RedisKey("generated-texts"))
+                    count = await db.SetLengthAsync(GetRedisKey(language))
                         .ConfigureAwait(false);
                 }
             }
+        }
+
+        private RedisKey GetRedisKey(string language)
+        {
+            return $"{language}_generated-texts";
         }
     }
 
@@ -139,25 +157,30 @@ namespace TypingRealm.Data.Infrastructure
     {
         private const int CacheSize = 1000;
         private readonly ITextRetriever _textRetriever;
-        private readonly ConcurrentQueue<string> _quoteQueue = new ConcurrentQueue<string>();
-        private Task _process;
+        private readonly Dictionary<string, ConcurrentQueue<string>> _quoteQueues = new Dictionary<string, ConcurrentQueue<string>>();
+        private readonly Dictionary<string, Task> _processes = new Dictionary<string, Task>();
 
         public InMemoryCachedTextRetriever(ITextRetriever textRetriever)
         {
             _textRetriever = textRetriever;
-            _process = StartGettingQuotesAsync();
+
+            _processes.Add("en", StartGettingQuotesAsync("en"));
+            _quoteQueues.Add("en", new ConcurrentQueue<string>());
         }
 
-        public ValueTask<string> GetNextTextValue() => GetQuoteAsync();
+        public ValueTask<string> GetNextTextValue(string language) => GetQuoteAsync(language);
 
-        private async ValueTask<string> GetQuoteAsync()
+        private async ValueTask<string> GetQuoteAsync(string language)
         {
-            if (_process.IsCompleted && _quoteQueue.Count < CacheSize)
-                _process = StartGettingQuotesAsync();
+            foreach (var process in _processes)
+            {
+                if (process.Value.IsCompleted && _quoteQueues[process.Key].Count < CacheSize)
+                    _processes[process.Key] = StartGettingQuotesAsync(process.Key);
+            }
 
             while (true)
             {
-                var quote = await TryGetQuoteAsync()
+                var quote = await TryGetQuoteAsync(language)
                     .ConfigureAwait(false);
 
                 if (quote != null)
@@ -168,22 +191,22 @@ namespace TypingRealm.Data.Infrastructure
             }
         }
 
-        private async ValueTask<string?> TryGetQuoteAsync()
+        private async ValueTask<string?> TryGetQuoteAsync(string language)
         {
-            if (_quoteQueue.TryDequeue(out var quote))
+            if (_quoteQueues[language].TryDequeue(out var quote))
                 return quote;
 
             return null;
         }
 
-        private async Task StartGettingQuotesAsync()
+        private async Task StartGettingQuotesAsync(string language)
         {
-            while (_quoteQueue.Count < CacheSize)
+            while (_quoteQueues[language].Count < CacheSize)
             {
-                var text = await _textRetriever.GetNextTextValue()
+                var text = await _textRetriever.GetNextTextValue(language)
                     .ConfigureAwait(false);
 
-                _quoteQueue.Enqueue(text);
+                _quoteQueues[language].Enqueue(text);
             }
         }
     }
@@ -203,6 +226,9 @@ namespace TypingRealm.Data.Infrastructure
 
         public async ValueTask<string> GenerateTextAsync(TextGenerationConfigurationDto configuration)
         {
+            if (!IsSupported(configuration.Language))
+                throw new NotSupportedException($"Language {configuration.Language} is not supported.");
+
             if (configuration.Length < 0)
                 throw new InvalidOperationException("Cannot have negative length.");
 
@@ -214,7 +240,7 @@ namespace TypingRealm.Data.Infrastructure
 
             while (builder.Length < Math.Min(minLength, MaxTextLength))
             {
-                var quoteFromApi = await _textRetriever.GetNextTextValue()
+                var quoteFromApi = await _textRetriever.GetNextTextValue(configuration.Language)
                     .ConfigureAwait(false);
 
                 var chunks = configuration.TextType == GenerationTextType.Words
@@ -281,6 +307,14 @@ namespace TypingRealm.Data.Infrastructure
             }
 
             return builder.ToString();
+        }
+
+        private bool IsSupported(string language)
+        {
+            if (language == "en")
+                return true;
+
+            return false;
         }
     }
 }
