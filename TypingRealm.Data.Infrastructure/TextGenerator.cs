@@ -60,6 +60,26 @@ namespace TypingRealm.Data.Infrastructure
                 return textValue;
             }
 
+            if (language == "ru")
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+
+                using var response = await httpClient.GetAsync("https://fish-text.ru/get?format=html")
+                    .ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+
+                var content = await response.Content.ReadAsStringAsync()
+                    .ConfigureAwait(false);
+
+                var value = content.Replace("<p>", string.Empty).Replace("</p>", string.Empty);
+
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new InvalidOperationException("Text API returned empty text.");
+
+                return value;
+            }
+
             throw new NotSupportedException($"Language {language} is not supported.");
         }
     }
@@ -80,6 +100,7 @@ namespace TypingRealm.Data.Infrastructure
             _connectionMultiplexer = connectionMultiplexer;
 
             _processes.Add("en", StartGettingQuotesAsync("en"));
+            _processes.Add("ru", StartGettingQuotesAsync("ru"));
         }
 
         public ValueTask<string> GetNextTextValue(string language) => GetQuoteAsync(language);
@@ -166,6 +187,9 @@ namespace TypingRealm.Data.Infrastructure
 
             _processes.Add("en", StartGettingQuotesAsync("en"));
             _quoteQueues.Add("en", new ConcurrentQueue<string>());
+
+            _processes.Add("ru", StartGettingQuotesAsync("ru"));
+            _quoteQueues.Add("ru", new ConcurrentQueue<string>());
         }
 
         public ValueTask<string> GetNextTextValue(string language) => GetQuoteAsync(language);
@@ -216,7 +240,7 @@ namespace TypingRealm.Data.Infrastructure
         private const int MaxTextLength = 5000; // So that user cannot request 50000 characters.
         private const int ShouldContainMinCount = 15; // If there's not enough data - generate default text.
 
-        private static readonly string _allowedLetters = "'\",<.>pPyYfFgGcCrRlL/?=+\\|aAoOeEuUiIdDhHtTnNsS-_;:qQjJkKxXbBmMwWvVzZ 1!2@3#4$5%6^7&8*9(0)[{]}`~";
+        private static readonly string _allowedLetters = "'\",<.>pPyYfFgGcCrRlL/?=+\\|aAoOeEuUiIdDhHtTnNsS-_;:qQjJkKxXbBmMwWvVzZ 1!2@3#4$5%6^7&8*9(0)[{]}`~йЙцЦуУкКеЕнНгГшШщЩзЗхХъЪфФыЫвВаАпПрРоОлЛдДжЖэЭяЯчЧсСмМиИтТьЬбБюЮёЁ";
         private readonly ITextRetriever _textRetriever;
 
         public TextGenerator(ITextRetriever textRetriever)
@@ -244,8 +268,8 @@ namespace TypingRealm.Data.Infrastructure
                     .ConfigureAwait(false);
 
                 var chunks = configuration.TextType == GenerationTextType.Words
-                    ? quoteFromApi.Split(' ')
-                    : new[] { quoteFromApi };
+                    ? quoteFromApi.Split('.').SelectMany(x => x.Split(' '))
+                    : quoteFromApi.Split('.');
 
                 // TODO: Account for spaces.
                 foreach (var chunk in chunks)
@@ -311,7 +335,7 @@ namespace TypingRealm.Data.Infrastructure
 
         private bool IsSupported(string language)
         {
-            if (language == "en")
+            if (language == "en" || language == "ru")
                 return true;
 
             return false;
