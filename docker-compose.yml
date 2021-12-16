@@ -42,5 +42,4 @@ services:
       dockerfile: TypingRealm.Data.Api/Dockerfile
     env_file:
       - .env.debug
-    environment:
-      - ConnectionStrings__ServiceCacheConnection=host.docker.internal:6379
+      - .env.debug.data

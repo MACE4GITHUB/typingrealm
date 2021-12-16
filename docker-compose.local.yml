@@ -47,23 +47,9 @@ services:
     mem_reservation: 750m
     env_file:
       - .env.local
-    environment:
-      - ConnectionStrings__ServiceCacheConnection=local-typingrealm-data-redis:6379
+      - .env.local.data
 
   # === Infrastructure ===
-
-  local-typingrealm-postgres:
-    image: postgres
-    container_name: local-typingrealm-postgres
-    networks:
-      - local-typingrealm-net
-    volumes:
-      - ./infrastructure-data/local/postgres:/var/lib/postgresql/data
-    restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
-    env_file:
-      - .env.local
 
   local-typingrealm-redis:
     image: redis
@@ -71,7 +57,7 @@ services:
     networks:
       - local-typingrealm-net
     volumes:
-      - ./infrastructure-data/local/redis:/data
+      - ./infrastructure-data/local/shared/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
@@ -84,12 +70,27 @@ services:
     networks:
       - local-typingrealm-data-net
     volumes:
-      - ./infrastructure-data/local/data-redis:/data
+      - ./infrastructure-data/local/data/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
       - .env.local
+      - .env.local.data
+
+  local-typingrealm-data-postgres:
+    image: postgres
+    container_name: local-typingrealm-data-postgres
+    networks:
+      - local-typingrealm-data-net
+    volumes:
+      - ./infrastructure-data/local/data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.local
+      - .env.local.data
 
   local-typingrealm-caddy:
     image: caddy

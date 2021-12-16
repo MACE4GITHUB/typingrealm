@@ -47,25 +47,9 @@ services:
     mem_reservation: 750m
     env_file:
       - .env.dev
-    environment:
-      - ConnectionStrings__ServiceCacheConnection=dev-typingrealm-data-redis:6379
+      - .env.dev.data
 
   # === Infrastructure ===
-
-  dev-typingrealm-postgres:
-    image: postgres
-    container_name: dev-typingrealm-postgres
-    networks:
-      - dev-typingrealm-net
-    ports:
-      - 5432:5432
-    volumes:
-      - ./infrastructure-data/dev/postgres:/var/lib/postgresql/data
-    restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
-    env_file:
-      - .env.dev
 
   dev-typingrealm-redis:
     image: redis
@@ -75,7 +59,7 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - ./infrastructure-data/dev/redis:/data
+      - ./infrastructure-data/dev/shared/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
@@ -90,12 +74,29 @@ services:
     ports:
       - 34379:6379
     volumes:
-      - ./infrastructure-data/dev/data-redis:/data
+      - ./infrastructure-data/dev/data/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
       - .env.dev
+      - .env.dev.data
+
+  dev-typingrealm-data-postgres:
+    image: postgres
+    container_name: dev-typingrealm-data-postgres
+    networks:
+      - dev-typingrealm-data-net
+    ports:
+      - 5432:5432
+    volumes:
+      - ./infrastructure-data/dev/data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.dev
+      - .env.dev.data
 
   # Simple local UI test page to facilitate BackEnd development.
   dev-typingrealm-web-ui:

@@ -47,23 +47,9 @@ services:
     mem_reservation: 750m
     env_file:
       - .env.prod
-    environment:
-      - ConnectionStrings__ServiceCacheConnection=typingrealm-data-redis:6379
+      - .env.prod.data
 
   # === Infrastructure ===
-
-  typingrealm-postgres:
-    image: postgres
-    container_name: typingrealm-postgres
-    networks:
-      - typingrealm-net
-    volumes:
-      - ./infrastructure-data/prod/postgres:/var/lib/postgresql/data
-    restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
-    env_file:
-      - .env.prod
 
   typingrealm-redis:
     image: redis
@@ -71,7 +57,7 @@ services:
     networks:
       - typingrealm-net
     volumes:
-      - ./infrastructure-data/prod/redis:/data
+      - ./infrastructure-data/prod/shared/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
@@ -84,12 +70,27 @@ services:
     networks:
       - typingrealm-data-net
     volumes:
-      - ./infrastructure-data/prod/data-redis:/data
+      - ./infrastructure-data/prod/data/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
       - .env.prod
+      - .env.prod.data
+
+  typingrealm-data-postgres:
+    image: postgres
+    container_name: typingrealm-data-postgres
+    networks:
+      - typingrealm-data-net
+    volumes:
+      - ./infrastructure-data/prod/data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.prod
+      - .env.prod.data
 
   typingrealm-caddy:
     image: caddy

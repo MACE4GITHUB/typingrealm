@@ -51,26 +51,9 @@ services:
     mem_reservation: 750m
     env_file:
       - .env.prod
-    environment:
-      - ConnectionStrings__ServiceCacheConnection=typingrealm-data-redis:6379
+      - .env.prod.data
 
   # === Infrastructure ===
-
-  typingrealm-postgres:
-    image: postgres
-    container_name: typingrealm-postgres
-    networks:
-      - typingrealm-net
-    # Should be disabled in production. This is for conveniency of connecting to prod DB.
-    ports:
-      - 5430:5432
-    volumes:
-      - ./infrastructure-data/prod/postgres:/var/lib/postgresql/data
-    restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
-    env_file:
-      - .env.prod
 
   typingrealm-redis:
     image: redis
@@ -81,7 +64,7 @@ services:
     ports:
       - 6370:6379
     volumes:
-      - ./infrastructure-data/prod/redis:/data
+      - ./infrastructure-data/prod/shared/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
@@ -97,12 +80,30 @@ services:
     ports:
       - 34370:6379
     volumes:
-      - ./infrastructure-data/prod/data-redis:/data
+      - ./infrastructure-data/prod/data/redis:/data
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
       - .env.prod
+      - .env.prod.data
+
+  typingrealm-data-postgres:
+    image: postgres
+    container_name: typingrealm-data-postgres
+    networks:
+      - typingrealm-data-net
+    # Should be disabled in production. This is for conveniency of connecting to prod DB.
+    ports:
+      - 5430:5432
+    volumes:
+      - ./infrastructure-data/prod/data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.prod
+      - .env.prod.data
 
   # This is Caddy both for PROD, DEV and LOCAL routing.
   # In the final PROD configuration another Caddyfile should be deployed.
