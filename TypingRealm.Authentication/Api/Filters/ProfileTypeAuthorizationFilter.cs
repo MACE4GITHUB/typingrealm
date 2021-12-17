@@ -15,7 +15,7 @@ namespace TypingRealm.Authentication.Api.Filters
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var profile = ProfileHelpers.GetProfileForUser(context.HttpContext.User);
+            var profile = Profile.GetProfileForUser(context.HttpContext.User);
 
             if (profile.Type != _profileType)
                 context.Result = new ForbidResult();

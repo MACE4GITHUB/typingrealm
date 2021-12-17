@@ -10,7 +10,7 @@
         Anonymous = 1,
 
         /// <summary>
-        /// If user is authenticated, but there is no sub claim.
+        /// If request is authenticated, but there is no sub claim (CC token).
         /// </summary>
         Service = 2,
 
