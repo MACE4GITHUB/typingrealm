@@ -37,15 +37,5 @@ namespace TypingRealm.Authentication.OAuth
 
             return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(60), _signingCredentials));
         }
-
-        public static string GenerateServiceAccessToken()
-        {
-            var claims = new List<Claim>
-            {
-                new Claim("scope", TyrScopes.Service)
-            };
-
-            return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(60), _signingCredentials));
-        }
     }
 }
