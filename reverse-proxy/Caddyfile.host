@@ -35,6 +35,10 @@ dev.api.typingrealm.com {
     handle_path /auth/* {
         reverse_proxy dev-typingrealm-identityserver:80
     }
+
+    handle_path /texts/* {
+        reverse_proxy dev-typingrealm-texts:80
+    }
 }
 
 localhost {

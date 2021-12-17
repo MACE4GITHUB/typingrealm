@@ -43,3 +43,17 @@ services:
     env_file:
       - .env.debug
       - .env.debug.data
+
+  debug-typingrealm-texts:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-texts
+    container_name: debug-typingrealm-texts
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30401:80
+    build:
+      context: .
+      dockerfile: TypingRealm.Texts.Api/Dockerfile
+    env_file:
+      - .env.debug
+      - .env.debug.texts

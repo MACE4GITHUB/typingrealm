@@ -5,6 +5,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileTag>debug-typingrealm-data</DockerfileTag>
     <DockerfileRunEnvironmentFiles>../.env.debug</DockerfileRunEnvironmentFiles>
+    <DockerfileRunEnvironmentFiles>../.env.debug.data</DockerfileRunEnvironmentFiles>
   </PropertyGroup>
 
   <ItemGroup>

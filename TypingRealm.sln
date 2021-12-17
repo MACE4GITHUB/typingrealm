@@ -153,7 +153,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosting", "Hosting", "{CBBE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Communication", "Communication", "{BE085F8D-973E-49A4-AC66-644D56305937}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Communication.Redis", "TypingRealm.Communication.Redis\TypingRealm.Communication.Redis.csproj", "{51C5F550-97D3-499A-A60E-FEBA0621C986}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Communication.Redis", "TypingRealm.Communication.Redis\TypingRealm.Communication.Redis.csproj", "{51C5F550-97D3-499A-A60E-FEBA0621C986}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Texts", "Texts", "{599F920A-F61F-49AC-AF17-420504F1852E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Texts.Api", "TypingRealm.Texts.Api\TypingRealm.Texts.Api.csproj", "{34DE5EE5-E978-44F3-8027-0CB334B53225}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -389,6 +393,10 @@ Global
 		{51C5F550-97D3-499A-A60E-FEBA0621C986}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51C5F550-97D3-499A-A60E-FEBA0621C986}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51C5F550-97D3-499A-A60E-FEBA0621C986}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34DE5EE5-E978-44F3-8027-0CB334B53225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34DE5EE5-E978-44F3-8027-0CB334B53225}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34DE5EE5-E978-44F3-8027-0CB334B53225}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34DE5EE5-E978-44F3-8027-0CB334B53225}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -452,6 +460,8 @@ Global
 		{CBBEC7E3-41B0-401A-8EC6-C570D40F0324} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
 		{BE085F8D-973E-49A4-AC66-644D56305937} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
 		{51C5F550-97D3-499A-A60E-FEBA0621C986} = {BE085F8D-973E-49A4-AC66-644D56305937}
+		{599F920A-F61F-49AC-AF17-420504F1852E} = {FBCBD592-7B6F-4480-891B-508B81BFF4C9}
+		{34DE5EE5-E978-44F3-8027-0CB334B53225} = {599F920A-F61F-49AC-AF17-420504F1852E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

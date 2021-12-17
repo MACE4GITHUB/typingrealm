@@ -14,4 +14,8 @@ api.localhost {
     handle_path /auth/* {
         reverse_proxy local-typingrealm-identityserver:80
     }
+
+    handle_path /texts/* {
+        reverse_proxy local-typingrealm-texts:80
+    }
 }

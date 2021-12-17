@@ -3,6 +3,7 @@ version: '3.4'
 networks:
   dev-typingrealm-net:
   dev-typingrealm-data-net:
+  dev-typingrealm-texts-net:
 
 services:
   dev-typingrealm-identityserver:
@@ -48,6 +49,22 @@ services:
     env_file:
       - .env.dev
       - .env.dev.data
+
+  dev-typingrealm-texts:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-texts
+    container_name: dev-typingrealm-texts
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-texts-net
+    build:
+      context: .
+      dockerfile: TypingRealm.Texts.Api/Dockerfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - .env.dev
+      - .env.dev.texts
 
   # === Infrastructure ===
 
