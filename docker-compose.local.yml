@@ -95,6 +95,20 @@ services:
       - .env.local
       - .env.local.data
 
+  local-typingrealm-texts-redis:
+    image: redis
+    container_name: local-typingrealm-texts-redis
+    networks:
+      - local-typingrealm-texts-net
+    volumes:
+      - ./infrastructure-data/local/texts/redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.local
+      - .env.local.texts
+
   local-typingrealm-data-postgres:
     image: postgres
     container_name: local-typingrealm-data-postgres

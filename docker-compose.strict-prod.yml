@@ -95,6 +95,20 @@ services:
       - .env.prod
       - .env.prod.data
 
+  typingrealm-texts-redis:
+    image: redis
+    container_name: typingrealm-texts-redis
+    networks:
+      - typingrealm-texts-net
+    volumes:
+      - ./infrastructure-data/prod/texts/redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.prod
+      - .env.prod.texts
+
   typingrealm-data-postgres:
     image: postgres
     container_name: typingrealm-data-postgres

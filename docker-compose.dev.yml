@@ -99,6 +99,22 @@ services:
       - .env.dev
       - .env.dev.data
 
+  dev-typingrealm-texts-redis:
+    image: redis
+    container_name: dev-typingrealm-texts-redis
+    networks:
+      - dev-typingrealm-texts-net
+    ports:
+      - 41379:6379
+    volumes:
+      - ./infrastructure-data/dev/texts/redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.dev
+      - .env.dev.texts
+
   dev-typingrealm-data-postgres:
     image: postgres
     container_name: dev-typingrealm-data-postgres
