@@ -7,19 +7,24 @@ namespace TypingRealm.Texts.Api.Controllers;
 public sealed record GeneratedText(
     string Value);
 
-public sealed record TextGenerationConfiguration(
-    int length);
-
 [Route("api/[controller]")]
 public sealed class TextsController : TyrController
 {
-    [HttpPost]
-    [Route("generate")]
-    public ValueTask<ActionResult<GeneratedText>> GenerateText(TextGenerationConfiguration configuration)
-    {
-        _ = configuration;
+    private readonly TextGeneratorResolver _textGeneratorResolver;
 
-        return new ValueTask<ActionResult<GeneratedText>>(
-            Ok(new GeneratedText("Some text.")));
+    public TextsController(TextGeneratorResolver textGeneratorResolver)
+    {
+        _textGeneratorResolver = textGeneratorResolver;
+    }
+
+    [HttpPost]
+    [Route("{language}/generate")]
+    public async ValueTask<ActionResult<GeneratedText>> GenerateText(string language, TextGenerationConfiguration configuration)
+    {
+        var textGenerator = _textGeneratorResolver(language);
+
+        var text = await textGenerator.GenerateTextAsync(configuration);
+
+        return new GeneratedText(text);
     }
 }
