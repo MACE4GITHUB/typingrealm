@@ -2,7 +2,6 @@
 **/bin/
 **/obj/
 **/*.*proj.user
-*.json
 
 # Caddy (reverse proxy) data files
 reverse-proxy/caddy_data/
