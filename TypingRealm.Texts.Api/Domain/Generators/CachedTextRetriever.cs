@@ -7,7 +7,7 @@ using TypingRealm.Communication;
 
 namespace TypingRealm.Texts.Generators
 {
-    public sealed class CachedTextRetriever : ITextRetriever
+    public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
     {
         private const int CacheSize = 100;
         private readonly ITextRetriever _textRetriever;
@@ -31,6 +31,8 @@ namespace TypingRealm.Texts.Generators
 
         public async ValueTask<string> RetrieveTextAsync()
         {
+            ThrowIfDisposed();
+
             var cache = await GetCacheAsync().ConfigureAwait(false);
 
             // TODO: Make sure this is hybrid cache: cache results in memory and listen to Redis changes.
@@ -106,5 +108,10 @@ namespace TypingRealm.Texts.Generators
         }
 
         private ValueTask<ITyrCache> GetCacheAsync() => _cacheProvider.GetServiceCacheAsync(_cachePrefix);
+
+        protected override void DisposeManagedResources()
+        {
+            _localLock.Dispose();
+        }
     }
 }
