@@ -70,6 +70,10 @@ namespace TypingRealm.Texts
             {
                 if (word.Contains(piece))
                     return true;
+
+                if ((piece.First() == ' ' && word.StartsWith(piece[1..], StringComparison.Ordinal))
+                    || (piece.Last() == ' ' && word.EndsWith(piece[0..^1], StringComparison.Ordinal)))
+                    return true;
             }
 
             return false;
