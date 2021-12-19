@@ -5,19 +5,19 @@ using System.Threading.Tasks;
 
 namespace TypingRealm.Texts.Generators
 {
-    public sealed class EnglishTextGenerator : ITextGenerator
+    public sealed class EnglishTextRetriever : ITextRetriever
     {
         private sealed record QuotableResponse(string content);
 
         public string Language => "en";
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public EnglishTextGenerator(IHttpClientFactory httpClientFactory)
+        public EnglishTextRetriever(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        public async ValueTask<string> GenerateTextAsync(TextGenerationConfiguration configuration)
+        public async ValueTask<string> RetrieveTextAsync()
         {
             var httpClient = _httpClientFactory.CreateClient();
 

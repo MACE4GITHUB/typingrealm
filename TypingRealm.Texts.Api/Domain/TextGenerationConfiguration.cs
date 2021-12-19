@@ -1,5 +1,8 @@
 ﻿namespace TypingRealm.Texts
 {
     public sealed record TextGenerationConfiguration(
-        int length);
+        int Length)
+    {
+        public string UniqueKey => $"length={Length}";
+    }
 }

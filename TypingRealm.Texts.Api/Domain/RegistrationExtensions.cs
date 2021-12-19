@@ -5,23 +5,25 @@ using TypingRealm.Texts.Generators;
 
 namespace TypingRealm.Texts
 {
-    public delegate ITextGenerator TextGeneratorResolver(string language);
+    public delegate ITextRetriever TextRetrieverResolver(string language);
 
     public static class RegistrationExtensions
     {
         public static IServiceCollection AddTextsApi(this IServiceCollection services)
         {
-            services.AddTransient<ITextGenerator, EnglishTextGenerator>();
+            services.AddTransient<ITextRetriever, EnglishTextRetriever>()
+                // This can be transient only if we inject a singleton local lock.
+                .Decorate<ITextRetriever, CachedTextRetriever>(ServiceLifetime.Singleton);
 
-            services.AddTransient<TextGeneratorResolver>(provider => language =>
+            services.AddTransient<TextRetrieverResolver>(provider => language =>
             {
-                var generator = provider.GetServices<ITextGenerator>()
+                var retriever = provider.GetServices<ITextRetriever>()
                     .LastOrDefault(generator => generator.Language == language);
 
-                if (generator == null)
+                if (retriever == null)
                     throw new NotSupportedException($"Text generator for language {language} is not supported.");
 
-                return generator;
+                return retriever;
             });
 
             return services;

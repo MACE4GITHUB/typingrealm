@@ -10,9 +10,9 @@ public sealed record GeneratedText(
 [Route("api/[controller]")]
 public sealed class TextsController : TyrController
 {
-    private readonly TextGeneratorResolver _textGeneratorResolver;
+    private readonly TextRetrieverResolver _textGeneratorResolver;
 
-    public TextsController(TextGeneratorResolver textGeneratorResolver)
+    public TextsController(TextRetrieverResolver textGeneratorResolver)
     {
         _textGeneratorResolver = textGeneratorResolver;
     }
@@ -21,9 +21,10 @@ public sealed class TextsController : TyrController
     [Route("{language}/generate")]
     public async ValueTask<ActionResult<GeneratedText>> GenerateText(string language, TextGenerationConfiguration configuration)
     {
+        _ = configuration;
         var textGenerator = _textGeneratorResolver(language);
 
-        var text = await textGenerator.GenerateTextAsync(configuration);
+        var text = await textGenerator.RetrieveTextAsync();
 
         return new GeneratedText(text);
     }
