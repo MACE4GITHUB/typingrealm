@@ -14,6 +14,8 @@ namespace TypingRealm.Texts
         {
             // The retriever cache can be transient only if we inject a singleton local lock.
 
+            services.AddTransient<ITextGenerator, TextGenerator>();
+
             services.AddTransient<EnglishTextRetriever>();
             services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
                 provider.GetRequiredService<EnglishTextRetriever>(),

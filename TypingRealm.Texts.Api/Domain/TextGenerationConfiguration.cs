@@ -1,8 +1,17 @@
-﻿namespace TypingRealm.Texts
+﻿using System.Collections.Generic;
+
+namespace TypingRealm.Texts
 {
-    public sealed record TextGenerationConfiguration(
-        int Length)
+    public enum TextGenerationType
     {
-        public string UniqueKey => $"length={Length}";
+        Sentences = 1,
+        Words = 2
     }
+
+    // Here will be some additional properties like remove punctuation or only lowercase.
+    public sealed record TextGenerationConfiguration(
+        string Language,
+        int Length,
+        TextGenerationType TextType,
+        IEnumerable<string> ShouldContain);
 }

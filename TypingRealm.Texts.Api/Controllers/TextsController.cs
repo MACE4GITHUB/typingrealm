@@ -10,21 +10,18 @@ public sealed record GeneratedText(
 [Route("api/[controller]")]
 public sealed class TextsController : TyrController
 {
-    private readonly TextRetrieverResolver _textGeneratorResolver;
+    private readonly ITextGenerator _textGenerator;
 
-    public TextsController(TextRetrieverResolver textGeneratorResolver)
+    public TextsController(ITextGenerator textGenerator)
     {
-        _textGeneratorResolver = textGeneratorResolver;
+        _textGenerator = textGenerator;
     }
 
     [HttpPost]
-    [Route("{language}/generate")]
-    public async ValueTask<ActionResult<GeneratedText>> GenerateText(string language, TextGenerationConfiguration configuration)
+    [Route("generate")]
+    public async ValueTask<ActionResult<GeneratedText>> GenerateText([FromBody] TextGenerationConfiguration configuration)
     {
-        _ = configuration;
-        var textGenerator = _textGeneratorResolver(language);
-
-        var text = await textGenerator.RetrieveTextAsync();
+        var text = await _textGenerator.GenerateTextAsync(configuration);
 
         return new GeneratedText(text);
     }

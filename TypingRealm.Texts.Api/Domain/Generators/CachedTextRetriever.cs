@@ -56,6 +56,7 @@ namespace TypingRealm.Texts.Generators
             }
 
             // TODO: Move out Randomizer to Common project.
+            // TODO: Return multiple sentences in one response, not just one.
             var index = RandomNumberGenerator.GetInt32(0, values.Count);
             var text = values[index];
             return text;
@@ -72,7 +73,7 @@ namespace TypingRealm.Texts.Generators
                 var text = await _textRetriever.RetrieveTextAsync()
                     .ConfigureAwait(false);
 
-                var sentences = GetSentences(text);
+                var sentences = TextGenerator.GetSentences(text);
 
                 texts.UnionWith(sentences);
             }
@@ -99,14 +100,7 @@ namespace TypingRealm.Texts.Generators
             }
         }
 
-        private static IEnumerable<string> GetSentences(string text)
-        {
-            return text.Split(". ")
-                .Select(text => text.TrimEnd('.'))
-                .Select(text => $"{text}.")
-                .ToList();
-        }
-
+        // TODO: Move this method to common helpers as it's also needed in TextGenerator.
         private ValueTask<ITyrCache> GetCacheAsync() => _cacheProvider.GetServiceCacheAsync(_cachePrefix);
 
         protected override void DisposeManagedResources()
