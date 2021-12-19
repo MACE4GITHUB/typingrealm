@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Communication;
 using TypingRealm.Texts.Generators;
 
 namespace TypingRealm.Texts
@@ -11,9 +12,17 @@ namespace TypingRealm.Texts
     {
         public static IServiceCollection AddTextsApi(this IServiceCollection services)
         {
-            services.AddTransient<ITextRetriever, EnglishTextRetriever>()
-                // This can be transient only if we inject a singleton local lock.
-                .Decorate<ITextRetriever, CachedTextRetriever>(ServiceLifetime.Singleton);
+            // The retriever cache can be transient only if we inject a singleton local lock.
+
+            services.AddTransient<EnglishTextRetriever>();
+            services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
+                provider.GetRequiredService<EnglishTextRetriever>(),
+                provider.GetRequiredService<IServiceCacheProvider>()));
+
+            services.AddTransient<RussianTextRetriever>();
+            services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
+                provider.GetRequiredService<RussianTextRetriever>(),
+                provider.GetRequiredService<IServiceCacheProvider>()));
 
             services.AddTransient<TextRetrieverResolver>(provider => language =>
             {
@@ -23,7 +32,9 @@ namespace TypingRealm.Texts
                 if (retriever == null)
                     throw new NotSupportedException($"Text generator for language {language} is not supported.");
 
-                return retriever;
+                return new CachedTextRetriever(
+                    retriever,
+                    provider.GetRequiredService<IServiceCacheProvider>());
             });
 
             return services;
