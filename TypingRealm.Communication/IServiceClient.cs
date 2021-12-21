@@ -18,6 +18,13 @@ namespace TypingRealm.Communication
             T content,
             CancellationToken cancellationToken);
 
+        ValueTask<TResponse> PostAsync<TBody, TResponse>(
+            string serviceName,
+            string endpoint,
+            EndpointAuthenticationType endpointAuthenticationType,
+            TBody content,
+            CancellationToken cancellationToken);
+
         ValueTask DeleteAsync(
             string serviceName,
             string endpoint,

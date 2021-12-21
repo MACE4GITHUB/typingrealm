@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
+    <ProjectReference Include="..\TypingRealm.Texts.Api.Client\TypingRealm.Texts.Api.Client.csproj" />
   </ItemGroup>
 
 </Project>

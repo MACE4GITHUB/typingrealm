@@ -1,13 +1,7 @@
 ﻿using System.Collections.Generic;
 
-namespace TypingRealm.Texts
+namespace TypingRealm.Texts.Api.Client
 {
-    public enum TextGenerationType
-    {
-        Sentences = 1,
-        Words = 2
-    }
-
     // Here will be some additional properties like remove punctuation or only lowercase.
     public sealed record TextGenerationConfiguration(
         string Language,

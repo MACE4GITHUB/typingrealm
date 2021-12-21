@@ -17,7 +17,8 @@ namespace TypingRealm.Communication
             = new Dictionary<string, string>
             {
                 ["profiles"] = GetProfilesHost(),
-                ["data"] = GetDataHost()
+                ["data"] = GetDataHost(),
+                ["texts"] = GetTextsHost()
             };
 
         private static string GetProfilesHost()
@@ -34,6 +35,15 @@ namespace TypingRealm.Communication
             var dataHost = Environment.GetEnvironmentVariable("DATA_URL");
             if (dataHost == null)
                 return "http://127.0.0.1:30400";
+
+            return dataHost;
+        }
+
+        private static string GetTextsHost()
+        {
+            var dataHost = Environment.GetEnvironmentVariable("TEXTS_URL");
+            if (dataHost == null)
+                return "http://127.0.0.1:30401";
 
             return dataHost;
         }
@@ -105,6 +115,28 @@ namespace TypingRealm.Communication
             var httpClient = _httpClientFactory.CreateClient();
             await httpClient.SendMessageAsync(message, accessToken, content, cancellationToken)
                 .ConfigureAwait(false);
+        }
+
+        public async ValueTask<TResponse> PostAsync<TBody, TResponse>(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, TBody content, CancellationToken cancellationToken)
+        {
+            if (!_serviceAddresses.ContainsKey(serviceName))
+                throw new InvalidOperationException("Service is not registered in service discovery.");
+
+            var uri = $"{_serviceAddresses[serviceName]}/{endpoint}";
+
+            var accessToken = endpointAuthenticationType switch
+            {
+                EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                _ => null
+            };
+
+            using var message = new HttpRequestMessage(HttpMethod.Post, uri);
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.SendMessageAsync<TResponse, TBody>(message, accessToken, content, cancellationToken)
+                .ConfigureAwait(false);
+
+            return response;
         }
 
         public async ValueTask DeleteAsync(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, CancellationToken cancellationToken)

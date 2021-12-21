@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TypingRealm.Texts.Api.Client;
 
 namespace TypingRealm.Texts
 {
@@ -22,7 +23,7 @@ namespace TypingRealm.Texts
             _textRetrieverResolver = textRetrieverResolver;
         }
 
-        public static IEnumerable<string> GetSentences(string text)
+        public static IEnumerable<string> GetText(string text)
         {
             return text.Split(". ", StringSplitOptions.RemoveEmptyEntries)
                 .Select(text => text.TrimEnd('.'))
@@ -32,7 +33,7 @@ namespace TypingRealm.Texts
 
         public static IEnumerable<string> GetWords(string text)
         {
-            return GetSentences(text)
+            return GetText(text)
                 .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 .ToList();
         }
@@ -43,7 +44,7 @@ namespace TypingRealm.Texts
 
             var textRetriever = _textRetrieverResolver(configuration.Language);
 
-            if (configuration.TextType == TextGenerationType.Sentences)
+            if (configuration.TextType == TextGenerationType.Text)
                 return GenerateTextAsync(textRetriever, configuration.Length);
 
             if (configuration.TextType == TextGenerationType.Words)
@@ -89,9 +90,9 @@ namespace TypingRealm.Texts
                 var text = await textRetriever.RetrieveTextAsync()
                     .ConfigureAwait(false);
 
-                var sentences = GetSentences(text);
+                var Text = GetText(text);
 
-                foreach (var sentence in sentences)
+                foreach (var sentence in Text)
                 {
                     if (builder.Length == 0)
                     {

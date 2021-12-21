@@ -4,6 +4,7 @@ using StackExchange.Redis;
 using TypingRealm.Communication.Redis;
 using TypingRealm.Data.Infrastructure.DataAccess;
 using TypingRealm.Data.Infrastructure.DataAccess.Repositories;
+using TypingRealm.Texts.Api.Client;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Infrastructure
@@ -18,6 +19,9 @@ namespace TypingRealm.Data.Infrastructure
         {
             // Typing Domain.
             services.AddTyping();
+
+            // API client to Texts service.
+            services.AddTextsApiClient();
 
             services.AddSingleton<ILocationRepository, InMemoryLocationRepository>();
 

@@ -56,13 +56,13 @@ namespace TypingRealm.Texts.Generators
             }
 
             // TODO: Move out Randomizer to Common project.
-            // TODO: Return multiple sentences in one response, not just one.
+            // TODO: Return multiple Text in one response, not just one.
             var index = RandomNumberGenerator.GetInt32(0, values.Count);
             var text = values[index];
             return text;
         }
 
-        private static string GetCacheKey() => "sentences";
+        private static string GetCacheKey() => "Text";
 
         private async Task FillCacheAsync()
         {
@@ -73,9 +73,9 @@ namespace TypingRealm.Texts.Generators
                 var text = await _textRetriever.RetrieveTextAsync()
                     .ConfigureAwait(false);
 
-                var sentences = TextGenerator.GetSentences(text);
+                var Text = TextGenerator.GetText(text);
 
-                texts.UnionWith(sentences);
+                texts.UnionWith(Text);
             }
 
             var cache = await GetCacheAsync().ConfigureAwait(false);

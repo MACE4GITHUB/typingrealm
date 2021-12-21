@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TypingRealm.Texts.Api.Client;
 using TypingRealm.Typing.Framework;
 
 namespace TypingRealm.Typing
@@ -7,7 +8,7 @@ namespace TypingRealm.Typing
     public sealed record TextGenerationConfiguration(
         int Length,
         IEnumerable<string> ShouldContain,
-        GenerationTextType GenerationTextType);
+        TextGenerationType GenerationTextType);
 
     public enum TextType
     {

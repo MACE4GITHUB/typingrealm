@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles;
+using TypingRealm.Texts.Api.Client;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Api.Controllers
@@ -42,17 +43,17 @@ namespace TypingRealm.Data.Api.Controllers
     public sealed class TextsController : TyrController
     {
         private readonly ITextRepository _textRepository;
-        private readonly ITextGenerator _textGenerator;
         private readonly ITypingReportGenerator _typingReportGerenator;
+        private readonly ITextsClient _textsClient;
 
         public TextsController(
             ITextRepository textRepository,
-            ITextGenerator textGenerator,
-            ITypingReportGenerator typingReportGenerator)
+            ITypingReportGenerator typingReportGenerator,
+            ITextsClient textsClient)
         {
             _textRepository = textRepository;
-            _textGenerator = textGenerator;
             _typingReportGerenator = typingReportGenerator;
+            _textsClient = textsClient;
         }
 
         [HttpGet]
@@ -69,7 +70,7 @@ namespace TypingRealm.Data.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("generate")]
-        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, GenerationTextType textType = GenerationTextType.Text, string? language = "en")
+        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, TextGenerationType textType = TextGenerationType.Text, string? language = "en")
         {
             if (language == null)
                 language = "en";
@@ -94,13 +95,15 @@ namespace TypingRealm.Data.Api.Controllers
                     .Take(10));
             }
 
-            var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
+            //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
+            var generatedText = await _textsClient.GenerateTextAsync(new Texts.Api.Client.TextGenerationConfiguration(language, length, textType, shouldContain), default);
+            var textValue = generatedText.Value;
 
             var textId = await _textRepository.NextIdAsync();
 
             var configuration = new TextConfiguration(
                 TextType.Generated,
-                new TextGenerationConfiguration(length, shouldContain, textType),
+                new Typing.TextGenerationConfiguration(length, shouldContain, textType),
                 language);
 
             var text = new Text(textId, textValue, ProfileId, DateTime.UtcNow, false, configuration);

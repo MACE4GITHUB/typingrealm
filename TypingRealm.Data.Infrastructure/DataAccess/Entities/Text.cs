@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Texts.Api.Client;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
@@ -26,7 +27,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
         public TextType TextType { get; set; }
         public int? GenerationLength { get; set; }
         public string? GenerationShouldContain { get; set; }
-        public GenerationTextType? GenerationTextType { get; set; }
+        public TextGenerationType? GenerationTextType { get; set; }
 
         [MaxLength(20)]
         public string Language { get; set; }
@@ -59,7 +60,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 CreatedUtc,
                 IsPublic,
                 IsArchived,
-                new TextConfiguration(TextType, GenerationLength == null ? null : new TextGenerationConfiguration(
+                new TextConfiguration(TextType, GenerationLength == null ? null : new Typing.TextGenerationConfiguration(
                     GenerationLength ?? throw new InvalidOperationException("GenerationLength is null in DB."),
                     GenerationShouldContain?.Split(',') ?? throw new InvalidOperationException("GenerationShouldContain is null in DB."),
                     GenerationTextType ?? throw new InvalidOperationException("GenerationTextType is null in DB.")),
