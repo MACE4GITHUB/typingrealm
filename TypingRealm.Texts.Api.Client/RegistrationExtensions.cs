@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace TypingRealm.Texts.Api.Client
+namespace TypingRealm.Texts.Api.Client;
+
+public static class RegistrationExtensions
 {
-    public static class RegistrationExtensions
+    public static IServiceCollection AddTextsApiClient(this IServiceCollection services)
     {
-        public static IServiceCollection AddTextsApiClient(this IServiceCollection services)
-        {
-            return services.AddTransient<ITextsClient, TextsClient>();
-        }
+        return services.AddTransient<ITextsClient, TextsClient>();
     }
 }

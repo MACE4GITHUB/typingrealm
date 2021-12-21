@@ -1,8 +1,7 @@
-﻿namespace TypingRealm.Texts.Api.Client
+﻿namespace TypingRealm.Texts.Api.Client;
+
+public enum TextGenerationType
 {
-    public enum TextGenerationType
-    {
-        Text = 1,
-        Words = 2
-    }
+    Text = 1,
+    Words = 2
 }
