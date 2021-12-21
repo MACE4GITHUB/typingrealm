@@ -11,26 +11,34 @@ namespace TypingRealm.Communication
 {
     public static class HttpClientExtensions
     {
-        public static ValueTask<TResponse> SendMessageAsync<TResponse, TBody>(
+        public static async ValueTask<TResponse> SendMessageAsync<TResponse, TBody>(
             this HttpClient httpClient,
             HttpRequestMessage message,
             string? accessToken,
             TBody body,
             CancellationToken cancellationToken)
         {
-            SetMessageContent(message, body);
-            return SendMessageAsync<TResponse>(httpClient, message, accessToken, cancellationToken);
+            using var content = SetMessageContent(message, body);
+
+            return await SendMessageAsync<TResponse>(httpClient, message, accessToken, cancellationToken)
+                .ConfigureAwait(false);
+
+            // Disposes of content here. Need to use async.
         }
 
-        public static ValueTask SendMessageAsync<TBody>(
+        public static async ValueTask SendMessageAsync<TBody>(
             this HttpClient httpClient,
             HttpRequestMessage message,
             string? accessToken,
             TBody body,
             CancellationToken cancellationToken)
         {
-            SetMessageContent(message, body);
-            return SendMessageAsync(httpClient, message, accessToken, cancellationToken);
+            using var content = SetMessageContent(message, body);
+
+            await SendMessageAsync(httpClient, message, accessToken, cancellationToken)
+                .ConfigureAwait(false);
+
+            // Disposes of content here. Need to use async.
         }
 
         public static async ValueTask<TResponse> SendMessageAsync<TResponse>(
@@ -79,13 +87,15 @@ namespace TypingRealm.Communication
                 message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
-        private static void SetMessageContent<TContent>(HttpRequestMessage message, TContent body)
+        private static StringContent SetMessageContent<TContent>(HttpRequestMessage message, TContent body)
         {
-            using var bodyStringContent = new StringContent(
+            var bodyStringContent = new StringContent(
                 JsonSerializer.Serialize(body, options: CreateJsonSerializerOptions()),
                 Encoding.UTF8,
                 "application/json");
             message.Content = bodyStringContent;
+
+            return bodyStringContent;
         }
 
         private static JsonSerializerOptions CreateJsonSerializerOptions()
