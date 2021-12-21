@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
@@ -95,6 +96,12 @@ namespace TypingRealm.Hosting
             // Web API controllers.
             var mvcBuilder = services.AddControllers();
             mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(DiagnosticsController).Assembly));
+
+            mvcBuilder.AddJsonOptions(options =>
+            {
+                // Accept enum values as strings to Web API endpoints.
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             // If host has custom APIs.
             if (controllersAssembly != null)
