@@ -70,7 +70,12 @@ namespace TypingRealm.Data.Api.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("generate")]
-        public async ValueTask<ActionResult<string>> GenerateTextValue(int length, TextGenerationType textType = TextGenerationType.Text, string? language = "en")
+        public async ValueTask<ActionResult<string>> GenerateTextValue(
+            int length,
+            TextGenerationType textType = TextGenerationType.Text,
+            string? language = "en",
+            int maxShouldContainErrors = 10,
+            int maxShouldContainSlow = 10)
         {
             if (language == null)
                 language = "en";
@@ -86,13 +91,13 @@ namespace TypingRealm.Data.Api.Controllers
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
                     .OrderByDescending(x => x.MistakesToSuccessRatio)
                     .Select(x => $"{x.FromKey}{x.ToKey}")
-                    .Take(10));
+                    .Take(maxShouldContainErrors));
 
                 shouldContain.AddRange(data.KeyPairs
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
                     .OrderByDescending(x => x.AverageDelay)
                     .Select(x => $"{x.FromKey}{x.ToKey}")
-                    .Take(10));
+                    .Take(maxShouldContainSlow));
             }
 
             //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));

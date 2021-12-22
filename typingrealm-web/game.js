@@ -20,6 +20,11 @@ async function main() {
     if (language == undefined) language = "en";
     setUrls();
 
+    let maxShouldContainErrors = url.searchParams.get('maxShouldContainErrors');
+    if (!maxShouldContainErrors) maxShouldContainErrors = 10;
+    let maxShouldContainSlow = url.searchParams.get('maxShouldContainSlow');
+    if (!maxShouldContainSlow) maxShouldContainSlow = 10;
+
     function setUrls() {
         if (!env || env == 'prod') {
             env = 'prod';
@@ -98,7 +103,7 @@ async function main() {
     const simulationSpeedMultiplierElement = document.getElementById('simulationSpeedMultiplier');
     const hintElement = document.getElementById('hint');
     const reportElement = document.getElementById('report');
-    const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}&language=${language}`;
+    const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textType=${textType}&language=${language}&maxShouldContainErrors=${maxShouldContainErrors}&maxShouldContainSlow=${maxShouldContainSlow}`;
     const authTokenRequestUrl = `${PROFILES_URL}/api/local-auth/profile-token?sub=${profile}`;
     const dataSubmitUrl = `${DATA_URL}/api/usersessions/result`;
     const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable?language=${language}`;
