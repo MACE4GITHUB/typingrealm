@@ -5,7 +5,7 @@ using TypingRealm.Texts.Api.Client;
 
 namespace TypingRealm.Texts.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route(ServiceConfiguration.TextsApiPrefix)]
 public sealed class TextsController : TyrController
 {
     private readonly ITextGenerator _textGenerator;
@@ -17,7 +17,7 @@ public sealed class TextsController : TyrController
 
     [HttpPost]
     [Route("generate")]
-    public async ValueTask<ActionResult<GeneratedText>> GenerateText([FromBody] TextGenerationConfiguration configuration)
+    public async ValueTask<ActionResult<GeneratedText>> GenerateText(TextGenerationConfiguration configuration)
     {
         var text = await _textGenerator.GenerateTextAsync(configuration);
 

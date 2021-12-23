@@ -6,13 +6,16 @@ namespace TypingRealm.Texts.Api.Client;
 
 public interface ITextsClient
 {
-    ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration, CancellationToken cancellationToken);
+    ValueTask<GeneratedText> GenerateTextAsync(
+        TextGenerationConfiguration configuration,
+        EndpointAuthenticationType authenticationType,
+        CancellationToken cancellationToken);
 }
 
 public sealed class TextsClient : ITextsClient
 {
-    public static readonly string ServiceName = "texts";
-    public static readonly string RoutePrefix = "api/texts";
+    public static readonly string ServiceName = ServiceConfiguration.ServiceName;
+    public static readonly string RoutePrefix = ServiceConfiguration.TextsApiPrefix;
     private readonly IServiceClient _serviceClient;
 
     public TextsClient(IServiceClient serviceClient)
@@ -20,12 +23,15 @@ public sealed class TextsClient : ITextsClient
         _serviceClient = serviceClient;
     }
 
-    public ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration, CancellationToken cancellationToken)
+    public ValueTask<GeneratedText> GenerateTextAsync(
+        TextGenerationConfiguration configuration,
+        EndpointAuthenticationType authenticationType,
+        CancellationToken cancellationToken)
     {
         return _serviceClient.PostAsync<TextGenerationConfiguration, GeneratedText>(
             ServiceName,
             $"{RoutePrefix}/generate",
-            EndpointAuthenticationType.Service, // TODO: Make sure this can be called by Profile as well, but still automatically get token when service calls it.
+            authenticationType,
             configuration,
             cancellationToken);
     }
