@@ -15,7 +15,6 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
     private readonly string _cachePrefix;
     private Task _fillProcess = Task.CompletedTask;
 
-    // TODO: Dispose of this.
     private readonly SemaphoreSlim _localLock = new SemaphoreSlim(1, 1);
 
     public CachedTextRetriever(
