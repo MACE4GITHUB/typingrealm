@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using TypingRealm.Messaging.Connections;
 
 namespace TypingRealm.Communication
 {

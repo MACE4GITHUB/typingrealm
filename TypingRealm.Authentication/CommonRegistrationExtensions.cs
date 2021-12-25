@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication.OAuth;
-using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Authentication
 {
@@ -25,9 +24,6 @@ namespace TypingRealm.Authentication
         {
             // S2S token issuer.
             services.AddTransient<IServiceTokenService, ServiceTokenService>();
-
-            // Adds possibility to query Profiles API (to get Profile data).
-            services.AddProfileApiClients();
 
             // Registers authentication data that is used by S2S token issuer and validation.
             services.AddSingleton<IAuthenticationInformationProvider>(authenticationInformationProvider);

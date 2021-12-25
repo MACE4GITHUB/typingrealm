@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Connections
+namespace TypingRealm
 {
     /// <summary>
     /// Lock that allows only one thread to enter at a time.

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Connections
+namespace TypingRealm
 {
     public static class LockExtensions
     {

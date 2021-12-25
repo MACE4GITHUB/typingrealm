@@ -4,6 +4,7 @@ using TypingRealm.Authentication.Service.Messages;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Serialization;
+using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Authentication.Service
 {
@@ -44,6 +45,9 @@ namespace TypingRealm.Authentication.Service
 
             // Wait for Authenticate message with valid token as the first message.
             services.Decorate<IConnectionInitializer, AuthenticateConnectionInitializer>();
+
+            // To query Characters API.
+            services.AddProfileApiClients();
 
             // Authorize Character: first message after authentication should be
             // Connect message with valid Character belonging to current Profile.

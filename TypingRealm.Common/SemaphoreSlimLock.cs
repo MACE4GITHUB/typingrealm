@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Connections
+namespace TypingRealm
 {
     public sealed class SemaphoreSlimLock : SyncManagedDisposable, ILock
     {
