@@ -17,6 +17,8 @@ api.typingrealm.com {
     handle_path /profiles/* {
         reverse_proxy typingrealm-profiles:80
     }
+
+    respond 404
 }
 
 dev.typingrealm.com {
@@ -39,6 +41,8 @@ dev.api.typingrealm.com {
     handle_path /texts/* {
         reverse_proxy dev-typingrealm-texts:80
     }
+
+    respond 404
 }
 
 localhost {
@@ -53,4 +57,6 @@ api.localhost {
     handle_path /profiles/* {
         reverse_proxy local-typingrealm-profiles:80
     }
+
+    respond 404
 }
