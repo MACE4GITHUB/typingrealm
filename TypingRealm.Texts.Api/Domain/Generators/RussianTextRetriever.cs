@@ -25,6 +25,8 @@ public sealed class RussianTextRetriever : ITextRetriever
         var count = 0; // Avoid endless loops.
         while (count < RetriesCount)
         {
+            count++;
+
             using var response = await httpClient.GetAsync("https://fish-text.ru/get?format=html")
                 .ConfigureAwait(false);
 
