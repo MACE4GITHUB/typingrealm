@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
+    <ProjectReference Include="..\TypingRealm.Profiles.Api.Resources\TypingRealm.Profiles.Api.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj" />
   </ItemGroup>
 
