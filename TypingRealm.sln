@@ -161,9 +161,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Texts.Api", "Ty
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Texts.Api.Client", "TypingRealm.Texts.Api.Client\TypingRealm.Texts.Api.Client.csproj", "{92AA1039-FEA0-40F9-A00E-62DA3158CC43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Texts.Core", "TypingRealm.Texts.Core\TypingRealm.Texts.Core.csproj", "{26FF34B3-3436-4F72-B255-663A8F3FBD78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Texts.Core", "TypingRealm.Texts.Core\TypingRealm.Texts.Core.csproj", "{26FF34B3-3436-4F72-B255-663A8F3FBD78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Texts", "TypingRealm.Texts\TypingRealm.Texts.csproj", "{A6DDA847-D8D6-4DD2-A425-74F4C27B8D02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Texts", "TypingRealm.Texts\TypingRealm.Texts.csproj", "{A6DDA847-D8D6-4DD2-A425-74F4C27B8D02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Texts.Infrastructure", "TypingRealm.Texts.Infrastructure\TypingRealm.Texts.Infrastructure.csproj", "{3481A963-9D3E-4C5B-B743-96B4FDE7F160}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -415,6 +417,10 @@ Global
 		{A6DDA847-D8D6-4DD2-A425-74F4C27B8D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6DDA847-D8D6-4DD2-A425-74F4C27B8D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6DDA847-D8D6-4DD2-A425-74F4C27B8D02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3481A963-9D3E-4C5B-B743-96B4FDE7F160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3481A963-9D3E-4C5B-B743-96B4FDE7F160}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3481A963-9D3E-4C5B-B743-96B4FDE7F160}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3481A963-9D3E-4C5B-B743-96B4FDE7F160}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -483,6 +489,7 @@ Global
 		{92AA1039-FEA0-40F9-A00E-62DA3158CC43} = {599F920A-F61F-49AC-AF17-420504F1852E}
 		{26FF34B3-3436-4F72-B255-663A8F3FBD78} = {599F920A-F61F-49AC-AF17-420504F1852E}
 		{A6DDA847-D8D6-4DD2-A425-74F4C27B8D02} = {599F920A-F61F-49AC-AF17-420504F1852E}
+		{3481A963-9D3E-4C5B-B743-96B4FDE7F160} = {599F920A-F61F-49AC-AF17-420504F1852E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

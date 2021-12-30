@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
-using TypingRealm.Texts;
+using TypingRealm.Texts.Infrastructure;
 using TypingRealm.Texts.Api.Controllers;
 
 [assembly: ApiController]

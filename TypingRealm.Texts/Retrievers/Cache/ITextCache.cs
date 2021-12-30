@@ -11,6 +11,6 @@ public interface ITextCache
     string Language { get; }
 
     ValueTask<int> GetCountAsync();
-    ValueTask<CachedText> GetRandomTextAsync();
+    ValueTask<CachedText?> GetRandomTextAsync();
     ValueTask AddTextsAsync(IEnumerable<CachedText> texts);
 }

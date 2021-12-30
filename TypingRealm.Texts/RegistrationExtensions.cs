@@ -11,7 +11,7 @@ public delegate ITextCache TextCacheResolver(string language);
 
 public static class RegistrationExtensions
 {
-    public static IServiceCollection AddTextsApi(this IServiceCollection services)
+    public static IServiceCollection AddTextsDomain(this IServiceCollection services)
     {
         // The retriever cache can be transient only if we inject a singleton local lock.
 

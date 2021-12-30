@@ -36,16 +36,19 @@ public sealed class InMemoryTextCache : ITextCache
         return new ValueTask<int>(_texts.Count);
     }
 
-    public ValueTask<CachedText> GetRandomTextAsync()
+    public ValueTask<CachedText?> GetRandomTextAsync()
     {
         while (true)
         {
+            if (_texts.IsEmpty)
+                return new ValueTask<CachedText?>((CachedText?)null);
+
             var index = RandomNumberGenerator.GetInt32(0, _texts.Count);
             var text = _texts.Values.ElementAtOrDefault(index);
             if (text == null)
                 continue; // In case some texts were removed (by future expiration feature).
 
-            return new ValueTask<CachedText>(text);
+            return new ValueTask<CachedText?>(text);
         }
     }
 }
