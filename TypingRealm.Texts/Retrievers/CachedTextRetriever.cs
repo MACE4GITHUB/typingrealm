@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using TypingRealm.Communication;
+using TypingRealm.Texts.Retrievers.Cache;
 
 namespace TypingRealm.Texts.Retrievers;
 
@@ -11,21 +10,20 @@ namespace TypingRealm.Texts.Retrievers;
 // Use DI principle instead, and implement caching abstraction in Infrastructure project.
 public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
 {
-    private const int CacheSize = 100;
+    private const int MinCacheSize = 50;
+    private const int FilledCacheSize = 100;
     private readonly ITextRetriever _textRetriever;
-    private readonly IServiceCacheProvider _cacheProvider;
-    private readonly string _cachePrefix;
+    private readonly ITextCache _textCache;
     private Task _fillProcess = Task.CompletedTask;
 
     private readonly SemaphoreSlim _localLock = new SemaphoreSlim(1, 1);
 
     public CachedTextRetriever(
         ITextRetriever textRetriever,
-        IServiceCacheProvider cacheProvider)
+        ITextCache textCache)
     {
         _textRetriever = textRetriever;
-        _cacheProvider = cacheProvider;
-        _cachePrefix = $"texts_{_textRetriever.Language}_";
+        _textCache = textCache;
     }
 
     public string Language => _textRetriever.Language;
@@ -34,13 +32,10 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
     {
         ThrowIfDisposed();
 
-        var cache = await GetCacheAsync().ConfigureAwait(false);
-
-        // TODO: Make sure this is hybrid cache: cache results in memory and listen to Redis changes.
-        var values = await cache.GetValueAsync<List<string>>(GetCacheKey())
+        var count = await _textCache.GetCountAsync()
             .ConfigureAwait(false);
 
-        if (values == null || values.Count < CacheSize)
+        if (count < FilledCacheSize)
         {
             await _localLock.WaitAsync().ConfigureAwait(false);
             try
@@ -53,23 +48,22 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
                 _localLock.Release();
             }
 
-            return await _textRetriever.RetrieveTextAsync().ConfigureAwait(false);
+            if (count < MinCacheSize)
+                return await _textRetriever.RetrieveTextAsync().ConfigureAwait(false);
         }
 
-        // TODO: Move out Randomizer to Common project.
-        // TODO: Return multiple Text in one response, not just one.
-        var index = RandomNumberGenerator.GetInt32(0, values.Count);
-        var text = values[index];
-        return text;
-    }
+        var cachedText = await _textCache.GetRandomTextAsync().ConfigureAwait(false);
+        if (cachedText == null)
+            return await _textRetriever.RetrieveTextAsync().ConfigureAwait(false);
 
-    private static string GetCacheKey() => "Text";
+        return cachedText.Value;
+    }
 
     private async Task FillCacheAsync()
     {
         var texts = new HashSet<string>();
 
-        for (var i = 0; i < CacheSize; i++)
+        for (var i = 0; i < FilledCacheSize; i++)
         {
             var text = await _textRetriever.RetrieveTextAsync()
                 .ConfigureAwait(false);
@@ -79,30 +73,9 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
             texts.UnionWith(Text);
         }
 
-        var cache = await GetCacheAsync().ConfigureAwait(false);
-        var @lock = cache.AcquireDistributedLock();
-        await @lock.WaitAsync(default).ConfigureAwait(false);
-        try
-        {
-            var values = await cache.GetValueAsync<List<string>>(GetCacheKey())
-                .ConfigureAwait(false);
-
-            if (values == null)
-                values = new List<string>();
-
-            values.AddRange(texts);
-            values = values.Distinct().ToList();
-
-            await cache.SetValueAsync(GetCacheKey(), values).ConfigureAwait(false);
-        }
-        finally
-        {
-            await @lock.ReleaseAsync(default).ConfigureAwait(false);
-        }
+        await _textCache.AddTextsAsync(texts.Select(value => new CachedText(value)))
+            .ConfigureAwait(false);
     }
-
-    // TODO: Move this method to common helpers as it's also needed in TextGenerator.
-    private ValueTask<ITyrCache> GetCacheAsync() => _cacheProvider.GetServiceCacheAsync(_cachePrefix);
 
     protected override void DisposeManagedResources()
     {

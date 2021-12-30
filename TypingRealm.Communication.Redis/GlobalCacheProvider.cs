@@ -72,18 +72,17 @@ namespace TypingRealm.Communication.Redis
         }
 
         public async ValueTask<T?> GetValueAsync<T>(string key)
-            where T : class
         {
             var value = await _database.StringGetAsync(GetRedisKey(key))
                 .ConfigureAwait(false);
 
             if (!value.HasValue)
-                return null;
+                return default; // TODO: Make sure customers of this method expect this behaviour (0 instead of null when T is INT).
 
             var stringValue = value.ToString();
 
-            if (typeof(T) == typeof(string))
-                return stringValue as T;
+            if (typeof(T).IsPrimitive || typeof(T) == typeof(string))
+                return (T)Convert.ChangeType(stringValue, typeof(T));
 
             var deserialized = JsonSerializer.Deserialize<T>(stringValue);
             if (deserialized == null)

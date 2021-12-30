@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
     <ProjectReference Include="..\TypingRealm.Texts.Core\TypingRealm.Texts.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Texts.Infrastructure\TypingRealm.Texts.Infrastructure.csproj" />
     <ProjectReference Include="..\TypingRealm.Texts\TypingRealm.Texts.csproj" />
   </ItemGroup>
 

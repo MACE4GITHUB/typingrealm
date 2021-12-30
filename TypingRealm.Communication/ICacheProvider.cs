@@ -4,8 +4,7 @@ namespace TypingRealm.Communication
 {
     public interface ITyrCache
     {
-        ValueTask<T?> GetValueAsync<T>(string key)
-            where T : class;
+        ValueTask<T?> GetValueAsync<T>(string key);
 
         ValueTask SetValueAsync<T>(string key, T value);
 

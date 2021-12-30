@@ -13,6 +13,7 @@ COPY ["TypingRealm.Hosting/TypingRealm.Hosting.csproj", "TypingRealm.Hosting/"]
 COPY ["TypingRealm.Profiles.Core/TypingRealm.Profiles.Core.csproj", "TypingRealm.Profiles.Core/"]
 COPY ["TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj", "TypingRealm.Texts.Api/"]
 COPY ["TypingRealm.Texts.Core/TypingRealm.Texts.Core.csproj", "TypingRealm.Texts.Core/"]
+COPY ["TypingRealm.Texts.Infrastructure/TypingRealm.Texts.Infrastructure.csproj", "TypingRealm.Texts.Infrastructure/"]
 COPY ["TypingRealm.Texts/TypingRealm.Texts.csproj", "TypingRealm.Texts/"]
 RUN dotnet restore "TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj"
 COPY . .

@@ -1,11 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Texts.Core\TypingRealm.Texts.Core.csproj" />
   </ItemGroup>
 
