@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Communication;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles;
+using TypingRealm.Texts;
 using TypingRealm.Texts.Api.Client;
 using TypingRealm.Typing;
 
@@ -102,7 +103,7 @@ namespace TypingRealm.Data.Api.Controllers
             }
 
             //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
-            var generatedText = await _textsClient.GenerateTextAsync(new Texts.Api.Client.TextGenerationConfiguration(language, length, textType, shouldContain), EndpointAuthenticationType.Service, default);
+            var generatedText = await _textsClient.GenerateTextAsync(new Texts.TextGenerationConfiguration(language, length, textType, shouldContain), EndpointAuthenticationType.Service, default);
             var textValue = generatedText.Value;
 
             var textId = await _textRepository.NextIdAsync();

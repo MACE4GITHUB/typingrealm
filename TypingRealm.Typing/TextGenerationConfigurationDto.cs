@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using TypingRealm.Texts.Api.Client;
+using TypingRealm.Texts;
 
 namespace TypingRealm.Typing
 {

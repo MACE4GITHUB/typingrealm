@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using TypingRealm.Texts.Api.Client;
+using TypingRealm.Texts;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Infrastructure.DataAccess.Entities

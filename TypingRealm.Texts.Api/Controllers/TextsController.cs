@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
-using TypingRealm.Texts.Api.Client;
 
 namespace TypingRealm.Texts.Api.Controllers;
 

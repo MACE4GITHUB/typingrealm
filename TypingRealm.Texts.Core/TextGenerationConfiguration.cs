@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TypingRealm.Texts.Api.Client;
+namespace TypingRealm.Texts;
 
 // Here will be some additional properties like remove punctuation or only lowercase.
 public sealed record TextGenerationConfiguration(

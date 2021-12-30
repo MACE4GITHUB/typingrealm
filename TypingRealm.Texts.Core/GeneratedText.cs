@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.Texts.Api.Client;
+﻿namespace TypingRealm.Texts;
 
 public sealed record GeneratedText(
     string Value);

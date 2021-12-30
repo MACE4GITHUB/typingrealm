@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using TypingRealm.Texts.Api.Client;
+using TypingRealm.Texts;
 using TypingRealm.Typing.Framework;
 
 namespace TypingRealm.Typing
