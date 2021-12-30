@@ -40,7 +40,7 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
 
         if (values == null || values.Count < CacheSize)
         {
-            await _localLock.WaitAsync();
+            await _localLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (_fillProcess.IsCompleted)
@@ -51,7 +51,7 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
                 _localLock.Release();
             }
 
-            return await _textRetriever.RetrieveTextAsync();
+            return await _textRetriever.RetrieveTextAsync().ConfigureAwait(false);
         }
 
         // TODO: Move out Randomizer to Common project.
@@ -91,11 +91,11 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
             values.AddRange(texts);
             values = values.Distinct().ToList();
 
-            await cache.SetValueAsync(GetCacheKey(), values);
+            await cache.SetValueAsync(GetCacheKey(), values).ConfigureAwait(false);
         }
         finally
         {
-            await @lock.ReleaseAsync(default);
+            await @lock.ReleaseAsync(default).ConfigureAwait(false);
         }
     }
 
