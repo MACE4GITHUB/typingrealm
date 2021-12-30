@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Communication;
-using TypingRealm.Texts.Generators;
+using TypingRealm.Texts.Retrievers;
 
 namespace TypingRealm.Texts;
 

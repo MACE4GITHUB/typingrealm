@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Texts.Generators;
+namespace TypingRealm.Texts.Retrievers;
 
 public sealed class RussianTextRetriever : ITextRetriever
 {

@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Texts.Generators;
+namespace TypingRealm.Texts.Retrievers;
 
 public sealed class EnglishTextRetriever : ITextRetriever
 {

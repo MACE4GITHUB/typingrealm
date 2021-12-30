@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Communication;
 
-namespace TypingRealm.Texts.Generators;
+namespace TypingRealm.Texts.Retrievers;
 
 // TODO: Consider not using IServiceCacheProvider here and not referencing Communication assembly.
 // Use DI principle instead, and implement caching abstraction in Infrastructure project.
