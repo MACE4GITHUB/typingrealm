@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using TypingRealm.Communication;
 using TypingRealm.Texts.Retrievers;
+using TypingRealm.Texts.Retrievers.Cache;
 
 namespace TypingRealm.Texts;
 
 public delegate ITextRetriever TextRetrieverResolver(string language);
+public delegate ITextCache TextCacheResolver(string language);
 
 public static class RegistrationExtensions
 {
@@ -21,12 +22,15 @@ public static class RegistrationExtensions
             services.AddTransient<EnglishTextRetriever>();
             services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
                 provider.GetRequiredService<EnglishTextRetriever>(),
-                provider.GetRequiredService<IServiceCacheProvider>()));
+                provider.GetRequiredService<TextCacheResolver>()("en")));
 
             services.AddTransient<RussianTextRetriever>();
             services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
                 provider.GetRequiredService<RussianTextRetriever>(),
-                provider.GetRequiredService<IServiceCacheProvider>()));
+                provider.GetRequiredService<TextCacheResolver>()("ru")));
+
+            services.AddSingleton<ITextCache>(provider => new InMemoryTextCache("en"));
+            services.AddSingleton<ITextCache>(provider => new InMemoryTextCache("ru"));
         }
         else
         {
@@ -48,12 +52,23 @@ public static class RegistrationExtensions
         services.AddTransient<TextRetrieverResolver>(provider => language =>
         {
             var retriever = provider.GetServices<ITextRetriever>()
-                .LastOrDefault(generator => generator.Language == language);
+                .LastOrDefault(retriever => retriever.Language == language);
 
             if (retriever == null)
                 throw new NotSupportedException($"Text generator for language {language} is not supported.");
 
             return retriever;
+        });
+
+        services.AddTransient<TextCacheResolver>(provider => language =>
+        {
+            var cache = provider.GetServices<ITextCache>()
+                .LastOrDefault(cache => cache.Language == language);
+
+            if (cache == null)
+                throw new NotSupportedException($"Text cache for language {language} is not registered.");
+
+            return cache;
         });
 
         return services;
