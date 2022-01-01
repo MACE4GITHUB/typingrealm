@@ -13,24 +13,12 @@ public static class RegistrationExtensions
 {
     public static IServiceCollection AddTextsDomain(this IServiceCollection services)
     {
-        // The retriever cache can be transient only if we inject a singleton local lock.
-
         services.AddTransient<ITextGenerator, TextGenerator>();
 
         if (DebugHelpers.UseInfrastructure)
         {
             services.AddTransient<EnglishTextRetriever>();
-            services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
-                provider.GetRequiredService<EnglishTextRetriever>(),
-                provider.GetRequiredService<TextCacheResolver>()("en")));
-
             services.AddTransient<RussianTextRetriever>();
-            services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
-                provider.GetRequiredService<RussianTextRetriever>(),
-                provider.GetRequiredService<TextCacheResolver>()("ru")));
-
-            services.AddSingleton<ITextCache>(provider => new InMemoryTextCache("en"));
-            services.AddSingleton<ITextCache>(provider => new InMemoryTextCache("ru"));
         }
         else
         {
