@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel.OidcClient;
 using TypingRealm.Messaging.Client;
-using TypingRealm.Messaging.Connections;
 
 namespace TypingRealm.Authentication.ConsoleClient.TokenProviders
 {
