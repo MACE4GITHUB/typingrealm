@@ -66,9 +66,9 @@ namespace TypingRealm.Communication.Redis
             _keyPrefix = keyPrefix;
         }
 
-        public IDistributedLock AcquireDistributedLock()
+        public IDistributedLock AcquireDistributedLock(TimeSpan expiration)
         {
-            return new RedisDistributedLock(_database, _keyPrefix, TimeSpan.FromDays(1));
+            return new RedisDistributedLock(_database, _keyPrefix, expiration);
         }
 
         public async ValueTask<T?> GetValueAsync<T>(string key)

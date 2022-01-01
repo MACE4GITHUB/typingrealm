@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace TypingRealm.Communication
 {
@@ -8,7 +9,7 @@ namespace TypingRealm.Communication
 
         ValueTask SetValueAsync<T>(string key, T value);
 
-        IDistributedLock AcquireDistributedLock();
+        IDistributedLock AcquireDistributedLock(TimeSpan expiration);
     }
 
     public interface IDistributedLock : ILock
@@ -22,6 +23,14 @@ namespace TypingRealm.Communication
 
         public static ValueTask SetValueAsync(this ITyrCache cache, string key, string value)
             => cache.SetValueAsync<string>(key, value);
+
+        /// <summary>
+        /// Acquires distributed lock with default expiration time of 1 hour.
+        /// </summary>
+        /// <param name="cache"></param>
+        /// <returns></returns>
+        public static IDistributedLock AcquireDistributedLock(this ITyrCache cache)
+            => cache.AcquireDistributedLock(TimeSpan.FromHours(1));
     }
 
     public interface IGlobalCacheProvider
