@@ -22,24 +22,23 @@ namespace TypingRealm.Texts.Infrastructure
                 .ConfigureAwait(false);
 
             var @lock = cache.AcquireDistributedLock();
-            await using (await @lock.UseWaitAsync(default).ConfigureAwait(false))
-            {
-                var values = await cache.GetValueAsync<List<CachedText>>("texts")
-                    .ConfigureAwait(false);
+            await using var _ = (await @lock.UseWaitAsync(default).ConfigureAwait(false)).ConfigureAwait(false);
 
-                if (values == null)
-                    values = new List<CachedText>();
+            var values = await cache.GetValueAsync<List<CachedText>>("texts")
+                .ConfigureAwait(false);
 
-                var newValues = values.Concat(texts)
-                    .DistinctBy(x => x.Value)
-                    .ToList();
+            if (values == null)
+                values = new List<CachedText>();
 
-                await cache.SetValueAsync("count", newValues.Count)
-                    .ConfigureAwait(false);
+            var newValues = values.Concat(texts)
+                .DistinctBy(x => x.Value)
+                .ToList();
 
-                await cache.SetValueAsync("texts", newValues)
-                    .ConfigureAwait(false);
-            }
+            await cache.SetValueAsync("count", newValues.Count)
+                .ConfigureAwait(false);
+
+            await cache.SetValueAsync("texts", newValues)
+                .ConfigureAwait(false);
         }
 
         public async ValueTask<int> GetCountAsync()
