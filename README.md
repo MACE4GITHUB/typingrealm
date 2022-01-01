@@ -82,6 +82,7 @@ to issue & debug tokens, since Profiles API already has an endpoint to get the
 test token which is being used by the frontend)
 - TypingRealm.Profiles.Api
 - TypingRealm.Data.Api
+- TypingRealm.Texts.Api (new Texts API, more documentation will soon follow)
 
 By default (current implementation at the time of writing this README), data is
 being stored in *.json files in the folder of TypingRealm.Data.Api project. You
