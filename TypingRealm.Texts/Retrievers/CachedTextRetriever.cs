@@ -6,8 +6,6 @@ using TypingRealm.Texts.Retrievers.Cache;
 
 namespace TypingRealm.Texts.Retrievers;
 
-// TODO: Consider not using IServiceCacheProvider here and not referencing Communication assembly.
-// Use DI principle instead, and implement caching abstraction in Infrastructure project.
 public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
 {
     private const int MinCacheSize = 50;
