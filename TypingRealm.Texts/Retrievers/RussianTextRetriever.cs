@@ -1,51 +1,24 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace TypingRealm.Texts.Retrievers;
 
-public sealed class RussianTextRetriever : ITextRetriever
+public sealed class RussianTextRetriever : HttpTextRetriever
 {
-    private const int RetriesCount = 10;
-    private static readonly string _allowedLetters = "'\",<.>/?=+\\|-_;: 1!2@3#4$5%6^7&8*9(0)[{]}`~йЙцЦуУкКеЕнНгГшШщЩзЗхХъЪфФыЫвВаАпПрРоОлЛдДжЖэЭяЯчЧсСмМиИтТьЬбБюЮёЁ";
-    private readonly IHttpClientFactory _httpClientFactory;
-
     public RussianTextRetriever(IHttpClientFactory httpClientFactory)
+        : base(httpClientFactory, "ru", new Uri("https://fish-text.ru/get?format=html"))
     {
-        _httpClientFactory = httpClientFactory;
     }
 
-    public string Language => "ru";
+    protected override string AllowedLetters => "'\",<.>/?=+\\|-_;: 1!2@3#4$5%6^7&8*9(0)[{]}`~йЙцЦуУкКеЕнНгГшШщЩзЗхХъЪфФыЫвВаАпПрРоОлЛдДжЖэЭяЯчЧсСмМиИтТьЬбБюЮёЁ";
 
-    public async ValueTask<string> RetrieveTextAsync()
+    protected override string ResponseHandler(string response)
     {
-        var httpClient = _httpClientFactory.CreateClient();
+        var value = response.Replace("<p>", string.Empty).Replace("</p>", string.Empty);
 
-        var count = 0; // Avoid endless loops.
-        while (count < RetriesCount)
-        {
-            count++;
+        if (string.IsNullOrWhiteSpace(value))
+            throw new InvalidOperationException("Text API returned empty text.");
 
-            using var response = await httpClient.GetAsync("https://fish-text.ru/get?format=html")
-                .ConfigureAwait(false);
-
-            response.EnsureSuccessStatusCode();
-
-            var content = await response.Content.ReadAsStringAsync()
-                .ConfigureAwait(false);
-
-            var value = content.Replace("<p>", string.Empty).Replace("</p>", string.Empty);
-
-            if (string.IsNullOrWhiteSpace(value))
-                throw new InvalidOperationException("Text API returned empty text.");
-
-            if (!value.All(character => _allowedLetters.Contains(character)))
-                continue;
-
-            return value;
-        }
-
-        throw new InvalidOperationException("Could not get text within allowed characters limit.");
+        return value;
     }
 }
