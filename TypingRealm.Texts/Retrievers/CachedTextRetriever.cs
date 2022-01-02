@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using TypingRealm.Texts.Retrievers.Cache;
 
 namespace TypingRealm.Texts.Retrievers;
 
-public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
+public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
 {
     private const int MinCacheSize = 50;
     private const int FilledCacheSize = 100;
@@ -39,7 +40,7 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
             try
             {
                 if (_fillProcess.IsCompleted)
-                    _fillProcess = FillCacheAsync();
+                    _fillProcess = FillCacheAsync(); // TODO: Consider logging exceptions.
             }
             finally
             {
@@ -59,24 +60,25 @@ public sealed class CachedTextRetriever : SyncManagedDisposable, ITextRetriever
 
     private async Task FillCacheAsync()
     {
-        var texts = new HashSet<string>();
+        var uniqueSentences = new HashSet<string>();
 
         for (var i = 0; i < FilledCacheSize; i++)
         {
             var text = await _textRetriever.RetrieveTextAsync()
                 .ConfigureAwait(false);
 
-            var Text = TextGenerator.GetText(text);
-
-            texts.UnionWith(Text);
+            uniqueSentences.UnionWith(TextGenerator.GetSentencesEnumerable(text));
         }
 
-        await _textCache.AddTextsAsync(texts.Select(value => new CachedText(value)))
+        await _textCache.AddTextsAsync(uniqueSentences.Select(sentence => new CachedText(sentence)))
             .ConfigureAwait(false);
     }
 
-    protected override void DisposeManagedResources()
+    protected override async ValueTask DisposeManagedResourcesAsync()
     {
+        await _fillProcess.HandleExceptionAsync<Exception>(exception => { /* Consider logging it. */ })
+            .ConfigureAwait(false);
+
         _localLock.Dispose();
     }
 }

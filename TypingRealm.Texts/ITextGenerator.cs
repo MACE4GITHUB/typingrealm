@@ -22,17 +22,16 @@ public sealed class TextGenerator : ITextGenerator
         _textRetrieverResolver = textRetrieverResolver;
     }
 
-    public static IEnumerable<string> GetText(string text)
+    public static IEnumerable<string> GetSentencesEnumerable(string text)
     {
         return text.Split(". ", StringSplitOptions.RemoveEmptyEntries)
             .Select(text => text.TrimEnd('.'))
-            .Select(text => $"{text}.")
-            .ToList();
+            .Select(text => $"{text}.");
     }
 
-    public static IEnumerable<string> GetWords(string text)
+    public static IList<string> GetWords(string text)
     {
-        return GetText(text)
+        return GetSentencesEnumerable(text)
             .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries))
             .ToList();
     }
@@ -89,9 +88,9 @@ public sealed class TextGenerator : ITextGenerator
             var text = await textRetriever.RetrieveTextAsync()
                 .ConfigureAwait(false);
 
-            var Text = GetText(text);
+            var sentences = GetSentencesEnumerable(text);
 
-            foreach (var sentence in Text)
+            foreach (var sentence in sentences)
             {
                 if (builder.Length == 0)
                 {
