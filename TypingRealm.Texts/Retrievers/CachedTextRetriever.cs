@@ -90,6 +90,8 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
 
         await _textCache.AddTextsAsync(uniqueSentences.Select(sentence => new CachedText(sentence)))
             .ConfigureAwait(false);
+
+        _logger.LogInformation($"Filled cache for '{Language}' language with {uniqueSentences.Count} unique sentences.");
     }
 
     protected override async ValueTask DisposeManagedResourcesAsync()
