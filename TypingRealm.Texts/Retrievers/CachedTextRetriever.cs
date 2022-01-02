@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TypingRealm.Texts.Retrievers.Cache;
 
 namespace TypingRealm.Texts.Retrievers;
@@ -11,6 +12,7 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
 {
     private const int MinCacheSize = 50;
     private const int FilledCacheSize = 100;
+    private readonly ILogger<CachedTextRetriever> _logger;
     private readonly ITextRetriever _textRetriever;
     private readonly ITextCache _textCache;
     private Task _fillProcess = Task.CompletedTask;
@@ -18,9 +20,11 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
     private readonly SemaphoreSlim _localLock = new SemaphoreSlim(1, 1);
 
     public CachedTextRetriever(
+        ILogger<CachedTextRetriever> logger,
         ITextRetriever textRetriever,
         ITextCache textCache)
     {
+        _logger = logger;
         _textRetriever = textRetriever;
         _textCache = textCache;
     }
@@ -40,7 +44,10 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
             try
             {
                 if (_fillProcess.IsCompleted)
-                    _fillProcess = FillCacheAsync(); // TODO: Consider logging exceptions.
+                    _fillProcess = FillCacheAsync().HandleExceptionAsync<Exception>(exception =>
+                    {
+                        _logger.LogWarning(exception, $"Error while filling cache in background for {nameof(CachedTextRetriever)} ({Language} language).");
+                    });
             }
             finally
             {
@@ -64,11 +71,22 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
 
         for (var i = 0; i < FilledCacheSize; i++)
         {
-            var text = await _textRetriever.RetrieveTextAsync()
-                .ConfigureAwait(false);
+            try
+            {
+                var text = await _textRetriever.RetrieveTextAsync()
+                    .ConfigureAwait(false);
 
-            uniqueSentences.UnionWith(TextGenerator.GetSentencesEnumerable(text));
+                uniqueSentences.UnionWith(TextGenerator.GetSentencesEnumerable(text));
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, $"Error while trying to receive a text in {nameof(FillCacheAsync)} method, stopping filling cache ({Language} language).");
+                break;
+            }
         }
+
+        if (uniqueSentences.Count == 0)
+            return;
 
         await _textCache.AddTextsAsync(uniqueSentences.Select(sentence => new CachedText(sentence)))
             .ConfigureAwait(false);
@@ -76,8 +94,10 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
 
     protected override async ValueTask DisposeManagedResourcesAsync()
     {
-        await _fillProcess.HandleExceptionAsync<Exception>(exception => { /* Consider logging it. */ })
-            .ConfigureAwait(false);
+        await _fillProcess.HandleExceptionAsync<Exception>(exception =>
+        {
+            _logger.LogWarning(exception, $"Error while waiting for {nameof(_fillProcess)} when disposing resources in {nameof(CachedTextRetriever)} ({Language} language.");
+        }).ConfigureAwait(false);
 
         _localLock.Dispose();
     }

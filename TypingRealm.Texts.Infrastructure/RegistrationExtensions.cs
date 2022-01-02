@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TypingRealm.Communication;
 using TypingRealm.Texts.Retrievers;
 using TypingRealm.Texts.Retrievers.Cache;
@@ -24,6 +25,7 @@ namespace TypingRealm.Texts.Infrastructure
         {
             // The retriever cache can be transient only if we inject a singleton local lock.
             services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
+                provider.GetRequiredService<ILogger<CachedTextRetriever>>(),
                 (ITextRetriever)provider.GetRequiredService(textRetrieverType),
                 provider.GetRequiredService<TextCacheResolver>()(language)));
 
