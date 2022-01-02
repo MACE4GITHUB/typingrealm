@@ -11,19 +11,20 @@ namespace TypingRealm.Texts.Infrastructure
         {
             services.AddTextsDomain();
 
-            services.AddTextRetrieverCache<EnglishTextRetriever>("en");
-            services.AddTextRetrieverCache<RussianTextRetriever>("ru");
+            foreach (var config in SupportedLanguages.SupportedTextRetrievers)
+            {
+                services.AddTextRetrieverCache(config.Value, config.Key);
+            }
 
             return services;
         }
 
-        private static IServiceCollection AddTextRetrieverCache<TTextRetriever>(
-            this IServiceCollection services, string language)
-            where TTextRetriever : ITextRetriever
+        private static IServiceCollection AddTextRetrieverCache(
+            this IServiceCollection services, Type textRetrieverType, string language)
         {
             // The retriever cache can be transient only if we inject a singleton local lock.
             services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
-                provider.GetRequiredService<TTextRetriever>(),
+                (ITextRetriever)provider.GetRequiredService(textRetrieverType),
                 provider.GetRequiredService<TextCacheResolver>()(language)));
 
             if (DebugHelpers.UseInfrastructure)
