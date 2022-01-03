@@ -12,6 +12,8 @@ namespace TypingRealm.Typing
 
     public enum TextType
     {
+        Unspecified = 0,
+
         Generated = 1,
         User = 2
     }

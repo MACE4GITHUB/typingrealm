@@ -26,6 +26,8 @@ namespace TypingRealm.Typing
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum KeyAction
     {
+        Unspecified = 0,
+
         Press = 1,
         Release = 2
     }

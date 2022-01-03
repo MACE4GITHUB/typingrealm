@@ -72,6 +72,8 @@ namespace TypingRealm.World.Layers
 
     public enum Layer
     {
+        Unspecified = 0,
+
         World = 1,
         RopeWar = 2,
         Road = 3,

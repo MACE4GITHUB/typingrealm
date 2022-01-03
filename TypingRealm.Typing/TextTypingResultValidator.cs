@@ -7,6 +7,8 @@ namespace TypingRealm.Typing
 {
     public enum KeyPairType
     {
+        Unspecified = 0,
+
         Correct = 1,
         Mistake = 2,
         Correction = 3

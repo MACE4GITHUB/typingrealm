@@ -9,6 +9,8 @@ namespace TypingRealm.Hosting
 {
     public enum ServiceToServiceCallType
     {
+        Unspecified = 0,
+
         UserProtected = 1,
         ServiceProtected = 2,
         Protected = 3,

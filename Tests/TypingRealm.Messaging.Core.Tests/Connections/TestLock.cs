@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TypingRealm.Messaging.Connections;
 
 namespace TypingRealm.Messaging.Tests.Connections
 {
