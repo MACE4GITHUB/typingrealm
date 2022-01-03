@@ -254,6 +254,9 @@ dotnet_diagnostic.CA1062.severity = silent
 # I don't care about logging performance.
 dotnet_diagnostic.CA1848.severity = silent
 
+# Allow builder methods (services registration, custom factories).
+dotnet_diagnostic.IDE0058.severity = silent
+
 
 
 # === Tests ===
