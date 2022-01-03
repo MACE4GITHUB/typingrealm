@@ -251,6 +251,9 @@ dotnet_diagnostic.CA1307.severity = silent
 # We use strict NullableReferenceTypes: don't check for nulls.
 dotnet_diagnostic.CA1062.severity = silent
 
+# I don't care about logging performance.
+dotnet_diagnostic.CA1848.severity = silent
+
 
 
 # === Tests ===

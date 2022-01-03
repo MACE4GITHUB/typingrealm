@@ -46,7 +46,10 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
                 if (_fillProcess.IsCompleted)
                     _fillProcess = FillCacheAsync().HandleExceptionAsync<Exception>(exception =>
                     {
-                        _logger.LogWarning(exception, $"Error while filling cache in background for {nameof(CachedTextRetriever)} ({Language} language).");
+                        _logger.LogWarning(
+                            exception,
+                            "Error while filling text cache ({Language} language).",
+                            Language);
                     });
             }
             finally
@@ -80,7 +83,11 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, $"Error while trying to receive a text in {nameof(FillCacheAsync)} method, stopping filling cache ({Language} language).");
+                _logger.LogError(
+                    exception,
+                    "Error while trying to receive a text. Stopping filling cache ({Language} language).",
+                    Language);
+
                 break;
             }
         }
@@ -91,14 +98,19 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
         await _textCache.AddTextsAsync(uniqueSentences.Select(sentence => new CachedText(sentence)))
             .ConfigureAwait(false);
 
-        _logger.LogInformation($"Filled cache for '{Language}' language with {uniqueSentences.Count} unique sentences.");
+        _logger.LogInformation(
+            "Filled cache for '{Language}' language with {UniqueSentencesCount} unique sentences.",
+            Language, uniqueSentences.Count);
     }
 
     protected override async ValueTask DisposeManagedResourcesAsync()
     {
         await _fillProcess.HandleExceptionAsync<Exception>(exception =>
         {
-            _logger.LogWarning(exception, $"Error while waiting for {nameof(_fillProcess)} when disposing resources in {nameof(CachedTextRetriever)} ({Language} language.");
+            _logger.LogWarning(
+                exception,
+                "Error while waiting for ending filling cache when disposing resources ({Language} language).",
+                Language);
         }).ConfigureAwait(false);
 
         _localLock.Dispose();

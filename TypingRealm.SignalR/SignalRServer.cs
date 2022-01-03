@@ -77,11 +77,17 @@ namespace TypingRealm.SignalR
                     .HandleAsync(connection, combinedCts.Token)
                     .HandleCancellationAsync(exception =>
                     {
-                        _logger.LogDebug(exception, $"Cancellation request received for client: {connectionDetails}");
+                        _logger.LogDebug(
+                            exception,
+                            "Cancellation request received for client: {ConnectionDetails}",
+                            connectionDetails);
                     })
                     .HandleExceptionAsync<Exception>(exception =>
                     {
-                        _logger.LogError(exception, $"Error happened while handling SignalR connection: {connectionDetails}");
+                        _logger.LogError(
+                            exception,
+                            "Error happened while handling SignalR connection: {ConnectionDetails}",
+                            connectionDetails);
                     });
 
                 var resource = new SignalRConnectionResource(
@@ -104,7 +110,10 @@ namespace TypingRealm.SignalR
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, $"Error happened when creating or handling SignalR connection: {connectionDetails}");
+                _logger.LogError(
+                    exception,
+                    "Error happened when creating or handling SignalR connection: {ConnectionDetails}",
+                    connectionDetails);
             }
             finally
             {

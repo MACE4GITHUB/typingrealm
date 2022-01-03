@@ -133,11 +133,17 @@ namespace TypingRealm.Tcp
                     .HandleAsync(connection, _cts.Token)
                     .HandleCancellationAsync(exception =>
                     {
-                        _logger.LogDebug(exception, $"Cancellation request received for client: {connectionDetails}");
+                        _logger.LogDebug(
+                            exception,
+                            "Cancellation request received for client: {ConnectionDetails}",
+                            connectionDetails);
                     })
                     .HandleExceptionAsync<Exception>(exception =>
                     {
-                        _logger.LogError(exception, $"Error happened while handling TCP connection: {connectionDetails}");
+                        _logger.LogError(
+                            exception,
+                            "Error happened while handling TCP connection: {ConnectionDetails}",
+                            connectionDetails);
                     });
 
                 _connectionProcessors.Add(task);
@@ -149,7 +155,10 @@ namespace TypingRealm.Tcp
             catch (Exception exception)
 #pragma warning restore CA1031
             {
-                _logger.LogError(exception, $"Error happened while creating TCP connection: {connectionDetails}");
+                _logger.LogError(
+                    exception,
+                    "Error happened while creating TCP connection: {ConnectionDetails}",
+                    connectionDetails);
             }
             finally
             {

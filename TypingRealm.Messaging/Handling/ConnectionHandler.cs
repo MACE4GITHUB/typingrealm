@@ -89,7 +89,9 @@ namespace TypingRealm.Messaging.Handling
 
                     if (messageWithMetadata.Metadata.MessageId != null && idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
                     {
-                        _logger.LogDebug($"Message with id {messageWithMetadata.Metadata.MessageId} has already been handled. Skipping duplicate (idempotency).");
+                        _logger.LogDebug(
+                            "Message with id {MessageId} has already been handled. Skipping duplicate (idempotency).",
+                            messageWithMetadata.Metadata.MessageId);
                         continue;
                     }
 
@@ -160,7 +162,11 @@ namespace TypingRealm.Messaging.Handling
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, $"There was an error when handling {message.GetType().Name} message for {sender.ClientId} client ID.");
+                _logger.LogError(
+                    exception,
+                    "There was an error when handling {MessageName} message for {SenderClientId} client ID.",
+                    message.GetType().Name,
+                    sender.ClientId);
 
 #pragma warning disable CA2012 // We store ValueTask in a variable to await it later once.
                 disconnecting = sender.Connection.SendAsync(new Disconnected($"Error when handling {message.GetType().Name} message."), cancellationToken);
@@ -182,7 +188,9 @@ namespace TypingRealm.Messaging.Handling
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogError(exception, $"Error during sending Disconnected message after message handling failed.");
+                    _logger.LogError(
+                        exception,
+                        "Error during sending Disconnected message after message handling failed.");
                 }
             }
         }
@@ -201,7 +209,7 @@ namespace TypingRealm.Messaging.Handling
             catch (Exception exception)
             {
                 // TODO: Disconnect player if update was unsuccessful. Currently it silently continues working (investigate).
-                _logger.LogError(exception, $"Error during sending pending updates.");
+                _logger.LogError(exception, "Error during sending pending updates.");
             }
         }
     }
