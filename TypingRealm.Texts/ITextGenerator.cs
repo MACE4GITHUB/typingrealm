@@ -29,11 +29,10 @@ public sealed class TextGenerator : ITextGenerator
             .Select(text => $"{text}.");
     }
 
-    public static IList<string> GetWords(string text)
+    public static IEnumerable<string> GetWordsEnumerable(string text)
     {
         return GetSentencesEnumerable(text)
-            .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            .ToList();
+            .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
 
     public ValueTask<string> GenerateTextAsync(TextGenerationConfiguration configuration)
@@ -122,7 +121,7 @@ public sealed class TextGenerator : ITextGenerator
             var text = await textRetriever.RetrieveTextAsync()
                 .ConfigureAwait(false);
 
-            var words = GetWords(text);
+            var words = GetWordsEnumerable(text);
 
             tries++;
             foreach (var word in words)
