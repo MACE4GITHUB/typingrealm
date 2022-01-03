@@ -72,6 +72,7 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
     {
         var uniqueSentences = new HashSet<string>();
 
+        Exception? retrievalException = null;
         for (var i = 0; i < FilledCacheSize; i++)
         {
             try
@@ -81,13 +82,16 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
 
                 uniqueSentences.UnionWith(TextGenerator.GetSentencesEnumerable(text));
             }
+#pragma warning disable CA1031 // It is being re-thrown later on.
             catch (Exception exception)
+#pragma warning restore CA1031
             {
                 _logger.LogError(
                     exception,
                     "Error while trying to receive a text. Stopping filling cache ({Language} language).",
                     Language);
 
+                retrievalException = exception;
                 break;
             }
         }
@@ -101,6 +105,9 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
         _logger.LogInformation(
             "Filled cache for '{Language}' language with {UniqueSentencesCount} unique sentences.",
             Language, uniqueSentences.Count);
+
+        if (retrievalException != null)
+            throw new InvalidOperationException("Error while retrieving text happened during filling the cache.", retrievalException);
     }
 
     protected override async ValueTask DisposeManagedResourcesAsync()
