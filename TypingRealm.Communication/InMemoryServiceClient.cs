@@ -79,7 +79,7 @@ namespace TypingRealm.Communication
             try
             {
                 using var message = new HttpRequestMessage(HttpMethod.Get, uri);
-                var httpClient = _httpClientFactory.CreateClient();
+                using var httpClient = _httpClientFactory.CreateClient();
                 return await httpClient.SendMessageAsync<T>(message, accessToken, cancellationToken)
                     .ConfigureAwait(false);
             }
@@ -112,7 +112,7 @@ namespace TypingRealm.Communication
             };
 
             using var message = new HttpRequestMessage(HttpMethod.Post, uri);
-            var httpClient = _httpClientFactory.CreateClient();
+            using var httpClient = _httpClientFactory.CreateClient();
             await httpClient.SendMessageAsync(message, accessToken, content, cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -132,7 +132,7 @@ namespace TypingRealm.Communication
             };
 
             using var message = new HttpRequestMessage(HttpMethod.Post, uri);
-            var httpClient = _httpClientFactory.CreateClient();
+            using var httpClient = _httpClientFactory.CreateClient();
             var response = await httpClient.SendMessageAsync<TResponse, TBody>(message, accessToken, content, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -154,7 +154,7 @@ namespace TypingRealm.Communication
             };
 
             using var message = new HttpRequestMessage(HttpMethod.Delete, uri);
-            var httpClient = _httpClientFactory.CreateClient();
+            using var httpClient = _httpClientFactory.CreateClient();
             await httpClient.SendMessageAsync(message, accessToken, cancellationToken)
                 .ConfigureAwait(false);
         }

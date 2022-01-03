@@ -43,7 +43,7 @@ namespace TypingRealm.Data.Infrastructure
         {
             if (language == "en")
             {
-                var httpClient = _httpClientFactory.CreateClient();
+                using var httpClient = _httpClientFactory.CreateClient();
 
                 using var response = await httpClient.GetAsync("http://api.quotable.io/random")
                     .ConfigureAwait(false);
@@ -62,7 +62,7 @@ namespace TypingRealm.Data.Infrastructure
 
             if (language == "ru")
             {
-                var httpClient = _httpClientFactory.CreateClient();
+                using var httpClient = _httpClientFactory.CreateClient();
 
                 using var response = await httpClient.GetAsync("https://fish-text.ru/get?format=html")
                     .ConfigureAwait(false);

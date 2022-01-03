@@ -26,7 +26,7 @@ public abstract class HttpTextRetriever : ITextRetriever
 
     public async ValueTask<string> RetrieveTextAsync()
     {
-        var httpClient = _httpClientFactory.CreateClient();
+        using var httpClient = _httpClientFactory.CreateClient();
 
         var count = 0; // Avoid endless loops.
         while (count < RetriesCount)

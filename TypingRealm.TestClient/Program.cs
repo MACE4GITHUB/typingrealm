@@ -309,7 +309,7 @@ namespace TypingRealm.TestClient
             string characterName)
         {
             var token = await tokenProvider.SignInAsync(default).ConfigureAwait(false);
-            var httpClient = httpClientFactory.CreateClient();
+            using var httpClient = httpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             using var content = new StringContent(JsonSerializer.Serialize(new
             {
