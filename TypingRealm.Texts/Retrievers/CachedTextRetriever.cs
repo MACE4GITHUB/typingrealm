@@ -62,10 +62,10 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
         }
 
         var cachedText = await _textCache.GetRandomTextAsync().ConfigureAwait(false);
-        if (cachedText == null)
-            return await _textRetriever.RetrieveTextAsync().ConfigureAwait(false);
 
-        return cachedText.Value;
+        return cachedText == null
+            ? await _textRetriever.RetrieveTextAsync().ConfigureAwait(false)
+            : cachedText.Value;
     }
 
     private async Task FillCacheAsync()

@@ -43,7 +43,7 @@ public abstract class HttpTextRetriever : ITextRetriever
 
             var text = ResponseHandler(content);
 
-            if (!text.All(character => AllowedLetters.Contains(character)))
+            if (string.IsNullOrWhiteSpace(text) || !text.All(character => AllowedLetters.Contains(character)))
                 continue;
 
             return text;

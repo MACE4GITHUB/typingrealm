@@ -33,10 +33,7 @@ public static class RegistrationExtensions
             var retriever = provider.GetServices<ITextRetriever>()
                 .LastOrDefault(retriever => retriever.Language == language);
 
-            if (retriever == null)
-                throw new NotSupportedException($"Text generator for language {language} is not supported.");
-
-            return retriever;
+            return retriever ?? throw new NotSupportedException($"Text generator for language {language} is not supported.");
         });
 
         services.AddTransient<TextCacheResolver>(provider => language =>
@@ -44,10 +41,7 @@ public static class RegistrationExtensions
             var cache = provider.GetServices<ITextCache>()
                 .LastOrDefault(cache => cache.Language == language);
 
-            if (cache == null)
-                throw new NotSupportedException($"Text cache for language {language} is not registered.");
-
-            return cache;
+            return cache ?? throw new NotSupportedException($"Text cache for language {language} is not registered.");
         });
 
         return services;

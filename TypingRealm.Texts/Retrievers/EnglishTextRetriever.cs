@@ -20,9 +20,7 @@ public sealed class EnglishTextRetriever : HttpTextRetriever
     protected override string ResponseHandler(string response)
     {
         var value = JsonSerializer.Deserialize<QuotableResponse>(response)?.content;
-        if (value == null)
-            throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
 
-        return value;
+        return value ?? throw new InvalidOperationException("Error when trying to get response from quotable API: invalid content.");
     }
 }

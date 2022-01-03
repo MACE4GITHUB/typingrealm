@@ -18,9 +18,6 @@ public sealed class RussianTextRetriever : HttpTextRetriever
     {
         var value = response.Replace("<p>", string.Empty).Replace("</p>", string.Empty);
 
-        if (string.IsNullOrWhiteSpace(value))
-            throw new InvalidOperationException("Text API returned empty text.");
-
-        return value;
+        return value ?? throw new InvalidOperationException("Error when trying to get response from fishtext API: invalid content.");
     }
 }
