@@ -18,8 +18,6 @@ public sealed class TextsController : TyrController
     [Route("generate")]
     public async ValueTask<ActionResult<GeneratedText>> GenerateText(TextGenerationConfiguration configuration)
     {
-        var text = await _textGenerator.GenerateTextAsync(configuration);
-
-        return new GeneratedText(text);
+        return await _textGenerator.GenerateTextAsync(configuration);
     }
 }

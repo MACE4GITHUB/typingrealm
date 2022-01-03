@@ -8,12 +8,12 @@ namespace TypingRealm.Texts;
 
 public interface ITextGenerator
 {
-    ValueTask<string> GenerateTextAsync(TextGenerationConfiguration configuration);
+    ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration);
 }
 
 public sealed class TextGenerator : ITextGenerator
 {
-    private const int MaxTextLength = 500;
+    private const int MaxAllowedTextLength = 1000;
 
     private readonly TextRetrieverResolver _textRetrieverResolver;
 
@@ -35,28 +35,91 @@ public sealed class TextGenerator : ITextGenerator
             .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
 
-    public ValueTask<string> GenerateTextAsync(TextGenerationConfiguration configuration)
+    public async ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration)
     {
         Validate(configuration);
 
+        var requiredLength = configuration.Length;
+        var shouldContain = configuration.IsLowerCase
+            ? configuration.ShouldContain.Select(part => part.ToLowerInvariant())
+            : configuration.ShouldContain;
+
         var textRetriever = _textRetrieverResolver(configuration.Language);
 
-        if (configuration.TextType == TextGenerationType.Text)
-            return GenerateTextAsync(textRetriever, configuration.Length);
+        var builder = new StringBuilder();
 
-        if (configuration.TextType == TextGenerationType.Words)
-            return GenerateWordsAsync(
-                textRetriever,
-                configuration.Length,
-                configuration.ShouldContain);
+        var maxTries = 200; // Avoid endless loop because of missing shouldContain chunks.
+        var tries = 0;
 
-        throw new NotSupportedException($"Unknown TextGenerationType: {configuration.TextType}.");
+        while (builder.Length < Math.Min(requiredLength, MaxAllowedTextLength))
+        {
+            var text = await textRetriever.RetrieveTextAsync()
+                .ConfigureAwait(false);
+
+            var textPartsEnumerable = configuration.Structure switch
+            {
+                TextStructure.Text => GetSentencesEnumerable(text),
+                TextStructure.Words => GetWordsEnumerable(text),
+                _ => throw new InvalidOperationException("Unknown text structure.")
+            };
+
+            if (configuration.IsLowerCase)
+                textPartsEnumerable = textPartsEnumerable.Select(part => part.ToLowerInvariant());
+
+            if (configuration.StripPunctuation)
+                textPartsEnumerable = textPartsEnumerable.Select(part =>
+                {
+                    foreach (var character in SupportedLanguages.PunctuationCharacters)
+                    {
+                        part = part.Replace(character.ToString(), "");
+                    }
+
+                    return part;
+                });
+
+            if (configuration.StripNumbers)
+                textPartsEnumerable = textPartsEnumerable.Select(part =>
+                {
+                    foreach (var character in SupportedLanguages.NumberCharacters)
+                    {
+                        part = part.Replace(character.ToString(), "");
+                    }
+
+                    return part;
+                });
+
+            foreach (var textPart in textPartsEnumerable)
+            {
+                if (!IsAllowed(textPart, shouldContain) && tries < maxTries)
+                {
+                    tries++;
+                    continue;
+                }
+
+                if (builder.Length == 0)
+                {
+                    builder.Append(textPart);
+                }
+                else
+                {
+                    builder.Append($" {textPart}");
+                }
+
+                if (builder.Length >= Math.Min(requiredLength, MaxAllowedTextLength))
+                    break;
+            }
+        }
+
+        return new GeneratedText(builder.ToString(), configuration);
     }
 
     private static void Validate(TextGenerationConfiguration configuration)
     {
-        if (configuration.Length < 0 || configuration.Length > MaxTextLength)
-            throw new ArgumentException($"Invalid configuration: length should be positive number below or equal to {MaxTextLength}.");
+        if (configuration.Length < 0 || configuration.Length > MaxAllowedTextLength)
+            throw new ArgumentException($"Invalid configuration: length should be positive number below or equal to {MaxAllowedTextLength}.");
+
+        if (!SupportedLanguages.Languages.Contains(configuration.Language))
+            throw new ArgumentException($"Language {configuration.Language} is not supported.");
     }
 
     private static bool IsAllowed(string word, IEnumerable<string> shouldContain)
@@ -75,74 +138,5 @@ public sealed class TextGenerator : ITextGenerator
         }
 
         return false;
-    }
-
-    private async ValueTask<string> GenerateTextAsync(
-        ITextRetriever textRetriever, int length)
-    {
-        var builder = new StringBuilder();
-
-        while (builder.Length < Math.Min(length, MaxTextLength))
-        {
-            var text = await textRetriever.RetrieveTextAsync()
-                .ConfigureAwait(false);
-
-            var sentences = GetSentencesEnumerable(text);
-
-            foreach (var sentence in sentences)
-            {
-                if (builder.Length == 0)
-                {
-                    builder.Append(sentence);
-                }
-                else
-                {
-                    builder.Append($" {sentence}");
-                }
-
-                if (builder.Length >= Math.Min(length, MaxTextLength))
-                    break;
-            }
-        }
-
-        return builder.ToString();
-    }
-
-    private async ValueTask<string> GenerateWordsAsync(
-        ITextRetriever textRetriever, int length, IEnumerable<string> shouldContain)
-    {
-        var builder = new StringBuilder();
-
-        var maxTries = 200; // Avoid endless loops because of shouldContain logic.
-        var tries = 0;
-
-        while (builder.Length < Math.Min(length, MaxTextLength))
-        {
-            var text = await textRetriever.RetrieveTextAsync()
-                .ConfigureAwait(false);
-
-            var words = GetWordsEnumerable(text);
-
-            tries++;
-            foreach (var word in words)
-            {
-                if (!IsAllowed(word, shouldContain) && tries < maxTries)
-                    continue;
-
-                if (builder.Length == 0)
-                {
-                    builder.Append(word);
-                }
-                else
-                {
-                    builder.Append($" {word}");
-                }
-
-                if (builder.Length >= Math.Min(length, MaxTextLength))
-                    break;
-            }
-        }
-
-        return builder.ToString();
     }
 }

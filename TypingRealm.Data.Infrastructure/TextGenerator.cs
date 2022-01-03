@@ -267,7 +267,7 @@ namespace TypingRealm.Data.Infrastructure
                 var quoteFromApi = await _textRetriever.GetNextTextValue(configuration.Language)
                     .ConfigureAwait(false);
 
-                var chunks = configuration.TextType == Texts.TextGenerationType.Words
+                var chunks = configuration.TextType == Texts.TextStructure.Words
                     ? quoteFromApi.Split('.').SelectMany(x => x.Split(' '))
                     : quoteFromApi.Split('.');
 

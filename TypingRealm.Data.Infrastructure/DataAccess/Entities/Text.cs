@@ -27,7 +27,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
         public TextType TextType { get; set; }
         public int? GenerationLength { get; set; }
         public string? GenerationShouldContain { get; set; }
-        public TextGenerationType? GenerationTextType { get; set; }
+        public TextStructure? GenerationTextType { get; set; }
 
         [MaxLength(20)]
         public string Language { get; set; }

@@ -8,7 +8,7 @@ namespace TypingRealm.Typing
     public sealed record TextGenerationConfiguration(
         int Length,
         IEnumerable<string> ShouldContain,
-        TextGenerationType GenerationTextType);
+        TextStructure GenerationTextType);
 
     public enum TextType
     {

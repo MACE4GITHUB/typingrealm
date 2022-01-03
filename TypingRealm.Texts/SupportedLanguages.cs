@@ -11,4 +11,9 @@ public static class SupportedLanguages
         ["en"] = typeof(EnglishTextRetriever),
         ["ru"] = typeof(RussianTextRetriever)
     };
+
+    public static IEnumerable<string> Languages => SupportedTextRetrievers.Keys;
+
+    public static string PunctuationCharacters => "'\",<.>/?=+\\|-_;:!@#$%^&*()[{]}`~";
+    public static string NumberCharacters => "0123456789";
 }

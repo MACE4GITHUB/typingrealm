@@ -1,6 +1,6 @@
 ﻿namespace TypingRealm.Texts;
 
-public enum TextGenerationType
+public enum TextStructure
 {
     Unspecified = 0,
 

@@ -74,7 +74,7 @@ namespace TypingRealm.Data.Api.Controllers
         [Route("generate")]
         public async ValueTask<ActionResult<string>> GenerateTextValue(
             int length,
-            TextGenerationType textType = TextGenerationType.Text,
+            TextStructure textType = TextStructure.Text,
             string? language = "en",
             int maxShouldContainErrors = 10,
             int maxShouldContainSlow = 10)
@@ -103,7 +103,8 @@ namespace TypingRealm.Data.Api.Controllers
             }
 
             //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
-            var generatedText = await _textsClient.GenerateTextAsync(new Texts.TextGenerationConfiguration(language, length, textType, shouldContain), EndpointAuthenticationType.Service, default);
+            var config = new Texts.TextGenerationConfiguration(language, length, textType, false, false, false, shouldContain);
+            var generatedText = await _textsClient.GenerateTextAsync(config, EndpointAuthenticationType.Service, default);
             var textValue = generatedText.Value;
 
             var textId = await _textRepository.NextIdAsync();

@@ -7,6 +7,6 @@ namespace TypingRealm.Typing
     public sealed record TextGenerationConfigurationDto(
         int Length,
         IEnumerable<string> ShouldContain,
-        TextGenerationType TextType,
+        TextStructure TextType,
         string Language);
 }
