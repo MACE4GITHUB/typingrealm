@@ -21,6 +21,6 @@ public sealed class OfflineTextRetriever : ITextRetriever
     {
         var index = RandomNumberGenerator.GetInt32(0, _texts.Count);
 
-        return new ValueTask<string>(_texts[index]);
+        return new(_texts[index]);
     }
 }

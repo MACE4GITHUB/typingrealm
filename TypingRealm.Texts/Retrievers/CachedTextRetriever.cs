@@ -17,7 +17,7 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
     private readonly ITextCache _textCache;
     private Task _fillProcess = Task.CompletedTask;
 
-    private readonly SemaphoreSlim _localLock = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _localLock = new(1, 1);
 
     public CachedTextRetriever(
         ILogger<CachedTextRetriever> logger,

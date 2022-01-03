@@ -6,10 +6,9 @@ namespace TypingRealm.Texts;
 
 public static class SupportedLanguages
 {
-    public static IDictionary<string, Type> SupportedTextRetrievers
-        => new Dictionary<string, Type>()
-        {
-            ["en"] = typeof(EnglishTextRetriever),
-            ["ru"] = typeof(RussianTextRetriever)
-        };
+    public static Dictionary<string, Type> SupportedTextRetrievers => new()
+    {
+        ["en"] = typeof(EnglishTextRetriever),
+        ["ru"] = typeof(RussianTextRetriever)
+    };
 }
