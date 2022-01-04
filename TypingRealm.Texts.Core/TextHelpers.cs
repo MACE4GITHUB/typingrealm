@@ -25,7 +25,7 @@ public static class TextHelpers
 
     public static IEnumerable<string> GetSentencesEnumerable(string text)
     {
-        return text.Split(". ", StringSplitOptions.RemoveEmptyEntries)
+        return text.Split(".", StringSplitOptions.RemoveEmptyEntries)
             .Select(text => text.Replace("\r", ""))
             .Select(text => text.Replace("\n", " "))
             .Select(text => text.Replace("“", "\""))
