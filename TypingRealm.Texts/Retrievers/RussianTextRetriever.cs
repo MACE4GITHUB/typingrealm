@@ -12,8 +12,7 @@ public sealed class RussianTextRetriever : HttpTextRetriever
     {
     }
 
-    // TODO: Append punctuation here from SupportedLanguages class.
-    protected override string AllowedLetters => "'\",<.>/?=+\\|-_;: 1!2@3#4$5%6^7&8*9(0)[{]}`~йЙцЦуУкКеЕнНгГшШщЩзЗхХъЪфФыЫвВаАпПрРоОлЛдДжЖэЭяЯчЧсСмМиИтТьЬбБюЮёЁ";
+    protected override string AllowedLetters => TextHelpers.AllowedRussianLetters;
 
     protected override string ResponseHandler(string response)
     {

@@ -15,8 +15,7 @@ public sealed class EnglishTextRetriever : HttpTextRetriever
     {
     }
 
-    // TODO: Append punctuation here from SupportedLanguages class.
-    protected override string AllowedLetters => "'\",<.>pPyYfFgGcCrRlL/?=+\\|aAoOeEuUiIdDhHtTnNsS-_;:qQjJkKxXbBmMwWvVzZ 1!2@3#4$5%6^7&8*9(0)[{]}`~";
+    protected override string AllowedLetters => TextHelpers.AllowedEnglishLetters;
 
     protected override string ResponseHandler(string response)
     {

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Hosting;
 
 namespace TypingRealm.Library.Api.Controllers;
 
-public sealed record ImportBookRequest(string Description, string Content);
+public sealed record ImportBookRequest(string Description, IFormFile Content);
 
 [Route(ServiceConfiguration.LibraryApiPrefix)]
 public sealed class LibraryController : TyrController
@@ -21,11 +24,12 @@ public sealed class LibraryController : TyrController
     [HttpPost]
     [SuperAdminScoped]
     [Route("book/import")]
-    public async ValueTask<ActionResult> ImportBook(ImportBookRequest request)
+    public async ValueTask<ActionResult> ImportBook(string description, IFormFile content)
     {
         try
         {
-            await _bookImporter.ImportBookAsync(request.Description, request.Content);
+            var textContent = await ReadAsStringAsync(content);
+            await _bookImporter.ImportBookAsync(description, textContent);
         }
         catch (Exception exception)
         {
@@ -33,5 +37,19 @@ public sealed class LibraryController : TyrController
         }
 
         return Ok();
+    }
+
+    // TODO: Consider reading file part by part.
+    public static async ValueTask<string> ReadAsStringAsync(IFormFile file)
+    {
+        var result = new StringBuilder();
+
+        using (var reader = new StreamReader(file.OpenReadStream()))
+        {
+            while (reader.Peek() >= 0)
+                result.AppendLine(await reader.ReadLineAsync());
+        }
+
+        return result.ToString();
     }
 }

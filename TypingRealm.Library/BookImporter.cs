@@ -44,6 +44,12 @@ namespace TypingRealm.Library
             var sentenceIndex = 0;
             foreach (var sentenceValue in TextHelpers.GetSentencesEnumerable(book.Content))
             {
+                if (!TextHelpers.IsAllLettersAllowed(sentenceValue, "en")) // TODO: Support other languages.
+                    continue;
+
+                if (sentenceValue.Length < TextHelpers.MinSentenceLength)
+                    continue;
+
                 var sentence = await CreateSentenceAsync(book.BookId, sentenceValue, sentenceIndex)
                     .ConfigureAwait(false);
 
