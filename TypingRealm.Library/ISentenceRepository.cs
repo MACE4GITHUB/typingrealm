@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace TypingRealm.Library
+namespace TypingRealm.Library;
+
+public interface ISentenceRepository
 {
-    public interface ISentenceRepository
-    {
-        ValueTask SaveAsync(Sentence sentence);
-        ValueTask<SentenceId> NextIdAsync();
-    }
+    ValueTask SaveAsync(Sentence sentence);
+    ValueTask<SentenceId> NextIdAsync();
 }

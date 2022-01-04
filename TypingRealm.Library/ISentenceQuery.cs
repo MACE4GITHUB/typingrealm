@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace TypingRealm.Library
+namespace TypingRealm.Library;
+
+public interface ISentenceQuery
 {
-    public interface ISentenceQuery
-    {
-        IEnumerable<string> FindSentencesContainingWordsAsync(IEnumerable<string> words, int count);
-        IEnumerable<string> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int count);
-    }
+    IEnumerable<string> FindSentencesContainingWordsAsync(IEnumerable<string> words, int count);
+    IEnumerable<string> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int count);
 }

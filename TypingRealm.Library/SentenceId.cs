@@ -1,14 +1,13 @@
 ﻿using System;
 using TypingRealm.Common;
 
-namespace TypingRealm.Library
-{
-    public sealed class SentenceId : Identity
-    {
-        public SentenceId(string value) : base(value)
-        {
-        }
+namespace TypingRealm.Library;
 
-        public static SentenceId New() => new(Guid.NewGuid().ToString());
+public sealed class SentenceId : Identity
+{
+    public SentenceId(string value) : base(value)
+    {
     }
+
+    public static SentenceId New() => new(Guid.NewGuid().ToString());
 }

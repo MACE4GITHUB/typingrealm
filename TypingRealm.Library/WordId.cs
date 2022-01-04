@@ -1,11 +1,10 @@
 ﻿using TypingRealm.Common;
 
-namespace TypingRealm.Library
+namespace TypingRealm.Library;
+
+public sealed class WordId : Identity
 {
-    public sealed class WordId : Identity
+    public WordId(string value) : base(value)
     {
-        public WordId(string value) : base(value)
-        {
-        }
     }
 }

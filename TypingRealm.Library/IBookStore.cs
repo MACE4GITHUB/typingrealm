@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace TypingRealm.Library
+namespace TypingRealm.Library;
+
+public interface IBookStore
 {
-    public interface IBookStore
-    {
-        ValueTask<BookId> NextBookIdAsync();
-        ValueTask<Book?> FindBookAsync(BookId bookId);
-        ValueTask SaveBook(Book book);
-    }
+    ValueTask<BookId> NextBookIdAsync();
+    ValueTask<Book?> FindBookAsync(BookId bookId);
+    ValueTask SaveBook(Book book);
 }
