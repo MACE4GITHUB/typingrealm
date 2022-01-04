@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Authentication.Api;
 using TypingRealm.Hosting;
 
 namespace TypingRealm.Library.Api.Controllers;
@@ -18,6 +19,7 @@ public sealed class LibraryController : TyrController
     }
 
     [HttpPost]
+    [SuperAdminScoped]
     [Route("book/import")]
     public async ValueTask<ActionResult> ImportBook(ImportBookRequest request)
     {
