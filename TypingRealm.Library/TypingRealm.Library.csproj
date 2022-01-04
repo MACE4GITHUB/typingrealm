@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
+    <ProjectReference Include="..\TypingRealm.Library.Core\TypingRealm.Library.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Texts.Core\TypingRealm.Texts.Core.csproj" />
+  </ItemGroup>
+
+</Project>

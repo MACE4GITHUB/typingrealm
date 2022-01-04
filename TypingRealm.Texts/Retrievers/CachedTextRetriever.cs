@@ -80,7 +80,7 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
                 var text = await _textRetriever.RetrieveTextAsync()
                     .ConfigureAwait(false);
 
-                uniqueSentences.UnionWith(TextGenerator.GetSentencesEnumerable(text));
+                uniqueSentences.UnionWith(TextHelpers.GetSentencesEnumerable(text));
             }
 #pragma warning disable CA1031 // It is being re-thrown later on.
             catch (Exception exception)

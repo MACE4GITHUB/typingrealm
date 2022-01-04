@@ -4,6 +4,7 @@ networks:
   typingrealm-net:
   typingrealm-data-net:
   typingrealm-texts-net:
+  typingrealm-library-net:
   local-tyr_local-typingrealm-net:
     external: true
   dev-tyr_dev-typingrealm-net:
@@ -69,6 +70,22 @@ services:
     env_file:
       - .env.prod
       - .env.prod.texts
+
+  typingrealm-library:
+    image: ${DOCKER_REGISTRY-}typingrealm-library
+    container_name: typingrealm-library
+    networks:
+      - typingrealm-net
+      - typingrealm-library-net
+    build:
+      context: .
+      dockerfile: TypingRealm.Library.Api/Dockerfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - .env.prod
+      - .env.prod.library
 
   # === Infrastructure ===
 
@@ -138,6 +155,23 @@ services:
     env_file:
       - .env.prod
       - .env.prod.data
+
+  typingrealm-library-postgres:
+    image: postgres
+    container_name: typingrealm-library-postgres
+    networks:
+      - typingrealm-library-net
+    # Should be disabled in production. This is for conveniency of connecting to prod DB.
+    ports:
+      - 32432:5432
+    volumes:
+      - ./infrastructure-data/prod/library/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - .env.prod
+      - .env.prod.library
 
   # This is Caddy both for PROD, DEV and LOCAL routing.
   # In the final PROD configuration another Caddyfile should be deployed.

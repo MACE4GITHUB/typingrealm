@@ -22,19 +22,6 @@ public sealed class TextGenerator : ITextGenerator
         _textRetrieverResolver = textRetrieverResolver;
     }
 
-    public static IEnumerable<string> GetSentencesEnumerable(string text)
-    {
-        return text.Split(". ", StringSplitOptions.RemoveEmptyEntries)
-            .Select(text => text.TrimEnd('.'))
-            .Select(text => $"{text}.");
-    }
-
-    public static IEnumerable<string> GetWordsEnumerable(string text)
-    {
-        return GetSentencesEnumerable(text)
-            .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-    }
-
     public async ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration)
     {
         Validate(configuration);
@@ -58,8 +45,8 @@ public sealed class TextGenerator : ITextGenerator
 
             var textPartsEnumerable = configuration.Structure switch
             {
-                TextStructure.Text => GetSentencesEnumerable(text),
-                TextStructure.Words => GetWordsEnumerable(text),
+                TextStructure.Text => TextHelpers.GetSentencesEnumerable(text),
+                TextStructure.Words => TextHelpers.GetWordsEnumerable(text),
                 _ => throw new InvalidOperationException("Unknown text structure.")
             };
 

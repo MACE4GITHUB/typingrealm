@@ -18,7 +18,8 @@ namespace TypingRealm.Communication
             {
                 ["profiles"] = GetProfilesHost(),
                 ["data"] = GetDataHost(),
-                ["texts"] = GetTextsHost()
+                ["texts"] = GetTextsHost(),
+                ["library"] = GetLibraryHost()
             };
 
         private static string GetProfilesHost()
@@ -44,6 +45,15 @@ namespace TypingRealm.Communication
             var dataHost = Environment.GetEnvironmentVariable("TEXTS_URL");
             if (dataHost == null)
                 return "http://127.0.0.1:30401";
+
+            return dataHost;
+        }
+
+        private static string GetLibraryHost()
+        {
+            var dataHost = Environment.GetEnvironmentVariable("LIBRARY_URL");
+            if (dataHost == null)
+                return "http://127.0.0.1:30402";
 
             return dataHost;
         }

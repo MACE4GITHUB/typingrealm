@@ -57,3 +57,17 @@ services:
     env_file:
       - .env.debug
       - .env.debug.texts
+
+  debug-typingrealm-library:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-library
+    container_name: debug-typingrealm-library
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30402:80
+    build:
+      context: .
+      dockerfile: TypingRealm.Library.Api/Dockerfile
+    env_file:
+      - .env.debug
+      - .env.debug.library
