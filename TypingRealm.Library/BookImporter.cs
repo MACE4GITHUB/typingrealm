@@ -168,6 +168,15 @@ public sealed class BookImporter : IBookImporter
         while (index < value.Length - 1)
         {
             yield return value.Substring(index, 2);
+
+            if (value[index..].Length > 2)
+                yield return value.Substring(index, 3);
+            else
+                yield return $"{value.Substring(index, 2)} ";
+
+            // TODO: !!! IndexInWord is completely incorrect for keypairs.
+            // We need to either fix it or it doesn't make sense.
+
             index++;
         }
 
