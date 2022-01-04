@@ -14,7 +14,10 @@ namespace TypingRealm.Hosting
         UserProtected = 1,
         ServiceProtected = 2,
         Protected = 3,
-        Anonymous = 4
+        Anonymous = 4,
+
+        SuperAdminProtected = 5,
+        SuperAdminAndServiceProtected = 6
     }
 
     public sealed record DiagnosticsCallResponse(
@@ -52,6 +55,8 @@ namespace TypingRealm.Hosting
                 ServiceToServiceCallType.UserProtected => CallAsync(serviceName, "api/diagnostics/user-protected-call", EndpointAuthenticationType.Profile),
                 ServiceToServiceCallType.Protected => CallAsync(serviceName, "api/diagnostics/protected-call", EndpointAuthenticationType.Profile),
                 ServiceToServiceCallType.Anonymous => CallAsync(serviceName, "api/diagnostics/anonymous-call", EndpointAuthenticationType.Anonymous),
+                ServiceToServiceCallType.SuperAdminProtected => CallAsync(serviceName, "api/diagnostics/superadmin-call", EndpointAuthenticationType.Profile),
+                ServiceToServiceCallType.SuperAdminAndServiceProtected => CallAsync(serviceName, "api/diagnostics/superadmin-service-call", EndpointAuthenticationType.Service),
                 _ => throw new NotSupportedException("Unsupported ServiceToService call type."),
             };
 
@@ -92,5 +97,15 @@ namespace TypingRealm.Hosting
         [HttpGet]
         [Route("protected-call")]
         public DiagnosticsCallResponse GetProtectedDate() => new(_serviceId, DateTime.UtcNow);
+
+        [HttpGet]
+        [SuperAdminScoped]
+        [Route("superadmin-call")]
+        public DiagnosticsCallResponse GetSuperAdminDate() => new(_serviceId, DateTime.UtcNow);
+
+        [HttpGet]
+        [ServiceScoped, SuperAdminScoped]
+        [Route("superadmin-service-call")]
+        public DiagnosticsCallResponse GetSuperAdminServiceDate() => new(_serviceId, DateTime.UtcNow);
     }
 }

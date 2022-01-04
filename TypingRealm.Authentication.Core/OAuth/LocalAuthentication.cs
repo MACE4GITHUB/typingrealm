@@ -28,11 +28,12 @@ namespace TypingRealm.Authentication.OAuth
         public static string Issuer => _authenticationConfiguration.Issuer;
         internal static SecurityKey SecurityKey { get; }
 
-        public static string GenerateProfileAccessToken(string subClaimValue)
+        public static string GenerateProfileAccessToken(string subClaimValue, string[] scopes)
         {
             var claims = new List<Claim>
             {
-                new Claim("sub", subClaimValue)
+                new Claim("sub", subClaimValue),
+                new Claim("scope", string.Join(' ', scopes))
             };
 
             return _tokenHandler.WriteToken(new JwtSecurityToken(Issuer, _authenticationConfiguration.Audience, claims, null, DateTime.UtcNow.AddMinutes(60), _signingCredentials));

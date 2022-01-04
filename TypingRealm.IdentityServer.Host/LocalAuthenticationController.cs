@@ -18,7 +18,7 @@ namespace TypingRealm.IdentityServer.Host
 
         [HttpPost]
         [Route("user-token")]
-        public ActionResult GenerateToken(string sub)
+        public ActionResult GenerateToken(string sub, string[] scopes)
         {
             if (!_environment.IsDevelopment())
                 return NotFound();
@@ -28,7 +28,7 @@ namespace TypingRealm.IdentityServer.Host
 
             return Ok(new
             {
-                access_token = LocalAuthentication.GenerateProfileAccessToken($"local-auth_{sub}")
+                access_token = LocalAuthentication.GenerateProfileAccessToken($"local-auth_{sub}", scopes)
             });
         }
     }
