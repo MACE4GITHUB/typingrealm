@@ -9,13 +9,13 @@ public static class RegistrationExtensions
     public static IServiceCollection AddLibraryDomain(this IServiceCollection services)
     {
         return services
-            .AddSingleton<IBookStore, InMemoryBookStore>()
+            .AddSingleton<IBookRepository, InMemoryBookStore>()
             .AddSingleton<ISentenceRepository, InMemorySentenceRepository>()
             .AddTransient<IBookImporter, BookImporter>();
     }
 }
 
-public sealed class InMemoryBookStore : IBookStore
+public sealed class InMemoryBookStore : IBookRepository
 {
     private readonly Dictionary<BookId, Book> _books = new Dictionary<BookId, Book>();
 
@@ -61,5 +61,14 @@ public sealed class InMemorySentenceRepository : ISentenceRepository
             _sentences[sentence.SentenceId] = sentence;
 
         return default;
+    }
+
+    public async ValueTask SaveBulkAsync(IEnumerable<Sentence> sentences)
+    {
+        foreach (var sentence in sentences)
+        {
+            await SaveAsync(sentence)
+                .ConfigureAwait(false);
+        }
     }
 }

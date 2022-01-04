@@ -7,7 +7,7 @@ namespace TypingRealm.Library;
 public sealed record Word(
     SentenceId SentenceId,
     //WordId WordId,
-    int Index,
+    int IndexInSentence,
     string Value,
     int CountInSentence,
     IEnumerable<KeyPair> KeyPairs);

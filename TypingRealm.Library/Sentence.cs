@@ -6,6 +6,6 @@ namespace TypingRealm.Library;
 public sealed record Sentence(
     BookId BookId,
     SentenceId SentenceId,
-    int Index,
+    int IndexInBook,
     string Value,
     IEnumerable<Word> Words);

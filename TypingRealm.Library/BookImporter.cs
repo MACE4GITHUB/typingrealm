@@ -14,11 +14,11 @@ public interface IBookImporter
 public sealed class BookImporter : IBookImporter
 {
     private readonly ISentenceRepository _sentenceRepository;
-    private readonly IBookStore _bookStore;
+    private readonly IBookRepository _bookStore;
 
     public BookImporter(
         ISentenceRepository sentenceRepository,
-        IBookStore bookStore)
+        IBookRepository bookStore)
     {
         _sentenceRepository = sentenceRepository;
         _bookStore = bookStore;
@@ -36,11 +36,24 @@ public sealed class BookImporter : IBookImporter
         await ImportBookAsync(book)
             .ConfigureAwait(false);
 
+        book = await _bookStore.FindBookAsync(bookId)
+            .ConfigureAwait(false);
+
+        if (book == null)
+            throw new InvalidOperationException("Did not find the book.");
+
+        book.FinishProcessing();
+
+        await _bookStore.SaveBook(book)
+            .ConfigureAwait(false);
+
         return book;
     }
 
     private async ValueTask ImportBookAsync(Book book)
     {
+        var bulk = new List<Sentence>(1000);
+
         var sentenceIndex = 0;
         foreach (var sentenceValue in TextHelpers.GetSentencesEnumerable(book.Content))
         {
@@ -53,11 +66,25 @@ public sealed class BookImporter : IBookImporter
             var sentence = await CreateSentenceAsync(book.BookId, sentenceValue, sentenceIndex)
                 .ConfigureAwait(false);
 
-            // TODO: Save in Bulk.
-            await _sentenceRepository.SaveAsync(sentence)
-                .ConfigureAwait(false);
+            if (bulk.Count < 1000)
+                bulk.Add(sentence);
+            else
+            {
+                await _sentenceRepository.SaveBulkAsync(bulk)
+                    .ConfigureAwait(false);
+
+                bulk.Clear();
+            }
 
             sentenceIndex++;
+        }
+
+        if (bulk.Count > 0)
+        {
+            await _sentenceRepository.SaveBulkAsync(bulk)
+                .ConfigureAwait(false);
+
+            bulk.Clear();
         }
     }
 

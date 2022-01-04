@@ -28,6 +28,8 @@ public static class TextHelpers
         return text.Split(". ", StringSplitOptions.RemoveEmptyEntries)
             .Select(text => text.Replace("\r", ""))
             .Select(text => text.Replace("\n", " "))
+            .Select(text => text.Replace("“", "\""))
+            .Select(text => text.Replace("”", "\""))
             .Select(text => text.TrimEnd('.'))
             .Select(text => string.Join(' ', text.Split(' ', StringSplitOptions.RemoveEmptyEntries))) // Remove multiple spaces in a row.
             .Select(text => $"{text}.");

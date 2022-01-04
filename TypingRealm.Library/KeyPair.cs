@@ -2,7 +2,7 @@
 
 public sealed record KeyPair(
     //WordId WordId,
-    int Index,
+    int IndexInWord,
     string Value,
     int CountInWord,
     int CountInSentence);
