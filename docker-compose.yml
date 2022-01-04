@@ -71,3 +71,5 @@ services:
     env_file:
       - .env.debug
       - .env.debug.library
+    mem_limit: 500m
+    mem_reservation: 350m
