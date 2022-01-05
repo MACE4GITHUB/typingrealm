@@ -5,7 +5,10 @@ namespace TypingRealm.Library;
 
 public interface ISentenceRepository
 {
-    ValueTask SaveBulkAsync(IEnumerable<Sentence> sentences);
+    ValueTask SaveByBatchesAsync(
+        IEnumerable<Sentence> allSentences,
+        int batchSize);
+
     ValueTask SaveAsync(Sentence sentence);
     ValueTask<SentenceId> NextIdAsync();
 }

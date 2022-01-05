@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
@@ -11,15 +12,9 @@ public sealed class SentenceRepository : ISentenceRepository
 {
     private readonly LibraryDbContext _dbContext;
 
-    // TODO: Anti-pattern, don't inject the provider. We need it currently for saving memory.
-    private readonly IServiceProvider _provider;
-
-    public SentenceRepository(
-        LibraryDbContext dbContext,
-        IServiceProvider provider)
+    public SentenceRepository(LibraryDbContext dbContext)
     {
         _dbContext = dbContext;
-        _provider = provider;
     }
 
     public ValueTask<SentenceId> NextIdAsync() => new(new SentenceId(Guid.NewGuid().ToString()));
@@ -37,16 +32,57 @@ public sealed class SentenceRepository : ISentenceRepository
             .ConfigureAwait(false);
     }
 
-    public async ValueTask SaveBulkAsync(IEnumerable<Sentence> sentences)
+    public async ValueTask SaveByBatchesAsync(
+        IEnumerable<Sentence> allSentences,
+        int batchSize)
     {
-        using var scope = _provider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+        var chunks = allSentences.Chunk(batchSize);
+        using var connection = new Npgsql.NpgsqlConnection(
+            _dbContext.Database.GetConnectionString());
+
+        await connection.OpenAsync()
+            .ConfigureAwait(false);
+
+        var transaction = await connection.BeginTransactionAsync()
+            .ConfigureAwait(false);
+
+        foreach (var chunk in chunks)
+        {
+            await SaveBulkAsync(chunk, connection, transaction)
+                .ConfigureAwait(false);
+        }
+
+        await transaction.CommitAsync()
+            .ConfigureAwait(false);
+    }
+
+    private async ValueTask SaveBulkAsync(
+        IEnumerable<Sentence> sentencesBatch,
+        DbConnection transactionConnection,
+        DbTransaction transaction)
+    {
+        // TODO: Centralize this registration.
+        var options = new DbContextOptionsBuilder<LibraryDbContext>()
+            .UseNpgsql(transactionConnection)
+            .UseSnakeCaseNamingConvention()
+            .Options;
+
+        using var context = new LibraryDbContext(options);
         context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-        await context.Sentence.AddRangeAsync(sentences.Select(s => SentenceDao.ToDao(s)))
+        await context.Database.UseTransactionAsync(transaction)
             .ConfigureAwait(false);
 
-        await context.SaveChangesAsync()
+        await context.Sentence.AddRangeAsync(sentencesBatch.Select(s => SentenceDao.ToDao(s)))
             .ConfigureAwait(false);
+
+        try
+        {
+            await context.SaveChangesAsync()
+                .ConfigureAwait(false);
+        }
+        catch (Exception exc)
+        {
+            throw;
+        }
     }
 }

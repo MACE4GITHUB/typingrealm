@@ -55,43 +55,21 @@ public sealed class BookImporter : IBookImporter
         var bulk = new List<Sentence>(100);
 
         var sentenceIndex = 0;
-        foreach (var sentenceValue in TextHelpers.GetSentencesEnumerable(book.Content))
-        {
-            if (!TextHelpers.IsAllLettersAllowed(sentenceValue, "en")) // TODO: Support other languages.
-                continue;
 
-            if (sentenceValue.Length < TextHelpers.MinSentenceLength)
-                continue;
+        // TODO: Move most of this logic inside GetSentencesEnumerable method.
+        var sentences = TextHelpers.GetSentencesEnumerable(book.Content)
+            .Where(sentence => TextHelpers.IsAllLettersAllowed(sentence, "en")) // TODO: Support other languages.
+            .Where(sentence => sentence.Length >= TextHelpers.MinSentenceLength)
+            .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
-            var sentence = await CreateSentenceAsync(book.BookId, sentenceValue, sentenceIndex)
-                .ConfigureAwait(false);
-
-            if (bulk.Count < 100)
-                bulk.Add(sentence);
-            else
-            {
-                await _sentenceRepository.SaveBulkAsync(bulk)
-                    .ConfigureAwait(false);
-
-                bulk.Clear();
-            }
-
-            sentenceIndex++;
-        }
-
-        if (bulk.Count > 0)
-        {
-            await _sentenceRepository.SaveBulkAsync(bulk)
-                .ConfigureAwait(false);
-
-            bulk.Clear();
-        }
+        await _sentenceRepository.SaveByBatchesAsync(sentences, 100)
+            .ConfigureAwait(false);
     }
 
-    private async ValueTask<Sentence> CreateSentenceAsync(BookId bookId, string value, int sentenceIndex)
+    private Sentence CreateSentence(BookId bookId, string value, int sentenceIndex)
     {
-        var sentenceId = await _sentenceRepository.NextIdAsync()
-            .ConfigureAwait(false);
+        // TODO: Use _sentenceRepository.NextIdAsync();
+        var sentenceId = SentenceId.New();
 
         var words = TextHelpers.GetWordsEnumerable(value)
             .Select((word, index) => new
