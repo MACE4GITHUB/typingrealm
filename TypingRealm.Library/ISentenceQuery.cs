@@ -3,10 +3,6 @@ using System.Threading.Tasks;
 
 namespace TypingRealm.Library;
 
-public sealed record SentenceDto(
-    string SentenceId,
-    string Value);
-
 public interface ISentenceQuery
 {
     ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(

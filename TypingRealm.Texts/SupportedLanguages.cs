@@ -8,7 +8,8 @@ public static class SupportedLanguages
 {
     public static Dictionary<string, Type> SupportedTextRetrievers => new()
     {
-        ["en"] = typeof(EnglishTextRetriever),
+        //["en"] = typeof(QuotableEnglishTextRetriever),
+        ["en"] = typeof(LibraryEnglishTextRetriever),
         ["ru"] = typeof(RussianTextRetriever)
     };
 

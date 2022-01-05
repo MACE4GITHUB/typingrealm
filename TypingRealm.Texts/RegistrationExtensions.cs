@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Library.Api.Client;
 using TypingRealm.Texts.Retrievers;
 using TypingRealm.Texts.Retrievers.Cache;
 
@@ -13,6 +14,8 @@ public static class RegistrationExtensions
 {
     public static IServiceCollection AddTextsDomain(this IServiceCollection services)
     {
+        services.AddLibraryApiClients();
+
         services.AddTransient<ITextGenerator, TextGenerator>();
 
         if (DebugHelpers.UseInfrastructure)
@@ -20,6 +23,7 @@ public static class RegistrationExtensions
             foreach (var config in SupportedLanguages.SupportedTextRetrievers)
             {
                 services.AddTransient(config.Value);
+                services.AddTransient(typeof(ITextRetriever), config.Value);
             }
         }
         else

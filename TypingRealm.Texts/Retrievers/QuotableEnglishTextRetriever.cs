@@ -4,11 +4,11 @@ using System.Text.Json;
 
 namespace TypingRealm.Texts.Retrievers;
 
-public sealed class EnglishTextRetriever : HttpTextRetriever
+public sealed class QuotableEnglishTextRetriever : HttpTextRetriever
 {
     private sealed record QuotableResponse(string content);
 
-    public EnglishTextRetriever(IHttpClientFactory httpClientFactory)
+    public QuotableEnglishTextRetriever(IHttpClientFactory httpClientFactory)
 #pragma warning disable S1075 // URIs should not be hardcoded: this is a specific text retriever working with this exact URI and no other.
         : base(httpClientFactory, "en", new Uri("https://api.quotable.io/random"))
 #pragma warning restore S1075
