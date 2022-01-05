@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
@@ -10,9 +11,15 @@ public sealed class SentenceRepository : ISentenceRepository
 {
     private readonly LibraryDbContext _dbContext;
 
-    public SentenceRepository(LibraryDbContext dbContext)
+    // TODO: Anti-pattern, don't inject the provider. We need it currently for saving memory.
+    private readonly IServiceProvider _provider;
+
+    public SentenceRepository(
+        LibraryDbContext dbContext,
+        IServiceProvider provider)
     {
         _dbContext = dbContext;
+        _provider = provider;
     }
 
     public ValueTask<SentenceId> NextIdAsync() => new(new SentenceId(Guid.NewGuid().ToString()));
@@ -32,10 +39,13 @@ public sealed class SentenceRepository : ISentenceRepository
 
     public async ValueTask SaveBulkAsync(IEnumerable<Sentence> sentences)
     {
-        await _dbContext.Sentence.AddRangeAsync(sentences.Select(s => SentenceDao.ToDao(s)))
+        using var scope = _provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+
+        await context.Sentence.AddRangeAsync(sentences.Select(s => SentenceDao.ToDao(s)))
             .ConfigureAwait(false);
 
-        await _dbContext.SaveChangesAsync()
+        await context.SaveChangesAsync()
             .ConfigureAwait(false);
     }
 }

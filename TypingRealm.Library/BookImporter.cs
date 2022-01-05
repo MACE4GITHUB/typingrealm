@@ -52,7 +52,7 @@ public sealed class BookImporter : IBookImporter
 
     private async ValueTask ImportBookAsync(Book book)
     {
-        var bulk = new List<Sentence>(1000);
+        var bulk = new List<Sentence>(100);
 
         var sentenceIndex = 0;
         foreach (var sentenceValue in TextHelpers.GetSentencesEnumerable(book.Content))
@@ -66,7 +66,7 @@ public sealed class BookImporter : IBookImporter
             var sentence = await CreateSentenceAsync(book.BookId, sentenceValue, sentenceIndex)
                 .ConfigureAwait(false);
 
-            if (bulk.Count < 1000)
+            if (bulk.Count < 100)
                 bulk.Add(sentence);
             else
             {
