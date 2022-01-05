@@ -136,6 +136,9 @@ public sealed class BookImporter : IBookImporter
 
         yield return new KeyPairInText(-1, $" {value[0]}");
 
+        if (value.Length > 1)
+            yield return new KeyPairInText(-1, $" {value[..2]}");
+
         var index = 0;
         while (index < value.Length - 1)
         {

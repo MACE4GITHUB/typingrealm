@@ -1,17 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
 #pragma warning disable CS8618
+[Index(nameof(Description))]
 [Index(nameof(IsProcessed))]
 [Index(nameof(IsArchived))]
+[Index(nameof(AddedAtUtc))]
 public class BookDao : IDao<BookDao>
 {
     [Key]
     [MaxLength(50)]
     public string Id { get; set; }
 
+    [MaxLength(100)]
     public string Description { get; set; }
 
     public string Content { get; set; }
@@ -19,6 +23,8 @@ public class BookDao : IDao<BookDao>
     public bool IsProcessed { get; set; }
 
     public bool IsArchived { get; set; }
+
+    public DateTime AddedAtUtc { get; set; }
 
     public static BookDao ToDao(Book book)
     {
@@ -30,7 +36,8 @@ public class BookDao : IDao<BookDao>
             Description = state.Description,
             Content = state.Content,
             IsProcessed = state.IsProcessed,
-            IsArchived = state.IsArchived
+            IsArchived = state.IsArchived,
+            AddedAtUtc = DateTime.UtcNow
         };
     }
 
@@ -54,6 +61,9 @@ public class BookDao : IDao<BookDao>
 
         if (IsArchived != from.IsArchived)
             IsArchived = from.IsArchived;
+
+        if (AddedAtUtc == default && AddedAtUtc != from.AddedAtUtc)
+            AddedAtUtc = from.AddedAtUtc;
     }
 }
 #pragma warning restore CS8618
