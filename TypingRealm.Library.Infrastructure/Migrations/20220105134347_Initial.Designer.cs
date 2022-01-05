@@ -11,7 +11,7 @@ using TypingRealm.Library.Infrastructure.DataAccess;
 namespace TypingRealm.Library.Infrastructure.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20220105001410_Initial")]
+    [Migration("20220105134347_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -163,6 +163,10 @@ namespace TypingRealm.Library.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("index_in_sentence");
 
+                    b.Property<int>("RawCountInSentence")
+                        .HasColumnType("integer")
+                        .HasColumnName("raw_count_in_sentence");
+
                     b.Property<string>("RawValue")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -189,6 +193,9 @@ namespace TypingRealm.Library.Infrastructure.Migrations
 
                     b.HasIndex("IndexInSentence")
                         .HasDatabaseName("ix_word_index_in_sentence");
+
+                    b.HasIndex("RawCountInSentence")
+                        .HasDatabaseName("ix_word_raw_count_in_sentence");
 
                     b.HasIndex("RawValue")
                         .HasDatabaseName("ix_word_raw_value");

@@ -63,6 +63,7 @@ public class SentenceDao : IDao<SentenceDao>
 [Index(nameof(Value))]
 [Index(nameof(RawValue))]
 [Index(nameof(CountInSentence))]
+[Index(nameof(RawCountInSentence))]
 public class WordDao
 {
     [Key]
@@ -82,6 +83,7 @@ public class WordDao
     public string RawValue { get; set; }
 
     public int CountInSentence { get; set; }
+    public int RawCountInSentence { get; set; }
 
     public virtual ICollection<KeyPairDao> KeyPairs { get; set; }
 
@@ -93,15 +95,16 @@ public class WordDao
             SentenceId = word.SentenceId,
             IndexInSentence = word.IndexInSentence,
             Value = word.Value,
-            RawValue = word.RawWord,
+            RawValue = word.RawValue,
             CountInSentence = word.CountInSentence,
+            RawCountInSentence = word.RawCountInSentence,
             KeyPairs = word.KeyPairs.Select(kp => KeyPairDao.ToDao(kp)).ToList()
         };
     }
 
     public Word FromDao()
     {
-        return new Word(new(SentenceId), IndexInSentence, Value, CountInSentence, KeyPairs.Select(kp => kp.FromDao()));
+        return new Word(new(SentenceId), IndexInSentence, Value, RawValue, CountInSentence, RawCountInSentence, KeyPairs.Select(kp => kp.FromDao()));
     }
 }
 

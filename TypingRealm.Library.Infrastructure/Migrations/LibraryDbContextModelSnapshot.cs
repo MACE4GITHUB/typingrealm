@@ -161,6 +161,10 @@ namespace TypingRealm.Library.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("index_in_sentence");
 
+                    b.Property<int>("RawCountInSentence")
+                        .HasColumnType("integer")
+                        .HasColumnName("raw_count_in_sentence");
+
                     b.Property<string>("RawValue")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -187,6 +191,9 @@ namespace TypingRealm.Library.Infrastructure.Migrations
 
                     b.HasIndex("IndexInSentence")
                         .HasDatabaseName("ix_word_index_in_sentence");
+
+                    b.HasIndex("RawCountInSentence")
+                        .HasDatabaseName("ix_word_raw_count_in_sentence");
 
                     b.HasIndex("RawValue")
                         .HasDatabaseName("ix_word_raw_value");

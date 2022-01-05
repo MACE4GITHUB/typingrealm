@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace TypingRealm.Texts;
 
 public static class TextHelpers
 {
     // TODO: Consider moving this constant to Library context.
-    public static int MinSentenceLength = 8;
+    public static readonly int MinSentenceLength = 8;
 
     // TODO: Append punctuation and numbers here from SupportedLanguages class.
     public static string AllowedEnglishLetters => "'\",<.>pPyYfFgGcCrRlL/?=+\\|aAoOeEuUiIdDhHtTnNsS-_;:qQjJkKxXbBmMwWvVzZ 1!2@3#4$5%6^7&8*9(0)[{]}`~";
@@ -26,16 +27,32 @@ public static class TextHelpers
         };
     }
 
+    private static readonly Regex _multipleSpacesRegex = new Regex(" {2,}", RegexOptions.Compiled);
     public static IEnumerable<string> GetSentencesEnumerable(string text)
     {
         return text.Split(".", StringSplitOptions.RemoveEmptyEntries)
-            .Select(text => text.Replace("\r", ""))
-            .Select(text => text.Replace("\n", " "))
-            .Select(text => text.Replace("“", "\""))
-            .Select(text => text.Replace("”", "\""))
-            .Select(text => text.TrimEnd('.'))
-            .Select(text => string.Join(' ', text.Split(' ', StringSplitOptions.RemoveEmptyEntries))) // Remove multiple spaces in a row.
-            .Select(text => $"{text}.");
+            .Select(text =>
+            {
+                var sentence = text.Replace("\r", string.Empty)
+                    .Replace("\n", " ")
+                    .Replace("“", "\"")
+                    .Replace("”", "\"")
+                    .TrimEnd('.');
+
+                // Remove multiple spaces in a row.
+                sentence = _multipleSpacesRegex.Replace(sentence, " ");
+
+                return $"{sentence}.";
+            })
+            .Where(sentence => sentence.Length >= MinSentenceLength);
+    }
+
+    public static IEnumerable<string> GetAllowedSentencesEnumerable(string text, string language)
+        => GetSentencesEnumerable(text).Where(sentence => IsAllLettersAllowed(sentence, language));
+
+    public static string[] SplitTextBySpaces(string text)
+    {
+        return text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
     }
 
     public static IEnumerable<string> GetWordsEnumerable(string text)
@@ -43,6 +60,9 @@ public static class TextHelpers
         return GetSentencesEnumerable(text)
             .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
+
+    public static IEnumerable<string> GetAllowedWordsEnumerable(string text, string language)
+        => GetWordsEnumerable(text).Where(word => IsAllLettersAllowed(word, language));
 
     /// <summary>
     /// Lowercase word without punctuation.

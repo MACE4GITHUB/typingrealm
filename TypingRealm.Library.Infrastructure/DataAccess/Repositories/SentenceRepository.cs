@@ -37,6 +37,7 @@ public sealed class SentenceRepository : ISentenceRepository
         int batchSize)
     {
         var chunks = allSentences.Chunk(batchSize);
+
         using var connection = new Npgsql.NpgsqlConnection(
             _dbContext.Database.GetConnectionString());
 

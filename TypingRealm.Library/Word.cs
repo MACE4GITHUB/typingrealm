@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using TypingRealm.Texts;
 
 namespace TypingRealm.Library;
 
@@ -10,8 +9,7 @@ public sealed record Word(
     //WordId WordId,
     int IndexInSentence,
     string Value,
+    string RawValue,
     int CountInSentence,
-    IEnumerable<KeyPair> KeyPairs)
-{
-    public string RawWord => TextHelpers.GetRawWord(Value);
-}
+    int RawCountInSentence,
+    IEnumerable<KeyPair> KeyPairs);

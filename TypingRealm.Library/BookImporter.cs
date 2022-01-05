@@ -52,112 +52,104 @@ public sealed class BookImporter : IBookImporter
 
     private async ValueTask ImportBookAsync(Book book)
     {
-        var bulk = new List<Sentence>(100);
-
-        var sentenceIndex = 0;
-
         // TODO: Move most of this logic inside GetSentencesEnumerable method.
-        var sentences = TextHelpers.GetSentencesEnumerable(book.Content)
-            .Where(sentence => TextHelpers.IsAllLettersAllowed(sentence, "en")) // TODO: Support other languages.
-            .Where(sentence => sentence.Length >= TextHelpers.MinSentenceLength)
+        var sentences = TextHelpers.GetAllowedSentencesEnumerable(book.Content, "en") // TODO: Support other languages.
             .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
-        await _sentenceRepository.SaveByBatchesAsync(sentences, 100)
+        await _sentenceRepository.SaveByBatchesAsync(sentences, 200)
             .ConfigureAwait(false);
     }
 
-    private Sentence CreateSentence(BookId bookId, string value, int sentenceIndex)
+    private Sentence CreateSentence(BookId bookId, string sentence, int sentenceIndex)
     {
-        // TODO: Use _sentenceRepository.NextIdAsync();
         var sentenceId = SentenceId.New();
+        var words = TextHelpers.SplitTextBySpaces(sentence);
+        var wordsList = new List<Word>(words.Length);
 
-        var words = TextHelpers.GetWordsEnumerable(value)
-            .Select((word, index) => new
-            {
-                Word = word,
-                Index = index
-            })
-            .GroupBy(x => x.Word)
+        var wordsInSentence = words
+            .GroupBy(word => word)
             .Select(group => new
             {
                 Word = group.Key,
-                Count = group.Count(),
-                Values = group
-            })
-            .SelectMany(x => x.Values.Select(word => new
-            {
-                Word = word.Word,
-                Index = word.Index,
-                Count = x.Count
-            }))
-            .OrderBy(x => x.Index)
-            .Select(x => new Word(sentenceId, x.Index, x.Word, x.Count, CreateKeyPairsEnumerable(value, x.Word).ToList()));
+                Count = group.Count()
+            }).ToDictionary(x => x.Word);
 
-        // Let the magic happen.
-        // TODO: Measure performance here.
-        words = words.ToList();
-
-        return new Sentence(bookId, sentenceId, sentenceIndex, value, words);
-    }
-
-    private static IEnumerable<KeyPair> CreateKeyPairsEnumerable(string sentence, string word)
-    {
-        var wordKeyPairs = GetKeyPairsEnumerable(word)
-            .Select((keyPair, index) => new
-            {
-                KeyPair = keyPair,
-                Index = index
-            })
-            .GroupBy(x => x.KeyPair)
+        var rawWordsInSentence = words
+            .Select(word => TextHelpers.GetRawWord(word))
+            .GroupBy(word => word)
             .Select(group => new
             {
-                KeyPair = group.Key,
-                Count = group.Count(),
-                Values = group
-            })
-            .SelectMany(x => x.Values.Select(keyPair => new
-            {
-                KeyPair = keyPair.KeyPair,
-                Index = keyPair.Index,
-                Count = x.Count
-            }))
-            .OrderBy(x => x.Index);
+                Word = group.Key,
+                Count = group.Count()
+            }).ToDictionary(x => x.Word);
 
+        var index = 0;
+        foreach (var word in words)
+        {
+            var keyPairs = CreateKeyPairs(sentence, word);
+
+            var rawWord = TextHelpers.GetRawWord(word);
+            wordsList.Add(new Word(
+                sentenceId, index,
+                word, rawWord,
+                wordsInSentence[word].Count, rawWordsInSentence[rawWord].Count,
+                keyPairs));
+            index++;
+        }
+
+        return new Sentence(bookId, sentenceId, sentenceIndex, sentence, wordsList);
+    }
+
+    private static IList<KeyPair> CreateKeyPairs(string sentence, string word)
+    {
         // TODO: Measure performance here (ToDictionary).
-        var sentenceKeyPairs = GetKeyPairsEnumerable(sentence)
-            .GroupBy(x => x)
+        var keyPairsInSentence = GetKeyPairsEnumerable(sentence)
+            .GroupBy(keyPair => keyPair.KeyPair)
             .Select(group => new
             {
                 KeyPair = group.Key,
                 Count = group.Count()
             }).ToDictionary(x => x.KeyPair);
 
-        return wordKeyPairs.Select(x => new KeyPair(x.Index, x.KeyPair, x.Count, sentenceKeyPairs[x.KeyPair].Count));
+        var keyPairs = GetKeyPairsEnumerable(word).ToList();
+
+        var keyPairsInWord = keyPairs
+            .GroupBy(keyPair => keyPair.KeyPair)
+            .Select(group => new
+            {
+                KeyPair = group.Key,
+                Count = group.Count()
+            }).ToDictionary(x => x.KeyPair);
+
+        return keyPairs.Select(x => new KeyPair(
+            x.Index,
+            x.KeyPair,
+            keyPairsInWord[x.KeyPair].Count,
+            keyPairsInSentence[x.KeyPair].Count)).ToList();
     }
 
-    private static IEnumerable<string> GetKeyPairsEnumerable(string value)
+    private sealed record KeyPairInText(int Index, string KeyPair);
+    private static IEnumerable<KeyPairInText> GetKeyPairsEnumerable(string value)
     {
         if (value.Length == 0)
             throw new ArgumentException("Value should not be empty.", nameof(value));
 
-        yield return $" {value[0]}";
+        yield return new KeyPairInText(-1, $" {value[0]}");
 
         var index = 0;
         while (index < value.Length - 1)
         {
-            yield return value.Substring(index, 2);
+            yield return new KeyPairInText(index, value.Substring(index, 2));
 
             if (value[index..].Length > 2)
-                yield return value.Substring(index, 3);
+                yield return new KeyPairInText(index, value.Substring(index, 3));
             else
-                yield return $"{value.Substring(index, 2)} ";
-
-            // TODO: !!! IndexInWord is completely incorrect for keypairs.
-            // We need to either fix it or it doesn't make sense.
+                yield return new KeyPairInText(index, $"{value.Substring(index, 2)} ");
 
             index++;
         }
 
-        yield return $"{value[^1]} ";
+        // TODO: Figure out whether "index" value is correct here or I need to do +1.
+        yield return new KeyPairInText(index, $"{value[^1]} ");
     }
 }
