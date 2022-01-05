@@ -46,7 +46,8 @@ public static class TextHelpers
                 sentence = _multipleSpacesRegex.Replace(sentence, " ");
 
                 var subSentences = sentence.Split(".\" ");
-                subSentences[0] = $"{subSentences[0]}.\"";
+                if (subSentences.Length > 1)
+                    subSentences[0] = $"{subSentences[0]}.\"";
 
                 return subSentences;
             })
