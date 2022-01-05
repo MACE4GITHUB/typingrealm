@@ -37,7 +37,8 @@ public static class TextHelpers
                     .Replace("\n", " ")
                     .Replace("“", "\"")
                     .Replace("”", "\"")
-                    .TrimEnd('.');
+                    .TrimEnd('.')
+                    .Trim();
 
                 // Remove multiple spaces in a row.
                 sentence = _multipleSpacesRegex.Replace(sentence, " ");
