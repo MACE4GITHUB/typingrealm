@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace TypingRealm.Texts;
@@ -30,21 +31,26 @@ public static class TextHelpers
     private static readonly Regex _multipleSpacesRegex = new Regex(" {2,}", RegexOptions.Compiled);
     public static IEnumerable<string> GetSentencesEnumerable(string text)
     {
-        return text.Split(".", StringSplitOptions.RemoveEmptyEntries)
+        return text.Split(". ", StringSplitOptions.RemoveEmptyEntries)
             .Select(text =>
             {
-                var sentence = text.Replace("\r", string.Empty)
+                var sb = new StringBuilder(text);
+                var sentence = sb.Replace("\r", string.Empty)
                     .Replace("\n", " ")
                     .Replace("“", "\"")
                     .Replace("”", "\"")
-                    .TrimEnd('.')
-                    .Trim();
+                    .Append('.')
+                    .ToString();
 
                 // Remove multiple spaces in a row.
                 sentence = _multipleSpacesRegex.Replace(sentence, " ");
 
-                return $"{sentence}.";
+                var subSentences = sentence.Split(".\" ");
+                subSentences[0] = $"{subSentences[0]}.\"";
+
+                return subSentences;
             })
+            .SelectMany(x => x)
             .Where(sentence => sentence.Length >= MinSentenceLength);
     }
 
