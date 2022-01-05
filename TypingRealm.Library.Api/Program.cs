@@ -8,7 +8,7 @@ using TypingRealm.Library.Api.Controllers;
 using TypingRealm.Library.Infrastructure;
 
 [assembly: ApiController]
-var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(LibraryController).Assembly);
+var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(SentencesController).Assembly);
 
 builder.Services.AddLibraryApi(builder.Configuration);
 
