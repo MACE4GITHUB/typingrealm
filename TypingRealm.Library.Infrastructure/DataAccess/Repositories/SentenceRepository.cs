@@ -18,12 +18,8 @@ public sealed class SentenceQuery : ISentenceQuery
         _dbContext = dbContext;
     }
 
-    public record A(string BookId, int SentenceIndexInBook);
-    public async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int sentencesCount, int consecutiveSentencesCount = 1)
+    public async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int sentencesCount, int consecutiveSentencesCount)
     {
-        if (consecutiveSentencesCount > 1)
-            throw new NotSupportedException("For now only 1 consecutive sentence is supported.");
-
         var allBooks = await _dbContext.Book
             .Where(x => !x.IsArchived && x.IsProcessed)
             .Select(x => new { BookId = x.Id })
@@ -48,40 +44,38 @@ public sealed class SentenceQuery : ISentenceQuery
 
         var maxSentenceIndexInBookDict = maxSentenceIndexInBook.ToDictionary(x => x!.BookId);
 
-        var sentencesInfo = randomBooks.Select(book =>
+        var sentencesInfo = randomBooks.SelectMany(book =>
         {
+            var currentMaxSentenceIndexInBook = maxSentenceIndexInBookDict[book.BookId]!.IndexInBook;
+
             var randomSentenceIndexInBook = RandomNumberGenerator.GetInt32(
-                0, maxSentenceIndexInBookDict[book.BookId]!.IndexInBook);
+                0, currentMaxSentenceIndexInBook);
 
-            /*return new
-            {
-                BookId = book.BookId,
-                SentenceIndexInBook = randomSentenceIndexInBook
-            };*/
-
-            return new A(book.BookId, randomSentenceIndexInBook);
+            return GenerateBookAndSentencePairs(book.BookId, randomSentenceIndexInBook, currentMaxSentenceIndexInBook, consecutiveSentencesCount);
         }).ToList();
 
         var localIdPairs = sentencesInfo
             .Select(x => $"{x.BookId}-{x.SentenceIndexInBook}")
             .ToList();
 
-        try
-        {
-            var sentences = await _dbContext.Sentence.Where(
-                /*x => (x.IndexInBook == sentencesInfo[0].SentenceIndexInBook && x.BookId == sentencesInfo[0].BookId)
-                    || x.IndexInBook == sentencesInfo[1].SentenceIndexInBook && x.BookId == sentencesInfo[1].BookId)*/
-                x => localIdPairs.Any(localId => localId == x.BookId + "-" + x.IndexInBook))
-                .Select(x => new { SentenceId = x.Id, Value = x.Value })
-                .ToListAsync()
-                .ConfigureAwait(false);
+        var sentences = await _dbContext.Sentence.Where(
+            x => localIdPairs.Any(localId => localId == x.BookId + "-" + x.IndexInBook))
+            .Select(x => new { SentenceId = x.Id, Value = x.Value })
+            .ToListAsync()
+            .ConfigureAwait(false);
 
-            return sentences.Select(x => new SentenceDto(x.SentenceId, x.Value)).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw;
-        }
+        return sentences
+            .Select(x => new SentenceDto(x.SentenceId, x.Value)).ToList();
+    }
+
+    public record BookAndSentencePair(string BookId, int SentenceIndexInBook);
+    private static IEnumerable<BookAndSentencePair> GenerateBookAndSentencePairs(
+        string bookId, int startSentenceIndexInBook, int maxSentenceIndexInBook, int consecutiveSentencesCount)
+    {
+        var count = Math.Min(maxSentenceIndexInBook - startSentenceIndexInBook + 1, consecutiveSentencesCount);
+
+        return Enumerable.Range(startSentenceIndexInBook, count)
+            .Select(indexInBook => new BookAndSentencePair(bookId, indexInBook));
     }
 
     public ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int sentencesCount)

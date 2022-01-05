@@ -10,7 +10,7 @@ public sealed record SentenceDto(
 public interface ISentenceQuery
 {
     ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(
-        int sentencesCount, int consecutiveSentencesCount = 1);
+        int sentencesCount, int consecutiveSentencesCount);
 
     ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(
         IEnumerable<string> words, int sentencesCount);

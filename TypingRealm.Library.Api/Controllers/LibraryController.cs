@@ -28,9 +28,9 @@ public sealed class LibraryController : TyrController
 
     [HttpGet]
     [Route("sentences")]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentences(int count)
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentences(int count, int consecutiveCount)
     {
-        var sentences = await _sentenceQuery.FindRandomSentencesAsync(count);
+        var sentences = await _sentenceQuery.FindRandomSentencesAsync(count, consecutiveCount);
 
         return Ok(sentences);
     }
