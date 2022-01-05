@@ -23,6 +23,7 @@ public static class RegistrationExtensions
 
         services.AddScoped<ISentenceRepository, SentenceRepository>();
         services.AddScoped<IBookRepository, BookRepository>();
+        services.AddScoped<ISentenceQuery, SentenceQuery>();
 
         // TODO: Register NoInfrastructureService when no infrastructure.
         // TODO: Move out infrastructure deployment service to hosting project and reuse it.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,8 @@ public class BookDao : IDao<BookDao>
     public bool IsArchived { get; set; }
 
     public DateTime AddedAtUtc { get; set; }
+
+    public virtual ICollection<SentenceDao> Sentences { get; set; }
 
     public static BookDao ToDao(Book book)
     {

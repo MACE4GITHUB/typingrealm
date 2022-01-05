@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,10 +16,23 @@ public sealed record ImportBookRequest(string Description, IFormFile Content);
 public sealed class LibraryController : TyrController
 {
     private readonly IBookImporter _bookImporter;
+    private readonly ISentenceQuery _sentenceQuery;
 
-    public LibraryController(IBookImporter bookImporter)
+    public LibraryController(
+        IBookImporter bookImporter,
+        ISentenceQuery sentenceQuery)
     {
         _bookImporter = bookImporter;
+        _sentenceQuery = sentenceQuery;
+    }
+
+    [HttpGet]
+    [Route("sentences")]
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentences(int count)
+    {
+        var sentences = await _sentenceQuery.FindRandomSentencesAsync(count);
+
+        return Ok(sentences);
     }
 
     [HttpPost]
