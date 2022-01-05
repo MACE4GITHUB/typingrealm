@@ -52,6 +52,10 @@ public sealed class SentenceQuery : ISentenceQuery
                 0, currentMaxSentenceIndexInBook);
 
             return GenerateBookAndSentencePairs(book.BookId, randomSentenceIndexInBook, currentMaxSentenceIndexInBook, consecutiveSentencesCount);
+        }).Select((x, index) =>
+        {
+            x.Index = index;
+            return x;
         }).ToList();
 
         var localIdPairs = sentencesInfo
@@ -60,15 +64,29 @@ public sealed class SentenceQuery : ISentenceQuery
 
         var sentences = await _dbContext.Sentence.Where(
             x => localIdPairs.Any(localId => localId == x.BookId + "-" + x.IndexInBook))
-            .Select(x => new { SentenceId = x.Id, Value = x.Value })
+            .Select(x => new { SentenceId = x.Id, Value = x.Value, IndexInBook = x.IndexInBook, BookId = x.BookId })
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return sentences
-            .Select(x => new SentenceDto(x.SentenceId, x.Value)).ToList();
+        var joinResult =
+            from info in sentencesInfo
+            join sentence in sentences
+            on new { info.BookId, IndexInBook = info.SentenceIndexInBook } equals new { sentence.BookId, sentence.IndexInBook }
+            select new { info.Index, info.BookId, info.SentenceIndexInBook, sentence.SentenceId, sentence.Value };
+
+        var result = joinResult
+            .OrderBy(x => x.Index)
+            .Select(x => new SentenceDto(x.SentenceId, x.Value))
+            .ToList();
+
+        return result;
     }
 
-    public record BookAndSentencePair(string BookId, int SentenceIndexInBook);
+    public sealed record BookAndSentencePair(string BookId, int SentenceIndexInBook)
+    {
+        public int Index { get; set; }
+    }
+
     private static IEnumerable<BookAndSentencePair> GenerateBookAndSentencePairs(
         string bookId, int startSentenceIndexInBook, int maxSentenceIndexInBook, int consecutiveSentencesCount)
     {
