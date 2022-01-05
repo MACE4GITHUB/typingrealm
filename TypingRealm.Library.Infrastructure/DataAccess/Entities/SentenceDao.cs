@@ -61,6 +61,7 @@ public class SentenceDao : IDao<SentenceDao>
 [Index(nameof(SentenceId))]
 [Index(nameof(IndexInSentence))]
 [Index(nameof(Value))]
+[Index(nameof(RawValue))]
 [Index(nameof(CountInSentence))]
 public class WordDao
 {
@@ -77,6 +78,9 @@ public class WordDao
     [MaxLength(100)]
     public string Value { get; set; }
 
+    [MaxLength(100)]
+    public string RawValue { get; set; }
+
     public int CountInSentence { get; set; }
 
     public virtual ICollection<KeyPairDao> KeyPairs { get; set; }
@@ -89,6 +93,7 @@ public class WordDao
             SentenceId = word.SentenceId,
             IndexInSentence = word.IndexInSentence,
             Value = word.Value,
+            RawValue = word.RawWord,
             CountInSentence = word.CountInSentence,
             KeyPairs = word.KeyPairs.Select(kp => KeyPairDao.ToDao(kp)).ToList()
         };

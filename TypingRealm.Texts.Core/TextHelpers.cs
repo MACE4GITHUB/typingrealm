@@ -13,6 +13,9 @@ public static class TextHelpers
     public static string AllowedEnglishLetters => "'\",<.>pPyYfFgGcCrRlL/?=+\\|aAoOeEuUiIdDhHtTnNsS-_;:qQjJkKxXbBmMwWvVzZ 1!2@3#4$5%6^7&8*9(0)[{]}`~";
     public static string AllowedRussianLetters => "'\",<.>/?=+\\|-_;: 1!2@3#4$5%6^7&8*9(0)[{]}`~йЙцЦуУкКеЕнНгГшШщЩзЗхХъЪфФыЫвВаАпПрРоОлЛдДжЖэЭяЯчЧсСмМиИтТьЬбБюЮёЁ";
 
+    public static string PunctuationCharacters => "'\",<.>/?=+\\|-_;:!@#$%^&*()[{]}`~";
+    public static string NumberCharacters => "0123456789";
+
     public static bool IsAllLettersAllowed(string text, string language)
     {
         return language switch
@@ -39,5 +42,20 @@ public static class TextHelpers
     {
         return GetSentencesEnumerable(text)
             .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    /// <summary>
+    /// Lowercase word without punctuation.
+    /// </summary>
+    public static string GetRawWord(string word)
+    {
+        foreach (var character in PunctuationCharacters)
+        {
+            word = word.Replace(character.ToString(), "");
+        }
+
+        word = word.Trim();
+
+        return word.ToLowerInvariant();
     }
 }

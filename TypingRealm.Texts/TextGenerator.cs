@@ -56,7 +56,7 @@ public sealed class TextGenerator : ITextGenerator
             if (configuration.StripPunctuation)
                 textPartsEnumerable = textPartsEnumerable.Select(part =>
                 {
-                    foreach (var character in SupportedLanguages.PunctuationCharacters)
+                    foreach (var character in TextHelpers.PunctuationCharacters)
                     {
                         part = part.Replace(character.ToString(), "");
                     }
@@ -67,7 +67,7 @@ public sealed class TextGenerator : ITextGenerator
             if (configuration.StripNumbers)
                 textPartsEnumerable = textPartsEnumerable.Select(part =>
                 {
-                    foreach (var character in SupportedLanguages.NumberCharacters)
+                    foreach (var character in TextHelpers.NumberCharacters)
                     {
                         part = part.Replace(character.ToString(), "");
                     }

@@ -13,7 +13,4 @@ public static class SupportedLanguages
     };
 
     public static IEnumerable<string> Languages => SupportedTextRetrievers.Keys;
-
-    public static string PunctuationCharacters => "'\",<.>/?=+\\|-_;:!@#$%^&*()[{]}`~";
-    public static string NumberCharacters => "0123456789";
 }

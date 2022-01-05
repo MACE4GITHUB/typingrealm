@@ -53,6 +53,7 @@ namespace TypingRealm.Library.Infrastructure.Migrations
                     sentence_id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     index_in_sentence = table.Column<int>(type: "integer", nullable: false),
                     value = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    raw_value = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     count_in_sentence = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -143,6 +144,11 @@ namespace TypingRealm.Library.Infrastructure.Migrations
                 name: "ix_word_index_in_sentence",
                 table: "word",
                 column: "index_in_sentence");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_word_raw_value",
+                table: "word",
+                column: "raw_value");
 
             migrationBuilder.CreateIndex(
                 name: "ix_word_sentence_id",
