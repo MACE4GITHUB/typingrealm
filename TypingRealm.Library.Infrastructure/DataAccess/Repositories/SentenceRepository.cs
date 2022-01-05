@@ -41,6 +41,7 @@ public sealed class SentenceRepository : ISentenceRepository
     {
         using var scope = _provider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+        context.ChangeTracker.AutoDetectChangesEnabled = false;
 
         await context.Sentence.AddRangeAsync(sentences.Select(s => SentenceDao.ToDao(s)))
             .ConfigureAwait(false);
