@@ -35,6 +35,24 @@ public sealed class LibraryController : TyrController
         return Ok(sentences);
     }
 
+    [HttpGet]
+    [Route("sentences-by-keypairs")]
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByKeypairs(string[] keyPairs, int count)
+    {
+        var sentences = await _sentenceQuery.FindSentencesContainingKeyPairsAsync(keyPairs, count);
+
+        return Ok(sentences);
+    }
+
+    [HttpGet]
+    [Route("sentences-by-words")]
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByWords(string[] words, int count)
+    {
+        var sentences = await _sentenceQuery.FindSentencesContainingWordsAsync(words, count);
+
+        return Ok(sentences);
+    }
+
     [HttpPost]
     [SuperAdminScoped]
     [Route("book/import")]

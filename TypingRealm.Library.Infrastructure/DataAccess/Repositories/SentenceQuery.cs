@@ -94,13 +94,53 @@ public sealed class SentenceQuery : ISentenceQuery
             .Select(indexInBook => new BookAndSentencePair(bookId, indexInBook));
     }
 
-    public ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int sentencesCount)
+    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int sentencesCount)
     {
-        throw new NotImplementedException();
+        var sentences = await _dbContext.KeyPair
+            .Include(keyPair => keyPair.Word)
+            .ThenInclude(word => word.Sentence)
+            .Where(keyPair => keyPairs.Contains(keyPair.Value))
+            .OrderByDescending(keyPair => keyPair.CountInSentence)
+            .Select(x => new
+            {
+                SentenceId = x.Word.SentenceId,
+                SentenceValue = x.Word.Sentence.Value,
+                CountInWord = x.CountInWord,
+                CountInSentence = x.CountInSentence
+            })
+            .Take(sentencesCount)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        var result = sentences
+            .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
+            .ToList();
+
+        return result;
     }
 
-    public ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int sentencesCount)
+    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int sentencesCount)
     {
-        throw new NotImplementedException();
+        var searchWords = words.Select(word => word.ToLowerInvariant()).ToList();
+
+        var sentences = await _dbContext.Word
+            .Include(word => word.Sentence)
+            .Where(word => searchWords.Contains(word.RawValue))
+            .OrderByDescending(word => word.RawCountInSentence)
+            .Select(x => new
+            {
+                SentenceId = x.SentenceId,
+                SentenceValue = x.Sentence.Value,
+                CountInSentence = x.CountInSentence
+            })
+            .Take(sentencesCount)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        var result = sentences
+            .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
+            .ToList();
+
+        return result;
     }
 }
