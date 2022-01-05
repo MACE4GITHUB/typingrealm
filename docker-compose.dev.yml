@@ -154,7 +154,8 @@ services:
     networks:
       - dev-typingrealm-library-net
     ports:
-      - 5432:5432
+    # Make sure everything is consistent. This port is temporary for debugging.
+      - 15432:5432
     volumes:
       - ./infrastructure-data/dev/library/postgres:/var/lib/postgresql/data
     restart: unless-stopped

@@ -18,4 +18,10 @@ api.localhost {
     handle_path /texts/* {
         reverse_proxy local-typingrealm-texts:80
     }
+
+    handle_path /library/* {
+        reverse_proxy local-typingrealm-library:80
+    }
+
+    respond 404
 }

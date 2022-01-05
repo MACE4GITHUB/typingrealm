@@ -18,6 +18,10 @@ api.typingrealm.com {
         reverse_proxy typingrealm-profiles:80
     }
 
+    handle_path /library/* {
+        reverse_proxy typingrealm-library:80
+    }
+
     respond 404
 }
 
@@ -42,6 +46,10 @@ dev.api.typingrealm.com {
         reverse_proxy dev-typingrealm-texts:80
     }
 
+    handle_path /library/* {
+        reverse_proxy dev-typingrealm-library:80
+    }
+
     respond 404
 }
 
@@ -56,6 +64,18 @@ api.localhost {
 
     handle_path /profiles/* {
         reverse_proxy local-typingrealm-profiles:80
+    }
+
+    handle_path /auth/* {
+        reverse_proxy local-typingrealm-identityserver:80
+    }
+
+    handle_path /texts/* {
+        reverse_proxy local-typingrealm-texts:80
+    }
+
+    handle_path /library/* {
+        reverse_proxy local-typingrealm-library:80
     }
 
     respond 404
