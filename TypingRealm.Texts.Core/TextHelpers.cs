@@ -29,27 +29,41 @@ public static class TextHelpers
     }
 
     private static readonly Regex _multipleSpacesRegex = new Regex(" {2,}", RegexOptions.Compiled);
+    private static readonly Regex _sentenceRegex = new Regex(@"(?<=[\.!\?]""?)\s+", RegexOptions.Compiled);
     public static IEnumerable<string> GetSentencesEnumerable(string text)
     {
-        return text.Split(". ", StringSplitOptions.RemoveEmptyEntries)
+        return _sentenceRegex.Split(text)
             .Select(text =>
             {
                 var sb = new StringBuilder(text);
-                var sentence = sb.Replace("\r", string.Empty)
+                var normalizedText = sb.Replace("\r", string.Empty)
                     .Replace("\n", " ")
                     .Replace("“", "\"")
                     .Replace("”", "\"")
-                    .Append('.')
-                    .ToString();
+                    .Replace("—", " - ")
+                    .Replace("…\"", "...\" ")
+                    .Replace("…", "... ")
+                    .ToString().Trim();
 
                 // Remove multiple spaces in a row.
-                sentence = _multipleSpacesRegex.Replace(sentence, " ");
+                normalizedText = _multipleSpacesRegex.Replace(normalizedText, " ");
 
-                var subSentences = sentence.Split(".\" ");
-                if (subSentences.Length > 1)
-                    subSentences[0] = $"{subSentences[0]}.\"";
+                var sentences = _sentenceRegex.Split(normalizedText)
+                    .Where(sentence => sentence.Length > 0)
+                    .Select(sentence =>
+                    {
+                        if (char.IsLower(sentence[0]))
+                        {
+                            if (sentence.Length == 1)
+                                return sentence.ToUpperInvariant();
 
-                return subSentences;
+                            return $"{sentence[0].ToString().ToUpperInvariant()}{sentence[1..]}";
+                        }
+
+                        return sentence;
+                    });
+
+                return sentences;
             })
             .SelectMany(x => x)
             .Where(sentence => sentence.Length >= MinSentenceLength);

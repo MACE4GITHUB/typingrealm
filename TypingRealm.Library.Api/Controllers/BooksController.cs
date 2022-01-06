@@ -21,7 +21,7 @@ public sealed class BooksController : TyrController
 
     [HttpPost]
     [SuperAdminScoped]
-    [Route("book/import")]
+    [Route("import")]
     public async ValueTask<ActionResult> ImportBook(string description, IFormFile content)
     {
         try
