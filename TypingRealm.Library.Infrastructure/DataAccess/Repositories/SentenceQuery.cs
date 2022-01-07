@@ -125,8 +125,8 @@ public sealed class SentenceQuery : ISentenceQuery
         var searchWords = words.Select(word => word.ToLowerInvariant()).ToList();
 
         var sentences = await _dbContext.Word
-            .Include(word => word.Sentence)
             .Where(word => searchWords.Contains(word.RawValue))
+            .Include(word => word.Sentence)
             .OrderByDescending(word => word.RawCountInSentence)
             .Select(x => new
             {
