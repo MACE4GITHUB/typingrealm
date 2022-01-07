@@ -1,7 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using TypingRealm.DeploymentHelper;
+using Environment = TypingRealm.DeploymentHelper.Environment;
 
-var folder = @"test";
+Console.WriteLine("Folder:");
+var folder = Console.ReadLine();
+if (folder == null)
+    throw new InvalidOperationException("Folder is not specified.");
+
 if (!Directory.Exists(folder))
     Directory.CreateDirectory(folder);
 
@@ -29,6 +35,6 @@ foreach (var env in environments)
 
     foreach (var file in envFiles)
     {
-        File.WriteAllText(Path.Combine(folder, file.Name), file.Data);
+        File.WriteAllText(Path.Combine(folder, "deployment", file.Name), file.Data);
     }
 }
