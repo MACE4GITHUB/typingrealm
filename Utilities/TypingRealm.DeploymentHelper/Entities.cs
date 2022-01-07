@@ -221,6 +221,8 @@ namespace TypingRealm.DeploymentHelper
         public bool RestartUnlessStopped => Value != "debug";
         public bool DeployInfrastructure => Value != "debug";
         public bool IsDevelopmentEnv => Value != "prod" && Value != "strict-prod";
+
+        public bool GenerateEnvFiles => Value != "strict-prod";
     }
 
     // TODO: Handle "Caddy" service separately (hardcode?).
@@ -230,35 +232,37 @@ namespace TypingRealm.DeploymentHelper
     {
         public IEnumerable<EnvFile> GenerateEnvFiles(DeploymentData deploymentData, Environment environment)
         {
+            if (!environment.GenerateEnvFiles)
+                yield break;
+
             var envVars = new List<EnvVariable>();
             var serviceEnvVars = deploymentData.Services
                 .Select(x => new { Service = x, EnvVars = new List<EnvVariable>() })
                 .ToDictionary(x => x.Service.ServiceName);
 
             if (environment.IsDevelopmentEnv)
-            {
                 envVars.Add(new EnvVariable("ASPNETCORE_ENVIRONMENT", "Development"));
 
-                foreach (var service in deploymentData.Services)
+            foreach (var service in deploymentData.Services)
+            {
+                if (service.ServiceName == "identityserver")
                 {
-                    if (service.ServiceName == "identityserver")
-                    {
-                        envVars.Add(new EnvVariable("SERVICE_AUTHORITY", $"http://{environment.EnvironmentPrefix}-{DeploymentData.ProjectName}-{service.ServiceName}/"));
-                        continue;
-                    }
+                    envVars.Add(new EnvVariable("SERVICE_AUTHORITY", $"http://{environment.EnvironmentPrefix}{DeploymentData.ProjectName}-{service.ServiceName}/"));
+                    continue;
+                }
 
-                    envVars.Add(new EnvVariable($"{service.ServiceName.ToUpperInvariant()}_URL", "http://{environment.EnvironmentPrefix}-{DeploymentData.ProjectName}"));
+                envVars.Add(new EnvVariable($"{service.ServiceName.ToUpperInvariant()}_URL", $"http://{environment.EnvironmentPrefix}{DeploymentData.ProjectName}-{service.ServiceName}"));
 
-                    if (service.CacheType == CacheType.Redis)
-                    {
-                        serviceEnvVars[service.ServiceName].EnvVars.Add(new EnvVariable("ConnectionStrings__ServiceCacheConnection", $"{environment.EnvironmentPrefix}-{DeploymentData.ProjectName}-{service.ServiceName}-redis:6379"));
-                    }
+                if (service.CacheType == CacheType.Redis)
+                {
+                    serviceEnvVars[service.ServiceName].EnvVars.Add(new EnvVariable("ConnectionStrings__ServiceCacheConnection", $"{environment.EnvironmentPrefix}{DeploymentData.ProjectName}-{service.ServiceName}-redis:6379"));
+                }
 
-                    if (service.DatabaseType == DatabaseType.Postgres)
-                    {
-                        var connectionString = $"{environment.EnvironmentPrefix}-{DeploymentData.ProjectName}-{service.ServiceName}-postgres; Port=5432; User Id=postgres; Password=admin; Database=db";
-                        serviceEnvVars[service.ServiceName].EnvVars.Add(new EnvVariable("ConnectionStrings__DataConnection", connectionString));
-                    }
+                if (service.DatabaseType == DatabaseType.Postgres)
+                {
+                    var connectionString = $"Server={environment.EnvironmentPrefix}{DeploymentData.ProjectName}-{service.ServiceName}-postgres; Port=5432; User Id=postgres; Password=admin; Database=db";
+                    serviceEnvVars[service.ServiceName].EnvVars.Add(new EnvVariable("ConnectionStrings__DataConnection", connectionString));
+                    serviceEnvVars[service.ServiceName].EnvVars.Add(new EnvVariable("POSTGRES_PASSWORD", "admin"));
                 }
             }
 
