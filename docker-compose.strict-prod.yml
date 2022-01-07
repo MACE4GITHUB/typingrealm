@@ -7,34 +7,6 @@ networks:
   typingrealm-library-net:
 
 services:
-  typingrealm-identityserver:
-    image: ${DOCKER_REGISTRY-}typingrealm-identityserver
-    container_name: typingrealm-identityserver
-    networks:
-      - typingrealm-net
-    build:
-      context: .
-      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
-    restart: unless-stopped
-    mem_limit: 1g
-    mem_reservation: 750m
-    env_file:
-      - deployment/.env.prod
-
-  typingrealm-profiles:
-    image: ${DOCKER_REGISTRY-}typingrealm-profiles
-    container_name: typingrealm-profiles
-    networks:
-      - typingrealm-net
-    build:
-      context: .
-      dockerfile: TypingRealm.Profiles.Api/Dockerfile
-    restart: unless-stopped
-    mem_limit: 1g
-    mem_reservation: 750m
-    env_file:
-      - deployment/.env.prod
-
   typingrealm-data:
     image: ${DOCKER_REGISTRY-}typingrealm-data
     container_name: typingrealm-data
@@ -51,21 +23,47 @@ services:
       - deployment/.env.prod
       - deployment/.env.prod.data
 
-  typingrealm-texts:
-    image: ${DOCKER_REGISTRY-}typingrealm-texts
-    container_name: typingrealm-texts
+  typingrealm-data-postgres:
+    image: postgres
+    container_name: typingrealm-data-postgres
+    networks:
+      - typingrealm-data-net
+    volumes:
+      - ./infrastructure-data/prod/data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - deployment/.env.prod
+      - deployment/.env.prod.data
+
+  typingrealm-data-redis:
+    image: redis
+    container_name: typingrealm-data-redis
+    networks:
+      - typingrealm-data-net
+    volumes:
+      - ./infrastructure-data/prod/data/redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - deployment/.env.prod
+      - deployment/.env.prod.data
+
+  typingrealm-identityserver:
+    image: ${DOCKER_REGISTRY-}typingrealm-identityserver
+    container_name: typingrealm-identityserver
     networks:
       - typingrealm-net
-      - typingrealm-texts-net
     build:
       context: .
-      dockerfile: TypingRealm.Texts.Api/Dockerfile
+      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
       - deployment/.env.prod
-      - deployment/.env.prod.texts
 
   typingrealm-library:
     image: ${DOCKER_REGISTRY-}typingrealm-library
@@ -83,34 +81,49 @@ services:
       - deployment/.env.prod
       - deployment/.env.prod.library
 
-  # === Infrastructure ===
+  typingrealm-library-postgres:
+    image: postgres
+    container_name: typingrealm-library-postgres
+    networks:
+      - typingrealm-library-net
+    volumes:
+      - ./infrastructure-data/prod/library/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.75g
+    env_file:
+      - deployment/.env.prod
+      - deployment/.env.prod.library
 
-  typingrealm-redis:
-    image: redis
-    container_name: typingrealm-redis
+  typingrealm-profiles:
+    image: ${DOCKER_REGISTRY-}typingrealm-profiles
+    container_name: typingrealm-profiles
     networks:
       - typingrealm-net
-    volumes:
-      - ./infrastructure-data/prod/shared/redis:/data
+    build:
+      context: .
+      dockerfile: TypingRealm.Profiles.Api/Dockerfile
     restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_limit: 1g
+    mem_reservation: 750m
     env_file:
       - deployment/.env.prod
 
-  typingrealm-data-redis:
-    image: redis
-    container_name: typingrealm-data-redis
+  typingrealm-texts:
+    image: ${DOCKER_REGISTRY-}typingrealm-texts
+    container_name: typingrealm-texts
     networks:
-      - typingrealm-data-net
-    volumes:
-      - ./infrastructure-data/prod/data/redis:/data
+      - typingrealm-net
+      - typingrealm-texts-net
+    build:
+      context: .
+      dockerfile: TypingRealm.Texts.Api/Dockerfile
     restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_limit: 1g
+    mem_reservation: 750m
     env_file:
       - deployment/.env.prod
-      - deployment/.env.prod.data
+      - deployment/.env.prod.texts
 
   typingrealm-texts-redis:
     image: redis
@@ -126,33 +139,19 @@ services:
       - deployment/.env.prod
       - deployment/.env.prod.texts
 
-  typingrealm-data-postgres:
-    image: postgres
-    container_name: typingrealm-data-postgres
+  typingrealm-web-ui:
+    image: ${DOCKER_REGISTRY-}typingrealm-web-ui
+    container_name: typingrealm-web-ui
     networks:
-      - typingrealm-data-net
-    volumes:
-      - ./infrastructure-data/prod/data/postgres:/var/lib/postgresql/data
+      - typingrealm-net
+    build:
+      context: ./typingrealm-web
+      dockerfile: Dockerfile
     restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_limit: 1g
+    mem_reservation: 750m
     env_file:
       - deployment/.env.prod
-      - deployment/.env.prod.data
-
-  typingrealm-library-postgres:
-    image: postgres
-    container_name: typingrealm-library-postgres
-    networks:
-      - typingrealm-library-net
-    volumes:
-      - ./infrastructure-data/prod/library/postgres:/var/lib/postgresql/data
-    restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.75g
-    env_file:
-      - deployment/.env.prod
-      - deployment/.env.prod.library
 
   typingrealm-caddy:
     image: caddy
@@ -165,20 +164,6 @@ services:
     volumes:
       - ./reverse-proxy/Caddyfile.prod:/etc/caddy/Caddyfile
       - ./infrastructure-data/prod/caddy_data:/data
-    restart: unless-stopped
-    mem_limit: 1g
-    mem_reservation: 750m
-    env_file:
-      - deployment/.env.prod
-
-  typingrealm-web-ui:
-    image: ${DOCKER_REGISTRY-}typingrealm-web-ui
-    container_name: typingrealm-web-ui
-    networks:
-      - typingrealm-net
-    build:
-      context: ./typingrealm-web
-      dockerfile: Dockerfile
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m

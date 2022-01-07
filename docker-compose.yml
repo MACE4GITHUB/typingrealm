@@ -4,32 +4,6 @@ networks:
   debug-typingrealm-net:
 
 services:
-  debug-typingrealm-identityserver:
-    image: ${DOCKER_REGISTRY-}debug-typingrealm-identityserver
-    container_name: debug-typingrealm-identityserver
-    networks:
-      - debug-typingrealm-net
-    ports:
-      - 30000:80
-    build:
-      context: .
-      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
-    env_file:
-      - deployment/.env.debug
-
-  debug-typingrealm-profiles:
-    image: ${DOCKER_REGISTRY-}debug-typingrealm-profiles
-    container_name: debug-typingrealm-profiles
-    networks:
-      - debug-typingrealm-net
-    ports:
-      - 30103:80
-    build:
-      context: .
-      dockerfile: TypingRealm.Profiles.Api/Dockerfile
-    env_file:
-      - deployment/.env.debug
-
   debug-typingrealm-data:
     image: ${DOCKER_REGISTRY-}debug-typingrealm-data
     container_name: debug-typingrealm-data
@@ -44,19 +18,18 @@ services:
       - deployment/.env.debug
       - deployment/.env.debug.data
 
-  debug-typingrealm-texts:
-    image: ${DOCKER_REGISTRY-}debug-typingrealm-texts
-    container_name: debug-typingrealm-texts
+  debug-typingrealm-identityserver:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-identityserver
+    container_name: debug-typingrealm-identityserver
     networks:
       - debug-typingrealm-net
     ports:
-      - 30401:80
+      - 30000:80
     build:
       context: .
-      dockerfile: TypingRealm.Texts.Api/Dockerfile
+      dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
     env_file:
       - deployment/.env.debug
-      - deployment/.env.debug.texts
 
   debug-typingrealm-library:
     image: ${DOCKER_REGISTRY-}debug-typingrealm-library
@@ -73,3 +46,30 @@ services:
       - deployment/.env.debug.library
     mem_limit: 1g
     mem_reservation: 500m
+
+  debug-typingrealm-profiles:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-profiles
+    container_name: debug-typingrealm-profiles
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30103:80
+    build:
+      context: .
+      dockerfile: TypingRealm.Profiles.Api/Dockerfile
+    env_file:
+      - deployment/.env.debug
+
+  debug-typingrealm-texts:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-texts
+    container_name: debug-typingrealm-texts
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30401:80
+    build:
+      context: .
+      dockerfile: TypingRealm.Texts.Api/Dockerfile
+    env_file:
+      - deployment/.env.debug
+      - deployment/.env.debug.texts
