@@ -237,6 +237,7 @@ namespace TypingRealm.DeploymentHelper
 
             var envVars = new List<EnvVariable>();
             var serviceEnvVars = deploymentData.Services
+                .Where(s => s.ServiceName != "web-ui")
                 .Select(x => new { Service = x, EnvVars = new List<EnvVariable>() })
                 .ToDictionary(x => x.Service.ServiceName);
 
@@ -245,9 +246,19 @@ namespace TypingRealm.DeploymentHelper
 
             foreach (var service in deploymentData.Services)
             {
+                if (service.ServiceName == "web-ui")
+                    continue;
+
                 if (service.ServiceName == "identityserver")
                 {
-                    envVars.Add(new EnvVariable("SERVICE_AUTHORITY", $"http://{environment.EnvironmentPrefix}{DeploymentData.ProjectName}-{service.ServiceName}/"));
+                    if (environment.IsDebug)
+                    {
+                        envVars.Add(new EnvVariable("SERVICE_AUTHORITY", $"http://host.docker.internal:{service.Port}/"));
+                    }
+                    else
+                    {
+                        envVars.Add(new EnvVariable("SERVICE_AUTHORITY", $"http://{environment.EnvironmentPrefix}{DeploymentData.ProjectName}-{service.ServiceName}/"));
+                    }
                     continue;
                 }
 
