@@ -19,7 +19,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.dev
+      - deployment/.env.dev
 
   dev-typingrealm-profiles:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-profiles
@@ -33,7 +33,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.dev
+      - deployment/.env.dev
 
   dev-typingrealm-data:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-data
@@ -48,8 +48,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.dev
-      - .env.dev.data
+      - deployment/.env.dev
+      - deployment/.env.dev.data
 
   dev-typingrealm-texts:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-texts
@@ -64,8 +64,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.dev
-      - .env.dev.texts
+      - deployment/.env.dev
+      - deployment/.env.dev.texts
 
   dev-typingrealm-library:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-library
@@ -80,8 +80,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.dev
-      - .env.dev.library
+      - deployment/.env.dev
+      - deployment/.env.dev.library
 
   # === Infrastructure ===
 
@@ -98,7 +98,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.dev
+      - deployment/.env.dev
 
   dev-typingrealm-data-redis:
     image: redis
@@ -113,8 +113,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.dev
-      - .env.dev.data
+      - deployment/.env.dev
+      - deployment/.env.dev.data
 
   dev-typingrealm-texts-redis:
     image: redis
@@ -129,8 +129,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.dev
-      - .env.dev.texts
+      - deployment/.env.dev
+      - deployment/.env.dev.texts
 
   dev-typingrealm-data-postgres:
     image: postgres
@@ -145,8 +145,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.dev
-      - .env.dev.data
+      - deployment/.env.dev
+      - deployment/.env.dev.data
 
   dev-typingrealm-library-postgres:
     image: postgres
@@ -162,8 +162,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.dev
-      - .env.dev.library
+      - deployment/.env.dev
+      - deployment/.env.dev.library
 
   # Simple local UI test page to facilitate BackEnd development.
   dev-typingrealm-web-ui:
@@ -178,4 +178,4 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.dev
+      - deployment/.env.dev

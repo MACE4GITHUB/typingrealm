@@ -19,7 +19,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.local
+      - deployment/.env.local
 
   local-typingrealm-profiles:
     image: ${DOCKER_REGISTRY-}local-typingrealm-profiles
@@ -33,7 +33,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.local
+      - deployment/.env.local
 
   local-typingrealm-data:
     image: ${DOCKER_REGISTRY-}local-typingrealm-data
@@ -48,8 +48,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.local
-      - .env.local.data
+      - deployment/.env.local
+      - deployment/.env.local.data
 
   local-typingrealm-texts:
     image: ${DOCKER_REGISTRY-}local-typingrealm-texts
@@ -64,8 +64,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.local
-      - .env.local.texts
+      - deployment/.env.local
+      - deployment/.env.local.texts
 
   local-typingrealm-library:
     image: ${DOCKER_REGISTRY-}local-typingrealm-library
@@ -80,8 +80,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.local
-      - .env.local.library
+      - deployment/.env.local
+      - deployment/.env.local.library
 
   # === Infrastructure ===
 
@@ -96,7 +96,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.local
+      - deployment/.env.local
 
   local-typingrealm-data-redis:
     image: redis
@@ -109,8 +109,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.local
-      - .env.local.data
+      - deployment/.env.local
+      - deployment/.env.local.data
 
   local-typingrealm-texts-redis:
     image: redis
@@ -123,8 +123,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.local
-      - .env.local.texts
+      - deployment/.env.local
+      - deployment/.env.local.texts
 
   local-typingrealm-data-postgres:
     image: postgres
@@ -137,8 +137,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.local
-      - .env.local.data
+      - deployment/.env.local
+      - deployment/.env.local.data
 
   local-typingrealm-library-postgres:
     image: postgres
@@ -151,8 +151,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.local
-      - .env.local.library
+      - deployment/.env.local
+      - deployment/.env.local.library
 
   local-typingrealm-caddy:
     image: caddy
@@ -169,4 +169,4 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.local
+      - deployment/.env.local

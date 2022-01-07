@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
     env_file:
-      - .env.debug
+      - deployment/.env.debug
 
   debug-typingrealm-profiles:
     image: ${DOCKER_REGISTRY-}debug-typingrealm-profiles
@@ -28,7 +28,7 @@ services:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
     env_file:
-      - .env.debug
+      - deployment/.env.debug
 
   debug-typingrealm-data:
     image: ${DOCKER_REGISTRY-}debug-typingrealm-data
@@ -41,8 +41,8 @@ services:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile
     env_file:
-      - .env.debug
-      - .env.debug.data
+      - deployment/.env.debug
+      - deployment/.env.debug.data
 
   debug-typingrealm-texts:
     image: ${DOCKER_REGISTRY-}debug-typingrealm-texts
@@ -55,8 +55,8 @@ services:
       context: .
       dockerfile: TypingRealm.Texts.Api/Dockerfile
     env_file:
-      - .env.debug
-      - .env.debug.texts
+      - deployment/.env.debug
+      - deployment/.env.debug.texts
 
   debug-typingrealm-library:
     image: ${DOCKER_REGISTRY-}debug-typingrealm-library
@@ -69,7 +69,7 @@ services:
       context: .
       dockerfile: TypingRealm.Library.Api/Dockerfile
     env_file:
-      - .env.debug
-      - .env.debug.library
+      - deployment/.env.debug
+      - deployment/.env.debug.library
     mem_limit: 1g
     mem_reservation: 500m

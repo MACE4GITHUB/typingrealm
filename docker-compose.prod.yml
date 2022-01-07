@@ -23,7 +23,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.prod
+      - deployment/.env.prod
 
   typingrealm-profiles:
     image: ${DOCKER_REGISTRY-}typingrealm-profiles
@@ -37,7 +37,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.prod
+      - deployment/.env.prod
 
   typingrealm-data:
     image: ${DOCKER_REGISTRY-}typingrealm-data
@@ -52,8 +52,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.prod
-      - .env.prod.data
+      - deployment/.env.prod
+      - deployment/.env.prod.data
 
   typingrealm-texts:
     image: ${DOCKER_REGISTRY-}typingrealm-texts
@@ -68,8 +68,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.prod
-      - .env.prod.texts
+      - deployment/.env.prod
+      - deployment/.env.prod.texts
 
   typingrealm-library:
     image: ${DOCKER_REGISTRY-}typingrealm-library
@@ -84,8 +84,8 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.prod
-      - .env.prod.library
+      - deployment/.env.prod
+      - deployment/.env.prod.library
 
   # === Infrastructure ===
 
@@ -103,7 +103,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.prod
+      - deployment/.env.prod
 
   typingrealm-data-redis:
     image: redis
@@ -119,8 +119,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.prod
-      - .env.prod.data
+      - deployment/.env.prod
+      - deployment/.env.prod.data
 
   typingrealm-texts-redis:
     image: redis
@@ -136,8 +136,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.prod
-      - .env.prod.texts
+      - deployment/.env.prod
+      - deployment/.env.prod.texts
 
   typingrealm-data-postgres:
     image: postgres
@@ -153,8 +153,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.prod
-      - .env.prod.data
+      - deployment/.env.prod
+      - deployment/.env.prod.data
 
   typingrealm-library-postgres:
     image: postgres
@@ -170,8 +170,8 @@ services:
     mem_limit: 2g
     mem_reservation: 1.75g
     env_file:
-      - .env.prod
-      - .env.prod.library
+      - deployment/.env.prod
+      - deployment/.env.prod.library
 
   # This is Caddy both for PROD, DEV and LOCAL routing.
   # In the final PROD configuration another Caddyfile should be deployed.
@@ -192,7 +192,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.prod
+      - deployment/.env.prod
 
   # Simple local UI test page to facilitate BackEnd development.
   typingrealm-web-ui:
@@ -207,4 +207,4 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - .env.prod
+      - deployment/.env.prod
