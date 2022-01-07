@@ -13,7 +13,15 @@ foreach (var env in environments)
         HardcodedData.Generate(),
         new Environment(env));
 
-    File.WriteAllText(Path.Combine(folder, $"docker-compose.{env}.yml"), compose);
+    if (env == "debug")
+    {
+        // Debug profile is the default one.
+        File.WriteAllText(Path.Combine(folder, $"docker-compose.yml"), compose);
+    }
+    else
+    {
+        File.WriteAllText(Path.Combine(folder, $"docker-compose.{env}.yml"), compose);
+    }
 
     var envFiles = new EnvFileGenerator().GenerateEnvFiles(
         HardcodedData.Generate(),
