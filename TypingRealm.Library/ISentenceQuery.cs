@@ -6,7 +6,7 @@ namespace TypingRealm.Library;
 public interface ISentenceQuery
 {
     ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(
-        int sentencesCount, int consecutiveSentencesCount);
+        int maxSentencesCount, int consecutiveSentencesCount);
 
     ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(
         IEnumerable<string> words, int maxSentencesCount);

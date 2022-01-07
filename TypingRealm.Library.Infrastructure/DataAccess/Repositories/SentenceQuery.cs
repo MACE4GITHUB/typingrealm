@@ -16,7 +16,7 @@ public sealed class SentenceQuery : ISentenceQuery
         _dbContext = dbContext;
     }
 
-    public async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int sentencesCount, int consecutiveSentencesCount)
+    public async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
     {
         var allBooks = await _dbContext.Book
             .Where(x => !x.IsArchived && x.IsProcessed)
@@ -24,7 +24,9 @@ public sealed class SentenceQuery : ISentenceQuery
             .ToListAsync()
             .ConfigureAwait(false);
 
-        var randomBooks = Enumerable.Range(0, sentencesCount)
+        var amountOfRecords = maxSentencesCount * 2;
+
+        var randomBooks = Enumerable.Range(0, amountOfRecords)
             .Select(_ => RandomNumberGenerator.GetInt32(0, allBooks.Count))
             .Select(index => allBooks[index])
             .ToList();
@@ -74,6 +76,7 @@ public sealed class SentenceQuery : ISentenceQuery
 
         var result = joinResult
             .OrderBy(x => x.Index)
+            .Take(maxSentencesCount)
             .Select(x => new SentenceDto(x.SentenceId, x.Value))
             .ToList();
 
