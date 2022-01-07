@@ -103,6 +103,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .OrderByDescending(keyPair => keyPair.CountInSentence)
             .Select(x => new
             {
+                KeyPair = x.Value,
                 SentenceId = x.Word.SentenceId,
                 SentenceValue = x.Word.Sentence.Value,
                 CountInWord = x.CountInWord,
