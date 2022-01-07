@@ -342,6 +342,15 @@ namespace TypingRealm.DeploymentHelper
             {
                 sb.AppendLine($"  {network}:");
             }
+
+            if (environment.Value == "prod")
+            {
+                // HOST production, needs access to external networks:
+                sb.AppendLine("  local-tyr_local-typingrealm-net:");
+                sb.AppendLine("    external: true");
+                sb.AppendLine("  dev-tyr_dev-typingrealm-net:");
+                sb.AppendLine("    external: true");
+            }
             sb.AppendLine();
 
             // Declare services.
