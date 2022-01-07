@@ -154,6 +154,9 @@ namespace TypingRealm.DeploymentHelper
 
         private IEnumerable<string> GetEnvFiles(Service service, Environment environment)
         {
+            if (service.ServiceName == "web-ui")
+                return new[] { environment.EnvironmentFileName };
+
             return new[]
             {
                 environment.EnvironmentFileName,
