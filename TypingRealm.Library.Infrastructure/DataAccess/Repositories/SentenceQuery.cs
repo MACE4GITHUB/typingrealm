@@ -100,7 +100,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
             .Include(keyPair => keyPair.Word)
             .ThenInclude(word => word.Sentence)
-            .OrderByDescending(keyPair => keyPair.CountInSentence * keyPair.Word.CountInSentence)
+            .OrderByDescending(keyPair => keyPair.CountInSentence)
             .Select(x => new
             {
                 SentenceId = x.Word.SentenceId,
