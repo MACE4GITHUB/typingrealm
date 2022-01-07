@@ -97,10 +97,10 @@ public sealed class SentenceQuery : ISentenceQuery
     public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int sentencesCount)
     {
         var sentences = await _dbContext.KeyPair
+            .Where(keyPair => keyPairs.Contains(keyPair.Value))
             .Include(keyPair => keyPair.Word)
             .ThenInclude(word => word.Sentence)
-            .Where(keyPair => keyPairs.Contains(keyPair.Value))
-            .OrderByDescending(keyPair => keyPair.CountInSentence)
+            .OrderByDescending(keyPair => keyPair.CountInSentence * keyPair.Word.CountInSentence)
             .Select(x => new
             {
                 SentenceId = x.Word.SentenceId,
