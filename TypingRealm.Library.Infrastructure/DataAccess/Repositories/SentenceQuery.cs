@@ -24,7 +24,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .ToListAsync()
             .ConfigureAwait(false);
 
-        var amountOfRecords = maxSentencesCount * 2;
+        var amountOfRecords = (maxSentencesCount * 2 / consecutiveSentencesCount) +1;
 
         var randomBooks = Enumerable.Range(0, amountOfRecords)
             .Select(_ => RandomNumberGenerator.GetInt32(0, allBooks.Count))
