@@ -43,6 +43,7 @@ namespace TypingRealm.DeploymentHelper
             // TODO: For prod/host env add external dev/local networks.
 
             return Services
+                .Where(service => service.Envs == null || service.Envs.Contains(environment.Value))
                 .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
                 .Append($"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}")
                 .ToList();
