@@ -181,7 +181,7 @@ namespace TypingRealm.DeploymentHelper
             if (value == "prod" || value == "strict-prod")
             {
                 EnvironmentPrefix = string.Empty;
-                EnvironmentFileName = ".env.prod";
+                EnvironmentFileName = ".deployment/.env.prod";
                 VolumeFolderName = "prod";
 
                 if (value == "prod")
@@ -195,7 +195,7 @@ namespace TypingRealm.DeploymentHelper
             if (value == "dev" || value == "local" || value == "debug")
             {
                 EnvironmentPrefix = $"{value}-";
-                EnvironmentFileName = $".env.{value}";
+                EnvironmentFileName = $".deployment/.env.{value}";
                 VolumeFolderName = value;
 
                 if (value == "dev")
