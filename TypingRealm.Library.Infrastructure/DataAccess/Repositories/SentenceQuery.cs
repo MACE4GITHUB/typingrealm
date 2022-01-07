@@ -94,7 +94,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .Select(indexInBook => new BookAndSentencePair(bookId, indexInBook));
     }
 
-    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int sentencesCount)
+    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int maxSentencesCount)
     {
         var sentences = await _dbContext.KeyPair
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
@@ -109,18 +109,21 @@ public sealed class SentenceQuery : ISentenceQuery
                 CountInWord = x.CountInWord,
                 CountInSentence = x.CountInSentence
             })
-            .Take(sentencesCount)
+            .Take(maxSentencesCount * 5)
             .ToListAsync()
             .ConfigureAwait(false);
 
         var result = sentences
+            .DistinctBy(x => x.SentenceId)
+            .OrderByDescending(x => x.CountInSentence)
             .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
+            .Take(maxSentencesCount)
             .ToList();
 
         return result;
     }
 
-    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int sentencesCount)
+    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int maxSentencesCount)
     {
         var searchWords = words.Select(word => word.ToLowerInvariant()).ToList();
 
@@ -132,14 +135,17 @@ public sealed class SentenceQuery : ISentenceQuery
             {
                 SentenceId = x.SentenceId,
                 SentenceValue = x.Sentence.Value,
-                CountInSentence = x.CountInSentence
+                RawCountInSentence = x.RawCountInSentence
             })
-            .Take(sentencesCount)
+            .Take(maxSentencesCount * 5)
             .ToListAsync()
             .ConfigureAwait(false);
 
         var result = sentences
+            .DistinctBy(x => x.SentenceId)
+            .OrderByDescending(x => x.RawCountInSentence)
             .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
+            .Take(maxSentencesCount)
             .ToList();
 
         return result;

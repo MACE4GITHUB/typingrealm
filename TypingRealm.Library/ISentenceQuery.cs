@@ -9,8 +9,8 @@ public interface ISentenceQuery
         int sentencesCount, int consecutiveSentencesCount);
 
     ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(
-        IEnumerable<string> words, int sentencesCount);
+        IEnumerable<string> words, int maxSentencesCount);
 
     ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(
-        IEnumerable<string> keyPairs, int sentencesCount);
+        IEnumerable<string> keyPairs, int maxSentencesCount);
 }
