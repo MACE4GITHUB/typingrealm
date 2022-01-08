@@ -51,5 +51,5 @@ foreach (var profile in new[] { "prod", "host", "local" })
         Path.Combine(folder, "reverse-proxy", $"Caddyfile.{profile}"),
         new CaddyfileGenerator().GenerateCaddyfile(
             HardcodedData.Generate(),
-            profile));
+            new CaddyProfile(profile)));
 }

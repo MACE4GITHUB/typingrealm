@@ -5,15 +5,25 @@ using System.Text;
 
 namespace TypingRealm.DeploymentHelper
 {
+    public sealed class CaddyProfile
+    {
+        public CaddyProfile(string value)
+        {
+            if (value != "prod" && value != "host" && value != "local")
+                throw new ArgumentException("CaddyProfile value is not correct.", nameof(value));
+
+            Value = value;
+        }
+
+        public string Value { get; }
+    }
+
     public sealed class CaddyfileGenerator
     {
-        public string GenerateCaddyfile(DeploymentData data, string profile /* prod, local or host */)
+        public string GenerateCaddyfile(DeploymentData data, CaddyProfile profile)
         {
-            if (profile != "prod" && profile != "local" && profile != "host")
-                throw new ArgumentException("Caddy profile should be prod, local or host");
-
             var sb = new StringBuilder();
-            if (profile != "local")
+            if (profile.Value != "local")
             {
                 sb.AppendLine("{");
                 sb.AppendLine("    email typingrealm@gmail.com");
@@ -33,7 +43,7 @@ namespace TypingRealm.DeploymentHelper
                 sb.AppendLine();
             }
 
-            if (profile == "local")
+            if (profile.Value == "local")
             {
                 sb.AppendLine("api.localhost {");
             }
@@ -43,12 +53,12 @@ namespace TypingRealm.DeploymentHelper
             }
 
             foreach (var serviceName in data.Services
-                .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile != "prod"))
+                .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile.Value != "prod"))
                 .Select(s => s.ServiceName)
                 .OrderBy(name => name))
             {
                 sb.AppendLine($"    handle_path /{serviceName}/* {{");
-                sb.AppendLine($"        reverse_proxy {(profile == "local" ? "local-" : "")}typingrealm-{serviceName}:80");
+                sb.AppendLine($"        reverse_proxy {(profile.Value == "local" ? "local-" : "")}typingrealm-{serviceName}:80");
                 sb.AppendLine("    }");
                 sb.AppendLine();
             }
@@ -56,7 +66,7 @@ namespace TypingRealm.DeploymentHelper
             sb.AppendLine("    respond 404");
             sb.AppendLine("}");
 
-            if (profile == "host")
+            if (profile.Value == "host")
             {
                 sb.AppendLine();
                 sb.AppendLine("dev.typingrealm.com {");
@@ -67,7 +77,7 @@ namespace TypingRealm.DeploymentHelper
                 sb.AppendLine("dev.api.typingrealm.com {");
 
                 foreach (var serviceName in data.Services
-                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile != "prod"))
+                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile.Value != "prod"))
                     .Select(s => s.ServiceName)
                     .OrderBy(name => name))
                 {
@@ -89,7 +99,7 @@ namespace TypingRealm.DeploymentHelper
                 sb.AppendLine("api.localhost {");
 
                 foreach (var serviceName in data.Services
-                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile != "prod"))
+                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile.Value != "prod"))
                     .Select(s => s.ServiceName)
                     .OrderBy(name => name))
                 {
