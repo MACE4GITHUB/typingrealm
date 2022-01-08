@@ -95,13 +95,8 @@ public static class TextHelpers
     /// </summary>
     public static string GetRawWord(string word)
     {
-        foreach (var character in PunctuationCharacters)
-        {
-            word = word.Replace(character.ToString(), "");
-        }
-
-        word = word.Trim();
-
-        return word.ToLowerInvariant();
+        return word.Trim(PunctuationCharacters.ToCharArray())
+            .Trim()
+            .ToLowerInvariant();
     }
 }
