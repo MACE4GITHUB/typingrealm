@@ -9,3 +9,9 @@
 **/obj
 LICENSE
 README.md
+
+*NCrunch*
+infrastructure-data/
+reverse-proxy/
+typingrealm-web/
+Utilities/
