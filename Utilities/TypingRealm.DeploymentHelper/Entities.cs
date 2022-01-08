@@ -44,6 +44,7 @@ namespace TypingRealm.DeploymentHelper
 
             return Services
                 .Where(service => service.Envs == null || service.Envs.Contains(environment.Value))
+                .Where(service => environment.Value != "debug")
                 .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
                 .Append($"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}")
                 .ToList();
@@ -51,6 +52,9 @@ namespace TypingRealm.DeploymentHelper
 
         public IEnumerable<string> GetNetworks(Service service, Environment environment)
         {
+            if (environment.Value == "debug")
+                return new[] { $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}" };
+
             return new[]
             {
                 $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}",
