@@ -41,8 +41,12 @@ public static class TextHelpers
                     .Replace("“", "\"")
                     .Replace("”", "\"")
                     .Replace("—", " - ")
+                    .Replace("–", "-")
                     .Replace("…\"", "...\" ")
                     .Replace("…", "... ")
+                    .Replace("’", "'")
+                    .Replace("‘", "'")
+                    .Replace("†", " ")
                     .ToString().Trim();
 
                 // Remove multiple spaces in a row.
