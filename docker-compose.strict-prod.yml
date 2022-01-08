@@ -1,10 +1,13 @@
 version: '3.4'
 
 networks:
-  typingrealm-net:
-  typingrealm-data-net:
+  typingrealm-identityserver-net:
   typingrealm-texts-net:
   typingrealm-library-net:
+  typingrealm-profiles-net:
+  typingrealm-data-net:
+  typingrealm-web-ui-net:
+  typingrealm-net:
 
 services:
   typingrealm-data:
@@ -32,7 +35,7 @@ services:
       - ./infrastructure-data/prod/data/postgres:/var/lib/postgresql/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.data
@@ -46,7 +49,7 @@ services:
       - ./infrastructure-data/prod/data/redis:/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.data
@@ -56,6 +59,7 @@ services:
     container_name: typingrealm-identityserver
     networks:
       - typingrealm-net
+      - typingrealm-identityserver-net
     build:
       context: .
       dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
@@ -64,6 +68,7 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.prod
+      - deployment/.env.prod.identityserver
 
   typingrealm-library:
     image: ${DOCKER_REGISTRY-}typingrealm-library
@@ -90,7 +95,7 @@ services:
       - ./infrastructure-data/prod/library/postgres:/var/lib/postgresql/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.library
@@ -100,6 +105,7 @@ services:
     container_name: typingrealm-profiles
     networks:
       - typingrealm-net
+      - typingrealm-profiles-net
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
@@ -108,6 +114,7 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.prod
+      - deployment/.env.prod.profiles
 
   typingrealm-texts:
     image: ${DOCKER_REGISTRY-}typingrealm-texts
@@ -134,7 +141,7 @@ services:
       - ./infrastructure-data/prod/texts/redis:/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.texts
@@ -144,6 +151,7 @@ services:
     container_name: typingrealm-web-ui
     networks:
       - typingrealm-net
+      - typingrealm-web-ui-net
     build:
       context: ./typingrealm-web
       dockerfile: Dockerfile
@@ -152,6 +160,7 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.prod
+
 
   typingrealm-caddy:
     image: caddy

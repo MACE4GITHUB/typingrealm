@@ -1,10 +1,12 @@
 version: '3.4'
 
 networks:
-  local-typingrealm-net:
-  local-typingrealm-data-net:
+  local-typingrealm-identityserver-net:
   local-typingrealm-texts-net:
   local-typingrealm-library-net:
+  local-typingrealm-profiles-net:
+  local-typingrealm-data-net:
+  local-typingrealm-net:
 
 services:
   local-typingrealm-data:
@@ -32,7 +34,7 @@ services:
       - ./infrastructure-data/local/data/postgres:/var/lib/postgresql/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.local
       - deployment/.env.local.data
@@ -46,7 +48,7 @@ services:
       - ./infrastructure-data/local/data/redis:/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.local
       - deployment/.env.local.data
@@ -56,6 +58,7 @@ services:
     container_name: local-typingrealm-identityserver
     networks:
       - local-typingrealm-net
+      - local-typingrealm-identityserver-net
     build:
       context: .
       dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
@@ -64,6 +67,7 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.local
+      - deployment/.env.local.identityserver
 
   local-typingrealm-library:
     image: ${DOCKER_REGISTRY-}local-typingrealm-library
@@ -90,7 +94,7 @@ services:
       - ./infrastructure-data/local/library/postgres:/var/lib/postgresql/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.local
       - deployment/.env.local.library
@@ -100,6 +104,7 @@ services:
     container_name: local-typingrealm-profiles
     networks:
       - local-typingrealm-net
+      - local-typingrealm-profiles-net
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
@@ -108,6 +113,7 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.local
+      - deployment/.env.local.profiles
 
   local-typingrealm-texts:
     image: ${DOCKER_REGISTRY-}local-typingrealm-texts
@@ -134,10 +140,11 @@ services:
       - ./infrastructure-data/local/texts/redis:/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.local
       - deployment/.env.local.texts
+
 
   local-typingrealm-caddy:
     image: caddy

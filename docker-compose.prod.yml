@@ -1,10 +1,13 @@
 version: '3.4'
 
 networks:
-  typingrealm-net:
-  typingrealm-data-net:
+  typingrealm-identityserver-net:
   typingrealm-texts-net:
   typingrealm-library-net:
+  typingrealm-profiles-net:
+  typingrealm-data-net:
+  typingrealm-web-ui-net:
+  typingrealm-net:
   local-tyr_local-typingrealm-net:
     external: true
   dev-tyr_dev-typingrealm-net:
@@ -32,14 +35,13 @@ services:
     container_name: typingrealm-data-postgres
     networks:
       - typingrealm-data-net
-    # Should be disabled in production. This is for conveniency of connecting to prod DB.
     ports:
-      - 5430:5432
+      - 13032:5432
     volumes:
       - ./infrastructure-data/prod/data/postgres:/var/lib/postgresql/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.data
@@ -49,14 +51,13 @@ services:
     container_name: typingrealm-data-redis
     networks:
       - typingrealm-data-net
-    # Should be disabled in production. This is for conveniency of connecting to prod DB.
     ports:
-      - 34370:6379
+      - 13079:6379
     volumes:
       - ./infrastructure-data/prod/data/redis:/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.data
@@ -66,6 +67,7 @@ services:
     container_name: typingrealm-identityserver
     networks:
       - typingrealm-net
+      - typingrealm-identityserver-net
     build:
       context: .
       dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
@@ -74,6 +76,7 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.prod
+      - deployment/.env.prod.identityserver
 
   typingrealm-library:
     image: ${DOCKER_REGISTRY-}typingrealm-library
@@ -96,14 +99,13 @@ services:
     container_name: typingrealm-library-postgres
     networks:
       - typingrealm-library-net
-    # Should be disabled in production. This is for conveniency of connecting to prod DB.
     ports:
-      - 32432:5432
+      - 11132:5432
     volumes:
       - ./infrastructure-data/prod/library/postgres:/var/lib/postgresql/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.library
@@ -113,6 +115,7 @@ services:
     container_name: typingrealm-profiles
     networks:
       - typingrealm-net
+      - typingrealm-profiles-net
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
@@ -121,6 +124,7 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.prod
+      - deployment/.env.prod.profiles
 
   typingrealm-texts:
     image: ${DOCKER_REGISTRY-}typingrealm-texts
@@ -143,24 +147,23 @@ services:
     container_name: typingrealm-texts-redis
     networks:
       - typingrealm-texts-net
-    # Should be disabled in production. This is for conveniency of connecting to prod DB.
     ports:
-      - 41370:6379
+      - 11079:6379
     volumes:
       - ./infrastructure-data/prod/texts/redis:/data
     restart: unless-stopped
     mem_limit: 2g
-    mem_reservation: 1.75g
+    mem_reservation: 1.5g
     env_file:
       - deployment/.env.prod
       - deployment/.env.prod.texts
 
-  # Simple local UI test page to facilitate BackEnd development.
   typingrealm-web-ui:
     image: ${DOCKER_REGISTRY-}typingrealm-web-ui
     container_name: typingrealm-web-ui
     networks:
       - typingrealm-net
+      - typingrealm-web-ui-net
     build:
       context: ./typingrealm-web
       dockerfile: Dockerfile
@@ -170,8 +173,7 @@ services:
     env_file:
       - deployment/.env.prod
 
-  # This is Caddy both for PROD, DEV and LOCAL routing.
-  # In the final PROD configuration another Caddyfile should be deployed.
+
   typingrealm-caddy:
     image: caddy
     container_name: typingrealm-caddy
@@ -190,4 +192,3 @@ services:
     mem_reservation: 750m
     env_file:
       - deployment/.env.prod
-
