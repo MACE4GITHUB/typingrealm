@@ -5,6 +5,108 @@ using System.Text;
 
 namespace TypingRealm.DeploymentHelper
 {
+    public sealed class CaddyfileGenerator
+    {
+        public string GenerateCaddyfile(DeploymentData data, string profile /* prod, local or host */)
+        {
+            if (profile != "prod" && profile != "local" && profile != "host")
+                throw new ArgumentException("Caddy profile should be prod, local or host");
+
+            var sb = new StringBuilder();
+            if (profile != "local")
+            {
+                sb.AppendLine("{");
+                sb.AppendLine("    email typingrealm@gmail.com");
+                sb.AppendLine("}");
+                sb.AppendLine();
+
+                sb.AppendLine("typingrealm.com {");
+                sb.AppendLine("    reverse_proxy typingrealm-web-ui:80");
+                sb.AppendLine("}");
+                sb.AppendLine();
+            }
+            else
+            {
+                sb.AppendLine("localhost {");
+                sb.AppendLine("    reverse_proxy host.docker.internal:4200");
+                sb.AppendLine("}");
+                sb.AppendLine();
+            }
+
+            if (profile == "local")
+            {
+                sb.AppendLine("api.localhost {");
+            }
+            else
+            {
+                sb.AppendLine("api.typingrealm.com {");
+            }
+
+            foreach (var serviceName in data.Services
+                .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile != "prod"))
+                .Select(s => s.ServiceName)
+                .OrderBy(name => name))
+            {
+                sb.AppendLine($"    handle_path /{serviceName}/* {{");
+                sb.AppendLine($"        reverse_proxy {(profile == "local" ? "local-" : "")}typingrealm-{serviceName}:80");
+                sb.AppendLine("    }");
+                sb.AppendLine();
+            }
+
+            sb.AppendLine("    respond 404");
+            sb.AppendLine("}");
+            sb.AppendLine();
+
+            if (profile == "host")
+            {
+                sb.AppendLine("dev.typingrealm.com {");
+                sb.AppendLine("    reverse_proxy dev-typingrealm-web-ui:80");
+                sb.AppendLine("}");
+                sb.AppendLine();
+
+                sb.AppendLine("dev.api.typingrealm.com {");
+
+                foreach (var serviceName in data.Services
+                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile != "prod"))
+                    .Select(s => s.ServiceName)
+                    .OrderBy(name => name))
+                {
+                    sb.AppendLine($"    handle_path /{serviceName}/* {{");
+                    sb.AppendLine($"        reverse_proxy dev-typingrealm-{serviceName}:80");
+                    sb.AppendLine("    }");
+                    sb.AppendLine();
+                }
+
+                sb.AppendLine("    respond 404");
+                sb.AppendLine("}");
+                sb.AppendLine();
+
+                sb.AppendLine("localhost {");
+                sb.AppendLine("    reverse_proxy host.docker.internal:4200");
+                sb.AppendLine("}");
+                sb.AppendLine();
+
+                sb.AppendLine("api.localhost {");
+
+                foreach (var serviceName in data.Services
+                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile != "prod"))
+                    .Select(s => s.ServiceName)
+                    .OrderBy(name => name))
+                {
+                    sb.AppendLine($"    handle_path /{serviceName}/* {{");
+                    sb.AppendLine($"        reverse_proxy local-typingrealm-{serviceName}:80");
+                    sb.AppendLine("    }");
+                    sb.AppendLine();
+                }
+
+                sb.AppendLine("    respond 404");
+                sb.AppendLine("}");
+            }
+
+            return sb.ToString();
+        }
+    }
+
     public sealed record BuildConfiguration(
         string Context, string Dockerfile);
 
@@ -27,7 +129,8 @@ namespace TypingRealm.DeploymentHelper
         CacheType CacheType,
         string DockerBuildContext,
         string DockerfilePath,
-        int Port)
+        int Port,
+        bool AddToReverseProxyInProduction)
     {
         public IEnumerable<string>? Envs { get; set; }
     }

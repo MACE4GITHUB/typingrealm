@@ -11,6 +11,12 @@ if (folder == null)
 if (!Directory.Exists(folder))
     Directory.CreateDirectory(folder);
 
+if (!Directory.Exists(Path.Combine(folder, "deployment")))
+    Directory.CreateDirectory(Path.Combine(folder, "deployment"));
+
+if (!Directory.Exists(Path.Combine(folder, "reverse-proxy")))
+    Directory.CreateDirectory(Path.Combine(folder, "reverse-proxy"));
+
 var environments = new[] { "strict-prod", "prod", "dev", "local", "debug" };
 
 foreach (var env in environments)
@@ -37,4 +43,13 @@ foreach (var env in environments)
     {
         File.WriteAllText(Path.Combine(folder, "deployment", file.Name), file.Data);
     }
+}
+
+foreach (var profile in new[] { "prod", "host", "local" })
+{
+    File.WriteAllText(
+        Path.Combine(folder, "reverse-proxy", $"Caddyfile.{profile}"),
+        new CaddyfileGenerator().GenerateCaddyfile(
+            HardcodedData.Generate(),
+            profile));
 }
