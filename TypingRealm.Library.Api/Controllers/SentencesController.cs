@@ -43,4 +43,13 @@ public sealed class SentencesController : TyrController
 
         return Ok(sentences);
     }
+
+    [HttpGet]
+    [Route("pure-words")]
+    public async ValueTask<ActionResult<IEnumerable<string>>> FindWordsContainingKeyPairs(string[] keyPairs, int maxWordsCount, bool rawWords)
+    {
+        var words = await _sentenceQuery.FindWordsContainingKeyPairsAsync(keyPairs, maxWordsCount, rawWords);
+
+        return Ok(words);
+    }
 }

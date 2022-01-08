@@ -13,4 +13,7 @@ public interface ISentenceQuery
 
     ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(
         IEnumerable<string> keyPairs, int maxSentencesCount);
+
+    ValueTask<IEnumerable<string>> FindWordsContainingKeyPairsAsync(
+        IEnumerable<string> keyPairs, int maxWordsCount, bool rawWords);
 }

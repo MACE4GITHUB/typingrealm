@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Texts;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 
@@ -152,5 +153,45 @@ public sealed class SentenceQuery : ISentenceQuery
             .ToList();
 
         return result;
+    }
+
+    public async ValueTask<IEnumerable<string>> FindWordsContainingKeyPairsAsync(
+        IEnumerable<string> keyPairs, int maxWordsCount, bool rawWords)
+    {
+        if (maxWordsCount <= 0)
+            throw new ArgumentException("Count should be at least 1 or higher.", nameof(maxWordsCount));
+
+        if (!keyPairs.Any())
+            throw new ArgumentException("KeyPairs cannot be empty.", nameof(keyPairs));
+
+        if (rawWords)
+        {
+            keyPairs = keyPairs
+                .Where(kp => IsKeyPairWithoutPunctuation(kp))
+                .Select(kp => kp.ToLowerInvariant())
+                .ToList();
+        }
+
+        var words = await _dbContext.KeyPair
+            .Where(keyPair => keyPairs.Contains(keyPair.Value))
+            .Include(keyPair => keyPair.Word)
+            .Select(x => rawWords ? x.Word.RawValue : x.Word.Value)
+            .Distinct()
+            .Take(maxWordsCount)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return words;
+    }
+
+    private bool IsKeyPairWithoutPunctuation(string keyPair)
+    {
+        foreach (var punctuationCharacter in TextHelpers.PunctuationCharacters)
+        {
+            if (keyPair.StartsWith(punctuationCharacter) || keyPair.EndsWith(punctuationCharacter))
+                return false;
+        }
+
+        return true;
     }
 }
