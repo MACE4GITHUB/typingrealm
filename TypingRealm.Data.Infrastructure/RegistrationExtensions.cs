@@ -17,6 +17,8 @@ namespace TypingRealm.Data.Infrastructure
             string cacheConnectionString,
             string dataCacheConnectionString)
         {
+            _ = cacheConnectionString;
+
             // Typing Domain.
             services.AddTyping();
 
@@ -47,7 +49,7 @@ namespace TypingRealm.Data.Infrastructure
 
                 services.AddStackExchangeRedisCache(options =>
                 {
-                    options.Configuration = cacheConnectionString;
+                    options.Configuration = dataCacheConnectionString;
                 });
 
                 services.AddTransient<IConnectionMultiplexer>(
