@@ -7,20 +7,20 @@ api.localhost {
         reverse_proxy local-typingrealm-data:80
     }
 
-    handle_path /profiles/* {
-        reverse_proxy local-typingrealm-profiles:80
-    }
-
     handle_path /auth/* {
         reverse_proxy local-typingrealm-identityserver:80
     }
 
-    handle_path /texts/* {
-        reverse_proxy local-typingrealm-texts:80
-    }
-
     handle_path /library/* {
         reverse_proxy local-typingrealm-library:80
+    }
+
+    handle_path /profiles/* {
+        reverse_proxy local-typingrealm-profiles:80
+    }
+
+    handle_path /texts/* {
+        reverse_proxy local-typingrealm-texts:80
     }
 
     respond 404
