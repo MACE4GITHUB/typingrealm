@@ -1,8 +1,5 @@
 {
     email typingrealm@gmail.com
-
-    # Uncomment for Staging LetsEncrypt
-    #acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
 }
 
 typingrealm.com {
@@ -14,12 +11,20 @@ api.typingrealm.com {
         reverse_proxy typingrealm-data:80
     }
 
+    handle_path /identityserver/* {
+        reverse_proxy typingrealm-identityserver:80
+    }
+
     handle_path /library/* {
         reverse_proxy typingrealm-library:80
     }
 
     handle_path /profiles/* {
         reverse_proxy typingrealm-profiles:80
+    }
+
+    handle_path /texts/* {
+        reverse_proxy typingrealm-texts:80
     }
 
     respond 404
@@ -34,7 +39,7 @@ dev.api.typingrealm.com {
         reverse_proxy dev-typingrealm-data:80
     }
 
-    handle_path /auth/* {
+    handle_path /identityserver/* {
         reverse_proxy dev-typingrealm-identityserver:80
     }
 
@@ -62,7 +67,7 @@ api.localhost {
         reverse_proxy local-typingrealm-data:80
     }
 
-    handle_path /auth/* {
+    handle_path /identityserver/* {
         reverse_proxy local-typingrealm-identityserver:80
     }
 

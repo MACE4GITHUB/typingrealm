@@ -55,10 +55,10 @@ namespace TypingRealm.DeploymentHelper
 
             sb.AppendLine("    respond 404");
             sb.AppendLine("}");
-            sb.AppendLine();
 
             if (profile == "host")
             {
+                sb.AppendLine();
                 sb.AppendLine("dev.typingrealm.com {");
                 sb.AppendLine("    reverse_proxy dev-typingrealm-web-ui:80");
                 sb.AppendLine("}");
