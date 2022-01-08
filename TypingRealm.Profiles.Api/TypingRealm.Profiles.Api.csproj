@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileTag>debug-typingrealm-profiles</DockerfileTag>
-    <DockerfileRunEnvironmentFiles>../.env.debug</DockerfileRunEnvironmentFiles>
+    <DockerfileRunEnvironmentFiles>../deployment/.env.debug</DockerfileRunEnvironmentFiles>
   </PropertyGroup>
 
   <ItemGroup>

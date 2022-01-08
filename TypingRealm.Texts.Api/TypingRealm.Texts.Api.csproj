@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileTag>debug-typingrealm-texts</DockerfileTag>
-    <DockerfileRunEnvironmentFiles>../.env.debug</DockerfileRunEnvironmentFiles>
-    <DockerfileRunEnvironmentFiles>../.env.debug.texts</DockerfileRunEnvironmentFiles>
+    <DockerfileRunEnvironmentFiles>../deployment/.env.debug</DockerfileRunEnvironmentFiles>
+    <DockerfileRunEnvironmentFiles>../deployment/.env.debug.texts</DockerfileRunEnvironmentFiles>
   </PropertyGroup>
 
   <ItemGroup>
