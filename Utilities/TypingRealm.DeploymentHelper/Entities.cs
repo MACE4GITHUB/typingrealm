@@ -31,6 +31,16 @@ namespace TypingRealm.DeploymentHelper
         bool AddToReverseProxyInProduction)
     {
         public IEnumerable<string>? Envs { get; set; }
+
+        public bool IsInEnvironment(Environment environment)
+        {
+            if (Envs == null || !Envs.Any())
+            {
+                return true;
+            }
+
+            return Envs.Contains(environment.Value);
+        }
     }
 
     public sealed record DeploymentData(
@@ -44,12 +54,13 @@ namespace TypingRealm.DeploymentHelper
         {
             var serviceNetworks = Services
                 .Where(service => !environment.OnlyMainNetwork)
+                .Where(service => service.IsInEnvironment(environment))
                 .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
                 .ToList();
 
             var webServiceNetworks = WebServices
                 .Where(service => !environment.OnlyMainNetwork)
-                .Where(service => service.Envs!.Any(e => e == environment.Value))
+                .Where(service => service.IsInEnvironment(environment))
                 .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
                 .ToList();
 
@@ -72,12 +83,13 @@ namespace TypingRealm.DeploymentHelper
         public IEnumerable<ServiceInformation> GetServiceInformations(Environment environment)
         {
             var serviceInfos = Services
+                .Where(service => service.IsInEnvironment(environment))
                 .OrderBy(service => service.ServiceName)
                 .SelectMany(service => GetDockerServices(service, environment))
                 .ToList();
 
             var webServiceInfos = WebServices
-                .Where(service => service.Envs!.Any(e => e == environment.Value))
+                .Where(service => service.IsInEnvironment(environment))
                 .OrderBy(service => service.ServiceName)
                 .SelectMany(service => GetDockerServices(service, environment))
                 .ToList();
