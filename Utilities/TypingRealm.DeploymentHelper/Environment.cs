@@ -39,7 +39,7 @@ public sealed class Environment
         }
 
         EnvironmentPrefix = $"{value}-";
-        EnvironmentFileName = $"{Constants.EnvironmentFilesFolderWithSlash}/.env.{value}";
+        EnvironmentFileName = $"{Constants.EnvironmentFilesFolderWithSlash}.env.{value}";
         VolumeFolderName = value;
 
         if (value == Dev)
@@ -52,6 +52,8 @@ public sealed class Environment
         if (PortPrefix == "999")
             throw new InvalidOperationException("Port prefix has not been set to a valid value.");
     }
+
+    public static Environment DevEnvironment => new Environment(Dev);
 
     public string EnvironmentPrefix { get; }
     public string Value { get; }
