@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TypingRealm.DeploymentHelper.Caddy;
 
@@ -11,6 +13,9 @@ public sealed class CaddyProfile
 
         Value = value;
     }
+
+    public static IEnumerable<CaddyProfile> GetAllProfiles()
+        => new[] { "prod", "host", "local" }.Select(x => new CaddyProfile(x)).ToList();
 
     public string Value { get; }
 

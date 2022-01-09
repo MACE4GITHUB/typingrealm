@@ -46,11 +46,11 @@ foreach (var env in environments)
     }
 }
 
-foreach (var profile in new[] { "prod", "host", "local" })
+foreach (var profile in CaddyProfile.GetAllProfiles())
 {
     File.WriteAllText(
         Path.Combine(folder, "reverse-proxy", $"Caddyfile.{profile}"),
         new CaddyfileGenerator().GenerateCaddyfile(
             HardcodedData.Generate(),
-            new CaddyProfile(profile)));
+            profile));
 }
