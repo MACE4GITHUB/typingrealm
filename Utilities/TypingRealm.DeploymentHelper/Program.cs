@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using TypingRealm.DeploymentHelper;
+using TypingRealm.DeploymentHelper.Caddy;
 using Environment = TypingRealm.DeploymentHelper.Environment;
 
 Console.WriteLine("Folder:");
