@@ -16,6 +16,38 @@ namespace TypingRealm.DeploymentHelper
         }
 
         public string Value { get; }
+
+        public bool IsStrictProd => Value == "prod";
+        public bool SpecifyEmail => Value != "local";
+        public string Domain
+        {
+            get
+            {
+                if (Value == "local")
+                    return "localhost";
+
+                return "typingrealm.com";
+            }
+        }
+
+        public string WebUiAddress
+        {
+            get
+            {
+                if (Value == "local")
+                    return "host.docker.internal:4200";
+
+                return "typingrealm-web-ui:80";
+            }
+        }
+
+        public string GetReverseProxyAddress(Service service)
+        {
+            if (Value == "local")
+                return $"local-typingrealm-{service.ServiceName}:80";
+
+            return $"typingrealm-{service.ServiceName}:80";
+        }
     }
 
     public sealed class CaddyfileGenerator
@@ -23,94 +55,49 @@ namespace TypingRealm.DeploymentHelper
         public string GenerateCaddyfile(DeploymentData data, CaddyProfile profile)
         {
             var sb = new StringBuilder();
-            if (profile.Value != "local")
+            if (profile.SpecifyEmail)
             {
                 sb.AppendLine("{");
                 sb.AppendLine("    email typingrealm@gmail.com");
                 sb.AppendLine("}");
-                sb.AppendLine();
+            }
 
-                sb.AppendLine("typingrealm.com {");
-                sb.AppendLine("    reverse_proxy typingrealm-web-ui:80");
+            void GenerateSection(string prefix, CaddyProfile caddyProfile)
+            {
+                if (sb == null)
+                    throw new InvalidOperationException("StringBuilder shouldn't be null.");
+
+                var domainPrefix = prefix == string.Empty ? string.Empty : $"{prefix}.";
+                var servicePrefix = prefix == string.Empty ? string.Empty : $"{prefix}-";
+
+                sb.AppendLine();
+                sb.AppendLine($"{domainPrefix}{caddyProfile.Domain} {{");
+                sb.AppendLine($"    reverse_proxy {servicePrefix}{caddyProfile.WebUiAddress}");
                 sb.AppendLine("}");
+
                 sb.AppendLine();
-            }
-            else
-            {
-                sb.AppendLine("localhost {");
-                sb.AppendLine("    reverse_proxy host.docker.internal:4200");
+                sb.AppendLine($"{domainPrefix}api.{caddyProfile.Domain} {{");
+
+                foreach (var service in data.Services
+                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || !caddyProfile.IsStrictProd))
+                    .OrderBy(service => service.ServiceName))
+                {
+                    sb.AppendLine($"    handle_path /{service.ServiceName}/* {{");
+                    sb.AppendLine($"        reverse_proxy {servicePrefix}{caddyProfile.GetReverseProxyAddress(service)}");
+                    sb.AppendLine("    }");
+                    sb.AppendLine();
+                }
+
+                sb.AppendLine("    respond 404");
                 sb.AppendLine("}");
-                sb.AppendLine();
             }
 
-            if (profile.Value == "local")
-            {
-                sb.AppendLine("api.localhost {");
-            }
-            else
-            {
-                sb.AppendLine("api.typingrealm.com {");
-            }
-
-            foreach (var serviceName in data.Services
-                .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile.Value != "prod"))
-                .Select(s => s.ServiceName)
-                .OrderBy(name => name))
-            {
-                sb.AppendLine($"    handle_path /{serviceName}/* {{");
-                sb.AppendLine($"        reverse_proxy {(profile.Value == "local" ? "local-" : "")}typingrealm-{serviceName}:80");
-                sb.AppendLine("    }");
-                sb.AppendLine();
-            }
-
-            sb.AppendLine("    respond 404");
-            sb.AppendLine("}");
+            GenerateSection(string.Empty, profile);
 
             if (profile.Value == "host")
             {
-                sb.AppendLine();
-                sb.AppendLine("dev.typingrealm.com {");
-                sb.AppendLine("    reverse_proxy dev-typingrealm-web-ui:80");
-                sb.AppendLine("}");
-                sb.AppendLine();
-
-                sb.AppendLine("dev.api.typingrealm.com {");
-
-                foreach (var serviceName in data.Services
-                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile.Value != "prod"))
-                    .Select(s => s.ServiceName)
-                    .OrderBy(name => name))
-                {
-                    sb.AppendLine($"    handle_path /{serviceName}/* {{");
-                    sb.AppendLine($"        reverse_proxy dev-typingrealm-{serviceName}:80");
-                    sb.AppendLine("    }");
-                    sb.AppendLine();
-                }
-
-                sb.AppendLine("    respond 404");
-                sb.AppendLine("}");
-                sb.AppendLine();
-
-                sb.AppendLine("localhost {");
-                sb.AppendLine("    reverse_proxy host.docker.internal:4200");
-                sb.AppendLine("}");
-                sb.AppendLine();
-
-                sb.AppendLine("api.localhost {");
-
-                foreach (var serviceName in data.Services
-                    .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || profile.Value != "prod"))
-                    .Select(s => s.ServiceName)
-                    .OrderBy(name => name))
-                {
-                    sb.AppendLine($"    handle_path /{serviceName}/* {{");
-                    sb.AppendLine($"        reverse_proxy local-typingrealm-{serviceName}:80");
-                    sb.AppendLine("    }");
-                    sb.AppendLine();
-                }
-
-                sb.AppendLine("    respond 404");
-                sb.AppendLine("}");
+                GenerateSection("dev", profile);
+                GenerateSection(string.Empty, new CaddyProfile("local"));
             }
 
             return sb.ToString();
