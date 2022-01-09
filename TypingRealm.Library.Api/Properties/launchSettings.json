@@ -11,15 +11,5 @@
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}"
     }
-  },
-  "profiles": {
-    "TypingRealm.Library.Api": {
-      "commandName": "Project"
-    },
-    "Docker": {
-      "commandName": "Docker",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "publishAllPorts": true
-    }
   }
 }
