@@ -58,7 +58,7 @@ namespace TypingRealm.DeploymentHelper
             return result;
         }
 
-        private IEnumerable<ServiceInformation> GetDockerServices(Service service, Environment environment)
+        private static IEnumerable<ServiceInformation> GetDockerServices(Service service, Environment environment)
         {
             // TODO: Move to common place and reuse in GetNetworks.
             var dockerName = $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}";
@@ -104,17 +104,17 @@ namespace TypingRealm.DeploymentHelper
             }
         }
 
-        private IEnumerable<string> GetRedisVolumes(Service service, Environment environment)
+        private static IEnumerable<string> GetRedisVolumes(Service service, Environment environment)
         {
             yield return $"{Constants.InfrastructureDataFolder}/{environment.VolumeFolderName}/{service.ServiceName}/redis:/data";
         }
 
-        private IEnumerable<string> GetPostgresVolumes(Service service, Environment environment)
+        private static IEnumerable<string> GetPostgresVolumes(Service service, Environment environment)
         {
             yield return $"{Constants.InfrastructureDataFolder}/{environment.VolumeFolderName}/{service.ServiceName}/postgres:/var/lib/postgresql/data";
         }
 
-        private IEnumerable<string> GetServiceVolumes(Service service, Environment environment)
+        private static IEnumerable<string> GetServiceVolumes(Service service, Environment environment)
         {
             _ = service;
             _ = environment;
@@ -122,7 +122,7 @@ namespace TypingRealm.DeploymentHelper
             return Enumerable.Empty<string>();
         }
 
-        private IEnumerable<string> GetServicePorts(Service service, Environment environment)
+        private static IEnumerable<string> GetServicePorts(Service service, Environment environment)
         {
             if (environment.Value == "debug")
                 return new[]
@@ -139,7 +139,7 @@ namespace TypingRealm.DeploymentHelper
             return $"{portPrefix}{infrastructurePort.ToString("D5").Substring(3, 2)}:{infrastructurePort}";
         }
 
-        private IEnumerable<string> GetEnvFiles(Service service, Environment environment)
+        private static IEnumerable<string> GetEnvFiles(Service service, Environment environment)
         {
             yield return environment.EnvironmentFileName;
 
