@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TypingRealm.DeploymentHelper;
+namespace TypingRealm.DeploymentHelper.Data;
 
 public sealed record ServiceInformation(
     string ImageName, string ContainerName,

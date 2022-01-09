@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace TypingRealm.DeploymentHelper;
+namespace TypingRealm.DeploymentHelper.Data;
 
 public sealed record DeploymentData(
     IEnumerable<Service> Services,

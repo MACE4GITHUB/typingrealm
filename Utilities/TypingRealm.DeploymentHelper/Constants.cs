@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.DeploymentHelper;
+﻿using TypingRealm.DeploymentHelper.Data;
+
+namespace TypingRealm.DeploymentHelper;
 
 public static class Constants
 {

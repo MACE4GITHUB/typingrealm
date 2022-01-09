@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.DeploymentHelper;
+﻿namespace TypingRealm.DeploymentHelper.Data;
 
 public enum DatabaseType
 {

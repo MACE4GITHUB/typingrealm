@@ -1,12 +1,8 @@
 ﻿using System.Linq;
 using System.Text;
+using TypingRealm.DeploymentHelper.Data;
 
-namespace TypingRealm.DeploymentHelper;
-
-public sealed record EnvVariable(string Name, string Value)
-{
-    public override string ToString() => $"{Name}={Value}";
-}
+namespace TypingRealm.DeploymentHelper.Compose;
 
 public sealed class DockerComposeGenerator
 {

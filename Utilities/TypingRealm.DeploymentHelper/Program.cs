@@ -2,8 +2,9 @@
 using System.IO;
 using TypingRealm.DeploymentHelper;
 using TypingRealm.DeploymentHelper.Caddy;
+using TypingRealm.DeploymentHelper.Compose;
 using TypingRealm.DeploymentHelper.EnvFiles;
-using Environment = TypingRealm.DeploymentHelper.Environment;
+using Environment = TypingRealm.DeploymentHelper.Data.Environment;
 
 Console.WriteLine("Folder:");
 var folder = Console.ReadLine();
