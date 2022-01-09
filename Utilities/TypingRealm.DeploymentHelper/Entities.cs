@@ -37,13 +37,11 @@ namespace TypingRealm.DeploymentHelper
         IEnumerable<Service> Services,
         IEnumerable<Service> WebServices)
     {
-        public static readonly string ProjectName = "typingrealm";
+        public static readonly string ProjectName = Constants.ProjectName;
         private const string NetworkPostfix = "net";
 
         public IEnumerable<string> GetAllNetworks(Environment environment)
         {
-            // TODO: For prod/host env add external dev/local networks.
-
             return Services
                 .Concat(WebServices)
                 .Where(service => service.Envs == null || service.Envs.Contains(environment.Value))
