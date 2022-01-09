@@ -43,155 +43,6 @@ namespace TypingRealm.DeploymentHelper
         }
     }
 
-    public sealed record DeploymentData(
-        IEnumerable<Service> Services,
-        IEnumerable<Service> WebServices)
-    {
-        public static readonly string ProjectName = Constants.ProjectName;
-        private const string NetworkPostfix = "net";
-
-        public IEnumerable<string> GetAllNetworks(Environment environment)
-        {
-            var serviceNetworks = Services
-                .Where(service => !environment.OnlyMainNetwork)
-                .Where(service => service.IsInEnvironment(environment))
-                .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
-                .ToList();
-
-            var webServiceNetworks = WebServices
-                .Where(service => !environment.OnlyMainNetwork)
-                .Where(service => service.IsInEnvironment(environment))
-                .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
-                .ToList();
-
-            var mainEnvironment = $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}";
-
-            return serviceNetworks
-                .Concat(webServiceNetworks)
-                .Append(mainEnvironment);
-        }
-
-        public static IEnumerable<string> GetNetworks(Service service, Environment environment)
-        {
-            yield return $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}";
-            if (environment.OnlyMainNetwork)
-                yield break;
-
-            yield return $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}";
-        }
-
-        public IEnumerable<ServiceInformation> GetServiceInformations(Environment environment)
-        {
-            var serviceInfos = Services
-                .Where(service => service.IsInEnvironment(environment))
-                .OrderBy(service => service.ServiceName)
-                .SelectMany(service => GetDockerServices(service, environment))
-                .ToList();
-
-            var webServiceInfos = WebServices
-                .Where(service => service.IsInEnvironment(environment))
-                .OrderBy(service => service.ServiceName)
-                .SelectMany(service => GetDockerServices(service, environment))
-                .ToList();
-
-            var result = serviceInfos.Concat(webServiceInfos);
-            return result;
-        }
-
-        private IEnumerable<ServiceInformation> GetDockerServices(Service service, Environment environment)
-        {
-            // TODO: Move to common place and reuse in GetNetworks.
-            var dockerName = $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}";
-
-            yield return new ServiceInformation(
-                "${DOCKER_REGISTRY-}" + dockerName, dockerName,
-                GetNetworks(service, environment),
-                new BuildConfiguration(service.DockerBuildContext, service.DockerfilePath),
-                "1g", "750m",
-                GetEnvFiles(service, environment),
-                GetServicePorts(service, environment),
-                GetServiceVolumes(service, environment));
-
-            if (environment.DeployInfrastructure)
-            {
-                if (service.DatabaseType == DatabaseType.Postgres)
-                {
-                    yield return new ServiceInformation(
-                        "postgres", $"{dockerName}-postgres",
-                        GetNetworks(service, environment).Where(x => x.Contains(service.ServiceName)),
-                        null,
-                        "2g", "1.5g",
-                        GetEnvFiles(service, environment),
-                        environment.HideInfrastructurePorts
-                            ? Enumerable.Empty<string>()
-                            : new[] { GetInfrastructurePort(5432, environment, service) },
-                        GetPostgresVolumes(service, environment));
-                }
-
-                if (service.CacheType == CacheType.Redis)
-                {
-                    yield return new ServiceInformation(
-                        "redis", $"{dockerName}-redis",
-                        GetNetworks(service, environment).Where(x => x.Contains(service.ServiceName)),
-                        null,
-                        "2g", "1.5g",
-                        GetEnvFiles(service, environment),
-                        environment.HideInfrastructurePorts
-                            ? Enumerable.Empty<string>()
-                            : new[] { GetInfrastructurePort(6379, environment, service) },
-                        GetRedisVolumes(service, environment));
-                }
-            }
-        }
-
-        private IEnumerable<string> GetRedisVolumes(Service service, Environment environment)
-        {
-            yield return $"./infrastructure-data/{environment.VolumeFolderName}/{service.ServiceName}/redis:/data";
-        }
-
-        private IEnumerable<string> GetPostgresVolumes(Service service, Environment environment)
-        {
-            yield return $"./infrastructure-data/{environment.VolumeFolderName}/{service.ServiceName}/postgres:/var/lib/postgresql/data";
-        }
-
-        private IEnumerable<string> GetServiceVolumes(Service service, Environment environment)
-        {
-            _ = service;
-            _ = environment;
-
-            return Enumerable.Empty<string>();
-        }
-
-        private IEnumerable<string> GetServicePorts(Service service, Environment environment)
-        {
-            if (environment.Value == "debug")
-                return new[]
-                {
-                    $"{service.Port}:80"
-                };
-
-            return Enumerable.Empty<string>();
-        }
-
-        public static string GetInfrastructurePort(int infrastructurePort, Environment environment, Service service)
-        {
-            var portPrefix = $"{environment.PortPrefix}{service.Index.ToString("D2")}";
-            return $"{portPrefix}{infrastructurePort.ToString("D5").Substring(3, 2)}:{infrastructurePort}";
-        }
-
-        private IEnumerable<string> GetEnvFiles(Service service, Environment environment)
-        {
-            if (service.ServiceName == "web-ui")
-                return new[] { environment.EnvironmentFileName };
-
-            return new[]
-            {
-                environment.EnvironmentFileName,
-                $"{environment.EnvironmentFileName}.{service.ServiceName}"
-            };
-        }
-    }
-
     public sealed record ServiceInformation(
         string ImageName, string ContainerName,
         IEnumerable<string> Networks,
@@ -270,7 +121,7 @@ namespace TypingRealm.DeploymentHelper
 
             var envVars = new List<EnvVariable>();
             var serviceEnvVars = deploymentData.Services
-                .Where(s => s.ServiceName != "web-ui")
+                .Where(s => s.ServiceName != Constants.WebUiServiceName)
                 .Select(x => new { Service = x, EnvVars = new List<EnvVariable>() })
                 .ToDictionary(x => x.Service.ServiceName);
 
@@ -279,7 +130,7 @@ namespace TypingRealm.DeploymentHelper
 
             foreach (var service in deploymentData.Services)
             {
-                if (service.ServiceName == "web-ui")
+                if (service.ServiceName == Constants.WebUiServiceName)
                     continue;
 
                 if (service.ServiceName == "identityserver")
