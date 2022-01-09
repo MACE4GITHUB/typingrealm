@@ -1,9 +1,11 @@
-﻿using TypingRealm.DeploymentHelper.Data;
+﻿using System.Collections.Generic;
+using TypingRealm.DeploymentHelper.Data;
 
 namespace TypingRealm.DeploymentHelper;
 
 public static class Constants
 {
+    public const string DockerComposeVersion = "3.4";
     public const string ProjectName = "typingrealm";
     public const string Domain = $"{ProjectName}.com";
     public const string LocalDomain = "localhost";
@@ -22,6 +24,12 @@ public static class Constants
     // Web UI.
     public const string WebUiDockerPath = $"{ProjectName}-{WebUiServiceName}:80";
     public const string LocalWebUiDockerPath = "host.docker.internal:4200";
+
+    public static IEnumerable<string> ExternalNetworksForHostProdCompose => new[]
+    {
+        "local-tyr_local-typingrealm-net",
+        "dev-tyr_dev-typingrealm-net"
+    };
 
     public static string GetReverseProxyAddressWithPort(Service service, string prefix)
     {

@@ -6,12 +6,10 @@ namespace TypingRealm.DeploymentHelper.Compose;
 
 public sealed class DockerComposeGenerator
 {
-    private const string Version = "3.4";
-
     public string Generate(DeploymentData deploymentData, Environment environment)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("version: '3.4'");
+        sb.AppendLine($"version: '{Constants.DockerComposeVersion}'");
         sb.AppendLine();
 
         // Declare networks.
@@ -21,13 +19,13 @@ public sealed class DockerComposeGenerator
             sb.AppendLine($"  {network}:");
         }
 
-        if (environment.Value == "prod")
+        if (environment.Value == Environment.Prod)
         {
-            // HOST production, needs access to external networks:
-            sb.AppendLine("  local-tyr_local-typingrealm-net:");
-            sb.AppendLine("    external: true");
-            sb.AppendLine("  dev-tyr_dev-typingrealm-net:");
-            sb.AppendLine("    external: true");
+            foreach (var network in Constants.ExternalNetworksForHostProdCompose)
+            {
+                sb.AppendLine($"  {network}:");
+                sb.AppendLine("    external: true");
+            }
         }
         sb.AppendLine();
 
