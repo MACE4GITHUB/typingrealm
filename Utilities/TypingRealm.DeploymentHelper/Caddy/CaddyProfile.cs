@@ -6,29 +6,33 @@ namespace TypingRealm.DeploymentHelper.Caddy;
 
 public sealed class CaddyProfile
 {
+    public const string ProdValue = "prod";
+    public const string HostValue = "host";
+    public const string LocalValue = "local";
+
     public CaddyProfile(string value)
     {
-        if (value != "prod" && value != "host" && value != "local")
+        if (value != ProdValue && value != HostValue && value != LocalValue)
             throw new ArgumentException("CaddyProfile value is not correct.", nameof(value));
 
         Value = value;
     }
 
     public static IEnumerable<CaddyProfile> GetAllProfiles()
-        => new[] { "prod", "host", "local" }.Select(x => new CaddyProfile(x)).ToList();
+        => new[] { ProdValue, HostValue, LocalValue }.Select(x => new CaddyProfile(x)).ToList();
 
     public string Value { get; }
 
-    public bool IsProd => Value == "prod";
-    public bool SpecifyEmail => Value != "local";
+    public bool IsProd => Value == ProdValue;
+    public bool SpecifyEmail => Value != LocalValue;
     public string Domain
     {
         get
         {
-            if (Value == "local")
-                return "localhost";
+            if (Value == LocalValue)
+                return Constants.LocalDomain;
 
-            return "typingrealm.com";
+            return Constants.Domain;
         }
     }
 
@@ -36,18 +40,10 @@ public sealed class CaddyProfile
     {
         get
         {
-            if (Value == "local")
-                return "host.docker.internal:4200";
+            if (Value == LocalValue)
+                return Constants.LocalWebUiDockerPath;
 
-            return "typingrealm-web-ui:80";
+            return Constants.WebUiDockerPath;
         }
-    }
-
-    public string GetReverseProxyAddress(Service service)
-    {
-        if (Value == "local")
-            return $"local-typingrealm-{service.ServiceName}:80";
-
-        return $"typingrealm-{service.ServiceName}:80";
     }
 }

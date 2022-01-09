@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 
 namespace TypingRealm.DeploymentHelper.Caddy;
@@ -12,15 +11,12 @@ public sealed class CaddyfileGenerator
         if (profile.SpecifyEmail)
         {
             sb.AppendLine("{");
-            sb.AppendLine("    email typingrealm@gmail.com");
+            sb.AppendLine($"    email {Constants.Email}");
             sb.AppendLine("}");
         }
 
-        void GenerateSection(string prefix, CaddyProfile caddyProfile)
+        void GenerateSection(string prefix, CaddyProfile caddyProfile, string serviceNamePrefix)
         {
-            if (sb == null)
-                throw new InvalidOperationException("StringBuilder shouldn't be null.");
-
             var domainPrefix = string.IsNullOrEmpty(prefix) ? string.Empty : $"{prefix}.";
             var servicePrefix = string.IsNullOrEmpty(prefix) ? string.Empty : $"{prefix}-";
 
@@ -37,7 +33,7 @@ public sealed class CaddyfileGenerator
                 .OrderBy(service => service.ServiceName))
             {
                 sb.AppendLine($"    handle_path /{service.ServiceName}/* {{");
-                sb.AppendLine($"        reverse_proxy {servicePrefix}{caddyProfile.GetReverseProxyAddress(service)}");
+                sb.AppendLine($"        reverse_proxy {servicePrefix}{Constants.GetReverseProxyAddressWithPort(service, serviceNamePrefix)}");
                 sb.AppendLine("    }");
                 sb.AppendLine();
             }
@@ -46,12 +42,12 @@ public sealed class CaddyfileGenerator
             sb.AppendLine("}");
         }
 
-        GenerateSection(string.Empty, profile);
+        GenerateSection(string.Empty, profile, profile.Value == "local" ? "local-" : string.Empty);
 
         if (profile.Value == "host")
         {
-            GenerateSection("dev", profile);
-            GenerateSection(string.Empty, new CaddyProfile("local"));
+            GenerateSection("dev", profile, string.Empty);
+            GenerateSection(string.Empty, new CaddyProfile("local"), "local-");
         }
 
         return sb.ToString();
