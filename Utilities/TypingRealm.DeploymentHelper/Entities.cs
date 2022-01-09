@@ -42,39 +42,48 @@ namespace TypingRealm.DeploymentHelper
 
         public IEnumerable<string> GetAllNetworks(Environment environment)
         {
-            return Services
-                .Concat(WebServices)
-                .Where(service => service.Envs == null || service.Envs.Contains(environment.Value))
-                .Where(service => environment.Value != "debug")
+            var serviceNetworks = Services
+                .Where(service => !environment.OnlyMainNetwork)
                 .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
-                .Append($"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}")
                 .ToList();
+
+            var webServiceNetworks = WebServices
+                .Where(service => !environment.OnlyMainNetwork)
+                .Where(service => service.Envs!.Any(e => e == environment.Value))
+                .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
+                .ToList();
+
+            var mainEnvironment = $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}";
+
+            return serviceNetworks
+                .Concat(webServiceNetworks)
+                .Append(mainEnvironment);
         }
 
-        public IEnumerable<string> GetNetworks(Service service, Environment environment)
+        public static IEnumerable<string> GetNetworks(Service service, Environment environment)
         {
-            if (environment.Value == "debug")
-                return new[] { $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}" };
+            yield return $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}";
+            if (environment.OnlyMainNetwork)
+                yield break;
 
-            return new[]
-            {
-                $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}",
-                $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}"
-            };
+            yield return $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}";
         }
 
         public IEnumerable<ServiceInformation> GetServiceInformations(Environment environment)
         {
             var serviceInfos = Services
-                .Concat(WebServices)
-                .Where(service => service.Envs == null || service.Envs.Contains(environment.Value))
                 .OrderBy(service => service.ServiceName)
                 .SelectMany(service => GetDockerServices(service, environment))
                 .ToList();
 
-            // TODO: Add Caddy for some envs like "prod/host" and "local".
+            var webServiceInfos = WebServices
+                .Where(service => service.Envs!.Any(e => e == environment.Value))
+                .OrderBy(service => service.ServiceName)
+                .SelectMany(service => GetDockerServices(service, environment))
+                .ToList();
 
-            return serviceInfos;
+            var result = serviceInfos.Concat(webServiceInfos);
+            return result;
         }
 
         private IEnumerable<ServiceInformation> GetDockerServices(Service service, Environment environment)
@@ -223,6 +232,8 @@ namespace TypingRealm.DeploymentHelper
         public string EnvironmentPrefix { get; }
         public string Value { get; }
         public string EnvironmentFileName { get; }
+
+        public bool OnlyMainNetwork => Value == "debug";
 
         // Should have single character.
         public string PortPrefix { get; }

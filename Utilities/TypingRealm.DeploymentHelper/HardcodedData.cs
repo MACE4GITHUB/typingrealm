@@ -20,6 +20,7 @@
                 // TODO: Move out or mark web-ui so that URL env variable is not created for it.
                 new Service(40, "web-ui", DatabaseType.None, CacheType.None, "./typingrealm-web", "Dockerfile", 8080, true)
                 {
+                    // Should be specified for WEB services.
                     Envs = new[] { "prod", "strict-prod", "dev" }
                 }
             });
