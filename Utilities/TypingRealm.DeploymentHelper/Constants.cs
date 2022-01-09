@@ -8,6 +8,7 @@ public static class Constants
     public const string Email = $"{ProjectName}@gmail.com";
     public const string InfrastructureDataFolder = "./infrastructure-data";
     public const string WebUiServiceName = "web-ui";
+    public const string EnvironmentFilesFolderWithSlash = "deployment/";
 
     // Web UI.
     public const string WebUiDockerPath = $"{ProjectName}-{WebUiServiceName}:80";
