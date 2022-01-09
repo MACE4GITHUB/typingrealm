@@ -19,7 +19,7 @@ public sealed class CaddyProfile
 
     public string Value { get; }
 
-    public bool IsStrictProd => Value == "prod";
+    public bool IsProd => Value == "prod";
     public bool SpecifyEmail => Value != "local";
     public string Domain
     {

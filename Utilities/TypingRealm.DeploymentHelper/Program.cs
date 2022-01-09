@@ -49,7 +49,7 @@ foreach (var env in environments)
 foreach (var profile in CaddyProfile.GetAllProfiles())
 {
     File.WriteAllText(
-        Path.Combine(folder, "reverse-proxy", $"Caddyfile.{profile}"),
+        Path.Combine(folder, "reverse-proxy", $"Caddyfile.{profile.Value}"),
         new CaddyfileGenerator().GenerateCaddyfile(
             HardcodedData.Generate(),
             profile));

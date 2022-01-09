@@ -33,7 +33,7 @@ public sealed class CaddyfileGenerator
             sb.AppendLine($"{domainPrefix}api.{caddyProfile.Domain} {{");
 
             foreach (var service in data.Services
-                .Where(s => s.ServiceName != "web-ui" && (s.AddToReverseProxyInProduction || !caddyProfile.IsStrictProd))
+                .Where(s => s.AddToReverseProxyInProduction || !caddyProfile.IsProd)
                 .OrderBy(service => service.ServiceName))
             {
                 sb.AppendLine($"    handle_path /{service.ServiceName}/* {{");

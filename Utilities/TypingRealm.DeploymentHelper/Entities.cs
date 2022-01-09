@@ -34,7 +34,8 @@ namespace TypingRealm.DeploymentHelper
     }
 
     public sealed record DeploymentData(
-        IEnumerable<Service> Services)
+        IEnumerable<Service> Services,
+        IEnumerable<Service> WebServices)
     {
         public static readonly string ProjectName = "typingrealm";
         private const string NetworkPostfix = "net";
@@ -44,6 +45,7 @@ namespace TypingRealm.DeploymentHelper
             // TODO: For prod/host env add external dev/local networks.
 
             return Services
+                .Concat(WebServices)
                 .Where(service => service.Envs == null || service.Envs.Contains(environment.Value))
                 .Where(service => environment.Value != "debug")
                 .Select(service => $"{environment.EnvironmentPrefix}{ProjectName}-{service.ServiceName}-{NetworkPostfix}")
@@ -66,6 +68,7 @@ namespace TypingRealm.DeploymentHelper
         public IEnumerable<ServiceInformation> GetServiceInformations(Environment environment)
         {
             var serviceInfos = Services
+                .Concat(WebServices)
                 .Where(service => service.Envs == null || service.Envs.Contains(environment.Value))
                 .OrderBy(service => service.ServiceName)
                 .SelectMany(service => GetDockerServices(service, environment))

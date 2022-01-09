@@ -14,8 +14,9 @@
                 new Service(11, "library", DatabaseType.Postgres, CacheType.None, ".", "TypingRealm.Library.Api/Dockerfile", 30402, false),
 
                 new Service(20, "profiles", DatabaseType.None, CacheType.None, ".", "TypingRealm.Profiles.Api/Dockerfile", 30103, true),
-                new Service(30, "data", DatabaseType.Postgres, CacheType.Redis, ".", "TypingRealm.Data.Api/Dockerfile", 30400, true),
-
+                new Service(30, "data", DatabaseType.Postgres, CacheType.Redis, ".", "TypingRealm.Data.Api/Dockerfile", 30400, true)
+            }, new Service[]
+            {
                 // TODO: Move out or mark web-ui so that URL env variable is not created for it.
                 new Service(40, "web-ui", DatabaseType.None, CacheType.None, "./typingrealm-web", "Dockerfile", 8080, true)
                 {
