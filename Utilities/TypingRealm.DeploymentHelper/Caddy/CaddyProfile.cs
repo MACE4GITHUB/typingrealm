@@ -9,22 +9,26 @@ public sealed class CaddyProfile
     public const string ProdValue = "prod";
     public const string HostValue = "host";
     public const string LocalValue = "local";
+    public static readonly string[] AllowedValues
+        = new[] { ProdValue, HostValue, LocalValue };
 
     public CaddyProfile(string value)
     {
-        if (value != ProdValue && value != HostValue && value != LocalValue)
-            throw new ArgumentException("CaddyProfile value is not correct.", nameof(value));
+        if (!AllowedValues.Contains(value))
+            throw new ArgumentException("CaddyProfile value is not supported.", nameof(value));
 
         Value = value;
     }
 
-    public static IEnumerable<CaddyProfile> GetAllProfiles()
-        => new[] { ProdValue, HostValue, LocalValue }.Select(x => new CaddyProfile(x)).ToList();
+    public static IEnumerable<CaddyProfile> GetAllProfiles() => AllowedValues
+        .Select(x => new CaddyProfile(x))
+        .ToList();
 
     public string Value { get; }
 
     public bool IsProd => Value == ProdValue;
     public bool SpecifyEmail => Value != LocalValue;
+
     public string Domain
     {
         get
