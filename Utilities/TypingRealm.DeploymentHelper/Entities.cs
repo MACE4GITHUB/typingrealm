@@ -98,64 +98,64 @@ public sealed class DockerComposeGenerator
         if (environment.Value == "local")
         {
             sb.AppendLine(@"
-local-typingrealm-caddy:
-image: caddy
-container_name: local-typingrealm-caddy
-networks:
-  - local-typingrealm-net
-ports:
-  - 80:80
-  - 443:443
-restart: unless-stopped
-volumes:
-  - ./reverse-proxy/Caddyfile.local:/etc/caddy/Caddyfile
-  - ./infrastructure-data/local/caddy_data:/data
-mem_limit: 1g
-mem_reservation: 750m
-env_file:
-  - deployment/.env.local");
+  local-typingrealm-caddy:
+    image: caddy
+    container_name: local-typingrealm-caddy
+    networks:
+      - local-typingrealm-net
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ./reverse-proxy/Caddyfile.local:/etc/caddy/Caddyfile
+      - ./infrastructure-data/local/caddy_data:/data
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - deployment/.env.local");
         }
         else if (environment.Value == "strict-prod")
         {
             sb.AppendLine(@"
-typingrealm-caddy:
-image: caddy
-container_name: typingrealm-caddy
-networks:
-  - typingrealm-net
-ports:
-  - 80:80
-  - 443:443
-volumes:
-  - ./reverse-proxy/Caddyfile.prod:/etc/caddy/Caddyfile
-  - ./infrastructure-data/prod/caddy_data:/data
-restart: unless-stopped
-mem_limit: 1g
-mem_reservation: 750m
-env_file:
-  - deployment/.env.prod");
+  typingrealm-caddy:
+    image: caddy
+    container_name: typingrealm-caddy
+    networks:
+      - typingrealm-net
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./reverse-proxy/Caddyfile.prod:/etc/caddy/Caddyfile
+      - ./infrastructure-data/prod/caddy_data:/data
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - deployment/.env.prod");
         }
         else if (environment.Value == "prod")
         {
             sb.AppendLine(@"
-typingrealm-caddy:
-image: caddy
-container_name: typingrealm-caddy
-networks:
-  - typingrealm-net
-  - local-tyr_local-typingrealm-net
-  - dev-tyr_dev-typingrealm-net
-ports:
-  - 80:80
-  - 443:443
-volumes:
-  - ./reverse-proxy/Caddyfile.host:/etc/caddy/Caddyfile
-  - ./infrastructure-data/prod/caddy_data:/data
-restart: unless-stopped
-mem_limit: 1g
-mem_reservation: 750m
-env_file:
-  - deployment/.env.prod");
+  typingrealm-caddy:
+    image: caddy
+    container_name: typingrealm-caddy
+    networks:
+      - typingrealm-net
+      - local-tyr_local-typingrealm-net
+      - dev-tyr_dev-typingrealm-net
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./reverse-proxy/Caddyfile.host:/etc/caddy/Caddyfile
+      - ./infrastructure-data/prod/caddy_data:/data
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - deployment/.env.prod");
         }
 
         return sb.ToString();
