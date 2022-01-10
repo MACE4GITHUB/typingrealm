@@ -22,7 +22,7 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.GetAsync<bool>(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}/{characterId}/belongsToCurrentProfile",
-                EndpointAuthenticationType.Profile,
+                EndpointAuthentication.Profile,
                 cancellationToken);
         }
 
@@ -31,7 +31,7 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.PostAsync(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}",
-                EndpointAuthenticationType.Profile,
+                EndpointAuthentication.Profile,
                 dto,
                 cancellationToken);
         }
@@ -41,7 +41,7 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.GetAsync<IEnumerable<CharacterResource>>(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}",
-                EndpointAuthenticationType.Profile,
+                EndpointAuthentication.Profile,
                 cancellationToken);
         }
     }

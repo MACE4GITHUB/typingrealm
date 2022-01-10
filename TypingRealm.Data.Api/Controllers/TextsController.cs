@@ -104,7 +104,7 @@ namespace TypingRealm.Data.Api.Controllers
 
             //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
             var config = new Texts.TextGenerationConfiguration(language, length, textType, false, false, false, shouldContain);
-            var generatedText = await _textsClient.GenerateTextAsync(config, EndpointAuthenticationType.Service, default);
+            var generatedText = await _textsClient.GenerateTextAsync(config, EndpointAuthentication.Service, default);
             var textValue = generatedText.Value;
 
             var textId = await _textRepository.NextIdAsync();

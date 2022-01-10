@@ -8,7 +8,7 @@ public interface ITextsClient
 {
     ValueTask<GeneratedText> GenerateTextAsync(
         TextGenerationConfiguration configuration,
-        EndpointAuthenticationType authenticationType,
+        EndpointAuthentication authentication,
         CancellationToken cancellationToken);
 }
 
@@ -25,13 +25,13 @@ public sealed class TextsClient : ITextsClient
 
     public ValueTask<GeneratedText> GenerateTextAsync(
         TextGenerationConfiguration configuration,
-        EndpointAuthenticationType authenticationType,
+        EndpointAuthentication authentication,
         CancellationToken cancellationToken)
     {
         return _serviceClient.PostAsync<TextGenerationConfiguration, GeneratedText>(
             ServiceName,
             $"{RoutePrefix}/generate",
-            authenticationType,
+            authentication,
             configuration,
             cancellationToken);
     }

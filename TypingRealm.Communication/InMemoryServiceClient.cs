@@ -36,17 +36,20 @@ namespace TypingRealm.Communication
             _serviceTokenService = serviceTokenService;
         }
 
-        public async ValueTask<T> GetAsync<T>(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, CancellationToken cancellationToken)
+        public async ValueTask<T> GetAsync<T>(string serviceName, string endpoint, EndpointAuthentication endpointAuthentication, CancellationToken cancellationToken)
         {
             if (!_serviceAddresses.ContainsKey(serviceName))
                 throw new InvalidOperationException("Service is not registered in service discovery.");
 
             var uri = $"{_serviceAddresses[serviceName]}/{endpoint}";
 
+            var endpointAuthenticationType = endpointAuthentication.AuthenticationType;
             var accessToken = endpointAuthenticationType switch
             {
                 EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
-                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => endpointAuthentication.Credentials == null
+                    ? await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false)
+                    : await _serviceTokenService.GetServiceAccessTokenAsync(endpointAuthentication.Credentials, cancellationToken).ConfigureAwait(false),
                 _ => null
             };
 
@@ -71,17 +74,20 @@ namespace TypingRealm.Communication
             }
         }
 
-        public async ValueTask PostAsync<T>(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, T content, CancellationToken cancellationToken)
+        public async ValueTask PostAsync<T>(string serviceName, string endpoint, EndpointAuthentication endpointAuthentication, T content, CancellationToken cancellationToken)
         {
             if (!_serviceAddresses.ContainsKey(serviceName))
                 throw new InvalidOperationException("Service is not registered in service discovery.");
 
             var uri = $"{_serviceAddresses[serviceName]}/{endpoint}";
 
+            var endpointAuthenticationType = endpointAuthentication.AuthenticationType;
             var accessToken = endpointAuthenticationType switch
             {
                 EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
-                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => endpointAuthentication.Credentials == null
+                    ? await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false)
+                    : await _serviceTokenService.GetServiceAccessTokenAsync(endpointAuthentication.Credentials, cancellationToken).ConfigureAwait(false),
                 _ => null
             };
 
@@ -91,17 +97,20 @@ namespace TypingRealm.Communication
                 .ConfigureAwait(false);
         }
 
-        public async ValueTask<TResponse> PostAsync<TBody, TResponse>(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, TBody content, CancellationToken cancellationToken)
+        public async ValueTask<TResponse> PostAsync<TBody, TResponse>(string serviceName, string endpoint, EndpointAuthentication endpointAuthentication, TBody content, CancellationToken cancellationToken)
         {
             if (!_serviceAddresses.ContainsKey(serviceName))
                 throw new InvalidOperationException("Service is not registered in service discovery.");
 
             var uri = $"{_serviceAddresses[serviceName]}/{endpoint}";
 
+            var endpointAuthenticationType = endpointAuthentication.AuthenticationType;
             var accessToken = endpointAuthenticationType switch
             {
                 EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
-                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => endpointAuthentication.Credentials == null
+                    ? await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false)
+                    : await _serviceTokenService.GetServiceAccessTokenAsync(endpointAuthentication.Credentials, cancellationToken).ConfigureAwait(false),
                 _ => null
             };
 
@@ -113,17 +122,20 @@ namespace TypingRealm.Communication
             return response;
         }
 
-        public async ValueTask DeleteAsync(string serviceName, string endpoint, EndpointAuthenticationType endpointAuthenticationType, CancellationToken cancellationToken)
+        public async ValueTask DeleteAsync(string serviceName, string endpoint, EndpointAuthentication endpointAuthentication, CancellationToken cancellationToken)
         {
             if (!_serviceAddresses.ContainsKey(serviceName))
                 throw new InvalidOperationException("Service is not registered in service discovery.");
 
             var uri = $"{_serviceAddresses[serviceName]}/{endpoint}";
 
+            var endpointAuthenticationType = endpointAuthentication.AuthenticationType;
             var accessToken = endpointAuthenticationType switch
             {
                 EndpointAuthenticationType.Profile => await _profileTokenService.GetProfileAccessTokenAsync(cancellationToken).ConfigureAwait(false),
-                EndpointAuthenticationType.Service => await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false),
+                EndpointAuthenticationType.Service => endpointAuthentication.Credentials == null
+                    ? await _serviceTokenService.GetServiceAccessTokenAsync(cancellationToken).ConfigureAwait(false)
+                    : await _serviceTokenService.GetServiceAccessTokenAsync(endpointAuthentication.Credentials, cancellationToken).ConfigureAwait(false),
                 _ => null
             };
 

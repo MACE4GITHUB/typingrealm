@@ -21,7 +21,7 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.GetAsync<ActivityResource?>(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}/current/{characterId}",
-                EndpointAuthenticationType.Service,
+                EndpointAuthentication.Service,
                 cancellationToken);
         }
 
@@ -30,7 +30,7 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.PostAsync(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}",
-                EndpointAuthenticationType.Service,
+                EndpointAuthentication.Service,
                 activityResource,
                 cancellationToken);
         }
@@ -40,7 +40,7 @@ namespace TypingRealm.Profiles.Api.Client
             return _serviceClient.DeleteAsync(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}/{activityId}",
-                EndpointAuthenticationType.Service,
+                EndpointAuthentication.Service,
                 cancellationToken);
         }
     }

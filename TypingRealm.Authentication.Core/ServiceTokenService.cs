@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -19,6 +20,7 @@ namespace TypingRealm.Authentication
     public interface IServiceTokenService
     {
         ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken);
+        ValueTask<string> GetServiceAccessTokenAsync(ClientCredentials credentials, CancellationToken cancellationToken);
     }
 
     // It needs to be public because it is used by API.
@@ -40,18 +42,35 @@ namespace TypingRealm.Authentication
             _authenticationInformationProvider = authenticationInformationProvider;
         }
 
-        public async ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken)
+        public ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken)
+        {
+            var authenticationInformation = _authenticationInformationProvider.GetServiceAuthenticationInformation();
+            if (authenticationInformation.ServiceClientId == null || authenticationInformation.ServiceClientSecret == null)
+                throw new InvalidOperationException("Client credentials authentication information is not set for service.");
+
+            return GetServiceAccessTokenAsync(new ClientCredentials(
+                authenticationInformation.ServiceClientId,
+                authenticationInformation.ServiceClientSecret,
+                Enumerable.Empty<string>()), cancellationToken);
+        }
+
+        public async ValueTask<string> GetServiceAccessTokenAsync(ClientCredentials credentials, CancellationToken cancellationToken)
         {
             var authenticationInformation = _authenticationInformationProvider.GetServiceAuthenticationInformation();
 
             using var httpClient = new HttpClient();
-            using var content = new FormUrlEncodedContent(new[]
+            var parameters = new List<KeyValuePair<string?, string?>>
             {
-                new KeyValuePair<string?, string?>("client_id", authenticationInformation.ServiceClientId),
-                new KeyValuePair<string?, string?>("client_secret", authenticationInformation.ServiceClientSecret),
+                new KeyValuePair<string?, string?>("client_id", credentials.ClientId),
+                new KeyValuePair<string?, string?>("client_secret", credentials.ClientSecret),
                 new KeyValuePair<string?, string?>("audience", "https://api.typingrealm.com"),
                 new KeyValuePair<string?, string?>("grant_type", "client_credentials")
-            });
+            };
+
+            if (credentials.Scopes.Any())
+                parameters.Add(new("scopes", string.Join(' ', credentials.Scopes)));
+
+            using var content = new FormUrlEncodedContent(parameters);
 
             var response = await httpClient.PostAsync(authenticationInformation.TokenEndpoint, content, cancellationToken)
                 .ConfigureAwait(false);

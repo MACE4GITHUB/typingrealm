@@ -28,7 +28,7 @@ public sealed class SentencesClient : ISentencesClient
         return _serviceClient.GetAsync<IEnumerable<SentenceDto>>(
             ServiceName,
             $"{RoutePrefix}?count={count}&consecutiveCount={consecutiveCount}",
-            EndpointAuthenticationType.Service,
+            EndpointAuthentication.Service,
             cancellationToken);
     }
 }

@@ -11,5 +11,10 @@ namespace TypingRealm.Communication
         {
             throw new NotSupportedException("Access tokens are not supported in anonymous provider.");
         }
+
+        public ValueTask<string> GetServiceAccessTokenAsync(ClientCredentials credentials, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException("Access tokens are not supported in anonymous provider.");
+        }
     }
 }

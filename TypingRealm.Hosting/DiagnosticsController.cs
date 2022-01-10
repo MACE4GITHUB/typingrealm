@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TypingRealm.Authentication;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
 
@@ -17,7 +18,7 @@ namespace TypingRealm.Hosting
         Anonymous = 4,
 
         SuperAdminProtected = 5,
-        SuperAdminAndServiceProtected = 6
+        DiagnosticsAndServiceProtected = 6
     }
 
     public sealed record DiagnosticsCallResponse(
@@ -51,23 +52,23 @@ namespace TypingRealm.Hosting
         {
             return callType switch
             {
-                ServiceToServiceCallType.ServiceProtected => CallAsync(serviceName, "api/diagnostics/service-protected-call", EndpointAuthenticationType.Service),
-                ServiceToServiceCallType.UserProtected => CallAsync(serviceName, "api/diagnostics/user-protected-call", EndpointAuthenticationType.Profile),
-                ServiceToServiceCallType.Protected => CallAsync(serviceName, "api/diagnostics/protected-call", EndpointAuthenticationType.Profile),
-                ServiceToServiceCallType.Anonymous => CallAsync(serviceName, "api/diagnostics/anonymous-call", EndpointAuthenticationType.Anonymous),
-                ServiceToServiceCallType.SuperAdminProtected => CallAsync(serviceName, "api/diagnostics/superadmin-call", EndpointAuthenticationType.Profile),
-                ServiceToServiceCallType.SuperAdminAndServiceProtected => CallAsync(serviceName, "api/diagnostics/superadmin-service-call", EndpointAuthenticationType.Service),
+                ServiceToServiceCallType.ServiceProtected => CallAsync(serviceName, "api/diagnostics/service-protected-call", EndpointAuthentication.Service),
+                ServiceToServiceCallType.UserProtected => CallAsync(serviceName, "api/diagnostics/user-protected-call", EndpointAuthentication.Profile),
+                ServiceToServiceCallType.Protected => CallAsync(serviceName, "api/diagnostics/protected-call", EndpointAuthentication.Profile),
+                ServiceToServiceCallType.Anonymous => CallAsync(serviceName, "api/diagnostics/anonymous-call", EndpointAuthentication.Anonymous),
+                ServiceToServiceCallType.SuperAdminProtected => CallAsync(serviceName, "api/diagnostics/superadmin-call", EndpointAuthentication.Profile),
+                ServiceToServiceCallType.DiagnosticsAndServiceProtected => CallAsync(serviceName, "api/diagnostics/diagnostics-scoped-service-call", EndpointAuthentication.FromClientCredentials(new("diagnostics", "diagnostics", new[] { TyrScopes.Diagnostics }))),
                 _ => throw new NotSupportedException("Unsupported ServiceToService call type."),
             };
 
-            async ValueTask<ActionResult<ServiceToServiceResult>> CallAsync(string serviceName, string endpoint, EndpointAuthenticationType authenticationType)
+            async ValueTask<ActionResult<ServiceToServiceResult>> CallAsync(string serviceName, string endpoint, EndpointAuthentication authentication)
             {
                 try
                 {
                     var response = await _serviceClient.GetAsync<DiagnosticsCallResponse>(
                         serviceName,
                         endpoint,
-                        authenticationType,
+                        authentication,
                         default).ConfigureAwait(false);
 
                     return Ok(new ServiceToServiceResult(response, null));
@@ -104,8 +105,8 @@ namespace TypingRealm.Hosting
         public DiagnosticsCallResponse GetSuperAdminDate() => new(_serviceId, DateTime.UtcNow);
 
         [HttpGet]
-        [ServiceScoped, SuperAdminScoped]
-        [Route("superadmin-service-call")]
+        [ServiceScoped, Scoped(TyrScopes.Diagnostics)]
+        [Route("diagnostics-scoped-service-call")]
         public DiagnosticsCallResponse GetSuperAdminServiceDate() => new(_serviceId, DateTime.UtcNow);
     }
 }

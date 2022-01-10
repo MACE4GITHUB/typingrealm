@@ -20,7 +20,7 @@ namespace TypingRealm.Data.Api.Client
             return _serviceClient.GetAsync<Location>(
                 ServiceConfiguration.ServiceName,
                 $"{RoutePrefix}/{locationId}",
-                EndpointAuthenticationType.Profile,
+                EndpointAuthentication.Profile,
                 cancellationToken);
         }
     }
