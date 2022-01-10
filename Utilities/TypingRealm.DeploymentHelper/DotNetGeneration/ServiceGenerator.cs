@@ -12,6 +12,7 @@ namespace TypingRealm.DeploymentHelper.DotNetGeneration;
 public sealed class ServiceGenerator
 {
     public static readonly string NetVersion = "net6.0";
+    public static readonly string ContainerToolsVersion = "1.14.0";
 
     public void GenerateServices(string rootFolder, IEnumerable<Service> services)
     {
@@ -117,11 +118,11 @@ public sealed class ServiceGenerator
 
             if (!File.Exists(file))
             {
-                CreateProjectFile(file, rootNamespace: service.BaseProjectFolder);
+                CreateProjectFile(service, file, rootNamespace: service.BaseProjectFolder);
             }
             else
             {
-                UpdateProjectFile(file, rootNamespace: service.BaseProjectFolder);
+                UpdateProjectFile(service, file, rootNamespace: service.BaseProjectFolder);
             }
         }
 
@@ -136,11 +137,11 @@ public sealed class ServiceGenerator
 
             if (!File.Exists(file))
             {
-                CreateProjectFile(file, includeProjects: projects);
+                CreateProjectFile(service, file, includeProjects: projects);
             }
             else
             {
-                UpdateProjectFile(file, includeProjects: projects);
+                UpdateProjectFile(service, file, includeProjects: projects);
             }
         }
 
@@ -156,11 +157,11 @@ public sealed class ServiceGenerator
 
             if (!File.Exists(file))
             {
-                CreateProjectFile(file, includeProjects: projects);
+                CreateProjectFile(service, file, includeProjects: projects);
             }
             else
             {
-                UpdateProjectFile(file, includeProjects: projects);
+                UpdateProjectFile(service, file, includeProjects: projects);
             }
         }
 
@@ -175,11 +176,11 @@ public sealed class ServiceGenerator
 
             if (!File.Exists(file))
             {
-                CreateProjectFile(file, includeProjects: projects);
+                CreateProjectFile(service, file, includeProjects: projects);
             }
             else
             {
-                UpdateProjectFile(file, includeProjects: projects);
+                UpdateProjectFile(service, file, includeProjects: projects);
             }
         }
 
@@ -195,19 +196,21 @@ public sealed class ServiceGenerator
 
             if (!File.Exists(file))
             {
-                CreateProjectFile(file, includeProjects: projects);
+                CreateProjectFile(service, file, includeProjects: projects, isHost: true);
             }
             else
             {
-                UpdateProjectFile(file, includeProjects: projects);
+                UpdateProjectFile(service, file, includeProjects: projects, isHost: true);
             }
         }
     }
 
     private static void CreateProjectFile(
+        Service service,
         string fileName,
         IEnumerable<string>? includeProjects = null,
-        string? rootNamespace = null)
+        string? rootNamespace = null,
+        bool isHost = false)
     {
         var sb = new StringBuilder();
         sb.AppendLine(@"<Project Sdk=""Microsoft.NET.Sdk"">");
@@ -217,6 +220,16 @@ public sealed class ServiceGenerator
 
         if (rootNamespace != null)
             sb.AppendLine($"    <RootNamespace>{rootNamespace}</RootNamespace>");
+
+        if (isHost)
+        {
+            sb.AppendLine("<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>");
+
+            // TODO: Unify this and "debug" constant with other generators.
+            sb.AppendLine($"<DockerfileTag>debug-{Constants.ProjectName}-{service.ServiceName}</DockerfileTag>");
+            sb.AppendLine($"<DockerfileRunEnvironmentFiles>../deployment/.env.debug</DockerfileRunEnvironmentFiles>");
+            sb.AppendLine($"<DockerfileRunEnvironmentFiles>../deployment/.env.debug.{service.ServiceName}</DockerfileRunEnvironmentFiles>");
+        }
 
         sb.AppendLine("  </PropertyGroup>");
         sb.AppendLine();
@@ -240,23 +253,27 @@ public sealed class ServiceGenerator
     }
 
     private static void UpdateProjectFile(
+        Service service,
         string fileName,
         IEnumerable<string>? includeProjects = null,
-        string? rootNamespace = null)
+        string? rootNamespace = null,
+        bool isHost = false)
     {
         XDocument document;
         using (var stream = File.OpenRead(fileName))
         {
             document = XDocument.Load(stream, LoadOptions.PreserveWhitespace);
-            var targetFramework = document.Root!.Element("PropertyGroup")!.Element("TargetFramework")!;
-            if (targetFramework.Value != NetVersion)
-                targetFramework.Value = NetVersion;
+            UpdateElementInPropertyGroup(document, "TargetFramework", NetVersion);
 
             if (rootNamespace != null)
+                UpdateElementInPropertyGroup(document, "RootNamespace", rootNamespace);
+
+            if (isHost)
             {
-                var element = document.Root!.Element("PropertyGroup")!.Element("RootNamespace")!;
-                if (element.Value != rootNamespace)
-                    element.Value = rootNamespace;
+                UpdateElementInPropertyGroup(document, "DockerDefaultTargetOS", "Linux");
+                UpdateElementInPropertyGroup(document, "DockerfileTag", $"debug-{Constants.ProjectName}-{service.ServiceName}");
+                UpdateElementInPropertyGroup(document, "DockerfileRunEnvironmentFiles", "../deployment/.env.debug", true);
+                UpdateElementInPropertyGroup(document, "DockerfileRunEnvironmentFiles", $"../deployment/.env.debug.{service.ServiceName}", true);
             }
 
             if (includeProjects != null)
@@ -280,6 +297,39 @@ public sealed class ServiceGenerator
                         group.Add(new XText("\n  "));
                     }
                 }
+            }
+        }
+
+        static void UpdateElementInPropertyGroup(XDocument document, string elementName, string value, bool addAsArrayItem = false)
+        {
+            var propertyGroup = document.Root!.Element("PropertyGroup");
+            if (propertyGroup == null)
+                throw new InvalidOperationException("PropertyGroup does not exist in csproj file.");
+
+            if (!addAsArrayItem)
+            {
+                var element = document.Root.Element("PropertyGroup")!.Element(elementName)!;
+                if (element == null)
+                {
+                    propertyGroup.Add(new XText("  "));
+                    propertyGroup.Add(new XElement(elementName, value));
+                    propertyGroup.Add(new XText("\n  "));
+                }
+                else
+                {
+                    if (element.Value != value)
+                        element.Value = value;
+                }
+            }
+            else
+            {
+                var elements = document.Root.Element("PropertyGroup")!.Elements(elementName)!;
+                if (elements.Any(e => e.Value == value))
+                    return;
+
+                propertyGroup.Add(new XText("  "));
+                propertyGroup.Add(new XElement(elementName, value));
+                propertyGroup.Add(new XText("\n  "));
             }
         }
 
