@@ -16,47 +16,11 @@ namespace TypingRealm.Communication
         private readonly Dictionary<string, string> _serviceAddresses
             = new Dictionary<string, string>
             {
-                ["profiles"] = GetProfilesHost(),
-                ["data"] = GetDataHost(),
-                ["texts"] = GetTextsHost(),
-                ["library"] = GetLibraryHost()
+                ["data"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30400",
+                ["library"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30402",
+                ["profiles"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30103",
+                ["texts"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30401"
             };
-
-        private static string GetProfilesHost()
-        {
-            var profilesHost = Environment.GetEnvironmentVariable("PROFILES_URL");
-            if (profilesHost == null)
-                return "http://127.0.0.1:30103";
-
-            return profilesHost;
-        }
-
-        private static string GetDataHost()
-        {
-            var dataHost = Environment.GetEnvironmentVariable("DATA_URL");
-            if (dataHost == null)
-                return "http://127.0.0.1:30400";
-
-            return dataHost;
-        }
-
-        private static string GetTextsHost()
-        {
-            var dataHost = Environment.GetEnvironmentVariable("TEXTS_URL");
-            if (dataHost == null)
-                return "http://127.0.0.1:30401";
-
-            return dataHost;
-        }
-
-        private static string GetLibraryHost()
-        {
-            var dataHost = Environment.GetEnvironmentVariable("LIBRARY_URL");
-            if (dataHost == null)
-                return "http://127.0.0.1:30402";
-
-            return dataHost;
-        }
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IProfileTokenService _profileTokenService;
