@@ -23,10 +23,10 @@ public sealed class EnvFileGenerator
 
         foreach (var service in deploymentData.Services)
         {
-            if (service.ServiceName == Constants.WebUiServiceName)
+            if (service.RawServiceName == Constants.WebUiServiceName)
                 continue;
 
-            if (service.ServiceName == Constants.AuthorityServiceName)
+            if (service.RawServiceName == Constants.AuthorityServiceName)
             {
                 if (environment.IsDebug)
                 {

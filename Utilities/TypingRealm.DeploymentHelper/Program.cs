@@ -1,15 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using TypingRealm.DeploymentHelper;
 using TypingRealm.DeploymentHelper.Caddy;
 using TypingRealm.DeploymentHelper.Compose;
+using TypingRealm.DeploymentHelper.DotNetGeneration;
 using TypingRealm.DeploymentHelper.EnvFiles;
 using Environment = TypingRealm.DeploymentHelper.Data.Environment;
 
 Console.WriteLine("Folder:");
 var folder = Console.ReadLine();
-if (folder == null)
-    throw new InvalidOperationException("Folder is not specified.");
+if (string.IsNullOrWhiteSpace(folder))
+    folder = @"d:\projects\typingrealm";
 
 if (!Directory.Exists(folder))
     Directory.CreateDirectory(folder);
@@ -55,4 +57,10 @@ foreach (var profile in CaddyProfile.GetAllProfiles())
         new CaddyfileGenerator().GenerateCaddyfile(
             HardcodedData.Generate(),
             profile));
+}
+
+var nonLegacyServices = new[] { "library", "texts", "test" };
+foreach (var service in HardcodedData.Generate().Services.Where(s => nonLegacyServices.Contains(s.ServiceName)))
+{
+    new ServiceGenerator().GenerateService(folder, service);
 }

@@ -6,13 +6,14 @@ namespace TypingRealm.DeploymentHelper;
 public static class Constants
 {
     public const string DockerComposeVersion = "3.4";
-    public const string ProjectName = "typingrealm";
-    public const string Domain = $"{ProjectName}.com";
+    public const string RawProjectName = "TypingRealm";
+    public static string ProjectName => RawProjectName.ToLowerInvariant();
+    public static string Domain => $"{ProjectName}.com";
     public const string LocalDomain = "localhost";
-    public const string Email = $"{ProjectName}@gmail.com";
+    public static string Email => $"{ProjectName}@gmail.com";
     public const string InfrastructureDataFolder = "./infrastructure-data";
     public const string WebUiServiceName = "web-ui";
-    public const string AuthorityServiceName = "identityserver";
+    public const string AuthorityServiceName = "IdentityServer";
     public const string EnvironmentFilesFolderWithSlash = "deployment/";
 
     public const string CacheConfigurationKey = "ConnectionStrings__ServiceCacheConnection";
@@ -22,8 +23,11 @@ public static class Constants
     public const string PostgresDatabase = "db";
 
     // Web UI.
-    public const string WebUiDockerPath = $"{ProjectName}-{WebUiServiceName}:80";
+    public static string WebUiDockerPath => $"{ProjectName}-{WebUiServiceName}:80";
     public const string LocalWebUiDockerPath = "host.docker.internal:4200";
+
+    public static string CommunicationProjectName => $"{RawProjectName}.Communication";
+    public static string HostingProjectName => $"{RawProjectName}.Hosting";
 
     public static IEnumerable<string> ExternalNetworksForHostProdCompose => new[]
     {
