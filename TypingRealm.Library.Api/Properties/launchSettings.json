@@ -1,5 +1,5 @@
 {
-  "library": {
+  "profiles": {
     "TypingRealm.Library.Api": {
       "commandName": "Project",
       "environmentVariables": {

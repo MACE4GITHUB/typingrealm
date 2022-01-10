@@ -9,11 +9,13 @@ public sealed record Service(
     DatabaseType DatabaseType,
     CacheType CacheType,
     string DockerBuildContext,
-    string DockerfilePath,
+    string ProjectFolder,
     int Port,
     bool AddToReverseProxyInProduction)
 {
     public IEnumerable<string>? Envs { get; set; }
+
+    public string DockerfilePath => $"{(ProjectFolder == "?" ? "" : $"{ProjectFolder}/")}Dockerfile";
 
     public bool IsInEnvironment(Environment environment)
     {
