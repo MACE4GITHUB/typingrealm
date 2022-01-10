@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -16,10 +16,10 @@ namespace TypingRealm.Communication
         private readonly Dictionary<string, string> _serviceAddresses
             = new Dictionary<string, string>
             {
-                ["data"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30400",
-                ["library"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30402",
+                ["data"] = Environment.GetEnvironmentVariable("DATA_URL") ?? "http://127.0.0.1:30400",
+                ["library"] = Environment.GetEnvironmentVariable("LIBRARY_URL") ?? "http://127.0.0.1:30402",
                 ["profiles"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30103",
-                ["texts"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30401"
+                ["texts"] = Environment.GetEnvironmentVariable("TEXTS_URL") ?? "http://127.0.0.1:30401"
             };
 
         private readonly IHttpClientFactory _httpClientFactory;

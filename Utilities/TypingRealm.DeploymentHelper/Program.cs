@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using TypingRealm.DeploymentHelper;
 using TypingRealm.DeploymentHelper.Caddy;
 using TypingRealm.DeploymentHelper.Compose;
@@ -59,8 +58,4 @@ foreach (var profile in CaddyProfile.GetAllProfiles())
             profile));
 }
 
-var nonLegacyServices = new[] { "library", "texts", "test" };
-foreach (var service in HardcodedData.Generate().Services.Where(s => nonLegacyServices.Contains(s.ServiceName)))
-{
-    new ServiceGenerator().GenerateService(folder, service);
-}
+new ServiceGenerator().GenerateServices(folder, HardcodedData.Generate().Services);

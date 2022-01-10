@@ -13,7 +13,87 @@ public sealed class ServiceGenerator
 {
     public static readonly string NetVersion = "net6.0";
 
-    public void GenerateService(string rootFolder, Service service)
+    public void GenerateServices(string rootFolder, IEnumerable<Service> services)
+    {
+        var legacyServices = new[] { "data", "profiles" };
+
+        foreach (var service in services.Where(s => !legacyServices.Contains(s.ServiceName)))
+        {
+            GenerateService(rootFolder, service);
+        }
+
+        var lines = services.Where(s => s.RawServiceName != Constants.AuthorityServiceName)
+            .OrderBy(s => s.ServiceName)
+            .Select(s => @$"{new string(' ', 16)}[""{s.ServiceName}""] = Environment.GetEnvironmentVariable(""{s.ServiceName.ToUpperInvariant()}_URL"") ?? ""http://127.0.0.1:{s.Port}"",")
+            .ToList();
+
+        lines[^1] = lines[^1][0..^1];
+
+        var filePath = Path.Combine(rootFolder, $@"{Constants.CommunicationProjectName}/InMemoryServiceClient.cs");
+        var serviceClientContent = File.ReadAllText(filePath);
+        var contentLines = serviceClientContent.Split('\n');
+        var newLines = new List<string>();
+        var step = 0;
+        foreach (var line in contentLines)
+        {
+            if (step == 0 && !line.Contains("<string, string> _serviceAddresses"))
+            {
+                newLines.Add(line);
+                continue;
+            }
+
+            if (step == 0 && line.Contains("<string, string> _serviceAddresses"))
+            {
+                newLines.Add(line);
+                step = 1;
+                continue;
+            }
+
+            if (step == 1 && !line.Contains("new Dictionary<string, string>"))
+            {
+                newLines.Add(line);
+                step = 0;
+                continue;
+            }
+
+            if (step == 1 && line.Contains("new Dictionary<string, string>"))
+            {
+                newLines.Add(line);
+                step = 2;
+                continue;
+            }
+
+            if (step == 2 && line.Trim().Trim('\r') == "{")
+            {
+                newLines.Add(line);
+                step = 3;
+                continue;
+            }
+            else if (step == 2)
+            {
+                newLines.Add(line);
+                step = 0;
+                continue;
+            }
+
+            if (step == 3 && line.Trim().Trim('\r') != "};")
+                continue;
+
+            if (step == 3 && line.Trim().Trim('\r') == "};")
+            {
+                newLines.AddRange(lines);
+                newLines.Add(line);
+                step = -1;
+                continue;
+            }
+
+            newLines.Add(line);
+        }
+
+        File.WriteAllText(filePath, string.Join('\n', newLines));
+    }
+
+    private void GenerateService(string rootFolder, Service service)
     {
         if (service.RawServiceName == Constants.AuthorityServiceName)
             return; // Do not change anything for IdentityServer project.
