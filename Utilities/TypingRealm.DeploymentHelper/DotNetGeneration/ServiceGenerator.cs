@@ -115,6 +115,7 @@ public sealed class ServiceGenerator
         {
             var path = Path.Combine(rootFolder, service.ServiceProjects.CorePath, "ServiceConfiguration.cs");
 
+            // TODO: Update ServiceConfiguration file if it exists.
             if (File.Exists(path))
                 return;
 
