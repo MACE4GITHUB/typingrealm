@@ -12,7 +12,6 @@ namespace TypingRealm.DeploymentHelper.DotNetGeneration;
 public sealed class ServiceGenerator
 {
     public static readonly string NetVersion = "net6.0";
-    public static readonly string ContainerToolsVersion = "1.14.0";
 
     public void GenerateServices(string rootFolder, IEnumerable<Service> services)
     {
