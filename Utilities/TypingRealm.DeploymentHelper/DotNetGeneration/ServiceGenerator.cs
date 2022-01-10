@@ -111,6 +111,25 @@ public sealed class ServiceGenerator
             return Path.Combine(rootFolder, projectName, $"{projectName}.csproj");
         }
 
+        void TryCreateServiceConfigurationFile(Service service)
+        {
+            var path = Path.Combine(rootFolder, service.ServiceProjects.CorePath, "ServiceConfiguration.cs");
+
+            if (File.Exists(path))
+                return;
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"namespace {Constants.RawProjectName}.{service.RawServiceName};");
+            sb.AppendLine();
+            sb.AppendLine("public static class ServiceConfiguration");
+            sb.AppendLine("{");
+            sb.AppendLine(@$"    public const string ServiceName = ""{service.ServiceName}"";");
+            sb.AppendLine(@"    public const string ApiVersion = ""api"";");
+            sb.AppendLine("}");
+
+            File.WriteAllText(path, sb.ToString());
+        }
+
         // Core project.
         {
             var file = PrepareFolder(rootFolder, service.ServiceProjects.CorePath);
@@ -123,6 +142,8 @@ public sealed class ServiceGenerator
             {
                 UpdateProjectFile(service, file, rootNamespace: service.BaseProjectFolder);
             }
+
+            TryCreateServiceConfigurationFile(service);
         }
 
         // Domain project.
