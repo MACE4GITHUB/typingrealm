@@ -8,7 +8,9 @@ namespace TypingRealm.Library.Api.Client;
 public interface ISentencesClient
 {
     ValueTask<IEnumerable<SentenceDto>> GetRandomSentencesAsync(
-        int count, int consecutiveCount, CancellationToken cancellationToken);
+        int count, int consecutiveCount,
+        EndpointAuthentication? authentication = null,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed class SentencesClient : ISentencesClient
@@ -23,12 +25,17 @@ public sealed class SentencesClient : ISentencesClient
     }
 
     public ValueTask<IEnumerable<SentenceDto>> GetRandomSentencesAsync(
-        int count, int consecutiveCount, CancellationToken cancellationToken)
+        int count, int consecutiveCount,
+        EndpointAuthentication? authentication = null,
+        CancellationToken cancellationToken = default)
     {
+        if (authentication == null)
+            authentication = EndpointAuthentication.Service;
+
         return _serviceClient.GetAsync<IEnumerable<SentenceDto>>(
             ServiceName,
             $"{RoutePrefix}?count={count}&consecutiveCount={consecutiveCount}",
-            EndpointAuthentication.Service,
+            authentication,
             cancellationToken);
     }
 }
