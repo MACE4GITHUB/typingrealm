@@ -68,7 +68,7 @@ namespace TypingRealm.Authentication
             };
 
             if (credentials.Scopes.Any())
-                parameters.Add(new("scopes", string.Join(' ', credentials.Scopes)));
+                parameters.Add(new("scope", string.Join(' ', credentials.Scopes)));
 
             using var content = new FormUrlEncodedContent(parameters);
 

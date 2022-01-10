@@ -57,7 +57,7 @@ namespace TypingRealm.Hosting
                 ServiceToServiceCallType.Protected => CallAsync(serviceName, "api/diagnostics/protected-call", EndpointAuthentication.Profile),
                 ServiceToServiceCallType.Anonymous => CallAsync(serviceName, "api/diagnostics/anonymous-call", EndpointAuthentication.Anonymous),
                 ServiceToServiceCallType.SuperAdminProtected => CallAsync(serviceName, "api/diagnostics/superadmin-call", EndpointAuthentication.Profile),
-                ServiceToServiceCallType.DiagnosticsAndServiceProtected => CallAsync(serviceName, "api/diagnostics/diagnostics-scoped-service-call", EndpointAuthentication.FromClientCredentials(new("diagnostics", "diagnostics", new[] { TyrScopes.Diagnostics }))),
+                ServiceToServiceCallType.DiagnosticsAndServiceProtected => CallAsync(serviceName, "api/diagnostics/diagnostics-scoped-service-call", EndpointAuthentication.FromClientCredentials(new("diagnostics", "diagnostics", new[] { TyrScopes.Diagnostics, TyrScopes.Service }))),
                 _ => throw new NotSupportedException("Unsupported ServiceToService call type."),
             };
 

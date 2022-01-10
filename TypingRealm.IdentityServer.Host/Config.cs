@@ -14,7 +14,8 @@ namespace TypingRealm.IdentityServer.Host
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
             {
-                new ApiScope("service", "TypingRealm internal service-to-service communication.")
+                new ApiScope("service", "TypingRealm internal service-to-service communication."),
+                new ApiScope("diagnostics", "TypingRealm internal diagnostics scope for diagnostics operations.")
             };
 
         public static IEnumerable<Client> Clients =>
@@ -33,6 +34,21 @@ namespace TypingRealm.IdentityServer.Host
                         "service"
                     },
                     AccessTokenLifetime = 3600
+                },
+                new Client
+                {
+                    ClientId = "diagnostics",
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    ClientSecrets =
+                    {
+                        new Secret("diagnostics".Sha256())
+                    },
+                    AllowedScopes =
+                    {
+                        "diagnostics",
+                        "service"
+                    },
+                    AccessTokenLifetime = 60
                 }
             };
     }
