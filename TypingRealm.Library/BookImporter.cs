@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TypingRealm.Texts;
@@ -8,7 +9,7 @@ namespace TypingRealm.Library;
 
 public interface IBookImporter
 {
-    ValueTask<Book> ImportBookAsync(string description, string content);
+    ValueTask<Book> ImportBookAsync(string description, Stream content);
 }
 
 public sealed class BookImporter : IBookImporter
@@ -24,16 +25,20 @@ public sealed class BookImporter : IBookImporter
         _bookStore = bookStore;
     }
 
-    public async ValueTask<Book> ImportBookAsync(string description, string content)
+    public async ValueTask<Book> ImportBookAsync(string description, Stream content)
     {
         var bookId = await _bookStore.NextBookIdAsync()
             .ConfigureAwait(false);
 
-        var book = new Book(bookId, description, content);
-        await _bookStore.SaveBook(book)
+        var bookContent = new BookContent(bookId, content);
+        var book = new Book(bookId, description);
+
+        await _bookStore.AddBookWithContent(book, bookContent)
             .ConfigureAwait(false);
 
-        await ImportBookAsync(book)
+        // TODO: Do the following part asynchronously, return statistics.
+
+        await ImportBookAsync(book, bookContent)
             .ConfigureAwait(false);
 
         book = await _bookStore.FindBookAsync(bookId)
@@ -44,16 +49,22 @@ public sealed class BookImporter : IBookImporter
 
         book.FinishProcessing();
 
-        await _bookStore.SaveBook(book)
+        await _bookStore.UpdateBook(book)
             .ConfigureAwait(false);
 
         return book;
     }
 
-    private async ValueTask ImportBookAsync(Book book)
+    private async ValueTask ImportBookAsync(Book book, BookContent bookContent)
     {
+        // TODO: Parse the stream by chunks.
+
+        using var reader = new StreamReader(bookContent.Content);
+        var text = await reader.ReadToEndAsync()
+            .ConfigureAwait(false);
+
         // TODO: Move most of this logic inside GetSentencesEnumerable method.
-        var sentences = TextHelpers.GetAllowedSentencesEnumerable(book.Content, "en") // TODO: Support other languages.
+        var sentences = TextHelpers.GetAllowedSentencesEnumerable(text, "en") // TODO: Support other languages.
             .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
         await _sentenceRepository.SaveByBatchesAsync(sentences, 200)

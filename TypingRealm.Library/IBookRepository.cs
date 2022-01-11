@@ -5,6 +5,10 @@ namespace TypingRealm.Library;
 public interface IBookRepository
 {
     ValueTask<BookId> NextBookIdAsync();
+
     ValueTask<Book?> FindBookAsync(BookId bookId);
-    ValueTask SaveBook(Book book);
+    ValueTask<BookContent?> FindBookContent(BookId bookContentId);
+
+    ValueTask AddBookWithContent(Book book, BookContent content);
+    ValueTask UpdateBook(Book book);
 }

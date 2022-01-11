@@ -10,6 +10,7 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 [Index(nameof(IsProcessed))]
 [Index(nameof(IsArchived))]
 [Index(nameof(AddedAtUtc))]
+[Index(nameof(ContentId))]
 public class BookDao : IDao<BookDao>
 {
     [Key]
@@ -19,7 +20,9 @@ public class BookDao : IDao<BookDao>
     [MaxLength(100)]
     public string Description { get; set; }
 
-    public string Content { get; set; }
+    [MaxLength(50)]
+    public string ContentId { get; set; }
+    public virtual BookContentDao Content { get; set; }
 
     public bool IsProcessed { get; set; }
 
@@ -37,7 +40,7 @@ public class BookDao : IDao<BookDao>
         {
             Id = state.BookId,
             Description = state.Description,
-            Content = state.Content,
+            ContentId = state.BookId,
             IsProcessed = state.IsProcessed,
             IsArchived = state.IsArchived,
             AddedAtUtc = DateTime.UtcNow
@@ -46,7 +49,7 @@ public class BookDao : IDao<BookDao>
 
     public Book FromDao()
     {
-        var state = new Book.State(new(Id), Description, Content, IsProcessed, IsArchived);
+        var state = new Book.State(new(Id), Description, IsProcessed, IsArchived);
 
         return Book.FromState(state);
     }
@@ -56,8 +59,8 @@ public class BookDao : IDao<BookDao>
         if (Description != from.Description)
             Description = from.Description;
 
-        if (Content != from.Content)
-            Content = from.Content;
+        if (ContentId != from.ContentId)
+            ContentId = from.ContentId;
 
         if (IsProcessed != from.IsProcessed)
             IsProcessed = from.IsProcessed;

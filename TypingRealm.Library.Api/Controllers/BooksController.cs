@@ -27,7 +27,10 @@ public sealed class BooksController : TyrController
         try
         {
             var textContent = await ReadAsStringAsync(content);
-            await _bookImporter.ImportBookAsync(description, textContent);
+
+            using var stream = content.OpenReadStream();
+
+            await _bookImporter.ImportBookAsync(description, stream);
         }
         catch (Exception exception)
         {

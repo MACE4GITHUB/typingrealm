@@ -11,6 +11,8 @@ public sealed class LibraryDbContext : DbContext
     }
 
     public DbSet<BookDao> Book { get; set; }
+    public DbSet<BookContentDao> BookContent { get; set; }
+
     public DbSet<SentenceDao> Sentence { get; set; }
     public DbSet<WordDao> Word { get; set; }
     public DbSet<KeyPairDao> KeyPair { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,19 @@ public static class RegistrationExtensions
 public sealed class InMemoryBookStore : IBookRepository
 {
     private readonly Dictionary<BookId, Book> _books = new Dictionary<BookId, Book>();
+    private readonly Dictionary<BookId, BookContent> _bookContents
+        = new Dictionary<BookId, BookContent>();
+
+    public ValueTask AddBookWithContent(Book book, BookContent content)
+    {
+        if (_books.ContainsKey(book.BookId))
+            throw new InvalidOperationException("Book already exists.");
+
+        _books.Add(book.BookId, book);
+        _bookContents.Add(content.BookId, content);
+
+        return default;
+    }
 
     public ValueTask<Book?> FindBookAsync(BookId bookId)
     {
@@ -27,17 +41,25 @@ public sealed class InMemoryBookStore : IBookRepository
         return new((Book?)null);
     }
 
+    public ValueTask<BookContent?> FindBookContent(BookId bookId)
+    {
+        if (!_bookContents.ContainsKey(bookId))
+            return new((BookContent?)null);
+
+        return new(_bookContents[bookId]);
+    }
+
     public ValueTask<BookId> NextBookIdAsync()
     {
         return new(BookId.New());
     }
 
-    public ValueTask SaveBook(Book book)
+    public ValueTask UpdateBook(Book book)
     {
         if (!_books.ContainsKey(book.BookId))
-            _books.Add(book.BookId, book);
-        else
-            _books[book.BookId] = book;
+            throw new InvalidOperationException("Book does not exists.");
+
+        _books[book.BookId] = book;
 
         return default;
     }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
@@ -25,12 +26,18 @@ public sealed class BookRepository : IBookRepository
         return new(BookId.New());
     }
 
-    public async ValueTask SaveBook(Book book)
+    public async ValueTask AddBookWithContent(Book book, BookContent content)
     {
         var existing = await _dbContext.Book.FindAsync(book.BookId.Value)
             .ConfigureAwait(false);
 
+        if (existing != null)
+            throw new InvalidOperationException("The book has already been imported (added).");
+
         var dao = BookDao.ToDao(book);
+
+        var transaction = await _dbContext.Database.BeginTransactionAsync()
+            .ConfigureAwait(false);
 
         if (existing == null)
         {
@@ -41,6 +48,32 @@ public sealed class BookRepository : IBookRepository
         {
             existing.MergeFrom(dao);
         }
+
+        await _dbContext.SaveChangesAsync()
+            .ConfigureAwait(false);
+
+        await transaction.CommitAsync()
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask<BookContent?> FindBookContent(BookId bookId)
+    {
+        var dao = await _dbContext.BookContent.FindAsync(bookId.Value)
+            .ConfigureAwait(false);
+
+        return dao?.FromDao();
+    }
+
+    public async ValueTask UpdateBook(Book book)
+    {
+        var existing = await _dbContext.Book.FindAsync(book.BookId.Value)
+            .ConfigureAwait(false);
+
+        if (existing == null)
+            throw new InvalidOperationException("The book doesn't exist.");
+
+        var dao = BookDao.ToDao(book);
+        existing.MergeFrom(dao);
 
         await _dbContext.SaveChangesAsync()
             .ConfigureAwait(false);

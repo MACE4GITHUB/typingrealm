@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 
 namespace TypingRealm.Library;
+
+public sealed record BookContent(BookId BookId, Stream Content);
 
 // Mutable aggregate root.
 public sealed class Book
@@ -8,7 +11,6 @@ public sealed class Book
     public sealed record State(
         BookId BookId,
         string Description,
-        string Content,
         bool IsProcessed,
         bool IsArchived);
 
@@ -22,25 +24,37 @@ public sealed class Book
     public State GetState() => _state with { };
     #endregion
 
-    public Book(BookId bookId, string description, string content)
+    public Book(BookId bookId, string description)
     {
         if (string.IsNullOrWhiteSpace(bookId))
             throw new ArgumentException("Book ID cannot be empty.", nameof(bookId));
 
         ArgumentNullException.ThrowIfNull(description);
-        ArgumentNullException.ThrowIfNull(content);
 
-        _state = new State(bookId, description, content, false, false);
+        _state = new State(bookId, description, false, false);
     }
 
     public BookId BookId => _state.BookId;
-    public string Content => _state.Content;
 
     public void Describe(string newDescription)
     {
         _state = _state with
         {
             Description = newDescription
+        };
+    }
+
+    public void StartProcessingAgain()
+    {
+        if (_state.IsArchived)
+            throw new InvalidOperationException("Book has already been archived.");
+
+        if (!_state.IsProcessed)
+            throw new InvalidOperationException("Book has not been processed yet.");
+
+        _state = _state with
+        {
+            IsProcessed = false
         };
     }
 
