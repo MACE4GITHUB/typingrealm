@@ -14,7 +14,10 @@ public static class SupportedLanguages
         ["en"] = new(typeof(LibraryTextRetriever), provider => new LibraryTextRetriever(
             provider.GetRequiredService<ISentencesClient>(), "en")),
 
-        ["ru"] = new(typeof(RussianTextRetriever), null)
+        //["ru"] = new(typeof(RussianTextRetriever), null)
+
+        ["ru"] = new(typeof(LibraryTextRetriever), provider => new LibraryTextRetriever(
+            provider.GetRequiredService<ISentencesClient>(), "ru"))
     };
 
     public static IEnumerable<string> Languages => SupportedTextRetrievers.Keys;
