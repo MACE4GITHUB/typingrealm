@@ -7,11 +7,6 @@ using TypingRealm.Texts;
 
 namespace TypingRealm.Library;
 
-public sealed record BookImportResult(
-    Book book,
-    IEnumerable<string> Top10NotAllowedSentences,
-    string NotAllowedCharacters);
-
 public interface IBookImporter
 {
     ValueTask<BookImportResult> ImportBookAsync(string description, string language, Stream content);
