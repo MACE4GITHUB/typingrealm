@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
@@ -39,15 +40,19 @@ public sealed class BookRepository : IBookRepository
         var transaction = await _dbContext.Database.BeginTransactionAsync()
             .ConfigureAwait(false);
 
-        if (existing == null)
-        {
-            await _dbContext.Book.AddAsync(dao)
-                .ConfigureAwait(false);
-        }
-        else
-        {
-            existing.MergeFrom(dao);
-        }
+        if (existing != null)
+            throw new InvalidOperationException("Book already exists.");
+
+        // TODO: Read by chunks.
+        using var reader = new StreamReader(content.Content);
+        var stringContent = await reader.ReadToEndAsync()
+            .ConfigureAwait(false);
+
+        await _dbContext.BookContent.AddAsync(BookContentDao.ToDao(content.BookId, stringContent))
+            .ConfigureAwait(false);
+
+        await _dbContext.Book.AddAsync(dao)
+            .ConfigureAwait(false);
 
         await _dbContext.SaveChangesAsync()
             .ConfigureAwait(false);

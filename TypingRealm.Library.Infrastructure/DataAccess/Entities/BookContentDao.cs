@@ -22,7 +22,8 @@ public class BookContentDao : IDao<BookContentDao>
     public static BookContentDao ToDao(string bookId, string content) => new BookContentDao
     {
         Id = bookId,
-        Content = content
+        Content = content,
+        BookId = bookId
     };
 
     public BookContent FromDao() => new BookContent(
