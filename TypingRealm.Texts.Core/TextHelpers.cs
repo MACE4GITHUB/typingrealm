@@ -50,6 +50,10 @@ public static class TextHelpers
                     .Replace("’", "'")
                     .Replace("‘", "'")
                     .Replace("†", " ")
+                    .Replace("\t", " ")
+                    .Replace("«", "\"")
+                    .Replace("»", "\"")
+                    .Replace(" ", " ") // This is a custom unicode character.
                     .ToString().Trim();
 
                 // Remove multiple spaces in a row.
@@ -78,6 +82,9 @@ public static class TextHelpers
 
     public static IEnumerable<string> GetAllowedSentencesEnumerable(string text, string language)
         => GetSentencesEnumerable(text).Where(sentence => IsAllLettersAllowed(sentence, language));
+
+    public static IEnumerable<string> GetDisallowedSentencesEnumerable(string text, string language)
+        => GetSentencesEnumerable(text).Where(sentence => !IsAllLettersAllowed(sentence, language));
 
     public static string[] SplitTextBySpaces(string text)
     {

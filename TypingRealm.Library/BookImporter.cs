@@ -7,9 +7,14 @@ using TypingRealm.Texts;
 
 namespace TypingRealm.Library;
 
+public sealed record BookImportResult(
+    Book book,
+    IEnumerable<string> Top10NotAllowedSentences,
+    string NotAllowedCharacters);
+
 public interface IBookImporter
 {
-    ValueTask<Book> ImportBookAsync(string description, string language, Stream content);
+    ValueTask<BookImportResult> ImportBookAsync(string description, string language, Stream content);
 }
 
 public sealed class BookImporter : IBookImporter
@@ -25,7 +30,7 @@ public sealed class BookImporter : IBookImporter
         _sentenceRepository = sentenceRepository;
     }
 
-    public async ValueTask<Book> ImportBookAsync(string description, string language, Stream content)
+    public async ValueTask<BookImportResult> ImportBookAsync(string description, string language, Stream content)
     {
         var bookId = await _bookStore.NextBookIdAsync()
             .ConfigureAwait(false);
@@ -43,7 +48,7 @@ public sealed class BookImporter : IBookImporter
         if (bookContent == null)
             throw new InvalidOperationException("Book content has not been found.");
 
-        await ImportBookAsync(book, bookContent)
+        var importResult = await ImportBookAsync(book, bookContent)
             .ConfigureAwait(false);
 
         book = await _bookStore.FindBookAsync(bookId)
@@ -57,10 +62,10 @@ public sealed class BookImporter : IBookImporter
         await _bookStore.UpdateBook(book)
             .ConfigureAwait(false);
 
-        return book;
+        return importResult;
     }
 
-    private async ValueTask ImportBookAsync(Book book, BookContent bookContent)
+    private async ValueTask<BookImportResult> ImportBookAsync(Book book, BookContent bookContent)
     {
         // TODO: Parse the stream by chunks.
 
@@ -68,12 +73,22 @@ public sealed class BookImporter : IBookImporter
         var text = await reader.ReadToEndAsync()
             .ConfigureAwait(false);
 
+        var notAllowedSentences = TextHelpers.GetDisallowedSentencesEnumerable(text, book.Language)
+            .ToList();
+
+        var notAllowedCharacters = notAllowedSentences.SelectMany(
+            sentence => sentence.Where(character => !TextHelpers.IsAllLettersAllowed(character.ToString(), book.Language)))
+            .Distinct()
+            .ToList();
+
         // TODO: Move most of this logic inside GetSentencesEnumerable method.
         var sentences = TextHelpers.GetAllowedSentencesEnumerable(text, book.Language)
             .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
         await _sentenceRepository.SaveByBatchesAsync(sentences, 200)
             .ConfigureAwait(false);
+
+        return new BookImportResult(book, notAllowedSentences.Take(10).ToList(), string.Join(string.Empty, notAllowedCharacters));
     }
 
     private Sentence CreateSentence(BookId bookId, string sentence, int sentenceIndex)
