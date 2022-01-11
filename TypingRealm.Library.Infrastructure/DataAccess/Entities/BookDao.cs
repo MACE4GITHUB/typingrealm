@@ -44,6 +44,7 @@ public class BookDao : IDao<BookDao>
         {
             Id = state.BookId,
             Description = state.Description,
+            Language = state.Language,
             ContentId = state.BookId,
             IsProcessed = state.IsProcessed,
             IsArchived = state.IsArchived,
