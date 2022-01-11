@@ -67,6 +67,19 @@ SET content_id = id");
                 name: "fk_book_book_content_content_id",
                 table: "book");
 
+            migrationBuilder.AddColumn<string>(
+                name: "content",
+                table: "book",
+                type: "text",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.Sql(@"
+UPDATE book
+SET content = book_content.content
+FROM book_content
+WHERE book.id = book_content.id");
+
             migrationBuilder.DropTable(
                 name: "book_content");
 
@@ -77,13 +90,6 @@ SET content_id = id");
             migrationBuilder.DropColumn(
                 name: "content_id",
                 table: "book");
-
-            migrationBuilder.AddColumn<string>(
-                name: "content",
-                table: "book",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
         }
     }
 }
