@@ -14,10 +14,10 @@ namespace TypingRealm.Texts.Infrastructure
 
             foreach (var config in SupportedLanguages.SupportedTextRetrievers)
             {
-                if (config.Value == typeof(LibraryEnglishTextRetriever))
+                if (config.Value.Key == typeof(LibraryTextRetriever))
                     continue; // Do not add caching if retriever is library retriever.
 
-                services.AddTextRetrieverCache(config.Value, config.Key);
+                services.AddTextRetrieverCache(config.Value.Key, config.Key);
             }
 
             return services;

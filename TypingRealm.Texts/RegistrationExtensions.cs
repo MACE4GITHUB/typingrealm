@@ -22,8 +22,15 @@ public static class RegistrationExtensions
         {
             foreach (var config in SupportedLanguages.SupportedTextRetrievers)
             {
-                services.AddTransient(config.Value);
-                services.AddTransient(typeof(ITextRetriever), config.Value);
+                if (config.Value.Value != null)
+                {
+                    services.AddTransient(config.Value.Value);
+                }
+                else
+                {
+                    services.AddTransient(config.Value.Key);
+                    services.AddTransient(typeof(ITextRetriever), config.Value.Key);
+                }
             }
         }
         else

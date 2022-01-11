@@ -4,16 +4,17 @@ using TypingRealm.Library.Api.Client;
 
 namespace TypingRealm.Texts.Retrievers;
 
-public sealed class LibraryEnglishTextRetriever : ITextRetriever
+public sealed class LibraryTextRetriever : ITextRetriever
 {
     private readonly ISentencesClient _client;
 
-    public LibraryEnglishTextRetriever(ISentencesClient client)
+    public LibraryTextRetriever(ISentencesClient client, string language)
     {
         _client = client;
+        Language = language;
     }
 
-    public string Language => "en";
+    public string Language { get; }
 
     public async ValueTask<string> RetrieveTextAsync()
     {
