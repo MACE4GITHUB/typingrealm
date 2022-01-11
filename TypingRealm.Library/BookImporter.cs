@@ -64,7 +64,7 @@ public sealed class BookImporter : IBookImporter
             .ConfigureAwait(false);
 
         // TODO: Move most of this logic inside GetSentencesEnumerable method.
-        var sentences = TextHelpers.GetAllowedSentencesEnumerable(text, "en") // TODO: Support other languages.
+        var sentences = TextHelpers.GetAllowedSentencesEnumerable(text, book.Language)
             .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
         await _sentenceRepository.SaveByBatchesAsync(sentences, 200)

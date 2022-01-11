@@ -41,6 +41,7 @@ public sealed class Book
     }
 
     public BookId BookId => _state.BookId;
+    public string Language => _state.Language;
 
     public void Describe(string newDescription)
     {
