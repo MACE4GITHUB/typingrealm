@@ -17,7 +17,7 @@ public sealed class LibraryEnglishTextRetriever : ITextRetriever
 
     public async ValueTask<string> RetrieveTextAsync()
     {
-        var sentences = await _client.GetRandomSentencesAsync(100, 2, default)
+        var sentences = await _client.GetRandomSentencesAsync(Language, 100, 2, default)
             .ConfigureAwait(false);
 
         return string.Join(" ", sentences.Select(s => s.Value));

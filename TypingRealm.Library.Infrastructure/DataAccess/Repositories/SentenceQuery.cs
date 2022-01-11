@@ -11,16 +11,18 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 public sealed class SentenceQuery : ISentenceQuery
 {
     private readonly LibraryDbContext _dbContext;
+    private readonly string _language;
 
-    public SentenceQuery(LibraryDbContext dbContext)
+    public SentenceQuery(LibraryDbContext dbContext, string language)
     {
         _dbContext = dbContext;
+        _language = language;
     }
 
     public async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
     {
         var allBooks = await _dbContext.Book
-            .Where(x => !x.IsArchived && x.IsProcessed)
+            .Where(x => !x.IsArchived && x.IsProcessed && x.Language == _language)
             .Select(x => new { BookId = x.Id })
             .ToListAsync()
             .ConfigureAwait(false);
@@ -104,6 +106,8 @@ public sealed class SentenceQuery : ISentenceQuery
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
             .Include(keyPair => keyPair.Word)
             .ThenInclude(word => word.Sentence)
+            .ThenInclude(sentence => sentence.Book)
+            .Where(kp => kp.Word.Sentence.Book.Language == _language)
             .OrderByDescending(keyPair => keyPair.CountInSentence)
             .Select(x => new
             {
@@ -134,6 +138,8 @@ public sealed class SentenceQuery : ISentenceQuery
         var sentences = await _dbContext.Word
             .Where(word => searchWords.Contains(word.RawValue))
             .Include(word => word.Sentence)
+            .ThenInclude(sentence => sentence.Book)
+            .Where(word => word.Sentence.Book.Language == _language)
             .OrderByDescending(word => word.RawCountInSentence)
             .Select(x => new
             {
@@ -175,6 +181,9 @@ public sealed class SentenceQuery : ISentenceQuery
         var words = await _dbContext.KeyPair
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
             .Include(keyPair => keyPair.Word)
+            .ThenInclude(word => word.Sentence)
+            .ThenInclude(sentence => sentence.Book)
+            .Where(kp => kp.Word.Sentence.Book.Language == _language)
             .Select(x => rawWords ? x.Word.RawValue : x.Word.Value)
             .Distinct()
             .Take(maxWordsCount)

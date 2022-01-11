@@ -11,44 +11,52 @@ public sealed record ImportBookRequest(string Description, IFormFile Content);
 [Route(ServiceConfiguration.SentencesApiPrefix)]
 public sealed class SentencesController : TyrController
 {
-    private readonly ISentenceQuery _sentenceQuery;
+    private readonly SentenceQueryResolver _sentenceQueryResolver;
 
-    public SentencesController(ISentenceQuery sentenceQuery)
+    public SentencesController(SentenceQueryResolver sentenceQueryResolver)
     {
-        _sentenceQuery = sentenceQuery;
+        _sentenceQueryResolver = sentenceQueryResolver;
     }
 
     [HttpGet]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentences(int count, int consecutiveCount)
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentences(string language, int count, int consecutiveCount)
     {
-        var sentences = await _sentenceQuery.FindRandomSentencesAsync(count, consecutiveCount);
+        var sentenceQuery = _sentenceQueryResolver(language);
+
+        var sentences = await sentenceQuery.FindRandomSentencesAsync(count, consecutiveCount);
 
         return Ok(sentences);
     }
 
     [HttpGet]
     [Route("keypairs")]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByKeypairs(string[] keyPairs, int count)
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByKeypairs(string language, string[] keyPairs, int count)
     {
-        var sentences = await _sentenceQuery.FindSentencesContainingKeyPairsAsync(keyPairs, count);
+        var sentenceQuery = _sentenceQueryResolver(language);
+
+        var sentences = await sentenceQuery.FindSentencesContainingKeyPairsAsync(keyPairs, count);
 
         return Ok(sentences);
     }
 
     [HttpGet]
     [Route("words")]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByWords(string[] words, int count)
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByWords(string language, string[] words, int count)
     {
-        var sentences = await _sentenceQuery.FindSentencesContainingWordsAsync(words, count);
+        var sentenceQuery = _sentenceQueryResolver(language);
+
+        var sentences = await sentenceQuery.FindSentencesContainingWordsAsync(words, count);
 
         return Ok(sentences);
     }
 
     [HttpGet]
     [Route("pure-words")]
-    public async ValueTask<ActionResult<IEnumerable<string>>> FindWordsContainingKeyPairs(string[] keyPairs, int maxWordsCount, bool rawWords)
+    public async ValueTask<ActionResult<IEnumerable<string>>> FindWordsContainingKeyPairs(string language, string[] keyPairs, int maxWordsCount, bool rawWords)
     {
-        var words = await _sentenceQuery.FindWordsContainingKeyPairsAsync(keyPairs, maxWordsCount, rawWords);
+        var sentenceQuery = _sentenceQueryResolver(language);
+
+        var words = await sentenceQuery.FindWordsContainingKeyPairsAsync(keyPairs, maxWordsCount, rawWords);
 
         return Ok(words);
     }
