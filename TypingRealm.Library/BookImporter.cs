@@ -9,29 +9,29 @@ namespace TypingRealm.Library;
 
 public interface IBookImporter
 {
-    ValueTask<Book> ImportBookAsync(string description, Stream content);
+    ValueTask<Book> ImportBookAsync(string description, string language, Stream content);
 }
 
 public sealed class BookImporter : IBookImporter
 {
-    private readonly ISentenceRepository _sentenceRepository;
     private readonly IBookRepository _bookStore;
+    private readonly ISentenceRepository _sentenceRepository;
 
     public BookImporter(
-        ISentenceRepository sentenceRepository,
-        IBookRepository bookStore)
+        IBookRepository bookStore,
+        ISentenceRepository sentenceRepository)
     {
-        _sentenceRepository = sentenceRepository;
         _bookStore = bookStore;
+        _sentenceRepository = sentenceRepository;
     }
 
-    public async ValueTask<Book> ImportBookAsync(string description, Stream content)
+    public async ValueTask<Book> ImportBookAsync(string description, string language, Stream content)
     {
         var bookId = await _bookStore.NextBookIdAsync()
             .ConfigureAwait(false);
 
         var bookContent = new BookContent(bookId, content);
-        var book = new Book(bookId, description);
+        var book = new Book(bookId, language, description);
 
         await _bookStore.AddBookWithContent(book, bookContent)
             .ConfigureAwait(false);

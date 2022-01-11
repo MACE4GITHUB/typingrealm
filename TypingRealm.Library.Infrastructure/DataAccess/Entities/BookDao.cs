@@ -11,6 +11,7 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 [Index(nameof(IsArchived))]
 [Index(nameof(AddedAtUtc))]
 [Index(nameof(ContentId))]
+[Index(nameof(Language))]
 public class BookDao : IDao<BookDao>
 {
     [Key]
@@ -19,6 +20,9 @@ public class BookDao : IDao<BookDao>
 
     [MaxLength(100)]
     public string Description { get; set; }
+
+    [MaxLength(10)]
+    public string Language { get; set; }
 
     [MaxLength(50)]
     public string ContentId { get; set; }
@@ -49,7 +53,7 @@ public class BookDao : IDao<BookDao>
 
     public Book FromDao()
     {
-        var state = new Book.State(new(Id), Description, IsProcessed, IsArchived);
+        var state = new Book.State(new(Id), Language, Description, IsProcessed, IsArchived);
 
         return Book.FromState(state);
     }
@@ -58,6 +62,9 @@ public class BookDao : IDao<BookDao>
     {
         if (Description != from.Description)
             Description = from.Description;
+
+        if (Language != from.Language)
+            Language = from.Language;
 
         if (ContentId != from.ContentId)
             ContentId = from.ContentId;

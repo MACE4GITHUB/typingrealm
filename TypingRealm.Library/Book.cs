@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using TypingRealm.Texts;
 
 namespace TypingRealm.Library;
 
@@ -10,6 +12,7 @@ public sealed class Book
 {
     public sealed record State(
         BookId BookId,
+        string Language,
         string Description,
         bool IsProcessed,
         bool IsArchived);
@@ -24,14 +27,17 @@ public sealed class Book
     public State GetState() => _state with { };
     #endregion
 
-    public Book(BookId bookId, string description)
+    public Book(BookId bookId, string language, string description)
     {
         if (string.IsNullOrWhiteSpace(bookId))
             throw new ArgumentException("Book ID cannot be empty.", nameof(bookId));
 
         ArgumentNullException.ThrowIfNull(description);
 
-        _state = new State(bookId, description, false, false);
+        if (!TextHelpers.SupportedLanguages.Contains(language))
+            throw new ArgumentException($"Language {language} is not supported.");
+
+        _state = new State(bookId, language, description, false, false);
     }
 
     public BookId BookId => _state.BookId;

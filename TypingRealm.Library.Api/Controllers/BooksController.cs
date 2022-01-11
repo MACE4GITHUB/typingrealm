@@ -22,7 +22,7 @@ public sealed class BooksController : TyrController
     [HttpPost]
     [SuperAdminScoped]
     [Route("import")]
-    public async ValueTask<ActionResult> ImportBook(string description, IFormFile content)
+    public async ValueTask<ActionResult> ImportBook(string description, string language, IFormFile content)
     {
         try
         {
@@ -30,7 +30,7 @@ public sealed class BooksController : TyrController
 
             using var stream = content.OpenReadStream();
 
-            await _bookImporter.ImportBookAsync(description, stream);
+            await _bookImporter.ImportBookAsync(description, language, stream);
         }
         catch (Exception exception)
         {

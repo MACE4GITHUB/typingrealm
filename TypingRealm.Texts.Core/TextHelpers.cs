@@ -8,6 +8,9 @@ namespace TypingRealm.Texts;
 
 public static class TextHelpers
 {
+    // TODO: Unify this with TextRetrievers and all the other validation places.
+    public static readonly string[] SupportedLanguages = new[] { "en", "ru" };
+
     // TODO: Consider moving this constant to Library context.
     public static readonly int MinSentenceLength = 8;
 
