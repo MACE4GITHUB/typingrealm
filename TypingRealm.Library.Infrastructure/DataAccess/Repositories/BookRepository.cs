@@ -61,7 +61,7 @@ public sealed class BookRepository : IBookRepository
             .ConfigureAwait(false);
     }
 
-    public async ValueTask<BookContent?> FindBookContent(BookId bookId)
+    public async ValueTask<BookContent?> FindBookContentAsync(BookId bookId)
     {
         var dao = await _dbContext.BookContent.FindAsync(bookId.Value)
             .ConfigureAwait(false);

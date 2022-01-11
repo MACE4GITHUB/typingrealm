@@ -38,6 +38,11 @@ public sealed class BookImporter : IBookImporter
 
         // TODO: Do the following part asynchronously, return statistics.
 
+        bookContent = await _bookStore.FindBookContentAsync(bookId)
+            .ConfigureAwait(false);
+        if (bookContent == null)
+            throw new InvalidOperationException("Book content has not been found.");
+
         await ImportBookAsync(book, bookContent)
             .ConfigureAwait(false);
 

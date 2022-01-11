@@ -41,7 +41,7 @@ public sealed class InMemoryBookStore : IBookRepository
         return new((Book?)null);
     }
 
-    public ValueTask<BookContent?> FindBookContent(BookId bookId)
+    public ValueTask<BookContent?> FindBookContentAsync(BookId bookId)
     {
         if (!_bookContents.ContainsKey(bookId))
             return new((BookContent?)null);
