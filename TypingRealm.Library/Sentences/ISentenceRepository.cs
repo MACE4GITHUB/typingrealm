@@ -6,11 +6,8 @@ namespace TypingRealm.Library.Sentences;
 
 public interface ISentenceRepository
 {
-    ValueTask SaveByBatchesAsync(
-        IEnumerable<Sentence> allSentences,
-        int batchSize);
-
-    ValueTask SaveAsync(Sentence sentence);
     ValueTask<SentenceId> NextIdAsync();
+    ValueTask SaveByBatchesAsync(IEnumerable<Sentence> allSentences, int batchSize);
+    ValueTask SaveAsync(Sentence sentence);
     ValueTask RemoveAllForBook(BookId bookId);
 }

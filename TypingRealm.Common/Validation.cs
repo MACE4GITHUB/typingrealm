@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TypingRealm.Library;
+namespace TypingRealm;
 
-// TODO: Move to Common.
 public static class Validation
 {
     public static void ValidateLength(string value, int from, int to)

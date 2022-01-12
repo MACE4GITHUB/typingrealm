@@ -4,7 +4,6 @@ using TypingRealm.Library.Books;
 
 namespace TypingRealm.Library.Sentences;
 
-// Immutable aggregate root (with all public fields, record).
 [DebuggerDisplay("{IndexInBook} - {Value}")]
 public sealed record Sentence(
     BookId BookId,
