@@ -30,11 +30,28 @@ public sealed class BooksController : TyrController
 
             using var stream = content.OpenReadStream();
 
-            return await _bookImporter.ImportBookAsync(description, language, stream);
+            return await _bookImporter.ImportNewBookAsync(description, language, stream);
         }
         catch (Exception exception)
         {
             return BadRequest($"Something bad happened during importing the book: {exception.Message}");
+        }
+
+        return Ok();
+    }
+
+    [HttpPost]
+    [SuperAdminScoped]
+    [Route("re-import")]
+    public async ValueTask<ActionResult<BookImportResult>> ReImportBook(string bookId)
+    {
+        try
+        {
+            return await _bookImporter.ReImportBookAsync(new(bookId));
+        }
+        catch (Exception exception)
+        {
+            return BadRequest($"Something bad happened during re-importing the book: {exception.Message}");
         }
 
         return Ok();

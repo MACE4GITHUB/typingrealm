@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -73,6 +74,16 @@ public sealed class InMemorySentenceRepository : ISentenceRepository
     public ValueTask<SentenceId> NextIdAsync()
     {
         return new(SentenceId.New());
+    }
+
+    public ValueTask RemoveAllForBook(BookId bookId)
+    {
+        foreach (var sentence in _sentences.Where(sentence => sentence.Value.BookId == bookId).ToList())
+        {
+            _sentences.Remove(sentence.Key);
+        }
+
+        return default;
     }
 
     public ValueTask SaveAsync(Sentence sentence)

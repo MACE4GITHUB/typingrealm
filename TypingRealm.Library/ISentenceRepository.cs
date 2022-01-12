@@ -11,4 +11,5 @@ public interface ISentenceRepository
 
     ValueTask SaveAsync(Sentence sentence);
     ValueTask<SentenceId> NextIdAsync();
+    ValueTask RemoveAllForBook(BookId bookId);
 }

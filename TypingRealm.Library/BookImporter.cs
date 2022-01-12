@@ -9,7 +9,8 @@ namespace TypingRealm.Library;
 
 public interface IBookImporter
 {
-    ValueTask<BookImportResult> ImportBookAsync(string description, string language, Stream content);
+    ValueTask<BookImportResult> ImportNewBookAsync(string description, string language, Stream content);
+    ValueTask<BookImportResult> ReImportBookAsync(BookId bookId);
 }
 
 public sealed class BookImporter : IBookImporter
@@ -25,7 +26,7 @@ public sealed class BookImporter : IBookImporter
         _sentenceRepository = sentenceRepository;
     }
 
-    public async ValueTask<BookImportResult> ImportBookAsync(string description, string language, Stream content)
+    public async ValueTask<BookImportResult> ImportNewBookAsync(string description, string language, Stream content)
     {
         var bookId = await _bookStore.NextBookIdAsync()
             .ConfigureAwait(false);
@@ -58,6 +59,41 @@ public sealed class BookImporter : IBookImporter
             .ConfigureAwait(false);
 
         return importResult;
+    }
+
+    public async ValueTask<BookImportResult> ReImportBookAsync(BookId bookId)
+    {
+        var book = await _bookStore.FindBookAsync(bookId)
+            .ConfigureAwait(false);
+
+        if (book == null)
+            throw new InvalidOperationException("Book is not found.");
+
+        var bookContent = await _bookStore.FindBookContentAsync(bookId)
+            .ConfigureAwait(false);
+
+        if (bookContent == null)
+            throw new InvalidOperationException("Content for a book is not found.");
+
+        book.StartReprocessing();
+
+        await _bookStore.UpdateBook(book)
+            .ConfigureAwait(false);
+
+        await _sentenceRepository.RemoveAllForBook(bookId)
+            .ConfigureAwait(false);
+
+        var result = await ImportBookAsync(book, bookContent)
+            .ConfigureAwait(false);
+
+        // TODO: Reuse this code.
+
+        book.FinishProcessing();
+
+        await _bookStore.UpdateBook(book)
+            .ConfigureAwait(false);
+
+        return result;
     }
 
     private async ValueTask<BookImportResult> ImportBookAsync(Book book, BookContent bookContent)

@@ -19,6 +19,19 @@ public sealed class SentenceRepository : ISentenceRepository
 
     public ValueTask<SentenceId> NextIdAsync() => new(new SentenceId(Guid.NewGuid().ToString()));
 
+    public async ValueTask RemoveAllForBook(BookId bookId)
+    {
+        var sentences = await _dbContext.Sentence
+            .Where(sentence => sentence.BookId == bookId.Value)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        _dbContext.Sentence.RemoveRange(sentences);
+
+        await _dbContext.SaveChangesAsync()
+            .ConfigureAwait(false);
+    }
+
     // TODO: Fix the implementation of SaveAsync and SaveBulkAsync to potentially be able to update records?
     // (right now it is only working for appending).
     public async ValueTask SaveAsync(Sentence sentence)
