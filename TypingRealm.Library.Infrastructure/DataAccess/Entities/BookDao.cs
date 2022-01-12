@@ -18,7 +18,7 @@ public class BookDao : IDao<BookDao>
     [MaxLength(50)]
     public string Id { get; set; }
 
-    [MaxLength(100)]
+    [MaxLength(BookDescription.MaxLength)]
     public string Description { get; set; }
 
     [MaxLength(10)]
@@ -54,7 +54,7 @@ public class BookDao : IDao<BookDao>
 
     public Book FromDao()
     {
-        var state = new Book.State(new(Id), Language, Description, IsProcessed, IsArchived);
+        var state = new Book.State(new(Id), new(Language), new(Description), IsProcessed, IsArchived);
 
         return Book.FromState(state);
     }

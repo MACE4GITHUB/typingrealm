@@ -5,15 +5,25 @@ using TypingRealm.Texts;
 
 namespace TypingRealm.Library;
 
+/// <summary>
+/// BookContent is a separate entity. It has the same identity as the Book to
+/// which it is attached, and it has a data field that can be read for storing
+/// or for Import process.
+/// </summary>
 public sealed record BookContent(BookId BookId, Stream Content);
 
-// Mutable aggregate root.
+/// <summary>
+/// Book can be Imported into the Library. It contains Sentences and it can be
+/// Re-Imported or Archived books are not used in queries.
+/// IsProcessed field indicates whether the book Import process has been
+/// finished successfully or no. In future we might rename it into IsImported.
+/// </summary>
 public sealed class Book
 {
     public sealed record State(
         BookId BookId,
-        string Language,
-        string Description,
+        Language Language,
+        BookDescription Description,
         bool IsProcessed,
         bool IsArchived);
 
@@ -27,15 +37,13 @@ public sealed class Book
     public State GetState() => _state with { };
     #endregion
 
-    public Book(BookId bookId, string language, string description)
+    public Book(BookId bookId, Language language, BookDescription description)
     {
-        if (string.IsNullOrWhiteSpace(bookId))
-            throw new ArgumentException("Book ID cannot be empty.", nameof(bookId));
-
+        ArgumentNullException.ThrowIfNull(bookId);
         ArgumentNullException.ThrowIfNull(description);
 
         if (!TextHelpers.SupportedLanguages.Contains(language))
-            throw new ArgumentException($"Language {language} is not supported.");
+            throw new ArgumentException($"Language {language} is not supported.", nameof(language));
 
         _state = new State(bookId, language, description, false, false);
     }
@@ -43,7 +51,7 @@ public sealed class Book
     public BookId BookId => _state.BookId;
     public string Language => _state.Language;
 
-    public void Describe(string newDescription)
+    public void Describe(BookDescription newDescription)
     {
         _state = _state with
         {

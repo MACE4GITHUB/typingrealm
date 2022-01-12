@@ -32,7 +32,7 @@ public sealed class BookImporter : IBookImporter
             .ConfigureAwait(false);
 
         var bookContent = new BookContent(bookId, content);
-        var book = new Book(bookId, language, description);
+        var book = new Book(bookId, new(language), new(description));
 
         await _bookStore.AddBookWithContent(book, bookContent)
             .ConfigureAwait(false);
