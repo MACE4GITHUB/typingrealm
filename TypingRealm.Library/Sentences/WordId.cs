@@ -1,6 +1,6 @@
 ﻿using TypingRealm.Common;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Sentences;
 
 public sealed class WordId : Identity
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Sentences;
 
 public delegate ISentenceQuery SentenceQueryResolver(string language);
 public interface ISentenceQuery

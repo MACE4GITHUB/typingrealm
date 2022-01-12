@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using TypingRealm.Texts;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Books;
 
 /// <summary>
 /// BookContent is a separate entity. It has the same identity as the Book to
@@ -40,10 +38,8 @@ public sealed class Book
     public Book(BookId bookId, Language language, BookDescription description)
     {
         ArgumentNullException.ThrowIfNull(bookId);
+        ArgumentNullException.ThrowIfNull(language);
         ArgumentNullException.ThrowIfNull(description);
-
-        if (!TextHelpers.SupportedLanguages.Contains(language))
-            throw new ArgumentException($"Language {language} is not supported.", nameof(language));
 
         _state = new State(bookId, language, description, false, false);
     }
@@ -53,6 +49,8 @@ public sealed class Book
 
     public void Describe(BookDescription newDescription)
     {
+        ArgumentNullException.ThrowIfNull(newDescription);
+
         _state = _state with
         {
             Description = newDescription

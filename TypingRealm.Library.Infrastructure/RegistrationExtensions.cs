@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Library.Books;
 using TypingRealm.Library.Infrastructure.DataAccess;
 using TypingRealm.Library.Infrastructure.DataAccess.Repositories;
+using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.Infrastructure;
 

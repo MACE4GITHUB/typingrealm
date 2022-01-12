@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Library.Sentences;
 using TypingRealm.Texts;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;

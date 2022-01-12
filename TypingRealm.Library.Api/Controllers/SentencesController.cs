@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
+using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.Api.Controllers;
 

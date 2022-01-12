@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.Library;
+﻿namespace TypingRealm.Library.Sentences;
 
 public sealed record KeyPair(
     //WordId WordId,

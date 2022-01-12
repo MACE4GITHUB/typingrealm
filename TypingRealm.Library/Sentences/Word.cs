@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Sentences;
 
 // Immutable entity of Sentence aggregate root (with all public fields, record).
 // Count is how many times this word is present in the sentence.

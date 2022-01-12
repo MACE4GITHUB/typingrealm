@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using TypingRealm.Library.Books;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
@@ -27,7 +28,7 @@ public sealed class BookRepository : IBookRepository
         return new(BookId.New());
     }
 
-    public async ValueTask AddBookWithContent(Book book, BookContent content)
+    public async ValueTask AddBookWithContentAsync(Book book, BookContent content)
     {
         var existing = await _dbContext.Book.FindAsync(book.BookId.Value)
             .ConfigureAwait(false);
@@ -69,7 +70,7 @@ public sealed class BookRepository : IBookRepository
         return dao?.FromDao();
     }
 
-    public async ValueTask UpdateBook(Book book)
+    public async ValueTask UpdateBookAsync(Book book)
     {
         var existing = await _dbContext.Book.FindAsync(book.BookId.Value)
             .ConfigureAwait(false);

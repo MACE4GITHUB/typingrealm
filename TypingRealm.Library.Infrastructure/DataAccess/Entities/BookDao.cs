@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Library.Books;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
@@ -15,7 +16,7 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 public class BookDao : IDao<BookDao>
 {
     [Key]
-    [MaxLength(50)]
+    [MaxLength(BookId.MaxLength)]
     public string Id { get; set; }
 
     [MaxLength(BookDescription.MaxLength)]
@@ -24,7 +25,7 @@ public class BookDao : IDao<BookDao>
     [MaxLength(10)]
     public string Language { get; set; }
 
-    [MaxLength(50)]
+    [MaxLength(BookId.MaxLength)]
     public string ContentId { get; set; }
     public virtual BookContentDao Content { get; set; }
 

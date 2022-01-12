@@ -1,7 +1,7 @@
 ﻿using TypingRealm.Common;
 using TypingRealm.Texts;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Books;
 
 public sealed class Language : Primitive<string>
 {

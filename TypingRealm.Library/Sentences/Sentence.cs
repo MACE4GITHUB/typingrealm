@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using TypingRealm.Library.Books;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Sentences;
 
 // Immutable aggregate root (with all public fields, record).
 [DebuggerDisplay("{IndexInBook} - {Value}")]

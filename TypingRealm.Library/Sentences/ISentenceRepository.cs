@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using TypingRealm.Library.Books;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Sentences;
 
 public interface ISentenceRepository
 {

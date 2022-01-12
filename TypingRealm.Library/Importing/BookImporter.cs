@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TypingRealm.Library.Books;
+using TypingRealm.Library.Sentences;
 using TypingRealm.Texts;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Importing;
 
 public interface IBookImporter
 {
@@ -34,7 +36,7 @@ public sealed class BookImporter : IBookImporter
         var bookContent = new BookContent(bookId, content);
         var book = new Book(bookId, new(language), new(description));
 
-        await _bookStore.AddBookWithContent(book, bookContent)
+        await _bookStore.AddBookWithContentAsync(book, bookContent)
             .ConfigureAwait(false);
 
         // TODO: Do the following part asynchronously, return statistics.
@@ -55,7 +57,7 @@ public sealed class BookImporter : IBookImporter
 
         book.FinishProcessing();
 
-        await _bookStore.UpdateBook(book)
+        await _bookStore.UpdateBookAsync(book)
             .ConfigureAwait(false);
 
         return importResult;
@@ -77,7 +79,7 @@ public sealed class BookImporter : IBookImporter
 
         book.StartReprocessing();
 
-        await _bookStore.UpdateBook(book)
+        await _bookStore.UpdateBookAsync(book)
             .ConfigureAwait(false);
 
         await _sentenceRepository.RemoveAllForBook(bookId)
@@ -90,7 +92,7 @@ public sealed class BookImporter : IBookImporter
 
         book.FinishProcessing();
 
-        await _bookStore.UpdateBook(book)
+        await _bookStore.UpdateBookAsync(book)
             .ConfigureAwait(false);
 
         return result;

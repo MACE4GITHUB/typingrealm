@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using TypingRealm.Library.Books;
 
-namespace TypingRealm.Library;
+namespace TypingRealm.Library.Importing;
 
 public sealed record BookImportResult(
     Book book,

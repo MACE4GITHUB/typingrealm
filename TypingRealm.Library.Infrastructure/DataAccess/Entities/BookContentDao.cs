@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Library.Books;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
@@ -11,12 +12,12 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 public class BookContentDao : IDao<BookContentDao>
 {
     [Key]
-    [MaxLength(50)]
+    [MaxLength(Books.BookId.MaxLength)]
     public string Id { get; set; }
 
     public string Content { get; set; }
 
-    [MaxLength(50)]
+    [MaxLength(Books.BookId.MaxLength)]
     public string BookId { get; set; }
 
     public static BookContentDao ToDao(string bookId, string content) => new BookContentDao

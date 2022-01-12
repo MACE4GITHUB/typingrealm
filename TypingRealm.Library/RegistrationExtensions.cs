@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Library.Books;
+using TypingRealm.Library.Importing;
+using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library;
 
@@ -23,7 +26,7 @@ public sealed class InMemoryBookStore : IBookRepository
     private readonly Dictionary<BookId, BookContent> _bookContents
         = new Dictionary<BookId, BookContent>();
 
-    public ValueTask AddBookWithContent(Book book, BookContent content)
+    public ValueTask AddBookWithContentAsync(Book book, BookContent content)
     {
         if (_books.ContainsKey(book.BookId))
             throw new InvalidOperationException("Book already exists.");
@@ -55,7 +58,7 @@ public sealed class InMemoryBookStore : IBookRepository
         return new(BookId.New());
     }
 
-    public ValueTask UpdateBook(Book book)
+    public ValueTask UpdateBookAsync(Book book)
     {
         if (!_books.ContainsKey(book.BookId))
             throw new InvalidOperationException("Book does not exists.");

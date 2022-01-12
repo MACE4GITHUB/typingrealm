@@ -4,7 +4,9 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Library.Books;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
+using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 
