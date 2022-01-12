@@ -20,7 +20,56 @@ public sealed class SentenceQuery : ISentenceQuery
         _language = language;
     }
 
-    public async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
+    public ValueTask<IEnumerable<SentenceDto>> FindSentencesAsync(SentencesRequest request)
+    {
+        if (!request.IsValid())
+            throw new InvalidOperationException("Invalid request.");
+
+        if (request.Type == SentencesRequestType.Random)
+            return FindRandomSentencesAsync(request.MaxCount, request.ConsecutiveCount);
+
+        if (request.Type == SentencesRequestType.ContainingWords)
+            return FindSentencesContainingWordsAsync(request.Contains, request.MaxCount);
+
+        if (request.Type == SentencesRequestType.ContainingKeyPairs)
+            return FindSentencesContainingKeyPairsAsync(request.Contains, request.MaxCount);
+
+        throw new NotSupportedException("Request type is not supported.");
+    }
+
+    public ValueTask<IEnumerable<string>> FindWordsAsync(WordsRequest request)
+    {
+        if (!request.IsValid())
+            throw new InvalidOperationException("Invalid request.");
+
+        if (request.Type == WordsRequestType.Random)
+            return FindRandomWordsAsync(request.MaxCount, request.RawWords);
+
+        if (request.Type == WordsRequestType.ContainingKeyPairs)
+            return FindWordsContainingKeyPairsAsync(request.Contains, request.MaxCount, request.RawWords);
+
+        throw new NotSupportedException("Request type is not supported.");
+    }
+
+    private async ValueTask<IEnumerable<string>> FindRandomWordsAsync(int maxCount, bool rawWords)
+    {
+        var randomSentences = await FindRandomSentencesAsync(maxCount, 1)
+            .ConfigureAwait(false);
+
+        var wordsEnumerable = randomSentences.SelectMany(sentence => TextHelpers.GetWordsEnumerable(sentence.Value));
+
+        if (rawWords)
+            wordsEnumerable = wordsEnumerable.Select(word => TextHelpers.GetRawWord(word));
+
+        var distinctWords = wordsEnumerable.Distinct().ToList();
+
+        return Enumerable.Range(0, maxCount)
+            .Select(index => RandomNumberGenerator.GetInt32(0, distinctWords.Count))
+            .Select(index => distinctWords[index])
+            .ToList();
+    }
+
+    private async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
     {
         var allBooks = await _dbContext.Book
             .Where(x => !x.IsArchived && x.IsProcessed && x.Language == _language)
@@ -87,7 +136,7 @@ public sealed class SentenceQuery : ISentenceQuery
         return result;
     }
 
-    public sealed record BookAndSentencePair(string BookId, int SentenceIndexInBook)
+    private sealed record BookAndSentencePair(string BookId, int SentenceIndexInBook)
     {
         public int Index { get; set; }
     }
@@ -101,7 +150,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .Select(indexInBook => new BookAndSentencePair(bookId, indexInBook));
     }
 
-    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int maxSentencesCount)
+    private async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int maxSentencesCount)
     {
         var sentences = await _dbContext.KeyPair
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
@@ -132,7 +181,7 @@ public sealed class SentenceQuery : ISentenceQuery
         return result;
     }
 
-    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int maxSentencesCount)
+    private async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int maxSentencesCount)
     {
         var searchWords = words.Select(word => word.ToLowerInvariant()).ToList();
 
@@ -162,7 +211,7 @@ public sealed class SentenceQuery : ISentenceQuery
         return result;
     }
 
-    public async ValueTask<IEnumerable<string>> FindWordsContainingKeyPairsAsync(
+    private async ValueTask<IEnumerable<string>> FindWordsContainingKeyPairsAsync(
         IEnumerable<string> keyPairs, int maxWordsCount, bool rawWords)
     {
         if (maxWordsCount <= 0)

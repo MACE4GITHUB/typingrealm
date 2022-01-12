@@ -8,6 +8,8 @@ namespace TypingRealm.Texts;
 
 public static class TextHelpers
 {
+    public const string DefaultLanguage = "en";
+
     // TODO: Unify this with TextRetrievers and all the other validation places.
     public static readonly string[] SupportedLanguages = new[] { "en", "ru" };
 

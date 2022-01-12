@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 using TypingRealm.Library.Sentences;
+using TypingRealm.Texts;
 
 namespace TypingRealm.Library.Api.Controllers;
 
@@ -19,45 +20,25 @@ public sealed class SentencesController : TyrController
         _sentenceQueryResolver = sentenceQueryResolver;
     }
 
-    [HttpGet]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentences(string language, int count, int consecutiveCount)
+    [HttpPost]
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetSentences(
+        SentencesRequest request, string language = TextHelpers.DefaultLanguage)
     {
         var sentenceQuery = _sentenceQueryResolver(language);
 
-        var sentences = await sentenceQuery.FindRandomSentencesAsync(count, consecutiveCount);
+        var sentences = await sentenceQuery.FindSentencesAsync(request);
 
         return Ok(sentences);
     }
 
-    [HttpGet]
-    [Route("keypairs")]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByKeypairs(string language, string[] keyPairs, int count)
-    {
-        var sentenceQuery = _sentenceQueryResolver(language);
-
-        var sentences = await sentenceQuery.FindSentencesContainingKeyPairsAsync(keyPairs, count);
-
-        return Ok(sentences);
-    }
-
-    [HttpGet]
+    [HttpPost]
     [Route("words")]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetRandomSentencesByWords(string language, string[] words, int count)
+    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetWords(
+        WordsRequest request, string language = TextHelpers.DefaultLanguage)
     {
         var sentenceQuery = _sentenceQueryResolver(language);
 
-        var sentences = await sentenceQuery.FindSentencesContainingWordsAsync(words, count);
-
-        return Ok(sentences);
-    }
-
-    [HttpGet]
-    [Route("pure-words")]
-    public async ValueTask<ActionResult<IEnumerable<string>>> FindWordsContainingKeyPairs(string language, string[] keyPairs, int maxWordsCount, bool rawWords)
-    {
-        var sentenceQuery = _sentenceQueryResolver(language);
-
-        var words = await sentenceQuery.FindWordsContainingKeyPairsAsync(keyPairs, maxWordsCount, rawWords);
+        var words = await sentenceQuery.FindWordsAsync(request);
 
         return Ok(words);
     }

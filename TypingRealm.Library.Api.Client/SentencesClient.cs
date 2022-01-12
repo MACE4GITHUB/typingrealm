@@ -2,13 +2,21 @@
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Communication;
+using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.Api.Client;
 
 public interface ISentencesClient
 {
-    ValueTask<IEnumerable<SentenceDto>> GetRandomSentencesAsync(
-        string language, int count, int consecutiveCount,
+    ValueTask<IEnumerable<SentenceDto>> GetSentencesAsync(
+        SentencesRequest request,
+        string language, // TODO: Use default "en" value.
+        EndpointAuthentication? authentication = null,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<IEnumerable<string>> GetWordsAsync(
+        WordsRequest request,
+        string language, // TODO: Use default "en" value.
         EndpointAuthentication? authentication = null,
         CancellationToken cancellationToken = default);
 }
@@ -24,18 +32,33 @@ public sealed class SentencesClient : ISentencesClient
         _serviceClient = serviceClient;
     }
 
-    public ValueTask<IEnumerable<SentenceDto>> GetRandomSentencesAsync(
-        string language, int count, int consecutiveCount,
+    public ValueTask<IEnumerable<SentenceDto>> GetSentencesAsync(
+        SentencesRequest request,
+        string language,
         EndpointAuthentication? authentication = null,
         CancellationToken cancellationToken = default)
     {
         if (authentication == null)
             authentication = EndpointAuthentication.Service;
 
-        return _serviceClient.GetAsync<IEnumerable<SentenceDto>>(
+        return _serviceClient.PostAsync<SentencesRequest, IEnumerable<SentenceDto>>(
             ServiceName,
-            $"{RoutePrefix}?language={language}&count={count}&consecutiveCount={consecutiveCount}",
+            $"{RoutePrefix}?language={language}",
             authentication,
+            request,
+            cancellationToken);
+    }
+
+    public ValueTask<IEnumerable<string>> GetWordsAsync(WordsRequest request, string language, EndpointAuthentication? authentication = null, CancellationToken cancellationToken = default)
+    {
+        if (authentication == null)
+            authentication = EndpointAuthentication.Service;
+
+        return _serviceClient.PostAsync<WordsRequest, IEnumerable<string>>(
+            ServiceName,
+            $"{RoutePrefix}/words?language={language}",
+            authentication,
+            request,
             cancellationToken);
     }
 }
