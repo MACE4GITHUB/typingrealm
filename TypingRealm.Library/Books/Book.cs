@@ -63,9 +63,6 @@ public sealed class Book
         if (_state.IsArchived)
             throw new InvalidOperationException("Book has already been archived.");
 
-        if (!_state.IsProcessed)
-            throw new InvalidOperationException("Book has not been processed yet.");
-
         _state = _state with
         {
             IsProcessed = false
@@ -93,7 +90,8 @@ public sealed class Book
 
         _state = _state with
         {
-            IsArchived = true
+            IsArchived = true,
+            IsProcessed = false
         };
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Hosting;
+using TypingRealm.Library.Books;
 using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Importing;
 
@@ -15,13 +16,16 @@ public sealed class BooksController : TyrController
 {
     private readonly IBookImporter _bookImporter;
     private readonly IBookQuery _bookQuery;
+    private readonly ArchiveBookService _archiveBookService;
 
     public BooksController(
         IBookImporter bookImporter,
-        IBookQuery bookQuery)
+        IBookQuery bookQuery,
+        ArchiveBookService archiveBookService)
     {
         _bookImporter = bookImporter;
         _bookQuery = bookQuery;
+        _archiveBookService = archiveBookService;
     }
 
     [HttpGet]
@@ -39,6 +43,14 @@ public sealed class BooksController : TyrController
         var book = await _bookQuery.FindBookAsync(bookId);
 
         return Ok(book);
+    }
+
+    [HttpDelete]
+    [Route("{bookId}")]
+    public async ValueTask<ActionResult> ArchiveBook(string bookId)
+    {
+        await _archiveBookService.ArchiveBookAsync(new(bookId));
+        return Ok();
     }
 
     [HttpPost]
