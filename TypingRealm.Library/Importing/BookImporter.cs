@@ -77,7 +77,8 @@ public sealed class BookImporter : IBookImporter
         if (bookContent == null)
             throw new InvalidOperationException("Content for a book is not found.");
 
-        book.StartReprocessing();
+        if (book.IsProcessed)
+            book.StartReprocessing();
 
         await _bookStore.UpdateBookAsync(book)
             .ConfigureAwait(false);
