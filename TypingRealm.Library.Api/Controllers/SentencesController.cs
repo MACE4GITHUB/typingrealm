@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 using TypingRealm.Library.Sentences;
 using TypingRealm.Texts;
 
 namespace TypingRealm.Library.Api.Controllers;
-
-public sealed record ImportBookRequest(string Description, IFormFile Content);
 
 [Route(ServiceConfiguration.SentencesApiPrefix)]
 public sealed class SentencesController : TyrController
