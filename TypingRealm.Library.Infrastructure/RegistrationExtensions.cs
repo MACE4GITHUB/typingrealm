@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Infrastructure.DataAccess;
 using TypingRealm.Library.Infrastructure.DataAccess.Repositories;
+using TypingRealm.Library.Infrastructure.InMemory;
 using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.Infrastructure;
@@ -12,11 +12,28 @@ namespace TypingRealm.Library.Infrastructure;
 public static class RegistrationExtensions
 {
     public static IServiceCollection AddLibraryApi(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services, IConfiguration configuration)
     {
         services.AddLibraryDomain();
 
+        if (DebugHelpers.UseInfrastructure)
+        {
+            services.AddLibraryDatabase(configuration);
+        }
+        else
+        {
+            services.AddTransient<IInfrastructureDeploymentService, NoInfrastructureService>();
+            services.AddSingleton<ISentenceRepository, InMemorySentenceRepository>();
+            services.AddSingleton<IBookRepository, InMemoryBookRepository>();
+        }
+
+        return services;
+    }
+
+    private static IServiceCollection AddLibraryDatabase(
+        this IServiceCollection services, IConfiguration configuration)
+    {
+        // TODO: Get data connection from common configuration (Hosting project or something).
         var dataConnectionString = configuration.GetConnectionString("DataConnection");
         services.AddDbContext<LibraryDbContext>(
             options => options
@@ -28,41 +45,9 @@ public static class RegistrationExtensions
         services.AddScoped<SentenceQueryResolver>(provider => language => new SentenceQuery(
             provider.GetRequiredService<LibraryDbContext>(), language));
 
-        // TODO: Register NoInfrastructureService when no infrastructure.
         // TODO: Move out infrastructure deployment service to hosting project and reuse it.
         services.AddScoped<IInfrastructureDeploymentService, InfrastructureDeploymentService>();
 
         return services;
-    }
-}
-
-// TODO: Generalize this, the same number of classes is registered in Data API.
-public interface IInfrastructureDeploymentService
-{
-    ValueTask DeployInfrastructureAsync();
-}
-
-public sealed class NoInfrastructureService : IInfrastructureDeploymentService
-{
-    public ValueTask DeployInfrastructureAsync()
-    {
-        return default;
-    }
-}
-
-public sealed class InfrastructureDeploymentService : IInfrastructureDeploymentService
-{
-    private readonly LibraryDbContext _context;
-
-    public InfrastructureDeploymentService(LibraryDbContext context)
-    {
-        _context = context;
-    }
-
-    public async ValueTask DeployInfrastructureAsync()
-    {
-        // TODO: Try this until it succeeds (database can be down).
-        await _context.Database.MigrateAsync()
-            .ConfigureAwait(false);
     }
 }
