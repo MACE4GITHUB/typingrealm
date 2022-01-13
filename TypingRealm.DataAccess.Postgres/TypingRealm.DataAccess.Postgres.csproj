@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -10,9 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TypingRealm.DataAccess.Postgres\TypingRealm.DataAccess.Postgres.csproj" />
     <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
-    <ProjectReference Include="..\TypingRealm.Library\TypingRealm.Library.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,11 +12,13 @@ COPY ["TypingRealm.Communication/TypingRealm.Communication.csproj", "TypingRealm
 COPY ["TypingRealm.Data.Api/TypingRealm.Data.Api.csproj", "TypingRealm.Data.Api/"]
 COPY ["TypingRealm.Data.Infrastructure/TypingRealm.Data.Infrastructure.csproj", "TypingRealm.Data.Infrastructure/"]
 COPY ["TypingRealm.Data.Resources/TypingRealm.Data.Resources.csproj", "TypingRealm.Data.Resources/"]
+COPY ["TypingRealm.DataAccess.Postgres/TypingRealm.DataAccess.Postgres.csproj", "TypingRealm.DataAccess.Postgres/"]
 COPY ["TypingRealm.Hosting/TypingRealm.Hosting.csproj", "TypingRealm.Hosting/"]
-COPY ["TypingRealm.Messaging.Core/TypingRealm.Messaging.Core.csproj", "TypingRealm.Messaging.Core/"]
 COPY ["TypingRealm.Profiles.Api.Client/TypingRealm.Profiles.Api.Client.csproj", "TypingRealm.Profiles.Api.Client/"]
 COPY ["TypingRealm.Profiles.Api.Resources/TypingRealm.Profiles.Api.Resources.csproj", "TypingRealm.Profiles.Api.Resources/"]
 COPY ["TypingRealm.Profiles.Core/TypingRealm.Profiles.Core.csproj", "TypingRealm.Profiles.Core/"]
+COPY ["TypingRealm.Texts.Api.Client/TypingRealm.Texts.Api.Client.csproj", "TypingRealm.Texts.Api.Client/"]
+COPY ["TypingRealm.Texts.Core/TypingRealm.Texts.Core.csproj", "TypingRealm.Texts.Core/"]
 COPY ["TypingRealm.Typing/TypingRealm.Typing.csproj", "TypingRealm.Typing/"]
 RUN dotnet restore "TypingRealm.Data.Api/TypingRealm.Data.Api.csproj"
 COPY . .

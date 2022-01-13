@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using TypingRealm.Communication.Redis;
 using TypingRealm.Data.Infrastructure.DataAccess;
 using TypingRealm.Data.Infrastructure.DataAccess.Repositories;
-using TypingRealm.Hosting;
+using TypingRealm.DataAccess.Postgres;
 using TypingRealm.Texts.Api.Client;
 using TypingRealm.Typing;
 
@@ -14,7 +14,7 @@ namespace TypingRealm.Data.Infrastructure
     {
         public static IServiceCollection RegisterDataApi(
             this IServiceCollection services,
-            string dataConnectionString,
+            IConfiguration configuration,
             string cacheConnectionString,
             string dataCacheConnectionString)
         {
@@ -40,12 +40,8 @@ namespace TypingRealm.Data.Infrastructure
                 services.AddTransient<ITypingSessionRepository, TypingSessionRepository>();
                 services.AddTransient<IUserSessionRepository, UserSessionRepository>();
 
-                services.AddDbContext<DataContext>(
-                    options => options
-                        .UseNpgsql(dataConnectionString)
-                        .UseSnakeCaseNamingConvention());
+                services.AddPostgresWithEFMigrations<DataContext>(configuration);
 
-                services.AddTransient<IInfrastructureDeploymentService, InfrastructureDeploymentService>();
                 services.AddTransient<IUserTypingStatisticsStore, UserTypingStatisticsStore>();
 
                 services.AddStackExchangeRedisCache(options =>

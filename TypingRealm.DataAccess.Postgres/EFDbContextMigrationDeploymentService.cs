@@ -2,15 +2,15 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TypingRealm.Hosting;
-using TypingRealm.Library.Infrastructure.DataAccess;
 
-namespace TypingRealm.Library.Infrastructure;
+namespace TypingRealm.DataAccess.Postgres;
 
-public sealed class InfrastructureDeploymentService : IInfrastructureDeploymentService
+public sealed class EFDbContextMigrationDeploymentService<TDbContext> : IInfrastructureDeploymentService
+    where TDbContext : DbContext
 {
-    private readonly LibraryDbContext _context;
+    private readonly TDbContext _context;
 
-    public InfrastructureDeploymentService(LibraryDbContext context)
+    public EFDbContextMigrationDeploymentService(TDbContext context)
     {
         _context = context;
     }
