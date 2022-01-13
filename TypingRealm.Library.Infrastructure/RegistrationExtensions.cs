@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Library.Books;
+using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Infrastructure.DataAccess;
 using TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 using TypingRealm.Library.Infrastructure.InMemory;
@@ -25,6 +26,8 @@ public static class RegistrationExtensions
             services.AddTransient<IInfrastructureDeploymentService, NoInfrastructureService>();
             services.AddSingleton<ISentenceRepository, InMemorySentenceRepository>();
             services.AddSingleton<IBookRepository, InMemoryBookRepository>();
+
+            // TODO: Implement and add here in memory IBookQuery, ISentenceQuery.
         }
 
         return services;
@@ -42,6 +45,7 @@ public static class RegistrationExtensions
 
         services.AddScoped<ISentenceRepository, SentenceRepository>();
         services.AddScoped<IBookRepository, BookRepository>();
+        services.AddScoped<IBookQuery, BookQuery>();
         services.AddScoped<SentenceQueryResolver>(provider => language => new SentenceQuery(
             provider.GetRequiredService<LibraryDbContext>(), language));
 
