@@ -4,6 +4,7 @@ using StackExchange.Redis;
 using TypingRealm.Communication.Redis;
 using TypingRealm.Data.Infrastructure.DataAccess;
 using TypingRealm.Data.Infrastructure.DataAccess.Repositories;
+using TypingRealm.Hosting;
 using TypingRealm.Texts.Api.Client;
 using TypingRealm.Typing;
 
@@ -60,7 +61,6 @@ namespace TypingRealm.Data.Infrastructure
             }
             else
             {
-                services.AddTransient<IInfrastructureDeploymentService, NoInfrastructureService>();
                 services.Decorate<ITextRetriever, InMemoryCachedTextRetriever>(ServiceLifetime.Singleton);
             }
 

@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
     <ProjectReference Include="..\TypingRealm.Library\TypingRealm.Library.csproj" />
   </ItemGroup>
 

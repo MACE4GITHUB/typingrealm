@@ -1,22 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Hosting;
 using TypingRealm.Library.Infrastructure.DataAccess;
 
 namespace TypingRealm.Library.Infrastructure;
-
-// TODO: Generalize this, the same number of classes is registered in Data API.
-public interface IInfrastructureDeploymentService
-{
-    ValueTask DeployInfrastructureAsync();
-}
-
-public sealed class NoInfrastructureService : IInfrastructureDeploymentService
-{
-    public ValueTask DeployInfrastructureAsync()
-    {
-        return default;
-    }
-}
 
 public sealed class InfrastructureDeploymentService : IInfrastructureDeploymentService
 {
@@ -27,10 +15,10 @@ public sealed class InfrastructureDeploymentService : IInfrastructureDeploymentS
         _context = context;
     }
 
-    public async ValueTask DeployInfrastructureAsync()
+    public async ValueTask DeployInfrastructureAsync(CancellationToken cancellationToken)
     {
         // TODO: Try this until it succeeds (database can be down).
-        await _context.Database.MigrateAsync()
+        await _context.Database.MigrateAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 }

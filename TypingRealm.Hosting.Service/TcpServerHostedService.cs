@@ -25,5 +25,4 @@ namespace TypingRealm.Hosting.Service
             await _tcpServer.StopAsync().ConfigureAwait(false);
         }
     }
-
 }

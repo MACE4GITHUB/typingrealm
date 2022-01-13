@@ -72,6 +72,9 @@ namespace TypingRealm.Hosting
             services.TryAddRedisGlobalCaching(configuration);
             services.TryAddRedisServiceCaching(configuration);
 
+            // Deployment of infrastructure from all hosts.
+            services.AddHostedService<InfrastructureDeploymentHostedService>();
+
             return services;
         }
 

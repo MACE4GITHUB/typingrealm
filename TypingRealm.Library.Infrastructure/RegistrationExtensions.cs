@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Hosting;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Infrastructure.DataAccess;
@@ -23,7 +24,6 @@ public static class RegistrationExtensions
         }
         else
         {
-            services.AddTransient<IInfrastructureDeploymentService, NoInfrastructureService>();
             services.AddSingleton<ISentenceRepository, InMemorySentenceRepository>();
             services.AddSingleton<IBookRepository, InMemoryBookRepository>();
 

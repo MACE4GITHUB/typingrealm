@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using TypingRealm.Data.Api.Controllers;
 using TypingRealm.Data.Infrastructure;
 using TypingRealm.Hosting;
@@ -26,23 +24,7 @@ public static class Program
             .AddRedis(cacheConnectionString)
             .AddNpgSql(dataConnectionString);
 
-        var app = builder.Build();
-
-        using (var scope = app.Services.CreateScope())
-        {
-            await OnAppStartup(scope.ServiceProvider);
-        }
-
-        await app.RunAsync();
-    }
-
-    private class Startup { }
-    private static async Task OnAppStartup(IServiceProvider serviceProvider)
-    {
-        var infrastructureDeploymentService = serviceProvider.GetRequiredService<IInfrastructureDeploymentService>();
-        var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
-
-        await infrastructureDeploymentService.DeployInfrastructureAsync();
-        logger.LogInformation("Database is successfully migrated.");
+        await builder.Build()
+            .RunAsync();
     }
 }
