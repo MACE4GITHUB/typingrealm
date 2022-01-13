@@ -71,7 +71,7 @@ public sealed class SentenceQuery : ISentenceQuery
 
     private async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
     {
-        var allBooks = await _dbContext.Book
+        var allBooks = await _dbContext.Book.AsNoTracking()
             .Where(x => !x.IsArchived && x.IsProcessed && x.Language == _language)
             .Select(x => new { BookId = x.Id })
             .ToListAsync()
@@ -88,7 +88,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .Distinct()
             .ToList();
 
-        var maxSentenceIndexInBook = await _dbContext.Sentence
+        var maxSentenceIndexInBook = await _dbContext.Sentence.AsNoTracking()
             .Where(x => booksIds.Contains(x.BookId))
             .GroupBy(x => x.BookId)
             .Select(group => group.OrderByDescending(x => x.IndexInBook).First())
@@ -115,7 +115,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .Select(x => $"{x.BookId}-{x.SentenceIndexInBook}")
             .ToList();
 
-        var sentences = await _dbContext.Sentence.Where(
+        var sentences = await _dbContext.Sentence.AsNoTracking().Where(
             x => localIdPairs.Any(localId => localId == x.BookId + "-" + x.IndexInBook))
             .Select(x => new { SentenceId = x.Id, Value = x.Value, IndexInBook = x.IndexInBook, BookId = x.BookId })
             .ToListAsync()
@@ -152,7 +152,7 @@ public sealed class SentenceQuery : ISentenceQuery
 
     private async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int maxSentencesCount)
     {
-        var sentences = await _dbContext.KeyPair
+        var sentences = await _dbContext.KeyPair.AsNoTracking()
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
             .Include(keyPair => keyPair.Word)
             .ThenInclude(word => word.Sentence)
@@ -185,7 +185,7 @@ public sealed class SentenceQuery : ISentenceQuery
     {
         var searchWords = words.Select(word => word.ToLowerInvariant()).ToList();
 
-        var sentences = await _dbContext.Word
+        var sentences = await _dbContext.Word.AsNoTracking()
             .Where(word => searchWords.Contains(word.RawValue))
             .Include(word => word.Sentence)
             .ThenInclude(sentence => sentence.Book)
@@ -228,7 +228,7 @@ public sealed class SentenceQuery : ISentenceQuery
                 .ToList();
         }
 
-        var words = await _dbContext.KeyPair
+        var words = await _dbContext.KeyPair.AsNoTracking()
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
             .Include(keyPair => keyPair.Word)
             .ThenInclude(word => word.Sentence)
