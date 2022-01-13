@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Hosting;
+using TypingRealm.Library.Api.Data;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Importing;
@@ -16,15 +17,18 @@ public sealed class BooksController : TyrController
 {
     private readonly IBookImporter _bookImporter;
     private readonly IBookQuery _bookQuery;
+    private readonly IBookRepository _bookRepository;
     private readonly ArchiveBookService _archiveBookService;
 
     public BooksController(
         IBookImporter bookImporter,
         IBookQuery bookQuery,
+        IBookRepository bookRepository,
         ArchiveBookService archiveBookService)
     {
         _bookImporter = bookImporter;
         _bookQuery = bookQuery;
+        _bookRepository = bookRepository;
         _archiveBookService = archiveBookService;
     }
 
@@ -41,8 +45,24 @@ public sealed class BooksController : TyrController
     public async ValueTask<ActionResult<BookDto>> GetBookById(string bookId)
     {
         var book = await _bookQuery.FindBookAsync(bookId);
+        if (book == null)
+            return NotFound();
 
         return Ok(book);
+    }
+
+    [HttpPut]
+    [Route("{bookId}")]
+    public async ValueTask<ActionResult> UpdateBook(string bookId, UpdateBookDto dto)
+    {
+        var book = await _bookRepository.FindBookAsync(new(bookId));
+        if (book == null)
+            return NotFound();
+
+        book.Describe(new(dto.Description));
+
+        await _bookRepository.UpdateBookAsync(book);
+        return Ok();
     }
 
     [HttpDelete]
