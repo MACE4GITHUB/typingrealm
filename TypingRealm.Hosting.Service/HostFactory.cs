@@ -25,6 +25,9 @@ namespace TypingRealm.Hosting.Service
                         configureServices(messageTypeCacheBuilder);
                     });
 
+                    webBuilder.ConfigureLogging(
+                        loggingBuilder => Hosting.HostFactory.ConfigureTyrLogging(loggingBuilder));
+
                     webBuilder.Configure(app =>
                     {
                         configureApp?.Invoke(app);
@@ -34,6 +37,9 @@ namespace TypingRealm.Hosting.Service
 
         public static IHostBuilder CreateTcpHostBuilder(int port, Action<MessageTypeCacheBuilder> configure)
         {
+            // TODO: Figure out how to set up logs here, we can't call ConfigureWebHostDefaults as it's not a Web service.
+            // At least call ConfigureTyrLogging method.
+
             return Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
