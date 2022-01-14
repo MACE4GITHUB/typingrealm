@@ -18,6 +18,7 @@
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication.Redis\TypingRealm.Communication.Redis.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
+    <ProjectReference Include="..\TypingRealm.Logging\TypingRealm.Logging.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj" />
   </ItemGroup>
 
