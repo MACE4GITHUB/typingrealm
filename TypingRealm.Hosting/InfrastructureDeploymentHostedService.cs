@@ -56,6 +56,8 @@ namespace TypingRealm.Hosting
             {
                 await deploy.DeployInfrastructureAsync(cancellationToken)
                     .ConfigureAwait(false);
+
+                _logger.LogInformation("Successfully deployed infrastructure: {DeployType}.", deploy.GetType());
             }
             catch (Exception)
             {
