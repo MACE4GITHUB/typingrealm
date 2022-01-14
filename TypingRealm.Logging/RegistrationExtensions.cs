@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 
 namespace TypingRealm.Logging
 {
@@ -8,14 +9,20 @@ namespace TypingRealm.Logging
         public static ILoggingBuilder AddTyrLogging(this ILoggingBuilder builder)
         {
             builder.ClearProviders();
-
-            var logger = new LoggerConfiguration()
-                .WriteTo.Console()
-                .CreateLogger();
-
-            builder.AddSerilog(logger);
+            builder.AddSerilog(CreateSerilogLogger());
 
             return builder;
+        }
+
+        private static Serilog.ILogger CreateSerilogLogger()
+        {
+            var isDevelopment = DebugHelpers.IsDevelopment();
+
+            return new LoggerConfiguration()
+                .WriteTo.Console()
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("TypingRealm", isDevelopment ? LogEventLevel.Verbose : LogEventLevel.Debug)
+                .CreateLogger();
         }
     }
 }
