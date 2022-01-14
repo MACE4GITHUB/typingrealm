@@ -9,3 +9,6 @@ infrastructure-data/
 
 # Certs
 *.pem
+
+# Logs folders
+**/logs/

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 
 namespace TypingRealm.Logging
 {
@@ -19,9 +20,10 @@ namespace TypingRealm.Logging
             var isDevelopment = DebugHelpers.IsDevelopment();
 
             return new LoggerConfiguration()
-                .WriteTo.Console()
                 .MinimumLevel.Information()
                 .MinimumLevel.Override("TypingRealm", isDevelopment ? LogEventLevel.Verbose : LogEventLevel.Debug)
+                .WriteTo.Console()
+                .WriteTo.File(new CompactJsonFormatter(), "logs/log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
     }
