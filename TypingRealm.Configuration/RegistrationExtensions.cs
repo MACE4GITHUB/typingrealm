@@ -14,15 +14,18 @@ namespace TypingRealm.Configuration
 
         public static ConfigurationManager AddTyrConfiguration(this ConfigurationManager configuration)
         {
-            // A hack to simpler get the service value if not set.
-            var entryAssemblyName = Assembly.GetEntryAssembly()?.FullName;
-            var parts = entryAssemblyName?.Split('.', ',');
-            if (parts != null && parts.Length >= 3 && parts[0] == "TypingRealm" && parts[2] == "Api")
+            if (configuration.GetServiceId() == null)
             {
-                configuration.AddInMemoryCollection(new[]
+                // A hack to simpler get the service value if not set.
+                var entryAssemblyName = Assembly.GetEntryAssembly()?.FullName;
+                var parts = entryAssemblyName?.Split('.', ',');
+                if (parts != null && parts.Length >= 3 && parts[0] == "TypingRealm" && parts[2] == "Api")
                 {
-                    new KeyValuePair<string, string>("ServiceId", parts[1].ToLowerInvariant())
-                });
+                    configuration.AddInMemoryCollection(new[]
+                    {
+                        new KeyValuePair<string, string>("ServiceId", parts[1].ToLowerInvariant())
+                    });
+                }
             }
 
             var serviceId = configuration.GetServiceId();
@@ -35,18 +38,22 @@ namespace TypingRealm.Configuration
         // For old configuration way.
         public static IConfigurationBuilder AddTyrConfiguration(this IConfigurationBuilder configurationBuilder)
         {
-            // A hack to simpler get the service value if not set.
-            var entryAssemblyName = Assembly.GetEntryAssembly()?.FullName;
-            var parts = entryAssemblyName?.Split('.', ',');
-            if (parts != null && parts.Length >= 3 && parts[0] == "TypingRealm" && parts[2] == "Api")
+            var configuration = configurationBuilder.Build();
+            if (configuration.GetServiceId() == null)
             {
-                configurationBuilder.AddInMemoryCollection(new[]
+                // A hack to simpler get the service value if not set.
+                var entryAssemblyName = Assembly.GetEntryAssembly()?.FullName;
+                var parts = entryAssemblyName?.Split('.', ',');
+                if (parts != null && parts.Length >= 3 && parts[0] == "TypingRealm" && parts[2] == "Api")
                 {
-                    new KeyValuePair<string, string>("ServiceId", parts[1].ToLowerInvariant())
-                });
+                    configurationBuilder.AddInMemoryCollection(new[]
+                    {
+                        new KeyValuePair<string, string>("ServiceId", parts[1].ToLowerInvariant())
+                    });
+                }
             }
 
-            var configuration = configurationBuilder.Build();
+            configuration = configurationBuilder.Build();
 
             var serviceId = configuration.GetServiceId();
             if (string.IsNullOrWhiteSpace(serviceId))
