@@ -23,6 +23,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.data
 
@@ -39,6 +40,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.data
 
@@ -55,6 +57,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.data
 
@@ -71,6 +74,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.identityserver
 
@@ -87,6 +91,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.library
 
@@ -103,6 +108,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.library
 
@@ -119,6 +125,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.profiles
 
@@ -135,6 +142,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.texts
 
@@ -151,6 +159,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.texts
 
@@ -167,5 +176,5 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.dev
-

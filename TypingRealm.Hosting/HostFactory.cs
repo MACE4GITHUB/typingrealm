@@ -10,7 +10,7 @@ namespace TypingRealm.Hosting
         {
             var builder = WebApplication.CreateBuilder();
             builder.Services.UseWebApiHost(builder.Configuration, controllersAssembly);
-            builder.Logging.AddTyrLogging();
+            builder.Logging.AddTyrLogging(builder.Configuration);
 
             return builder;
         }

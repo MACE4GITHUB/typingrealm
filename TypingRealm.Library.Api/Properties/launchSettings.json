@@ -3,7 +3,7 @@
     "TypingRealm.Library.Api": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Debug"
       },
       "applicationUrl": "http://0.0.0.0:30402"
     },

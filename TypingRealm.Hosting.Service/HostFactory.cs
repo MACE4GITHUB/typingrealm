@@ -27,7 +27,7 @@ namespace TypingRealm.Hosting.Service
                     });
 
                     webBuilder.ConfigureLogging(
-                        loggingBuilder => loggingBuilder.AddTyrLogging());
+                        (context, loggingBuilder) => loggingBuilder.AddTyrLogging(context.Configuration));
 
                     webBuilder.Configure(app =>
                     {
@@ -42,7 +42,7 @@ namespace TypingRealm.Hosting.Service
             // At least call ConfigureTyrLogging method.
 
             return Host.CreateDefaultBuilder()
-                .ConfigureLogging(loggingBuilder => loggingBuilder.AddTyrLogging())
+                .ConfigureLogging((context, loggingBuilder) => loggingBuilder.AddTyrLogging(context.Configuration))
                 .ConfigureServices(services =>
                 {
                     var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();

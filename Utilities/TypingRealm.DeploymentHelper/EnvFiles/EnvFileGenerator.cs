@@ -18,8 +18,10 @@ public sealed class EnvFileGenerator
             .Select(x => new { Service = x, EnvVars = new List<EnvVariable>() })
             .ToDictionary(x => x.Service.ServiceName);
 
-        if (environment.IsDevelopmentEnv)
+        if (environment.IsDevelopmentEnv && !environment.IsDebug)
             envVars.Add(new EnvVariable("ASPNETCORE_ENVIRONMENT", "Development"));
+        else if (environment.IsDebug)
+            envVars.Add(new EnvVariable("ASPNETCORE_ENVIRONMENT", "Debug"));
 
         foreach (var service in deploymentData.Services)
         {

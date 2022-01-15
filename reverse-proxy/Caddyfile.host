@@ -58,6 +58,14 @@ dev.api.typingrealm.com {
     respond 404
 }
 
+elastic.typingrealm.com {
+    reverse_proxy typingrealm-infra-elasticsearch:9200
+}
+
+kibana.typingrealm.com {
+    reverse_proxy typingrealm-infra-kibana:5601
+}
+
 localhost {
     reverse_proxy host.docker.internal:4200
 }

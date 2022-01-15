@@ -14,7 +14,8 @@ namespace TypingRealm
 
         public static bool IsDevelopment()
         {
-            return GetEnvironment() == "Development";
+            var environment = GetEnvironment();
+            return environment == "Development" || environment == "Debug" || environment == "Local";
         }
 
         public static string GetEnvironment()

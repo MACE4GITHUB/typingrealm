@@ -27,6 +27,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.data
 
@@ -43,6 +44,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.data
 
@@ -59,6 +61,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.data
 
@@ -75,6 +78,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.identityserver
 
@@ -91,6 +95,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.library
 
@@ -107,6 +112,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.library
 
@@ -123,6 +129,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.profiles
 
@@ -139,6 +146,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.texts
 
@@ -155,6 +163,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.texts
 
@@ -171,6 +180,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
 
 
@@ -191,4 +201,38 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
+
+
+# Infrastructure
+
+  typingrealm-infra-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
+    container_name: typingrealm-infra-elasticsearch
+    networks:
+      - typingrealm-net
+    volumes:
+      - ./infrastructure-data/infra/elasticsearch:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.5g
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    env_file:
+      - deployment/.env.infra.elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  typingrealm-infra-kibana:
+    image: docker.elastic.co/kibana/kibana:7.16.3
+    container_name: typingrealm-infra-kibana
+    networks:
+      - typingrealm-net
+    environment:
+      ELASTICSEARCH_URL: http://typingrealm-infra-elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '["http://typingrealm-infra-elasticsearch:9200"]'
+    env_file:
+      - deployment/.env.infra.elastic

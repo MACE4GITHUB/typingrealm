@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using TypingRealm.Authentication.OAuth;
 
 namespace TypingRealm.IdentityServer.Host
@@ -9,18 +8,11 @@ namespace TypingRealm.IdentityServer.Host
     [Route("api/local")]
     public sealed class LocalAuthenticationController : ControllerBase
     {
-        private readonly IHostEnvironment _environment;
-
-        public LocalAuthenticationController(IHostEnvironment environment)
-        {
-            _environment = environment;
-        }
-
         [HttpPost]
         [Route("user-token")]
         public ActionResult GenerateToken(string sub, string[] scopes)
         {
-            if (!_environment.IsDevelopment())
+            if (!DebugHelpers.IsDevelopment())
                 return NotFound();
 
             if (string.IsNullOrWhiteSpace(sub))

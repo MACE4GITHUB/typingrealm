@@ -23,6 +23,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.data
 
@@ -37,6 +38,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.data
 
@@ -51,6 +53,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.data
 
@@ -67,6 +70,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.identityserver
 
@@ -83,6 +87,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.library
 
@@ -97,6 +102,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.library
 
@@ -113,6 +119,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.profiles
 
@@ -129,6 +136,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.texts
 
@@ -143,6 +151,7 @@ services:
     mem_limit: 2g
     mem_reservation: 1.5g
     env_file:
+      - deployment/.env
       - deployment/.env.prod
       - deployment/.env.prod.texts
 
@@ -159,6 +168,7 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod
 
 
@@ -177,4 +187,5 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
+      - deployment/.env
       - deployment/.env.prod

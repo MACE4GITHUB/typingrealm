@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using TypingRealm.Combat;
 using TypingRealm.Combat.Messages;
 using TypingRealm.Messaging;
@@ -37,9 +35,9 @@ namespace TypingRealm.SignalRServer
             services.UseUpdateFactory<UpdateFactory>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (DebugHelpers.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
             app.UseRouting();
