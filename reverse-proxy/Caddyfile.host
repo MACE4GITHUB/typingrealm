@@ -58,12 +58,30 @@ dev.api.typingrealm.com {
     respond 404
 }
 
+# Unfortunately IP filtering doesn't work under WSL, so it's accessible to outside network as well.
 elastic.typingrealm.com {
-    reverse_proxy typingrealm-infra-elasticsearch:9200
+    @internal {
+        remote_ip 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8
+    }
+
+    handle @internal {
+        reverse_proxy typingrealm-infra-elasticsearch:9200
+    }
+
+    respond 403
 }
 
+# Unfortunately IP filtering doesn't work under WSL, so it's accessible to outside network as well.
 kibana.typingrealm.com {
-    reverse_proxy typingrealm-infra-kibana:5601
+    @internal {
+        remote_ip 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8
+    }
+
+    handle @internal {
+        reverse_proxy typingrealm-infra-kibana:5601
+    }
+
+    respond 403
 }
 
 localhost {
