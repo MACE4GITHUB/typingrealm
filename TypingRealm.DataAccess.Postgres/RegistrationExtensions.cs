@@ -18,7 +18,11 @@ public static class RegistrationExtensions
             .UseSnakeCaseNamingConvention());
 
         services.AddHealthChecks()
-            .AddDbContextCheck<TDbContext>();
+            .AddDbContextCheck<TDbContext>(tags: new[]
+            {
+                HealthCheckTags.Infrastructure,
+                HealthCheckTags.Database
+            });
 
         services.AddScoped<IInfrastructureDeploymentService, EFDbContextMigrationDeploymentService<TDbContext>>();
 

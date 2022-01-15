@@ -51,8 +51,22 @@ namespace TypingRealm.Hosting
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers().RequireAuthorization();
+                endpoints.MapHealthChecks("ping", new HealthCheckOptions
+                {
+                    Predicate = _ => false
+                });
                 endpoints.MapHealthChecks("health", new HealthCheckOptions
                 {
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+                endpoints.MapHealthChecks("health/services", new HealthCheckOptions
+                {
+                    Predicate = reg => reg.Tags.Contains("service"),
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+                endpoints.MapHealthChecks("health/infrastructure", new HealthCheckOptions
+                {
+                    Predicate = reg => reg.Tags.Contains("infrastructure"),
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
                 });
 
