@@ -185,7 +185,6 @@ services:
     container_name: typingrealm-caddy
     networks:
       - typingrealm-net
-      - infra-tyr_typingrealm-infra-net
     ports:
       - 80:80
       - 443:443
@@ -196,5 +195,4 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - deployment/.env
       - deployment/.env.prod

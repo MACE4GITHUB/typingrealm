@@ -18,6 +18,7 @@ public static class Constants
 
     public const string CacheConfigurationKey = "ConnectionStrings__ServiceCacheConnection";
     public const string DatabaseConfigurationKey = "ConnectionStrings__DataConnection";
+    public const string LoggingConfigurationKey = "ConnectionStrings__Logging";
     public const string PostgresUserId = "postgres";
     public const string PostgresPassword = "admin";
     public const string PostgresDatabase = "db";
@@ -33,6 +34,11 @@ public static class Constants
     {
         "local-tyr_local-typingrealm-net",
         "dev-tyr_dev-typingrealm-net"
+    };
+
+    public static IEnumerable<string> InfraExternalNetworks => new[]
+    {
+        "infra-tyr_typingrealm-infra-net"
     };
 
     public static string GetReverseProxyAddressWithPort(Service service, string prefix)

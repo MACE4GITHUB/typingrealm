@@ -27,6 +27,16 @@ public sealed class DockerComposeGenerator
                 sb.AppendLine("    external: true");
             }
         }
+
+        if (environment.Value != Environment.Local && environment.Value != Environment.Debug)
+        {
+            foreach (var network in Constants.InfraExternalNetworks)
+            {
+                sb.AppendLine($"  {network}:");
+                sb.AppendLine("    external: true");
+            }
+        }
+
         sb.AppendLine();
 
         // Declare services.
@@ -77,13 +87,11 @@ public sealed class DockerComposeGenerator
             sb.AppendLine($"    mem_limit: {service.MemLimit}");
             sb.AppendLine($"    mem_reservation: {service.MemReservation}");
 
-            if (service.EnvFiles.Any())
+            sb.AppendLine("    env_file:");
+            sb.AppendLine("      - deployment/.env");
+            foreach (var envFile in service.EnvFiles)
             {
-                sb.AppendLine("    env_file:");
-                foreach (var envFile in service.EnvFiles)
-                {
-                    sb.AppendLine($"      - {envFile}");
-                }
+                sb.AppendLine($"      - {envFile}");
             }
 
             sb.AppendLine();

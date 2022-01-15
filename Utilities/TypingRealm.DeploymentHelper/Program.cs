@@ -23,6 +23,7 @@ if (!Directory.Exists(Path.Combine(folder, "reverse-proxy")))
 
 var environments = new[] { "strict-prod", "prod", "dev", "local", "debug" };
 
+File.WriteAllText(Path.Combine(folder, "deployment", ".env"), string.Empty);
 foreach (var env in environments)
 {
     var compose = new DockerComposeGenerator().Generate(

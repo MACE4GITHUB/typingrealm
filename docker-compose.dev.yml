@@ -186,3 +186,4 @@ services:
     env_file:
       - deployment/.env
       - deployment/.env.dev
+

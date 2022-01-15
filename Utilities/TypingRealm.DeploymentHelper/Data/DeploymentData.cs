@@ -26,14 +26,20 @@ public sealed record DeploymentData(
 
         var mainEnvironment = $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}";
 
-        return serviceNetworks
+        var all = serviceNetworks
             .Concat(webServiceNetworks)
             .Append(mainEnvironment);
+
+        return all;
     }
 
     public static IEnumerable<string> GetNetworks(Service service, Environment environment)
     {
         yield return $"{environment.EnvironmentPrefix}{ProjectName}-{NetworkPostfix}";
+
+        if (!environment.IsLocal && !environment.IsDebug)
+            yield return $"infra-tyr_{ProjectName}-infra-{NetworkPostfix}";
+
         if (environment.OnlyMainNetwork)
             yield break;
 

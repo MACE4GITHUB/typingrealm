@@ -170,5 +170,4 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
     env_file:
-      - deployment/.env
       - deployment/.env.local

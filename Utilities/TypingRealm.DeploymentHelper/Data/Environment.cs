@@ -70,4 +70,5 @@ public sealed class Environment
     public bool IsDevelopmentEnv => Value != Prod && Value != StrictProd;
     public bool GenerateEnvFiles => Value != StrictProd;
     public bool IsDebug => Value == Debug;
+    public bool IsLocal => Value == Local;
 }
