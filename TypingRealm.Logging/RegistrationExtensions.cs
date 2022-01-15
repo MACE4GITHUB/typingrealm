@@ -6,6 +6,7 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.File;
+using TypingRealm.Configuration;
 
 namespace TypingRealm.Logging
 {
@@ -24,7 +25,8 @@ namespace TypingRealm.Logging
         {
             var isDevelopment = DebugHelpers.IsDevelopment();
             var environment = DebugHelpers.GetEnvironment().ToLowerInvariant();
-            var indexFormat = $"typingrealm-{environment}-{{0:yyyy.MM.dd}}";
+            var serviceId = configuration.GetServiceId();
+            var indexFormat = $"typingrealm-{environment}-{serviceId}-{{0:yyyy.MM.dd}}";
 
             var connectionString = configuration.GetConnectionString("Logging");
 
@@ -33,6 +35,7 @@ namespace TypingRealm.Logging
                 .MinimumLevel.Override("TypingRealm", isDevelopment ? LogEventLevel.Verbose : LogEventLevel.Debug)
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("Environment", environment)
+                .Enrich.WithProperty("ServiceId", serviceId)
                 .WriteTo.Console()
                 .WriteTo.File(new CompactJsonFormatter(), "logs/log", rollingInterval: RollingInterval.Day);
 

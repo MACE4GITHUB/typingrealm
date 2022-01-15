@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
+    <ProjectReference Include="..\TypingRealm.Configuration\TypingRealm.Configuration.csproj" />
   </ItemGroup>
 
 </Project>

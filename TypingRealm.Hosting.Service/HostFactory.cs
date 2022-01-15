@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TypingRealm.Configuration;
 using TypingRealm.Logging;
 using TypingRealm.Messaging.Serialization;
 
@@ -29,6 +30,8 @@ namespace TypingRealm.Hosting.Service
                     webBuilder.ConfigureLogging(
                         (context, loggingBuilder) => loggingBuilder.AddTyrLogging(context.Configuration));
 
+                    webBuilder.ConfigureAppConfiguration(configBuilder => configBuilder.AddTyrConfiguration());
+
                     webBuilder.Configure(app =>
                     {
                         configureApp?.Invoke(app);
@@ -43,6 +46,7 @@ namespace TypingRealm.Hosting.Service
 
             return Host.CreateDefaultBuilder()
                 .ConfigureLogging((context, loggingBuilder) => loggingBuilder.AddTyrLogging(context.Configuration))
+                .ConfigureAppConfiguration(configBuilder => configBuilder.AddTyrConfiguration())
                 .ConfigureServices(services =>
                 {
                     var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();

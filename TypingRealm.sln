@@ -189,7 +189,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataAccess", "DataAccess", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.DataAccess.Postgres", "TypingRealm.DataAccess.Postgres\TypingRealm.DataAccess.Postgres.csproj", "{B00FE25E-F613-4124-8911-BDB4AA85A689}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Logging", "TypingRealm.Logging\TypingRealm.Logging.csproj", "{57F0E1BD-97EE-45D2-B02F-06FC832A92DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Logging", "TypingRealm.Logging\TypingRealm.Logging.csproj", "{57F0E1BD-97EE-45D2-B02F-06FC832A92DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Configuration", "TypingRealm.Configuration\TypingRealm.Configuration.csproj", "{6943E46B-2C1E-47D9-9C59-3D361486EE59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -477,6 +479,10 @@ Global
 		{57F0E1BD-97EE-45D2-B02F-06FC832A92DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57F0E1BD-97EE-45D2-B02F-06FC832A92DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57F0E1BD-97EE-45D2-B02F-06FC832A92DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6943E46B-2C1E-47D9-9C59-3D361486EE59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6943E46B-2C1E-47D9-9C59-3D361486EE59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6943E46B-2C1E-47D9-9C59-3D361486EE59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6943E46B-2C1E-47D9-9C59-3D361486EE59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -556,6 +562,7 @@ Global
 		{02240830-DFE9-4B54-ADB8-6A4A5CD75DA5} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
 		{B00FE25E-F613-4124-8911-BDB4AA85A689} = {02240830-DFE9-4B54-ADB8-6A4A5CD75DA5}
 		{57F0E1BD-97EE-45D2-B02F-06FC832A92DD} = {CBBEC7E3-41B0-401A-8EC6-C570D40F0324}
+		{6943E46B-2C1E-47D9-9C59-3D361486EE59} = {CBBEC7E3-41B0-401A-8EC6-C570D40F0324}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}
