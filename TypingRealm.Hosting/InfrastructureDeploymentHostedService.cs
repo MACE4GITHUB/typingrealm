@@ -59,9 +59,9 @@ namespace TypingRealm.Hosting
 
                 _logger.LogInformation("Successfully deployed infrastructure: {DeployType}.", deploy.GetType());
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                _logger.LogError("Failed to deploy infrastructure from {DeployType} type.", deploy.GetType());
+                _logger.LogError(exception, "Failed to deploy infrastructure from {DeployType} type.", deploy.GetType());
                 throw;
             }
         }
