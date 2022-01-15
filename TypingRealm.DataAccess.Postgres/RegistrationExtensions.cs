@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TypingRealm.Hosting;
+using TypingRealm.Hosting.Deployment;
 
 namespace TypingRealm.DataAccess.Postgres;
 

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using TypingRealm.Hosting;
+using TypingRealm.Hosting.Deployment;
 
 namespace TypingRealm.DataAccess.Postgres;
 

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
 using TypingRealm.Communication.Redis;
+using TypingRealm.Hosting.Deployment;
 
 namespace TypingRealm.Hosting
 {

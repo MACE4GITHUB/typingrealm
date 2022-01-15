@@ -6,9 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace TypingRealm.Hosting
+namespace TypingRealm.Hosting.Deployment
 {
-    // TODO: Fail healthcheck or stop the whole service if some deployment services have failed.
     public sealed class InfrastructureDeploymentHostedService : SyncManagedDisposable, IHostedService
     {
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
@@ -32,8 +31,7 @@ namespace TypingRealm.Hosting
 
             var deploymentServices = scope.ServiceProvider.GetServices<IInfrastructureDeploymentService>();
 
-            // TODO: Do not await this (do not crash the host when it's unsuccessful).
-            // Also re-try until it's successful.
+            // Until everything is deployed - host will not start.
             await Task.WhenAll(deploymentServices.Select(
                 d => DeployInfrastructureAsync(d, cts.Token)))
                 .ConfigureAwait(false);
@@ -54,17 +52,34 @@ namespace TypingRealm.Hosting
 
         private async Task DeployInfrastructureAsync(IInfrastructureDeploymentService deploy, CancellationToken cancellationToken)
         {
-            try
+            var i = 0;
+            while (true)
             {
-                await deploy.DeployInfrastructureAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
 
-                _logger.LogInformation("Successfully deployed infrastructure: {DeployType}.", deploy.GetType());
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Failed to deploy infrastructure from {DeployType} type.", deploy.GetType());
-                throw;
+                try
+                {
+                    await deploy.DeployInfrastructureAsync(cancellationToken)
+                        .ConfigureAwait(false);
+
+                    _logger.LogInformation("Successfully deployed infrastructure: {DeployType}.", deploy.GetType());
+                    return;
+                }
+                catch (Exception exception)
+                {
+                    i++;
+                    _logger.LogError(exception, "Failed to deploy infrastructure from {DeployType} type.", deploy.GetType());
+
+                    if (i > 5)
+                    {
+                        _logger.LogCritical(exception, "Could not deploy infrastructure from {DeployType} type. Host will be shut down.", deploy.GetType());
+                        throw;
+                    }
+
+                    _logger.LogDebug("Waiting for one minute to retry {DeployType} again.", deploy.GetType());
+                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken)
+                        .ConfigureAwait(false);
+                }
             }
         }
     }
