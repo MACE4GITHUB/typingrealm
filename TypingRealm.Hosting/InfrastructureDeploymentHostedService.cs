@@ -32,6 +32,8 @@ namespace TypingRealm.Hosting
 
             var deploymentServices = scope.ServiceProvider.GetServices<IInfrastructureDeploymentService>();
 
+            // TODO: Do not await this (do not crash the host when it's unsuccessful).
+            // Also re-try until it's successful.
             await Task.WhenAll(deploymentServices.Select(
                 d => DeployInfrastructureAsync(d, cts.Token)))
                 .ConfigureAwait(false);
