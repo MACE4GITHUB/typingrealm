@@ -2,8 +2,10 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 
@@ -49,7 +51,10 @@ namespace TypingRealm.Hosting
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers().RequireAuthorization();
-                endpoints.MapHealthChecks("health");
+                endpoints.MapHealthChecks("health", new HealthCheckOptions
+                {
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
 
                 configureEndpoints?.Invoke(endpoints);
             });
