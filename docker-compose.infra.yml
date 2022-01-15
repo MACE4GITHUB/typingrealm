@@ -1,0 +1,41 @@
+version: '3.4'
+
+# Infrastructure that is shared between ALL services and ALL environments
+
+networks:
+  typingrealm-infra-net:
+
+services:
+  typingrealm-infra-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
+    container_name: typingrealm-infra-elasticsearch
+    networks:
+      - typingrealm-infra-net
+    ports:
+      - 9200:9200
+    volumes:
+      - ./infrastructure-data/infra/elasticsearch:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.5g
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    env_file:
+      - deployment/.env.infra.elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  typingrealm-infra-kibana:
+    image: docker.elastic.co/kibana/kibana:7.16.3
+    container_name: typingrealm-infra-kibana
+    networks:
+      - typingrealm-infra-net
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://typingrealm-infra-elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '["http://typingrealm-infra-elasticsearch:9200"]'
+    env_file:
+      - deployment/.env.infra.elastic

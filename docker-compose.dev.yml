@@ -8,6 +8,8 @@ networks:
   dev-typingrealm-data-net:
   dev-typingrealm-web-ui-net:
   dev-typingrealm-net:
+  infra-tyr_typingrealm-infra-net:
+    external: true
 
 services:
   dev-typingrealm-data:
@@ -15,6 +17,7 @@ services:
     container_name: dev-typingrealm-data
     networks:
       - dev-typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-data-net
     build:
       context: .
@@ -66,6 +69,7 @@ services:
     container_name: dev-typingrealm-identityserver
     networks:
       - dev-typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-identityserver-net
     build:
       context: .
@@ -83,6 +87,7 @@ services:
     container_name: dev-typingrealm-library
     networks:
       - dev-typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-library-net
     build:
       context: .
@@ -117,6 +122,7 @@ services:
     container_name: dev-typingrealm-profiles
     networks:
       - dev-typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-profiles-net
     build:
       context: .
@@ -134,6 +140,7 @@ services:
     container_name: dev-typingrealm-texts
     networks:
       - dev-typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-texts-net
     build:
       context: .
@@ -168,6 +175,7 @@ services:
     container_name: dev-typingrealm-web-ui
     networks:
       - dev-typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-web-ui-net
     build:
       context: ./typingrealm-web

@@ -12,6 +12,8 @@ networks:
     external: true
   dev-tyr_dev-typingrealm-net:
     external: true
+  infra-tyr_typingrealm-infra-net:
+    external: true
 
 services:
   typingrealm-data:
@@ -19,6 +21,7 @@ services:
     container_name: typingrealm-data
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-data-net
     build:
       context: .
@@ -70,6 +73,7 @@ services:
     container_name: typingrealm-identityserver
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-identityserver-net
     build:
       context: .
@@ -87,6 +91,7 @@ services:
     container_name: typingrealm-library
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-library-net
     build:
       context: .
@@ -121,6 +126,7 @@ services:
     container_name: typingrealm-profiles
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-profiles-net
     build:
       context: .
@@ -138,6 +144,7 @@ services:
     container_name: typingrealm-texts
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-texts-net
     build:
       context: .
@@ -172,6 +179,7 @@ services:
     container_name: typingrealm-web-ui
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-web-ui-net
     build:
       context: ./typingrealm-web
@@ -189,6 +197,7 @@ services:
     container_name: typingrealm-caddy
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - local-tyr_local-typingrealm-net
       - dev-tyr_dev-typingrealm-net
     ports:
@@ -203,36 +212,3 @@ services:
     env_file:
       - deployment/.env
       - deployment/.env.prod
-
-
-# Infrastructure
-
-  typingrealm-infra-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
-    container_name: typingrealm-infra-elasticsearch
-    networks:
-      - typingrealm-net
-    volumes:
-      - ./infrastructure-data/infra/elasticsearch:/usr/share/elasticsearch/data
-    restart: unless-stopped
-    mem_limit: 2g
-    mem_reservation: 1.5g
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    env_file:
-      - deployment/.env.infra.elastic
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-
-  typingrealm-infra-kibana:
-    image: docker.elastic.co/kibana/kibana:7.16.3
-    container_name: typingrealm-infra-kibana
-    networks:
-      - typingrealm-net
-    environment:
-      ELASTICSEARCH_URL: http://typingrealm-infra-elasticsearch:9200
-      ELASTICSEARCH_HOSTS: '["http://typingrealm-infra-elasticsearch:9200"]'
-    env_file:
-      - deployment/.env.infra.elastic

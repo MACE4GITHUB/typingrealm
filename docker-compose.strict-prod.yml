@@ -8,6 +8,8 @@ networks:
   typingrealm-data-net:
   typingrealm-web-ui-net:
   typingrealm-net:
+  infra-tyr_typingrealm-infra-net:
+    external: true
 
 services:
   typingrealm-data:
@@ -15,6 +17,7 @@ services:
     container_name: typingrealm-data
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-data-net
     build:
       context: .
@@ -62,6 +65,7 @@ services:
     container_name: typingrealm-identityserver
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-identityserver-net
     build:
       context: .
@@ -79,6 +83,7 @@ services:
     container_name: typingrealm-library
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-library-net
     build:
       context: .
@@ -111,6 +116,7 @@ services:
     container_name: typingrealm-profiles
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-profiles-net
     build:
       context: .
@@ -128,6 +134,7 @@ services:
     container_name: typingrealm-texts
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-texts-net
     build:
       context: .
@@ -160,6 +167,7 @@ services:
     container_name: typingrealm-web-ui
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
       - typingrealm-web-ui-net
     build:
       context: ./typingrealm-web
@@ -177,6 +185,7 @@ services:
     container_name: typingrealm-caddy
     networks:
       - typingrealm-net
+      - infra-tyr_typingrealm-infra-net
     ports:
       - 80:80
       - 443:443
