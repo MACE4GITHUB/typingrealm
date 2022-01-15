@@ -17,6 +17,9 @@ public static class RegistrationExtensions
             .UseNpgsql(dataConnectionString)
             .UseSnakeCaseNamingConvention());
 
+        services.AddHealthChecks()
+            .AddDbContextCheck<TDbContext>();
+
         services.AddScoped<IInfrastructureDeploymentService, EFDbContextMigrationDeploymentService<TDbContext>>();
 
         return services;
