@@ -10,6 +10,7 @@ using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
 using TypingRealm.Communication.Redis;
 using TypingRealm.Hosting.Deployment;
+using TypingRealm.Hosting.HealthChecks;
 
 namespace TypingRealm.Hosting
 {
@@ -95,7 +96,7 @@ namespace TypingRealm.Hosting
                     .AllowCredentials()));
 
             // TODO: Consider how to add healthchecks for custom TCP hosts (ping address?).
-            services.AddHealthChecks();
+            services.AddTyrHealthChecks();
 
             // Web API controllers.
             var mvcBuilder = services.AddControllers();
