@@ -34,6 +34,9 @@ services:
       - typingrealm-infra-net
     ports:
       - 5601:5601
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.5g
     environment:
       ELASTICSEARCH_URL: http://typingrealm-infra-elasticsearch:9200
       ELASTICSEARCH_HOSTS: '["http://typingrealm-infra-elasticsearch:9200"]'
