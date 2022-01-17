@@ -23,7 +23,7 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories
                 .ConfigureAwait(false);
 
             return daos
-                .Select(x => new BookDto(x.Id, x.Language, x.Description, x.IsProcessed, x.AddedAtUtc))
+                .Select(x => new BookDto(x.Id, x.Language, x.Description, x.ProcessingStatus, x.AddedAtUtc))
                 .ToList();
         }
 
@@ -36,7 +36,7 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories
             if (dao == null)
                 return null;
 
-            return new BookDto(dao.Id, dao.Language, dao.Description, dao.IsProcessed, dao.AddedAtUtc);
+            return new BookDto(dao.Id, dao.Language, dao.Description, dao.ProcessingStatus, dao.AddedAtUtc);
         }
     }
 }

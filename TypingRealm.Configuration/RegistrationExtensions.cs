@@ -29,6 +29,9 @@ namespace TypingRealm.Configuration
             }
 
             var serviceId = configuration.GetServiceId();
+
+            // TODO: This prevents ef migrations from working, figure out how to fix it.
+            // Also without appsettings.json file with a valid connection string it doesn't work.
             if (string.IsNullOrWhiteSpace(serviceId))
                 throw new InvalidOperationException("ServiceId should be specified for service.");
 

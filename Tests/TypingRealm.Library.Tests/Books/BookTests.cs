@@ -34,7 +34,7 @@ namespace TypingRealm.Library.Tests.Books
             var sut = CreateNewBook();
 
             var state = sut.GetState();
-            Assert.False(state.IsProcessed);
+            Assert.Equal(ProcessingStatus.NotProcessed, state.ProcessingStatus);
         }
 
         [Fact]
@@ -69,14 +69,6 @@ namespace TypingRealm.Library.Tests.Books
             var state = sut.GetState();
 
             Assert.Equal(state.Language, sut.Language);
-        }
-
-        [Theory, AutoDomainData]
-        public void ShouldExposeIsProcessed(Book sut)
-        {
-            var state = sut.GetState();
-
-            Assert.Equal(state.IsProcessed, sut.IsProcessed);
         }
 
         [Theory, AutoDomainData]
@@ -118,24 +110,20 @@ namespace TypingRealm.Library.Tests.Books
             Assert.Throws<InvalidOperationException>(() => sut.StartReprocessing());
         }
 
-        [Fact]
-        public void StartReprocessing_ShouldSetProcessedToFalse()
+        [Theory]
+        [InlineData(ProcessingStatus.NotProcessed)]
+        [InlineData(ProcessingStatus.Processed)]
+        [InlineData(ProcessingStatus.Processing)]
+        [InlineData(ProcessingStatus.Error)]
+        public void StartReprocessing_ShouldSetToProcessing(ProcessingStatus status)
         {
             var sut = Fixture.CreateBook(config => config
                 .With(x => x.IsArchived, false)
-                .With(x => x.IsProcessed, false));
+                .With(x => x.ProcessingStatus, status));
 
             sut.StartReprocessing();
 
-            Assert.False(sut.GetState().IsProcessed);
-
-            sut = Fixture.CreateBook(config => config
-                .With(x => x.IsArchived, false)
-                .With(x => x.IsProcessed, true));
-
-            sut.StartReprocessing();
-
-            Assert.False(sut.GetState().IsProcessed);
+            Assert.Equal(ProcessingStatus.Processing, sut.GetState().ProcessingStatus);
         }
 
         [Fact]
@@ -143,17 +131,20 @@ namespace TypingRealm.Library.Tests.Books
         {
             var sut = Fixture.CreateBook(config => config
                 .With(x => x.IsArchived, true)
-                .With(x => x.IsProcessed, false));
+                .With(x => x.ProcessingStatus, ProcessingStatus.Processing));
 
             Assert.Throws<InvalidOperationException>(() => sut.FinishProcessing());
         }
 
-        [Fact]
-        public void FinishProcessing_ShouldThrow_WhenAlreadyProcessed()
+        [Theory]
+        [InlineData(ProcessingStatus.NotProcessed)]
+        [InlineData(ProcessingStatus.Processed)]
+        [InlineData(ProcessingStatus.Error)]
+        public void FinishProcessing_ShouldThrow_WhenNotProcessing(ProcessingStatus status)
         {
             var sut = Fixture.CreateBook(config => config
                 .With(x => x.IsArchived, false)
-                .With(x => x.IsProcessed, true));
+                .With(x => x.ProcessingStatus, status));
 
             Assert.Throws<InvalidOperationException>(() => sut.FinishProcessing());
         }
@@ -163,11 +154,46 @@ namespace TypingRealm.Library.Tests.Books
         {
             var sut = Fixture.CreateBook(config => config
                 .With(x => x.IsArchived, false)
-                .With(x => x.IsProcessed, false));
+                .With(x => x.ProcessingStatus, ProcessingStatus.Processing));
 
             sut.FinishProcessing();
 
-            Assert.True(sut.GetState().IsProcessed);
+            Assert.Equal(ProcessingStatus.Processed, sut.GetState().ProcessingStatus);
+        }
+
+        [Fact]
+        public void ErrorProcessing_ShouldThrow_WhenAlreadyArchived()
+        {
+            var sut = Fixture.CreateBook(config => config
+                .With(x => x.IsArchived, true)
+                .With(x => x.ProcessingStatus, ProcessingStatus.Processing));
+
+            Assert.Throws<InvalidOperationException>(() => sut.ErrorProcessing());
+        }
+
+        [Theory]
+        [InlineData(ProcessingStatus.NotProcessed)]
+        [InlineData(ProcessingStatus.Processed)]
+        [InlineData(ProcessingStatus.Error)]
+        public void ErrorProcessing_ShouldThrow_WhenNotProcessing(ProcessingStatus status)
+        {
+            var sut = Fixture.CreateBook(config => config
+                .With(x => x.IsArchived, false)
+                .With(x => x.ProcessingStatus, status));
+
+            Assert.Throws<InvalidOperationException>(() => sut.ErrorProcessing());
+        }
+
+        [Fact]
+        public void ErrorProcessing_ShouldMarkAsErrored()
+        {
+            var sut = Fixture.CreateBook(config => config
+                .With(x => x.IsArchived, false)
+                .With(x => x.ProcessingStatus, ProcessingStatus.Processing));
+
+            sut.ErrorProcessing();
+
+            Assert.Equal(ProcessingStatus.Error, sut.GetState().ProcessingStatus);
         }
 
         [Fact]

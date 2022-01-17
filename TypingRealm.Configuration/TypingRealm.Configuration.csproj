@@ -9,4 +9,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
+  </ItemGroup>
+
 </Project>

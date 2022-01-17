@@ -6,6 +6,6 @@ namespace TypingRealm.Library.Books.Queries
         string BookId,
         string Language,
         string Description,
-        bool IsProcessed,
+        ProcessingStatus ProcessingStatus,
         DateTime AddedAtUtc);
 }

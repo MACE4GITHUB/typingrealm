@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
 using TypingRealm.Texts;
 
@@ -72,7 +73,7 @@ public sealed class SentenceQuery : ISentenceQuery
     private async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
     {
         var allBooks = await _dbContext.Book.AsNoTracking()
-            .Where(x => !x.IsArchived && x.IsProcessed && x.Language == _language)
+            .Where(x => !x.IsArchived && x.ProcessingStatus == ProcessingStatus.Processed && x.Language == _language)
             .Select(x => new { BookId = x.Id })
             .ToListAsync()
             .ConfigureAwait(false);

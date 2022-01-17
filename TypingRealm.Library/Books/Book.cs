@@ -10,6 +10,14 @@ namespace TypingRealm.Library.Books;
 /// </summary>
 public sealed record BookContent(BookId BookId, Stream Content);
 
+public enum ProcessingStatus
+{
+    NotProcessed = 1,
+    Processing,
+    Processed,
+    Error
+}
+
 /// <summary>
 /// Book can be Imported into the Library. It contains Sentences and it can be
 /// Re-Imported or Archived books are not used in queries.
@@ -22,7 +30,7 @@ public sealed class Book
         BookId BookId,
         Language Language,
         BookDescription Description,
-        bool IsProcessed,
+        ProcessingStatus ProcessingStatus,
         bool IsArchived);
 
     #region State
@@ -41,12 +49,11 @@ public sealed class Book
         ArgumentNullException.ThrowIfNull(language);
         ArgumentNullException.ThrowIfNull(description);
 
-        _state = new State(bookId, language, description, false, false);
+        _state = new State(bookId, language, description, ProcessingStatus.NotProcessed, false);
     }
 
     internal BookId BookId => _state.BookId;
     internal Language Language => _state.Language;
-    internal bool IsProcessed => _state.IsProcessed;
 
     public void Describe(BookDescription newDescription)
     {
@@ -65,7 +72,7 @@ public sealed class Book
 
         _state = _state with
         {
-            IsProcessed = false
+            ProcessingStatus = ProcessingStatus.Processing
         };
     }
 
@@ -74,12 +81,26 @@ public sealed class Book
         if (_state.IsArchived)
             throw new InvalidOperationException("Book has already been archived.");
 
-        if (_state.IsProcessed)
-            throw new InvalidOperationException("This book has already been processed.");
+        if (_state.ProcessingStatus != ProcessingStatus.Processing)
+            throw new InvalidOperationException("This book is not started processing yet.");
 
         _state = _state with
         {
-            IsProcessed = true
+            ProcessingStatus = ProcessingStatus.Processed
+        };
+    }
+
+    public void ErrorProcessing()
+    {
+        if (_state.IsArchived)
+            throw new InvalidOperationException("Book has already been archived.");
+
+        if (_state.ProcessingStatus != ProcessingStatus.Processing)
+            throw new InvalidOperationException("This book is not started processing yet.");
+
+        _state = _state with
+        {
+            ProcessingStatus = ProcessingStatus.Error
         };
     }
 
@@ -91,7 +112,7 @@ public sealed class Book
         _state = _state with
         {
             IsArchived = true,
-            IsProcessed = false
+            ProcessingStatus = ProcessingStatus.NotProcessed
         };
     }
 }
