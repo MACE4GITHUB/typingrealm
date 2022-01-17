@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Kernel;
+using Moq;
 using TypingRealm.Messaging;
 using Xunit;
 
@@ -15,7 +16,7 @@ namespace TypingRealm.Testing
         // Used for creating instances with custom ISpecimenBuilder.
         private readonly object _lock = new object();
 
-        protected Fixture Fixture { get; } = AutoMoqDataAttribute.CreateFixture();
+        protected IFixture Fixture { get; set; } = AutoMoqDataAttribute.CreateFixture();
         protected CancellationTokenSource Cts { get; } = new CancellationTokenSource();
 
         protected T Create<T>() => Fixture.Create<T>();
@@ -99,6 +100,9 @@ namespace TypingRealm.Testing
 
         protected Task<Exception> SwallowAnyAsync(Task task)
             => Assert.ThrowsAnyAsync<Exception>(() => task);
+
+        protected Mock<T> Freeze<T>() where T : class
+            => Fixture.Freeze<Mock<T>>();
 
         public void Dispose()
         {
