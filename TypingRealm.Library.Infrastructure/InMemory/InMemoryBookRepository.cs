@@ -13,10 +13,11 @@ public sealed class InMemoryBookRepository : IBookRepository
 
     public ValueTask AddBookWithContentAsync(Book book, BookContent content)
     {
-        if (_books.ContainsKey(book.BookId))
+        var state = book.GetState();
+        if (_books.ContainsKey(state.BookId))
             throw new InvalidOperationException("Book already exists.");
 
-        _books.Add(book.BookId, book);
+        _books.Add(state.BookId, book);
         _bookContents.Add(content.BookId, content);
 
         return default;
@@ -45,10 +46,11 @@ public sealed class InMemoryBookRepository : IBookRepository
 
     public ValueTask UpdateBookAsync(Book book)
     {
-        if (!_books.ContainsKey(book.BookId))
+        var state = book.GetState();
+        if (!_books.ContainsKey(state.BookId))
             throw new InvalidOperationException("Book does not exists.");
 
-        _books[book.BookId] = book;
+        _books[state.BookId] = book;
 
         return default;
     }

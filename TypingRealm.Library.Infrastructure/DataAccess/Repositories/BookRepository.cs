@@ -30,7 +30,8 @@ public sealed class BookRepository : IBookRepository
 
     public async ValueTask AddBookWithContentAsync(Book book, BookContent content)
     {
-        var existing = await _dbContext.Book.FindAsync(book.BookId.Value)
+        var state = book.GetState();
+        var existing = await _dbContext.Book.FindAsync(state.BookId)
             .ConfigureAwait(false);
 
         if (existing != null)
@@ -72,7 +73,8 @@ public sealed class BookRepository : IBookRepository
 
     public async ValueTask UpdateBookAsync(Book book)
     {
-        var existing = await _dbContext.Book.FindAsync(book.BookId.Value)
+        var state = book.GetState();
+        var existing = await _dbContext.Book.FindAsync(state.BookId)
             .ConfigureAwait(false);
 
         if (existing == null)

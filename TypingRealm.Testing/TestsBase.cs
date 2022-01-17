@@ -16,7 +16,17 @@ namespace TypingRealm.Testing
         // Used for creating instances with custom ISpecimenBuilder.
         private readonly object _lock = new object();
 
-        protected IFixture Fixture { get; set; } = AutoMoqDataAttribute.CreateFixture();
+        protected TestsBase()
+        {
+            Fixture = AutoMoqDataAttribute.CreateFixture();
+        }
+
+        protected TestsBase(IFixture fixture)
+        {
+            Fixture = fixture;
+        }
+
+        protected virtual IFixture Fixture { get; }
         protected CancellationTokenSource Cts { get; } = new CancellationTokenSource();
 
         protected T Create<T>() => Fixture.Create<T>();

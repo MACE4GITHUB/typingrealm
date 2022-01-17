@@ -44,9 +44,9 @@ public sealed class Book
         _state = new State(bookId, language, description, false, false);
     }
 
-    public BookId BookId => _state.BookId;
-    public string Language => _state.Language;
-    public bool IsProcessed => _state.IsProcessed;
+    internal BookId BookId => _state.BookId;
+    internal Language Language => _state.Language;
+    internal bool IsProcessed => _state.IsProcessed;
 
     public void Describe(BookDescription newDescription)
     {

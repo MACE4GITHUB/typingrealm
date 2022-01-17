@@ -9,7 +9,8 @@ using Xunit;
 
 namespace TypingRealm.Library.Tests.Books
 {
-    public class ArchiveBookServiceTests : TestsBase
+
+    public class ArchiveBookServiceTests : LibraryTestsBase
     {
         private readonly Mock<ISentenceRepository> _sentenceRepository;
         private readonly Mock<IBookRepository> _bookRepository;
@@ -17,8 +18,6 @@ namespace TypingRealm.Library.Tests.Books
 
         public ArchiveBookServiceTests()
         {
-            Fixture = AutoDomainDataAttribute.CreateFixture();
-
             _sentenceRepository = Freeze<ISentenceRepository>();
             _bookRepository = Freeze<IBookRepository>();
             _sut = Fixture.Create<ArchiveBookService>();
