@@ -189,6 +189,37 @@ namespace TypingRealm.Library.Tests.Books
             Assert.True(sut.GetState().IsArchived);
         }
 
+        // Primitives.
+
+        [Fact]
+        public void BookDescription_ShouldBeBetween1And100Characters()
+        {
+            Assert.Throws<ArgumentNullException>(() => new BookDescription(null!));
+            Assert.Throws<ArgumentException>(() => new BookDescription(string.Empty));
+            Assert.Throws<ArgumentException>(() => new BookDescription(new string('a', 101)));
+
+            _ = new BookDescription(new string('a', 100));
+            _ = new BookDescription("a");
+        }
+
+        [Fact]
+        public void BookId_ShouldBeBetween1And50Characters()
+        {
+            Assert.Throws<ArgumentNullException>(() => new BookId(null!));
+            Assert.Throws<ArgumentException>(() => new BookId(string.Empty));
+            Assert.Throws<ArgumentException>(() => new BookId(new string('a', 51)));
+
+            _ = new BookId(new string('a', 50));
+            _ = new BookId("a");
+        }
+
+        [Fact]
+        public void BookDescription_New_ShouldCreateNewGuid()
+        {
+            Assert.True(Guid.TryParse(BookId.New(), out var id));
+            Assert.NotEqual(Guid.Empty, id);
+        }
+
         private Book CreateNewBook()
         {
             return new Book(
