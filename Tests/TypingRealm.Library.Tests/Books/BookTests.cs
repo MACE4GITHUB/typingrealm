@@ -1,6 +1,7 @@
 ﻿using System;
 using AutoFixture;
 using TypingRealm.Library.Books;
+using TypingRealm.Library.Sentences;
 using Xunit;
 
 namespace TypingRealm.Library.Tests.Books
@@ -214,9 +215,27 @@ namespace TypingRealm.Library.Tests.Books
         }
 
         [Fact]
-        public void BookDescription_New_ShouldCreateNewGuid()
+        public void BookId_New_ShouldCreateNewGuid()
         {
             Assert.True(Guid.TryParse(BookId.New(), out var id));
+            Assert.NotEqual(Guid.Empty, id);
+        }
+
+        [Fact]
+        public void SentenceId_ShouldBeBetween1And50Characters()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SentenceId(null!));
+            Assert.Throws<ArgumentException>(() => new SentenceId(string.Empty));
+            Assert.Throws<ArgumentException>(() => new SentenceId(new string('a', 51)));
+
+            _ = new SentenceId(new string('a', 50));
+            _ = new SentenceId("a");
+        }
+
+        [Fact]
+        public void SentenceId_New_ShouldCreateNewGuid()
+        {
+            Assert.True(Guid.TryParse(SentenceId.New(), out var id));
             Assert.NotEqual(Guid.Empty, id);
         }
 
