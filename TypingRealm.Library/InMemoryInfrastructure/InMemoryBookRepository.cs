@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TypingRealm.Library.Books;
 
-namespace TypingRealm.Library.Infrastructure.InMemory;
+namespace TypingRealm.Library.InMemoryInfrastructure;
 
 public sealed class InMemoryBookRepository : IBookRepository
 {

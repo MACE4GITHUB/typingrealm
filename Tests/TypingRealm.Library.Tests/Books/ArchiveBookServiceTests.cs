@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoFixture;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
@@ -9,7 +10,6 @@ using Xunit;
 
 namespace TypingRealm.Library.Tests.Books
 {
-
     public class ArchiveBookServiceTests : LibraryTestsBase
     {
         private readonly Mock<ISentenceRepository> _sentenceRepository;
@@ -81,6 +81,17 @@ namespace TypingRealm.Library.Tests.Books
 
             _sentenceRepository.Verify(x => x.RemoveAllForBook(It.IsAny<BookId>()), Times.Never);
             _bookRepository.Verify(x => x.UpdateBookAsync(It.IsAny<Book>()), Times.Never);
+        }
+
+        [Fact]
+        public void ShouldBeRegisteredInLibraryDomain()
+        {
+            var services = new ServiceCollection()
+                .AddLibraryDomain()
+                .AddInMemoryInfrastructure()
+                .BuildServiceProvider();
+
+            services.AssertRegisteredTransient<ArchiveBookService, ArchiveBookService>();
         }
     }
 }

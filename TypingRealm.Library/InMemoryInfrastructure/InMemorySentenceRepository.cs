@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
 
-namespace TypingRealm.Library.Infrastructure.InMemory;
+namespace TypingRealm.Library.InMemoryInfrastructure;
 
 public sealed class InMemorySentenceRepository : ISentenceRepository
 {
