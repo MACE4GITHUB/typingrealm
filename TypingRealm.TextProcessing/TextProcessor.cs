@@ -57,7 +57,8 @@ namespace TypingRealm.TextProcessing
                 .Replace("\t", " ")
                 .Replace("«", "\"")
                 .Replace("»", "\"")
-                .Replace(" ", " ") // This is a custom unicode character.
+                .Replace(" ", " ") // These are custom unicode characters.
+                .Replace("‚", ",")
                 .ToString().Trim();
 
             // Remove multiple spaces in a row.

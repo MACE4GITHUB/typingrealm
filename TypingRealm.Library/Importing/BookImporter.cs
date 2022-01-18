@@ -44,13 +44,13 @@ public sealed class BookImporter : IBookImporter
             .ConfigureAwait(false);
 
         if (book == null)
-            throw new InvalidOperationException("Book is not found.");
+            throw new InvalidOperationException($"Book {bookId} is not found.");
 
         var bookContent = await _bookStore.FindBookContentAsync(bookId)
             .ConfigureAwait(false);
 
         if (bookContent == null)
-            throw new InvalidOperationException("Content for a book is not found.");
+            throw new InvalidOperationException($"Content for the book {bookId} is not found.");
 
         book.StartProcessing();
 
@@ -60,32 +60,32 @@ public sealed class BookImporter : IBookImporter
         await _sentenceRepository.RemoveAllForBook(bookId)
             .ConfigureAwait(false);
 
-        BookImportResult result;
         try
         {
-            result = await ImportBookAsync(book, bookContent)
+            var result = await ImportBookAsync(book, bookContent)
                 .ConfigureAwait(false);
 
             book.FinishProcessing();
+
+            await _bookStore.UpdateBookAsync(book)
+                .ConfigureAwait(false);
+
+            return result;
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Error while importing the book {BookId}.", bookId.Value);
             book.ErrorProcessing();
 
-            result = new BookImportResult(book, Enumerable.Empty<string>(), string.Empty, false);
+            await _bookStore.UpdateBookAsync(book)
+                .ConfigureAwait(false);
+
+            throw new InvalidOperationException($"Error while importing book {bookId}");
         }
-
-        await _bookStore.UpdateBookAsync(book)
-            .ConfigureAwait(false);
-
-        return result;
     }
 
     private async ValueTask<BookImportResult> ImportBookAsync(Book book, BookContent bookContent)
     {
-        // TODO: Parse the stream by chunks.
-
         using var reader = new StreamReader(bookContent.Content);
         var text = await reader.ReadToEndAsync()
             .ConfigureAwait(false);
@@ -93,23 +93,33 @@ public sealed class BookImporter : IBookImporter
         var languageInfo = await _languageProvider.FindLanguageInformationAsync(book.Language)
             .ConfigureAwait(false);
 
-        var notAllowedSentences = _textProcessor.GetSentencesEnumerable(text, languageInfo)
-            .ToList();
-
-        var notAllowedCharacters = notAllowedSentences.SelectMany(
-            sentence => sentence.Where(character => languageInfo.IsAllLettersAllowed(character.ToString())))
+        var tooShortSentences = _textProcessor.GetSentencesEnumerable(text)
+            .Where(sentence => sentence.Length < _minSentenceLengthCharacters)
             .Distinct()
             .ToList();
 
-        // TODO: Move most of this logic inside GetSentencesEnumerable method.
-        var sentences = _textProcessor.GetSentencesEnumerable(text, languageInfo)
+        var notAllowedSentences = _textProcessor.GetSentencesEnumerable(text)
+            .Where(sentence => !languageInfo.IsAllLettersAllowed(sentence))
+            .Distinct()
+            .ToList();
+
+        var notAllowedCharacters = notAllowedSentences.SelectMany(
+            sentence => sentence.Where(character => !languageInfo.IsAllLettersAllowed(character.ToString())))
+            .Distinct()
+            .ToList();
+
+        var sentencesEnumerable = _textProcessor.GetSentencesEnumerable(text, languageInfo)
             .Where(sentence => sentence.Length >= _minSentenceLengthCharacters)
             .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
-        await _sentenceRepository.SaveByBatchesAsync(sentences, 200)
+        await _sentenceRepository.SaveByBatchesAsync(sentencesEnumerable, 200)
             .ConfigureAwait(false);
 
-        return new BookImportResult(book, notAllowedSentences.Take(10).ToList(), string.Join(string.Empty, notAllowedCharacters), true);
+        return new BookImportResult(
+            book,
+            tooShortSentences,
+            notAllowedSentences,
+            string.Join(string.Empty, notAllowedCharacters));
     }
 
     private Sentence CreateSentence(BookId bookId, string sentence, int sentenceIndex)
@@ -204,7 +214,6 @@ public sealed class BookImporter : IBookImporter
             index++;
         }
 
-        // TODO: Figure out whether "index" value is correct here or I need to do +1.
         yield return new KeyPairInText(index, $"{value[^1]} ");
     }
 }
