@@ -35,14 +35,18 @@ public sealed class SentenceRepository : ISentenceRepository
 
     public async ValueTask RemoveAllForBook(BookId bookId)
     {
-        var sentences = await _dbContext.Sentence
-            .Where(sentence => sentence.BookId == bookId.Value)
-            .ToListAsync()
+        using var connection = new NpgsqlConnection(_dbContext.Database.GetConnectionString() + "; Command Timeout = 240;");
+        await connection.OpenAsync()
             .ConfigureAwait(false);
 
-        _dbContext.Sentence.RemoveRange(sentences);
-
-        await _dbContext.SaveChangesAsync()
+        using var command = new NpgsqlCommand("DELETE FROM sentence WHERE book_id = (@book_id)", connection)
+        {
+            Parameters =
+            {
+                new("book_id", bookId.Value)
+            }
+        };
+        await command.ExecuteNonQueryAsync()
             .ConfigureAwait(false);
     }
 
