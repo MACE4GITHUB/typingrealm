@@ -36,7 +36,7 @@ public sealed class InMemorySentenceRepository : ISentenceRepository
         return default;
     }
 
-    public async ValueTask SaveByBatchesAsync(IEnumerable<Sentence> allSentences, int batchSize)
+    public async ValueTask SaveByBatchesAsync(IEnumerable<Sentence> allSentences)
     {
         foreach (var sentence in allSentences)
         {

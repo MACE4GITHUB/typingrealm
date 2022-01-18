@@ -112,7 +112,7 @@ public sealed class BookImporter : IBookImporter
             .Where(sentence => sentence.Length >= _minSentenceLengthCharacters)
             .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
-        await _sentenceRepository.SaveByBatchesAsync(sentencesEnumerable, 200)
+        await _sentenceRepository.SaveByBatchesAsync(sentencesEnumerable)
             .ConfigureAwait(false);
 
         return new BookImportResult(
