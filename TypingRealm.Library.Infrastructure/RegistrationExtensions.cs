@@ -6,6 +6,7 @@ using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Infrastructure.DataAccess;
 using TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 using TypingRealm.Library.Sentences;
+using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Infrastructure;
 
@@ -37,7 +38,9 @@ public static class RegistrationExtensions
         services.AddScoped<IBookRepository, BookRepository>();
         services.AddScoped<IBookQuery, BookQuery>();
         services.AddScoped<SentenceQueryResolver>(provider => language => new SentenceQuery(
-            provider.GetRequiredService<LibraryDbContext>(), language));
+            provider.GetRequiredService<LibraryDbContext>(),
+            provider.GetRequiredService<ITextProcessor>(),
+            language));
 
         return services;
     }

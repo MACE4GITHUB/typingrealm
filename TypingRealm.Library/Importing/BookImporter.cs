@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
-using TypingRealm.Texts;
+using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Importing;
 
@@ -17,17 +17,24 @@ public interface IBookImporter
 
 public sealed class BookImporter : IBookImporter
 {
+    private static readonly int _minSentenceLengthCharacters = 8;
     private readonly IBookRepository _bookStore;
     private readonly ISentenceRepository _sentenceRepository;
+    private readonly ITextProcessor _textProcessor;
+    private readonly ILanguageProvider _languageProvider;
     private readonly ILogger<BookImporter> _logger;
 
     public BookImporter(
         IBookRepository bookStore,
         ISentenceRepository sentenceRepository,
+        ITextProcessor textProcessor,
+        ILanguageProvider languageProvider,
         ILogger<BookImporter> logger)
     {
         _bookStore = bookStore;
         _sentenceRepository = sentenceRepository;
+        _textProcessor = textProcessor;
+        _languageProvider = languageProvider;
         _logger = logger;
     }
 
@@ -83,16 +90,20 @@ public sealed class BookImporter : IBookImporter
         var text = await reader.ReadToEndAsync()
             .ConfigureAwait(false);
 
-        var notAllowedSentences = TextHelpers.GetDisallowedSentencesEnumerable(text, book.Language)
+        var languageInfo = await _languageProvider.FindLanguageInformationAsync(book.Language)
+            .ConfigureAwait(false);
+
+        var notAllowedSentences = _textProcessor.GetSentencesEnumerable(text, languageInfo)
             .ToList();
 
         var notAllowedCharacters = notAllowedSentences.SelectMany(
-            sentence => sentence.Where(character => !TextHelpers.IsAllLettersAllowed(character.ToString(), book.Language)))
+            sentence => sentence.Where(character => languageInfo.IsAllLettersAllowed(character.ToString())))
             .Distinct()
             .ToList();
 
         // TODO: Move most of this logic inside GetSentencesEnumerable method.
-        var sentences = TextHelpers.GetAllowedSentencesEnumerable(text, book.Language)
+        var sentences = _textProcessor.GetSentencesEnumerable(text, languageInfo)
+            .Where(sentence => sentence.Length >= _minSentenceLengthCharacters)
             .Select((sentence, sentenceIndex) => CreateSentence(book.BookId, sentence, sentenceIndex));
 
         await _sentenceRepository.SaveByBatchesAsync(sentences, 200)
@@ -104,7 +115,7 @@ public sealed class BookImporter : IBookImporter
     private Sentence CreateSentence(BookId bookId, string sentence, int sentenceIndex)
     {
         var sentenceId = SentenceId.New();
-        var words = TextHelpers.SplitTextBySpaces(sentence);
+        var words = _textProcessor.GetWordsEnumerable(sentence).ToArray();
         var wordsList = new List<Word>(words.Length);
 
         var wordsInSentence = words
@@ -116,7 +127,7 @@ public sealed class BookImporter : IBookImporter
             }).ToDictionary(x => x.Word);
 
         var rawWordsInSentence = words
-            .Select(word => TextHelpers.GetRawWord(word))
+            .Select(word => _textProcessor.NormalizeWord(word))
             .GroupBy(word => word)
             .Select(group => new
             {
@@ -129,7 +140,7 @@ public sealed class BookImporter : IBookImporter
         {
             var keyPairs = CreateKeyPairs(sentence, word);
 
-            var rawWord = TextHelpers.GetRawWord(word);
+            var rawWord = _textProcessor.NormalizeWord(word);
             wordsList.Add(new Word(
                 sentenceId, index,
                 word, rawWord,

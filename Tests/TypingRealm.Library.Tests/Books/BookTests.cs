@@ -2,6 +2,7 @@
 using AutoFixture;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
+using TypingRealm.TextProcessing;
 using Xunit;
 
 namespace TypingRealm.Library.Tests.Books

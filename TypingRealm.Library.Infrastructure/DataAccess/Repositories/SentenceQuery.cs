@@ -6,18 +6,23 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
-using TypingRealm.Texts;
+using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 
 public sealed class SentenceQuery : ISentenceQuery
 {
     private readonly LibraryDbContext _dbContext;
+    private readonly ITextProcessor _textProcessor;
     private readonly string _language;
 
-    public SentenceQuery(LibraryDbContext dbContext, string language)
+    public SentenceQuery(
+        LibraryDbContext dbContext,
+        ITextProcessor textProcessor,
+        string language)
     {
         _dbContext = dbContext;
+        _textProcessor = textProcessor;
         _language = language;
     }
 
@@ -57,10 +62,10 @@ public sealed class SentenceQuery : ISentenceQuery
         var randomSentences = await FindRandomSentencesAsync(maxCount, 1)
             .ConfigureAwait(false);
 
-        var wordsEnumerable = randomSentences.SelectMany(sentence => TextHelpers.GetWordsEnumerable(sentence.Value));
+        var wordsEnumerable = randomSentences.SelectMany(sentence => _textProcessor.GetWordsEnumerable(sentence.Value));
 
         if (rawWords)
-            wordsEnumerable = wordsEnumerable.Select(word => TextHelpers.GetRawWord(word));
+            wordsEnumerable = wordsEnumerable.Select(word => _textProcessor.NormalizeWord(word));
 
         var distinctWords = wordsEnumerable.Distinct().ToList();
 
@@ -246,7 +251,7 @@ public sealed class SentenceQuery : ISentenceQuery
 
     private bool IsKeyPairWithoutPunctuation(string keyPair)
     {
-        foreach (var punctuationCharacter in TextHelpers.PunctuationCharacters)
+        foreach (var punctuationCharacter in Constants.PunctuationCharacters)
         {
             if (keyPair.StartsWith(punctuationCharacter) || keyPair.EndsWith(punctuationCharacter))
                 return false;

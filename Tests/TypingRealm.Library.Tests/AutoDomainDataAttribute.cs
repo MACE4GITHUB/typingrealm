@@ -7,7 +7,7 @@ using AutoFixture.Xunit2;
 using TypingRealm.Common;
 using TypingRealm.Library.Books;
 using TypingRealm.Testing;
-using TypingRealm.Texts;
+using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Tests
 {
@@ -27,7 +27,7 @@ namespace TypingRealm.Library.Tests
         public void Customize(IFixture fixture)
         {
             fixture.Customizations.Add(new MaxLengthBuilder());
-            fixture.Register(() => new Language(TextHelpers.SupportedLanguages[0]));
+            fixture.Register(() => Constants.EnglishLanguage);
             fixture.Register(() => Book.FromState(fixture.Create<Book.State>()));
         }
     }

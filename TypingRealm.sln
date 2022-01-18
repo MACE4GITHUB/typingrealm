@@ -195,7 +195,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Configuration",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5F9A0FD4-FC92-4E45-8103-C8BCC118F70D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Library.Tests", "Tests\TypingRealm.Library.Tests\TypingRealm.Library.Tests.csproj", "{EB62798A-FAF0-4B1F-BF74-5E38B94F6873}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Library.Tests", "Tests\TypingRealm.Library.Tests\TypingRealm.Library.Tests.csproj", "{EB62798A-FAF0-4B1F-BF74-5E38B94F6873}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.TextProcessing", "TypingRealm.TextProcessing\TypingRealm.TextProcessing.csproj", "{1D29186C-1FB1-423B-B1C8-988F40D54A5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -491,6 +493,10 @@ Global
 		{EB62798A-FAF0-4B1F-BF74-5E38B94F6873}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB62798A-FAF0-4B1F-BF74-5E38B94F6873}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB62798A-FAF0-4B1F-BF74-5E38B94F6873}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D29186C-1FB1-423B-B1C8-988F40D54A5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D29186C-1FB1-423B-B1C8-988F40D54A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D29186C-1FB1-423B-B1C8-988F40D54A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D29186C-1FB1-423B-B1C8-988F40D54A5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -573,6 +579,7 @@ Global
 		{6943E46B-2C1E-47D9-9C59-3D361486EE59} = {CBBEC7E3-41B0-401A-8EC6-C570D40F0324}
 		{5F9A0FD4-FC92-4E45-8103-C8BCC118F70D} = {F6B12C72-DEB4-4F40-B922-FC061DFC8719}
 		{EB62798A-FAF0-4B1F-BF74-5E38B94F6873} = {5F9A0FD4-FC92-4E45-8103-C8BCC118F70D}
+		{1D29186C-1FB1-423B-B1C8-988F40D54A5D} = {4B79F737-A120-46CD-9476-A4401220BFAB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

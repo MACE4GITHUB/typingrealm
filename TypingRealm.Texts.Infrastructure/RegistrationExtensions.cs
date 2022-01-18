@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TypingRealm.Communication;
+using TypingRealm.TextProcessing;
 using TypingRealm.Texts.Retrievers;
 using TypingRealm.Texts.Retrievers.Cache;
 
@@ -30,7 +31,8 @@ namespace TypingRealm.Texts.Infrastructure
             services.AddSingleton<ITextRetriever>(provider => new CachedTextRetriever(
                 provider.GetRequiredService<ILogger<CachedTextRetriever>>(),
                 (ITextRetriever)provider.GetRequiredService(textRetrieverType),
-                provider.GetRequiredService<TextCacheResolver>()(language)));
+                provider.GetRequiredService<TextCacheResolver>()(language),
+                provider.GetRequiredService<ITextProcessor>()));
 
             if (DebugHelpers.UseInfrastructure)
             {

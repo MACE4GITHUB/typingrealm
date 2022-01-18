@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 using TypingRealm.Library.Sentences;
-using TypingRealm.Texts;
+using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Api.Controllers;
 
@@ -19,7 +19,7 @@ public sealed class SentencesController : TyrController
 
     [HttpPost]
     public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetSentences(
-        SentencesRequest request, string language = TextHelpers.DefaultLanguage)
+        SentencesRequest request, string language = Constants.DefaultLanguageValue)
     {
         var sentenceQuery = _sentenceQueryResolver(language);
 
@@ -31,7 +31,7 @@ public sealed class SentencesController : TyrController
     [HttpPost]
     [Route("words")]
     public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetWords(
-        WordsRequest request, string language = TextHelpers.DefaultLanguage)
+        WordsRequest request, string language = Constants.DefaultLanguageValue)
     {
         var sentenceQuery = _sentenceQueryResolver(language);
 

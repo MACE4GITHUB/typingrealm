@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using TypingRealm.TextProcessing;
 using TypingRealm.Texts.Retrievers.Cache;
 
 namespace TypingRealm.Texts.Retrievers;
@@ -15,6 +16,7 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
     private readonly ILogger<CachedTextRetriever> _logger;
     private readonly ITextRetriever _textRetriever;
     private readonly ITextCache _textCache;
+    private readonly ITextProcessor _textProcessor;
     private Task _fillProcess = Task.CompletedTask;
 
     private readonly SemaphoreSlim _localLock = new(1, 1);
@@ -22,11 +24,13 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
     public CachedTextRetriever(
         ILogger<CachedTextRetriever> logger,
         ITextRetriever textRetriever,
-        ITextCache textCache)
+        ITextCache textCache,
+        ITextProcessor textProcessor)
     {
         _logger = logger;
         _textRetriever = textRetriever;
         _textCache = textCache;
+        _textProcessor = textProcessor;
     }
 
     public string Language => _textRetriever.Language;
@@ -80,7 +84,7 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
                 var text = await _textRetriever.RetrieveTextAsync()
                     .ConfigureAwait(false);
 
-                uniqueSentences.UnionWith(TextHelpers.GetSentencesEnumerable(text));
+                uniqueSentences.UnionWith(_textProcessor.GetSentencesEnumerable(text));
             }
 #pragma warning disable CA1031 // It is being re-thrown later on.
             catch (Exception exception)

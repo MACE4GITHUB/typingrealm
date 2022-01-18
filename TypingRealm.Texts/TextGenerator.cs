@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Texts;
 
@@ -16,10 +17,14 @@ public sealed class TextGenerator : ITextGenerator
     private const int MaxAllowedTextLength = 1000;
 
     private readonly TextRetrieverResolver _textRetrieverResolver;
+    private readonly ITextProcessor _textProcessor;
 
-    public TextGenerator(TextRetrieverResolver textRetrieverResolver)
+    public TextGenerator(
+        TextRetrieverResolver textRetrieverResolver,
+        ITextProcessor textProcessor)
     {
         _textRetrieverResolver = textRetrieverResolver;
+        _textProcessor = textProcessor;
     }
 
     public async ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration)
@@ -45,8 +50,8 @@ public sealed class TextGenerator : ITextGenerator
 
             var textPartsEnumerable = configuration.Structure switch
             {
-                TextStructure.Text => TextHelpers.GetSentencesEnumerable(text),
-                TextStructure.Words => TextHelpers.GetWordsEnumerable(text),
+                TextStructure.Text => _textProcessor.GetSentencesEnumerable(text),
+                TextStructure.Words => _textProcessor.GetWordsEnumerable(text),
                 _ => throw new InvalidOperationException("Unknown text structure.")
             };
 
@@ -56,7 +61,7 @@ public sealed class TextGenerator : ITextGenerator
             if (configuration.StripPunctuation)
                 textPartsEnumerable = textPartsEnumerable.Select(part =>
                 {
-                    foreach (var character in TextHelpers.PunctuationCharacters)
+                    foreach (var character in Constants.PunctuationCharacters)
                     {
                         part = part.Replace(character.ToString(), "");
                     }
@@ -67,7 +72,7 @@ public sealed class TextGenerator : ITextGenerator
             if (configuration.StripNumbers)
                 textPartsEnumerable = textPartsEnumerable.Select(part =>
                 {
-                    foreach (var character in TextHelpers.NumberCharacters)
+                    foreach (var character in Constants.NumberCharacters)
                     {
                         part = part.Replace(character.ToString(), "");
                     }
