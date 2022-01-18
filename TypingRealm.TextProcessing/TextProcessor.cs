@@ -17,7 +17,7 @@ namespace TypingRealm.TextProcessing
     {
         private static readonly Regex _sentenceRegex = new Regex(@"(?<=[\.!\?]""?)\s+", RegexOptions.Compiled);
         private static readonly Regex _multipleSpacesRegex = new Regex(" {2,}", RegexOptions.Compiled);
-        private static readonly char[] _wordTrimCharacters = $"{Constants.PunctuationCharacters} ".ToCharArray();
+        private static readonly char[] _wordTrimCharacters = $"{TextConstants.PunctuationCharacters} ".ToCharArray();
 
         public IEnumerable<string> GetSentencesEnumerable(string text)
         {

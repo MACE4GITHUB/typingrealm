@@ -2,7 +2,7 @@
 
 namespace TypingRealm.TextProcessing
 {
-    public static class Constants
+    public static class TextConstants
     {
         public const string DefaultLanguageValue = EnglishLanguageValue;
         private const string EnglishLanguageValue = "en";

@@ -6,7 +6,7 @@ namespace TypingRealm.TextProcessing
     {
         public Language(string value) : base(value)
         {
-            Validation.ValidateIn(value, Constants.SupportedLanguageValues);
+            Validation.ValidateIn(value, TextConstants.SupportedLanguageValues);
         }
     }
 }

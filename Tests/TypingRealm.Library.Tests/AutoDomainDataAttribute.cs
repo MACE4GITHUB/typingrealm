@@ -27,7 +27,7 @@ namespace TypingRealm.Library.Tests
         public void Customize(IFixture fixture)
         {
             fixture.Customizations.Add(new MaxLengthBuilder());
-            fixture.Register(() => Constants.EnglishLanguage);
+            fixture.Register(() => TextConstants.EnglishLanguage);
             fixture.Register(() => Book.FromState(fixture.Create<Book.State>()));
         }
     }

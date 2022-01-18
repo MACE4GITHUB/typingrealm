@@ -16,8 +16,8 @@ namespace TypingRealm.TextProcessing
 
         private static readonly Dictionary<Language, string> _allowedCharacters = new()
         {
-            [Constants.EnglishLanguage] = $"{AllowedEnglishLetters}{Constants.NumberCharacters}{Constants.PunctuationCharacters}",
-            [Constants.RussianLanguage] = $"{AllowedRussianLetters}{Constants.NumberCharacters}{Constants.PunctuationCharacters}"
+            [TextConstants.EnglishLanguage] = $"{AllowedEnglishLetters}{TextConstants.NumberCharacters}{TextConstants.PunctuationCharacters}",
+            [TextConstants.RussianLanguage] = $"{AllowedRussianLetters}{TextConstants.NumberCharacters}{TextConstants.PunctuationCharacters}"
         };
 
         public ValueTask<LanguageInformation> FindLanguageInformationAsync(Language language)

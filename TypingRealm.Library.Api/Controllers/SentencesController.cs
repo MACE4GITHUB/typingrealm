@@ -19,7 +19,7 @@ public sealed class SentencesController : TyrController
 
     [HttpPost]
     public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetSentences(
-        SentencesRequest request, string language = Constants.DefaultLanguageValue)
+        SentencesRequest request, string language = TextConstants.DefaultLanguageValue)
     {
         var sentenceQuery = _sentenceQueryResolver(language);
 
@@ -31,7 +31,7 @@ public sealed class SentencesController : TyrController
     [HttpPost]
     [Route("words")]
     public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetWords(
-        WordsRequest request, string language = Constants.DefaultLanguageValue)
+        WordsRequest request, string language = TextConstants.DefaultLanguageValue)
     {
         var sentenceQuery = _sentenceQueryResolver(language);
 

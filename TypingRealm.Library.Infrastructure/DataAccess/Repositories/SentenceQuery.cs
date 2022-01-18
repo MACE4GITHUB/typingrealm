@@ -251,7 +251,7 @@ public sealed class SentenceQuery : ISentenceQuery
 
     private bool IsKeyPairWithoutPunctuation(string keyPair)
     {
-        foreach (var punctuationCharacter in Constants.PunctuationCharacters)
+        foreach (var punctuationCharacter in TextConstants.PunctuationCharacters)
         {
             if (keyPair.StartsWith(punctuationCharacter) || keyPair.EndsWith(punctuationCharacter))
                 return false;
