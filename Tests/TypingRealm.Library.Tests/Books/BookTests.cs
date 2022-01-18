@@ -102,12 +102,12 @@ namespace TypingRealm.Library.Tests.Books
         }
 
         [Fact]
-        public void StartReprocessing_ShouldThrow_WhenAlreadyArchived()
+        public void StartProcessing_ShouldThrow_WhenAlreadyArchived()
         {
             var sut = Fixture.CreateBook(config => config
                 .With(x => x.IsArchived, true));
 
-            Assert.Throws<InvalidOperationException>(() => sut.StartReprocessing());
+            Assert.Throws<InvalidOperationException>(() => sut.StartProcessing());
         }
 
         [Theory]
@@ -115,13 +115,13 @@ namespace TypingRealm.Library.Tests.Books
         [InlineData(ProcessingStatus.Processed)]
         [InlineData(ProcessingStatus.Processing)]
         [InlineData(ProcessingStatus.Error)]
-        public void StartReprocessing_ShouldSetToProcessing(ProcessingStatus status)
+        public void StartProcessing_ShouldSetToProcessing(ProcessingStatus status)
         {
             var sut = Fixture.CreateBook(config => config
                 .With(x => x.IsArchived, false)
                 .With(x => x.ProcessingStatus, status));
 
-            sut.StartReprocessing();
+            sut.StartProcessing();
 
             Assert.Equal(ProcessingStatus.Processing, sut.GetState().ProcessingStatus);
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
 using TypingRealm.Texts;
@@ -11,59 +12,26 @@ namespace TypingRealm.Library.Importing;
 
 public interface IBookImporter
 {
-    ValueTask<BookImportResult> ImportNewBookAsync(string description, string language, Stream content);
-    ValueTask<BookImportResult> ReImportBookAsync(BookId bookId);
+    ValueTask<BookImportResult> ImportBookAsync(BookId bookId);
 }
 
 public sealed class BookImporter : IBookImporter
 {
     private readonly IBookRepository _bookStore;
     private readonly ISentenceRepository _sentenceRepository;
+    private readonly ILogger<BookImporter> _logger;
 
     public BookImporter(
         IBookRepository bookStore,
-        ISentenceRepository sentenceRepository)
+        ISentenceRepository sentenceRepository,
+        ILogger<BookImporter> logger)
     {
         _bookStore = bookStore;
         _sentenceRepository = sentenceRepository;
+        _logger = logger;
     }
 
-    public async ValueTask<BookImportResult> ImportNewBookAsync(string description, string language, Stream content)
-    {
-        var bookId = await _bookStore.NextBookIdAsync()
-            .ConfigureAwait(false);
-
-        var bookContent = new BookContent(bookId, content);
-        var book = new Book(bookId, new(language), new(description));
-
-        await _bookStore.AddBookWithContentAsync(book, bookContent)
-            .ConfigureAwait(false);
-
-        // TODO: Do the following part asynchronously, return statistics.
-
-        bookContent = await _bookStore.FindBookContentAsync(bookId)
-            .ConfigureAwait(false);
-        if (bookContent == null)
-            throw new InvalidOperationException("Book content has not been found.");
-
-        var importResult = await ImportBookAsync(book, bookContent)
-            .ConfigureAwait(false);
-
-        book = await _bookStore.FindBookAsync(bookId)
-            .ConfigureAwait(false);
-
-        if (book == null)
-            throw new InvalidOperationException("Did not find the book.");
-
-        book.FinishProcessing();
-
-        await _bookStore.UpdateBookAsync(book)
-            .ConfigureAwait(false);
-
-        return importResult;
-    }
-
-    public async ValueTask<BookImportResult> ReImportBookAsync(BookId bookId)
+    public async ValueTask<BookImportResult> ImportBookAsync(BookId bookId)
     {
         var book = await _bookStore.FindBookAsync(bookId)
             .ConfigureAwait(false);
@@ -77,7 +45,7 @@ public sealed class BookImporter : IBookImporter
         if (bookContent == null)
             throw new InvalidOperationException("Content for a book is not found.");
 
-        book.StartReprocessing();
+        book.StartProcessing();
 
         await _bookStore.UpdateBookAsync(book)
             .ConfigureAwait(false);
@@ -85,12 +53,21 @@ public sealed class BookImporter : IBookImporter
         await _sentenceRepository.RemoveAllForBook(bookId)
             .ConfigureAwait(false);
 
-        var result = await ImportBookAsync(book, bookContent)
-            .ConfigureAwait(false);
+        BookImportResult result;
+        try
+        {
+            result = await ImportBookAsync(book, bookContent)
+                .ConfigureAwait(false);
 
-        // TODO: Reuse this code.
+            book.FinishProcessing();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Error while importing the book {BookId}.", bookId.Value);
+            book.ErrorProcessing();
 
-        book.FinishProcessing();
+            result = new BookImportResult(book, Enumerable.Empty<string>(), string.Empty, false);
+        }
 
         await _bookStore.UpdateBookAsync(book)
             .ConfigureAwait(false);
@@ -121,7 +98,7 @@ public sealed class BookImporter : IBookImporter
         await _sentenceRepository.SaveByBatchesAsync(sentences, 200)
             .ConfigureAwait(false);
 
-        return new BookImportResult(book, notAllowedSentences.Take(10).ToList(), string.Join(string.Empty, notAllowedCharacters));
+        return new BookImportResult(book, notAllowedSentences.Take(10).ToList(), string.Join(string.Empty, notAllowedCharacters), true);
     }
 
     private Sentence CreateSentence(BookId bookId, string sentence, int sentenceIndex)

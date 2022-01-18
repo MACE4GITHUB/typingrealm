@@ -6,4 +6,5 @@ namespace TypingRealm.Library.Importing;
 public sealed record BookImportResult(
     Book book,
     IEnumerable<string> Top10NotAllowedSentences,
-    string NotAllowedCharacters);
+    string NotAllowedCharacters,
+    bool IsSuccessful);

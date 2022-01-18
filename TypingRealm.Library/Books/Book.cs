@@ -65,7 +65,7 @@ public sealed class Book
         };
     }
 
-    public void StartReprocessing()
+    public void StartProcessing()
     {
         if (_state.IsArchived)
             throw new InvalidOperationException("Book has already been archived.");

@@ -74,18 +74,24 @@ public sealed class BooksController : TyrController
     }
 
     [HttpPost]
-    [Route("import")]
-    public async ValueTask<ActionResult<BookImportResult>> ImportBook(string description, string language, IFormFile content)
+    public async ValueTask<ActionResult> UploadBook(string description, string language, IFormFile content)
     {
         using var stream = content.OpenReadStream();
 
-        return await _bookImporter.ImportNewBookAsync(description, language, stream);
+        var bookId = await _bookRepository.NextBookIdAsync();
+        var book = new Book(bookId, new(language), new(description));
+        var bookContent = new BookContent(bookId, stream);
+
+        await _bookRepository.AddBookWithContentAsync(book, bookContent);
+
+        var result = new { bookId = bookId.Value };
+        return CreatedAtAction(nameof(GetBookById), result, result);
     }
 
     [HttpPost]
-    [Route("{bookId}/re-import")]
-    public async ValueTask<ActionResult<BookImportResult>> ReImportBook(string bookId)
+    [Route("{bookId}/import")]
+    public async ValueTask<ActionResult<BookImportResult>> ImportBook(string bookId)
     {
-        return await _bookImporter.ReImportBookAsync(new(bookId));
+        return await _bookImporter.ImportBookAsync(new(bookId));
     }
 }
