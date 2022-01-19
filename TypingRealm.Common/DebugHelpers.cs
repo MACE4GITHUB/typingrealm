@@ -12,6 +12,12 @@ namespace TypingRealm
         public static bool UseInfrastructure => !Convert.ToBoolean(
             Environment.GetEnvironmentVariable("DISABLE_INFRASTRUCTURE"));
 
+        public static bool IsDeployment()
+        {
+            var isDeployment = Convert.ToBoolean(Environment.GetEnvironmentVariable("DEPLOYMENT"));
+            return isDeployment;
+        }
+
         public static bool IsDevelopment()
         {
             var environment = GetEnvironment();

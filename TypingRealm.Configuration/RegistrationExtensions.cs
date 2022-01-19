@@ -28,12 +28,13 @@ namespace TypingRealm.Configuration
                 }
             }
 
-            var serviceId = configuration.GetServiceId();
-
-            // TODO: This prevents ef migrations from working, figure out how to fix it.
-            // Also without appsettings.json file with a valid connection string it doesn't work.
-            if (string.IsNullOrWhiteSpace(serviceId))
-                throw new InvalidOperationException("ServiceId should be specified for service.");
+            if (!DebugHelpers.IsDeployment())
+            {
+                // This prevents EF migration from working.
+                var serviceId = configuration.GetServiceId();
+                if (string.IsNullOrWhiteSpace(serviceId))
+                    throw new InvalidOperationException("ServiceId should be specified for service.");
+            }
 
             return configuration;
         }
@@ -56,11 +57,15 @@ namespace TypingRealm.Configuration
                 }
             }
 
-            configuration = configurationBuilder.Build();
+            if (!DebugHelpers.IsDevelopment())
+            {
+                configuration = configurationBuilder.Build();
 
-            var serviceId = configuration.GetServiceId();
-            if (string.IsNullOrWhiteSpace(serviceId))
-                throw new InvalidOperationException("ServiceId should be specified for service.");
+                // This prevents EF migration from working.
+                var serviceId = configuration.GetServiceId();
+                if (string.IsNullOrWhiteSpace(serviceId))
+                    throw new InvalidOperationException("ServiceId should be specified for service.");
+            }
 
             return configurationBuilder;
         }

@@ -113,6 +113,7 @@ public class WordDao
 [Index(nameof(CountInWord))]
 [Index(nameof(CountInSentence))]
 [Index(nameof(Value))]
+[Index(nameof(WordId))]
 public class KeyPairDao
 {
     [Key]
