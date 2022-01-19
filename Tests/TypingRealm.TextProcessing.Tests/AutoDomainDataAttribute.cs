@@ -19,6 +19,12 @@ namespace TypingRealm.TextProcessing.Tests
         }
     }
 
+    public sealed class InlineDomainDataAttribute : InlineAutoDataAttribute
+    {
+        public InlineDomainDataAttribute(params object[] objects)
+            : base(new AutoDomainDataAttribute(), objects) { }
+    }
+
     public class DomainCustomization : ICustomization
     {
         public void Customize(IFixture fixture)

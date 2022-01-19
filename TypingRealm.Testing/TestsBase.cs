@@ -50,6 +50,9 @@ namespace TypingRealm.Testing
             }
         }
 
+        protected TestException NewTestException()
+            => Fixture.Create<TestException>();
+
         protected void AssertSerializable<T>()
         {
             // This will use default parameterless constructor and assign all properties.

@@ -59,7 +59,7 @@ namespace TypingRealm.Library.Tests.Books
             BookId bookId)
         {
             _bookRepository.Setup(x => x.FindBookAsync(bookId))
-                .ThrowsAsync(new TestException());
+                .ThrowsAsync(NewTestException());
 
             await AssertThrowsAsync<TestException>(
                 () => _sut.ArchiveBookAsync(bookId));
