@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Library.Api.Client;
+using TypingRealm.TextProcessing;
 using TypingRealm.Texts.Retrievers;
 using TypingRealm.Texts.Retrievers.Cache;
 
@@ -14,6 +15,7 @@ public static class RegistrationExtensions
 {
     public static IServiceCollection AddTextsDomain(this IServiceCollection services)
     {
+        services.AddTextProcessing();
         services.AddLibraryApiClients();
 
         services.AddTransient<ITextGenerator, TextGenerator>();
