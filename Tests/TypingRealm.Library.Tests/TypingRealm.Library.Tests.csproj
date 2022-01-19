@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\TypingRealm.Library\TypingRealm.Library.csproj" />
     <ProjectReference Include="..\..\TypingRealm.Testing\TypingRealm.Testing.csproj" />
+    <ProjectReference Include="..\TypingRealm.TextProcessing.Tests\TypingRealm.TextProcessing.Tests.csproj" />
   </ItemGroup>
 
 </Project>

@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\TypingRealm.Testing\TypingRealm.Testing.csproj" />
     <ProjectReference Include="..\..\TypingRealm.TextProcessing\TypingRealm.TextProcessing.csproj" />
   </ItemGroup>
 
