@@ -197,7 +197,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5F9A0FD4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Library.Tests", "Tests\TypingRealm.Library.Tests\TypingRealm.Library.Tests.csproj", "{EB62798A-FAF0-4B1F-BF74-5E38B94F6873}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.TextProcessing", "TypingRealm.TextProcessing\TypingRealm.TextProcessing.csproj", "{1D29186C-1FB1-423B-B1C8-988F40D54A5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.TextProcessing", "TypingRealm.TextProcessing\TypingRealm.TextProcessing.csproj", "{1D29186C-1FB1-423B-B1C8-988F40D54A5D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{60D4822C-FBB0-4625-B331-38C07967AE68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.TextProcessing.Tests", "Tests\TypingRealm.TextProcessing.Tests\TypingRealm.TextProcessing.Tests.csproj", "{0E12AEFA-F877-4B6F-9FAC-5FB9465F72F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -497,6 +501,10 @@ Global
 		{1D29186C-1FB1-423B-B1C8-988F40D54A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D29186C-1FB1-423B-B1C8-988F40D54A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D29186C-1FB1-423B-B1C8-988F40D54A5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E12AEFA-F877-4B6F-9FAC-5FB9465F72F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E12AEFA-F877-4B6F-9FAC-5FB9465F72F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E12AEFA-F877-4B6F-9FAC-5FB9465F72F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E12AEFA-F877-4B6F-9FAC-5FB9465F72F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -580,6 +588,8 @@ Global
 		{5F9A0FD4-FC92-4E45-8103-C8BCC118F70D} = {F6B12C72-DEB4-4F40-B922-FC061DFC8719}
 		{EB62798A-FAF0-4B1F-BF74-5E38B94F6873} = {5F9A0FD4-FC92-4E45-8103-C8BCC118F70D}
 		{1D29186C-1FB1-423B-B1C8-988F40D54A5D} = {4B79F737-A120-46CD-9476-A4401220BFAB}
+		{60D4822C-FBB0-4625-B331-38C07967AE68} = {4B79F737-A120-46CD-9476-A4401220BFAB}
+		{0E12AEFA-F877-4B6F-9FAC-5FB9465F72F3} = {60D4822C-FBB0-4625-B331-38C07967AE68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}
