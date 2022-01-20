@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoFixture;
 using Xunit;
 
 namespace TypingRealm.TextProcessing.Tests
@@ -39,13 +38,12 @@ namespace TypingRealm.TextProcessing.Tests
         [InlineData("a abc cabd dabc adbc", "abcd ")]
         [InlineData("a ", "a ")]
         [InlineData("bcd", "dbc")]
-        [InlineData("", "")]
+        [InlineData("", "dbc")]
         public void ShouldAllowCharacters_WhenAllowed(
             string text, string allowedCharacters)
         {
-            var info = Fixture.Build<LanguageInformation>()
-                .With(x => x.AllowedCharacters, allowedCharacters)
-                .Create();
+            var info = Create<LanguageInformation>(
+                new LanguageInformationBuilder(allowedCharacters));
 
             Assert.True(info.IsAllLettersAllowed(text));
         }
@@ -53,20 +51,42 @@ namespace TypingRealm.TextProcessing.Tests
         [Theory]
         [InlineData("a abc tcb", "abcd ")]
         [InlineData("a ", "a")]
-        [InlineData("a", "")]
-        [InlineData(" ", null)]
-        [InlineData("", null)]
-        [InlineData(null, null)]
-        [InlineData(null, "")]
-        [InlineData(null, "abc ")]
         public void ShouldNotAllowCharacters_WhenNotAllowed(
             string text, string allowedCharacters)
         {
-            var info = Fixture.Build<LanguageInformation>()
-                .With(x => x.AllowedCharacters, allowedCharacters)
-                .Create();
+            var info = Create<LanguageInformation>(
+                new LanguageInformationBuilder(allowedCharacters));
 
             Assert.False(info.IsAllLettersAllowed(text));
+        }
+
+        [Theory]
+        [AutoDomainData]
+        public void IsAllLettersAllowed_ShouldThrow_WhenInputIsNull(
+            LanguageInformation info)
+        {
+            Assert.Throws<ArgumentNullException>(() => info.IsAllLettersAllowed(null!));
+        }
+
+        [Theory, AutoDomainData]
+        public void ShouldThrow_WhenAllowedCharactersAreEmpty(Language language)
+        {
+            Assert.Throws<ArgumentException>(
+                () => new LanguageInformation(language, string.Empty));
+        }
+
+        [Theory, AutoDomainData]
+        public void ShouldThrow_WhenAllowedCharactersAreNull(Language language)
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new LanguageInformation(language, null!));
+        }
+
+        [Theory, AutoDomainData]
+        public void ShouldThrow_WhenLanguageIsNull(string allowedCharacters)
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new LanguageInformation(null!, allowedCharacters));
         }
     }
 }

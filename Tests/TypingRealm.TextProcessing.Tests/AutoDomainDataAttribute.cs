@@ -56,4 +56,28 @@ namespace TypingRealm.TextProcessing.Tests
             return new NoSpecimen();
         }
     }
+
+    public class LanguageInformationBuilder : ISpecimenBuilder
+    {
+        private readonly string _allowedCharacters;
+
+        public LanguageInformationBuilder(string allowedCharacters)
+        {
+            _allowedCharacters = allowedCharacters;
+        }
+
+        public object Create(object request, ISpecimenContext context)
+        {
+            if (request is ParameterInfo pi
+                && pi.ParameterType == typeof(string)
+                && pi.Name == "allowedCharacters"
+                && pi.Member.DeclaringType == typeof(LanguageInformation))
+            {
+                return _allowedCharacters;
+            }
+
+            return new NoSpecimen();
+        }
+    }
+
 }
