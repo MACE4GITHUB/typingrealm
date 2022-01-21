@@ -283,6 +283,35 @@ public class TextProcessorTests : TextProcessingTestsBase
     }
 
     [Fact]
+    public void GetWords_ShouldGetWordsFromText_WithChunksOfPunctuation()
+    {
+        var text = "  - word # Another; word. another word?   # word";
+
+        var words = _sut.GetWordsEnumerable(text)
+            .ToList();
+
+        Assert.Equal("-", words[0]);
+        Assert.Equal("Word", words[1]);
+        Assert.Equal("#", words[2]);
+        Assert.Equal("Another;", words[3]);
+        Assert.Equal("word.", words[4]);
+        Assert.Equal("Another", words[5]);
+        Assert.Equal("word?", words[6]);
+        Assert.Equal("#", words[7]);
+        Assert.Equal("Word.", words[8]);
+    }
+
+    [Fact]
+    public void NormalizeWord_ShouldStripPunctuationAroundAndLowercase()
+    {
+        var text = "  , SOme Word?? $.sOmet hing  ## $.  ";
+
+        var normalized = _sut.NormalizeWord(text);
+
+        Assert.Equal("some word?? $.somet hing", normalized);
+    }
+
+    [Fact]
     public void AddTextProcessing_ShouldRegisterAsSingleton()
     {
         var serviceProvider = new ServiceCollection()
