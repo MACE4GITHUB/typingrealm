@@ -63,7 +63,7 @@ public class LanguageProviderTests : TextProcessingTestsBase
             var language = new Language(languageValue);
 
             var info = await _sut.FindLanguageInformationAsync(language);
-            Assert.True(info.IsAllLettersAllowed(TextConstants.SpaceCharacter));
+            Assert.True(info.IsAllLettersAllowed(TextConstants.SpaceCharacter.ToString()));
         }
     }
 

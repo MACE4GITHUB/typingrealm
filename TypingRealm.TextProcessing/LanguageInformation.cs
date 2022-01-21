@@ -26,10 +26,5 @@ namespace TypingRealm.TextProcessing
 
             return text.All(character => AllowedCharacters.Contains(character));
         }
-
-        internal bool IsAllLettersAllowed(object space)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
