@@ -282,6 +282,9 @@ public class TextProcessorTests : TextProcessingTestsBase
         Assert.Equal(5, sentences.Count);
     }
 
+    // TODO: Make sure when we save words like "#" - raw word is empty and when
+    // raw words are requested we need not to pick them up.
+    // Mark punctuation-words somehow so they are separate from word-words.
     [Fact]
     public void GetWords_ShouldGetWordsFromText_WithChunksOfPunctuation()
     {
