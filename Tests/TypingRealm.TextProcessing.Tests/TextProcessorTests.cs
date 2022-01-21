@@ -6,7 +6,6 @@ using Xunit;
 
 namespace TypingRealm.TextProcessing.Tests;
 
-// TODO: Add dot at the end of every sentence.
 public class TextProcessorTests : TextProcessingTestsBase
 {
     private readonly TextProcessor _sut;
