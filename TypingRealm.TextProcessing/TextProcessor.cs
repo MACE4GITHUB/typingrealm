@@ -34,11 +34,13 @@ namespace TypingRealm.TextProcessing
                 .SelectMany(sentence => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries));
         }
 
+#pragma warning disable CA1308 // Normalize strings to uppercase: We need them exactly in lowercase.
         public string NormalizeWord(string word)
         {
             return word.Trim(_wordTrimCharacters)
                 .ToLowerInvariant();
         }
+#pragma warning restore CA1308
 
         private static string NormalizeCharacters(string text)
         {
