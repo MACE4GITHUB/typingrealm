@@ -7,7 +7,7 @@ namespace TypingRealm.TextProcessing
         public static IServiceCollection AddTextProcessing(this IServiceCollection services)
         {
             services.AddSingleton<ILanguageProvider, LanguageProvider>();
-            services.AddTransient<ITextProcessor, TextProcessor>();
+            services.AddSingleton<ITextProcessor, TextProcessor>();
 
             return services;
         }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.TextProcessing.Tests;
@@ -103,5 +105,15 @@ public class LanguageProviderTests : TextProcessingTestsBase
     {
         var info = await _sut.FindLanguageInformationAsync(TextConstants.RussianLanguage);
         Assert.False(info.IsAllLettersAllowed("abcde"));
+    }
+
+    [Fact]
+    public void AddTextProcessing_ShouldRegisterAsSingleton()
+    {
+        var serviceProvider = new ServiceCollection()
+            .AddTextProcessing()
+            .BuildServiceProvider();
+
+        serviceProvider.AssertRegisteredSingleton<ILanguageProvider, LanguageProvider>();
     }
 }

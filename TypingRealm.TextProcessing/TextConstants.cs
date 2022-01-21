@@ -2,6 +2,8 @@
 
 namespace TypingRealm.TextProcessing
 {
+    // This file is not unit tested and is critical to contain valid consistent data
+    // as it is being reused in multiple domains.
     public static class TextConstants
     {
         public const string DefaultLanguageValue = EnglishLanguageValue;
