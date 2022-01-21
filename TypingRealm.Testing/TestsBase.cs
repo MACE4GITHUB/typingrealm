@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Kernel;
 using Moq;
+using TypingRealm.Common;
 using TypingRealm.Messaging;
 using Xunit;
 
@@ -24,6 +25,12 @@ namespace TypingRealm.Testing
         protected TestsBase(IFixture fixture)
         {
             Fixture = fixture;
+        }
+
+        protected void SetStringPrimitiveValue(object instance, string propertyName, object value)
+        {
+            var field = typeof(Primitive<string>).GetField($"<{propertyName}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
+            field!.SetValue(instance, value);
         }
 
         protected virtual IFixture Fixture { get; }
