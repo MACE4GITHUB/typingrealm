@@ -15,7 +15,7 @@ namespace TypingRealm.TextProcessing
 
     public sealed class TextProcessor : ITextProcessor
     {
-        private static readonly Regex _sentenceRegex = new Regex(@"(?<=[\.!\?]""?)\s+", RegexOptions.Compiled);
+        private static readonly Regex _sentenceRegex = new Regex(@$"(?<=[\.!\?][{TextConstants.PunctuationCharactersForRegex}]*)\s+", RegexOptions.Compiled);
         private static readonly Regex _multipleSpacesRegex = new Regex(" {2,}", RegexOptions.Compiled);
         private static readonly char[] _wordTrimCharacters = $"{TextConstants.PunctuationCharacters} ".ToCharArray();
 
@@ -25,7 +25,8 @@ namespace TypingRealm.TextProcessing
                 .Select(sentence => NormalizeCharacters(sentence))
                 .SelectMany(sentence => _sentenceRegex.Split(sentence))
                 .Where(sentence => sentence.Length > 0)
-                .Select(sentence => CapitalizeFirstCharacter(sentence));
+                .Where(sentence => !sentence.All(character => ".!? ".Contains(character)))
+                .Select(sentence => CapitalizeFirstLetter(sentence));
         }
 
         public IEnumerable<string> GetWordsEnumerable(string text)
@@ -45,38 +46,66 @@ namespace TypingRealm.TextProcessing
         private static string NormalizeCharacters(string text)
         {
             var sb = new StringBuilder(text);
-            var normalizedText = sb.Replace("\r", string.Empty)
+            var normalizedText = sb
+                .Replace("\r", string.Empty)
                 .Replace("\n", " ")
                 .Replace("“", "\"")
                 .Replace("”", "\"")
-                .Replace("—", " - ")
-                .Replace("–", "-")
-                .Replace("…\"", "...\" ")
-                .Replace("…", "... ")
-                .Replace("’", "'")
-                .Replace("‘", "'")
-                .Replace("†", " ")
-                .Replace("\t", " ")
                 .Replace("«", "\"")
                 .Replace("»", "\"")
-                .Replace(" ", " ") // These are custom unicode characters.
+                .Replace("’", "'")
+                .Replace("‘", "'")
                 .Replace("‚", ",")
+                .Replace("\t", " ")
+                .Replace(" ", " ") // These are custom unicode characters.
+                .Replace("†", " ")
+                .Replace("–", "-")
+                .Replace("—", " - ")
+                .Replace("…", "...")
                 .ToString().Trim();
 
             // Remove multiple spaces in a row.
             normalizedText = _multipleSpacesRegex.Replace(normalizedText, " ");
 
+            if (normalizedText.Trim() == string.Empty)
+                return normalizedText;
+
+            // TODO: Add a dot at the end here if last character is not punctuation.
+
+            // TODO: Optimize this to not copy strings.
+            if (normalizedText.EndsWith(" .", StringComparison.Ordinal))
+                normalizedText = $"{normalizedText[0..^2]}.";
+            if (normalizedText.EndsWith(" ?", StringComparison.Ordinal))
+                normalizedText = $"{normalizedText[0..^2]}?";
+            if (normalizedText.EndsWith(" !", StringComparison.Ordinal))
+                normalizedText = $"{normalizedText[0..^2]}!";
+
+            if (!normalizedText.EndsWith(".")
+                && !normalizedText.EndsWith("!")
+                && !normalizedText.EndsWith("?"))
+                normalizedText = $"{normalizedText}.";
+
             return normalizedText;
         }
 
-        private static string CapitalizeFirstCharacter(string text)
+        private static string CapitalizeFirstLetter(string text)
         {
-            if (char.IsLower(text[0]))
+            for (var i = 0; i < text.Length; i++)
             {
-                if (text.Length == 1)
-                    return text.ToUpperInvariant();
+                if (TextConstants.PunctuationCharacters.Contains(text[i]) || text[i] == TextConstants.SpaceCharacter)
+                    continue;
 
-                return $"{text[0].ToString().ToUpperInvariant()}{text[1..]}";
+                if (char.IsLower(text[i]))
+                {
+                    if (text.Length == 1)
+                        return text.ToUpperInvariant();
+
+                    var firstPart = i > 0 ? text[..i] : string.Empty;
+                    var secondPart = text.Length > i ? text[(i+1)..] : string.Empty;
+                    return $"{firstPart}{text[i].ToString().ToUpperInvariant()}{secondPart}";
+                }
+
+                return text;
             }
 
             return text;
