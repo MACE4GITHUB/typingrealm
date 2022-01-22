@@ -24,6 +24,7 @@ public sealed class SentenceFactory : ISentenceFactory
     public Sentence CreateSentence(BookId bookId, string validatedSentence, int indexInBook)
     {
         validatedSentence = string.Join(" ", _textProcessor.GetWordsEnumerable(validatedSentence));
+        var sentenceType = SentenceType.Normal;
 
         var sentenceId = SentenceId.New();
         var words = _textProcessor.GetWordsEnumerable(validatedSentence).ToArray();
@@ -36,6 +37,16 @@ public sealed class SentenceFactory : ISentenceFactory
                 Word = group.Key,
                 Count = group.Count()
             }).ToDictionary(x => x.Word);
+
+        foreach (var word in words)
+        {
+            if (word.All(character => TextConstants.PunctuationCharacters.Contains(character))
+                && word.Length > 1)
+                sentenceType = SentenceType.Other;
+
+            if (word.EndsWith(".?", StringComparison.Ordinal) || word.EndsWith(".!", StringComparison.Ordinal))
+                sentenceType = SentenceType.Other;
+        }
 
         var rawWordsInSentence = words
             .Select(word => _textProcessor.NormalizeWord(word))
@@ -60,7 +71,7 @@ public sealed class SentenceFactory : ISentenceFactory
             index++;
         }
 
-        return new Sentence(bookId, sentenceId, indexInBook, validatedSentence, wordsList);
+        return new Sentence(bookId, sentenceId, sentenceType, indexInBook, validatedSentence, wordsList);
     }
 
     private static IList<KeyPair> CreateKeyPairs(string sentence, string word)

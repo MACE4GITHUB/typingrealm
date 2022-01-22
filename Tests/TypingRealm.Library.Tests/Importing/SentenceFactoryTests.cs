@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Importing;
+using TypingRealm.Library.Sentences;
 using TypingRealm.Testing;
 using TypingRealm.TextProcessing;
 using Xunit;
@@ -113,6 +114,8 @@ namespace TypingRealm.Library.Tests.Importing
                     index++;
                 }
             }
+
+            Assert.Equal(SentenceType.Normal, sentence.Type);
         }
 
         [Theory, AutoDomainData]
@@ -128,6 +131,8 @@ namespace TypingRealm.Library.Tests.Importing
             Assert.Equal("-$", sentence.Words.First().Value);
             Assert.Equal("...", sentence.Words.ToList()[3].Value);
             Assert.Equal(" .| ..|..|...|..|.. |. ", string.Join("|", sentence.Words.ToList()[3].KeyPairs.Select(kp => kp.Value)));
+
+            Assert.Equal(SentenceType.Other, sentence.Type);
         }
 
         [Theory, AutoDomainData]
@@ -145,6 +150,7 @@ namespace TypingRealm.Library.Tests.Importing
             var keyPairs = word.KeyPairs.ToList();
 
             Assert.True(word.KeyPairs.Where(kp => kp.Value == "sa").All(kp => kp.CountInWord == 3));
+            Assert.Equal(SentenceType.Normal, sentence.Type);
         }
 
         [Theory, AutoDomainData]
@@ -154,14 +160,59 @@ namespace TypingRealm.Library.Tests.Importing
             Fixture.Register<ITextProcessor>(() => new TextProcessor());
             var e2eSut = Fixture.Create<SentenceFactory>();
 
-            var text = " sentence, one.  sentence two?..";
+            var text = " sentence, one.  sentence two?.. - \"Sentence three?\"";
 
             var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
             var words = sentence.Words.ToList();
 
-            Assert.Equal("Sentence, one. Sentence two?..", sentence.Value);
+            Assert.Equal("Sentence, one. Sentence two?.. - \"Sentence three?\"", sentence.Value);
             Assert.Equal("Sentence,", words[0].Value);
-            Assert.Equal("two?..", words[^1].Value);
+            Assert.Equal("two?..", words[3].Value);
+            Assert.Equal("three?\"", words[^1].Value);
+            Assert.Equal(SentenceType.Normal, sentence.Type);
+        }
+
+        [Theory, AutoDomainData]
+        public void ShouldNotHaveDotAfterQuotes(
+            BookId bookId, int indexInBook)
+        {
+            Fixture.Register<ITextProcessor>(() => new TextProcessor());
+            var e2eSut = Fixture.Create<SentenceFactory>();
+
+            var text = " sentence, one?\"";
+
+            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+            var words = sentence.Words.ToList();
+
+            Assert.Equal("Sentence, one?\"", sentence.Value);
+            Assert.Equal(SentenceType.Normal, sentence.Type);
+        }
+
+        // TODO: Rewrite this test with more examples / inline data.
+        [Theory, AutoDomainData]
+        public void ShouldHaveSentenceWithOtherType_WhenMultiplePunctuationSignsInARow_ExceptQuotesDotQuestionExclamation(
+            BookId bookId, int indexInBook)
+        {
+            Fixture.Register<ITextProcessor>(() => new TextProcessor());
+            var e2eSut = Fixture.Create<SentenceFactory>();
+
+            var sentence = e2eSut.CreateSentence(bookId, "Sentence ## one", indexInBook);
+            Assert.Equal(SentenceType.Other, sentence.Type);
+
+            sentence = e2eSut.CreateSentence(bookId, "Sentence!\"", indexInBook);
+            Assert.Equal(SentenceType.Normal, sentence.Type);
+
+            sentence = e2eSut.CreateSentence(bookId, "Sentence.\"", indexInBook);
+            Assert.Equal(SentenceType.Normal, sentence.Type);
+
+            sentence = e2eSut.CreateSentence(bookId, "Sentence\"?", indexInBook);
+            Assert.Equal(SentenceType.Normal, sentence.Type);
+
+            sentence = e2eSut.CreateSentence(bookId, "Sentence.?", indexInBook);
+            Assert.Equal(SentenceType.Other, sentence.Type);
+
+            sentence = e2eSut.CreateSentence(bookId, "Sentence.!", indexInBook);
+            Assert.Equal(SentenceType.Other, sentence.Type);
         }
 
         [Fact]

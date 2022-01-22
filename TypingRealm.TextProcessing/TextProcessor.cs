@@ -82,7 +82,8 @@ namespace TypingRealm.TextProcessing
 
             if (!normalizedText.EndsWith(".")
                 && !normalizedText.EndsWith("!")
-                && !normalizedText.EndsWith("?"))
+                && !normalizedText.EndsWith("?")
+                && !normalizedText.EndsWith("\""))
                 normalizedText = $"{normalizedText}.";
 
             return normalizedText;
