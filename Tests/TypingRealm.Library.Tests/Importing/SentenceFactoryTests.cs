@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using AutoFixture;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Importing;
+using TypingRealm.Testing;
 using TypingRealm.TextProcessing;
 using Xunit;
 
@@ -160,6 +162,16 @@ namespace TypingRealm.Library.Tests.Importing
             Assert.Equal("Sentence, one. Sentence two?..", sentence.Value);
             Assert.Equal("Sentence,", words[0].Value);
             Assert.Equal("two?..", words[^1].Value);
+        }
+
+        [Fact]
+        public void AddLibraryDomain_ShouldRegisterTransient()
+        {
+            var serviceProvider = new ServiceCollection()
+                .AddLibraryDomain()
+                .BuildServiceProvider();
+
+            serviceProvider.AssertRegisteredTransient<ISentenceFactory, SentenceFactory>();
         }
     }
 }

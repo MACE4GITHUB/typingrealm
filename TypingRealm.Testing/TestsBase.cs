@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Kernel;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Common;
 using TypingRealm.Messaging;
@@ -56,6 +57,14 @@ namespace TypingRealm.Testing
                 return result;
             }
         }
+
+        protected virtual IServiceCollection GetServiceCollection()
+        {
+            return new ServiceCollection()
+                .AddLogging();
+        }
+
+        protected virtual IServiceProvider GetServiceProvider() => GetServiceCollection().BuildServiceProvider();
 
         protected TestException NewTestException()
             => Fixture.Create<TestException>();

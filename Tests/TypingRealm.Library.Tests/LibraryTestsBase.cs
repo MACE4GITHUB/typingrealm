@@ -2,6 +2,7 @@
 using AutoFixture;
 using AutoFixture.Dsl;
 using AutoFixture.Xunit2;
+using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Library.Books;
 using TypingRealm.Testing;
 
@@ -11,6 +12,12 @@ public abstract class LibraryTestsBase : TestsBase
 {
     protected LibraryTestsBase() : base(AutoDomainDataAttribute.CreateFixture())
     {
+    }
+
+    protected override IServiceCollection GetServiceCollection()
+    {
+        return base.GetServiceCollection()
+            .AddInMemoryInfrastructure();
     }
 }
 

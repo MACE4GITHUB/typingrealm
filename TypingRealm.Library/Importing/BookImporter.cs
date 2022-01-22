@@ -21,7 +21,7 @@ public sealed class BookImporter : IBookImporter
     private readonly ISentenceRepository _sentenceRepository;
     private readonly ITextProcessor _textProcessor;
     private readonly ILanguageProvider _languageProvider;
-    private readonly ISentenceFactory _sentenceFactory;
+    private readonly IBookContentProcessor _bookContentProcessor;
     private readonly ILogger<BookImporter> _logger;
 
     public BookImporter(
@@ -29,14 +29,14 @@ public sealed class BookImporter : IBookImporter
         ISentenceRepository sentenceRepository,
         ITextProcessor textProcessor,
         ILanguageProvider languageProvider,
-        ISentenceFactory sentenceGenerator,
+        IBookContentProcessor bookContentProcessor,
         ILogger<BookImporter> logger)
     {
         _bookStore = bookStore;
         _sentenceRepository = sentenceRepository;
         _textProcessor = textProcessor;
         _languageProvider = languageProvider;
-        _sentenceFactory = sentenceGenerator;
+        _bookContentProcessor = bookContentProcessor;
         _logger = logger;
     }
 
@@ -89,18 +89,18 @@ public sealed class BookImporter : IBookImporter
     private async ValueTask<BookImportResult> ImportBookAsync(Book book, BookContent bookContent)
     {
         using var reader = new StreamReader(bookContent.Content);
-        var text = await reader.ReadToEndAsync()
+        var content = await reader.ReadToEndAsync()
             .ConfigureAwait(false);
 
         var languageInfo = await _languageProvider.FindLanguageInformationAsync(book.Language)
             .ConfigureAwait(false);
 
-        var tooShortSentences = _textProcessor.GetSentencesEnumerable(text, languageInfo)
+        var tooShortSentences = _textProcessor.GetSentencesEnumerable(content, languageInfo)
             .Where(sentence => sentence.Length < MinSentenceLengthCharacters)
             .Distinct()
             .ToList();
 
-        var notAllowedSentences = _textProcessor.GetSentencesEnumerable(text)
+        var notAllowedSentences = _textProcessor.GetSentencesEnumerable(content)
             .Where(sentence => !languageInfo.IsAllLettersAllowed(sentence))
             .Distinct()
             .ToList();
@@ -110,9 +110,8 @@ public sealed class BookImporter : IBookImporter
             .Distinct()
             .ToList();
 
-        var sentencesEnumerable = _textProcessor.GetSentencesEnumerable(text, languageInfo)
-            .Where(sentence => sentence.Length >= MinSentenceLengthCharacters)
-            .Select((sentence, sentenceIndex) => _sentenceFactory.CreateSentence(book.BookId, sentence, sentenceIndex));
+        var sentencesEnumerable = _bookContentProcessor.ProcessBookContent(
+            book.BookId, content, languageInfo);
 
         await _sentenceRepository.SaveByBatchesAsync(sentencesEnumerable)
             .ConfigureAwait(false);

@@ -14,6 +14,7 @@ public static class RegistrationExtensions
         services.AddTextProcessing();
 
         return services
+            .AddTransient<IBookContentProcessor, BookContentProcessor>()
             .AddTransient<ISentenceFactory, SentenceFactory>()
             .AddTransient<IBookImporter, BookImporter>()
             .AddTransient<ArchiveBookService>();

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Importing;
 using TypingRealm.Library.Sentences;
+using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Library.Tests.Importing
@@ -13,12 +15,14 @@ namespace TypingRealm.Library.Tests.Importing
     {
         private readonly Mock<IBookRepository> _bookRepository;
         private readonly Mock<ISentenceRepository> _sentenceRepository;
+        private readonly Mock<IBookContentProcessor> _bookContentProcessor;
         private readonly BookImporter _sut;
 
         public BookImporterTests()
         {
             _bookRepository = Freeze<IBookRepository>();
             _sentenceRepository = Freeze<ISentenceRepository>();
+            _bookContentProcessor = Freeze<IBookContentProcessor>();
             _sut = Create<BookImporter>();
         }
 
@@ -113,6 +117,16 @@ namespace TypingRealm.Library.Tests.Importing
                 async () => await _sut.ImportBookAsync(bookId));
 
             Assert.Empty(updates);
+        }
+
+        [Fact]
+        public void AddLibraryDomain_ShouldRegisterTransient()
+        {
+            var serviceProvider = GetServiceCollection()
+                .AddLibraryDomain()
+                .BuildServiceProvider();
+
+            serviceProvider.AssertRegisteredTransient<IBookImporter, BookImporter>();
         }
     }
 }
