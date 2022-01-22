@@ -53,7 +53,7 @@ public sealed class SentenceFactory : ISentenceFactory
             wordsList.Add(new Word(
                 sentenceId, index,
                 word, rawWord,
-                wordsInSentence[word].Count, rawWordsInSentence[rawWord].Count,
+                wordsInSentence[word].Count, rawWord == string.Empty ? 0 : rawWordsInSentence[rawWord].Count,
                 keyPairs));
             index++;
         }
