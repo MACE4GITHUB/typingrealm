@@ -112,5 +112,20 @@ namespace TypingRealm.Library.Tests.Importing
                 }
             }
         }
+
+        [Theory, AutoDomainData]
+        public void ShouldCreateSentence_WithWeirdFormat_EndToEnd(BookId bookId, int indexInBook)
+        {
+            Fixture.Register<ITextProcessor>(() => new TextProcessor());
+            var e2eSut = Fixture.Create<SentenceFactory>();
+
+            var text = "  -$ Simple sentence ... . soME other sentence. # , . ! ? another; sentence-  ";
+            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+
+            Assert.Equal("-$ Simple sentence ... SoME other sentence. # ,. Another; sentence-.", sentence.Value);
+            Assert.Equal("-$", sentence.Words.First().Value);
+            Assert.Equal("...", sentence.Words.ToList()[3].Value);
+            Assert.Equal(" .| ..|..|...|..|.. |. ", string.Join("|", sentence.Words.ToList()[3].KeyPairs.Select(kp => kp.Value)));
+        }
     }
 }

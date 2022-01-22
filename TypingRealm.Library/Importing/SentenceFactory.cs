@@ -23,6 +23,8 @@ public sealed class SentenceFactory : ISentenceFactory
 
     public Sentence CreateSentence(BookId bookId, string validatedSentence, int indexInBook)
     {
+        validatedSentence = string.Join(" ", _textProcessor.GetWordsEnumerable(validatedSentence));
+
         var sentenceId = SentenceId.New();
         var words = _textProcessor.GetWordsEnumerable(validatedSentence).ToArray();
         var wordsList = new List<Word>(words.Length);

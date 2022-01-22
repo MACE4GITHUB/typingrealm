@@ -314,6 +314,23 @@ public class TextProcessorTests : TextProcessingTestsBase
     }
 
     [Fact]
+    public void GetWords_ShouldGetSymbolsAsWords_AndRemoveSpaceBeforeDotQuestionExclamation()
+    {
+        var text = " -some #~ # . ! symbols -# aha   ? .";
+
+        var words = _sut.GetWordsEnumerable(text)
+            .ToList();
+
+        Assert.Equal("-Some", words[0]);
+        Assert.Equal("#~", words[1]);
+        Assert.Equal("#.", words[2]);
+        Assert.Equal("Symbols", words[3]);
+        Assert.Equal("-#", words[4]);
+        Assert.Equal("aha?", words[5]);
+        Assert.Equal(6, words.Count);
+    }
+
+    [Fact]
     public void AddTextProcessing_ShouldRegisterAsSingleton()
     {
         var serviceProvider = new ServiceCollection()
