@@ -9,7 +9,7 @@ namespace TypingRealm.Library.Importing;
 
 public interface ISentenceFactory
 {
-    Sentence CreateSentence(BookId bookId, string sentence, int indexInBook);
+    Sentence CreateSentence(BookId bookId, string validatedSentence, int indexInBook);
 }
 
 public sealed class SentenceFactory : ISentenceFactory
@@ -21,10 +21,10 @@ public sealed class SentenceFactory : ISentenceFactory
         _textProcessor = textProcessor;
     }
 
-    public Sentence CreateSentence(BookId bookId, string sentence, int indexInBook)
+    public Sentence CreateSentence(BookId bookId, string validatedSentence, int indexInBook)
     {
         var sentenceId = SentenceId.New();
-        var words = _textProcessor.GetWordsEnumerable(sentence).ToArray();
+        var words = _textProcessor.GetWordsEnumerable(validatedSentence).ToArray();
         var wordsList = new List<Word>(words.Length);
 
         var wordsInSentence = words
@@ -47,7 +47,7 @@ public sealed class SentenceFactory : ISentenceFactory
         var index = 0;
         foreach (var word in words)
         {
-            var keyPairs = CreateKeyPairs(sentence, word);
+            var keyPairs = CreateKeyPairs(validatedSentence, word);
 
             var rawWord = _textProcessor.NormalizeWord(word);
             wordsList.Add(new Word(
@@ -58,7 +58,7 @@ public sealed class SentenceFactory : ISentenceFactory
             index++;
         }
 
-        return new Sentence(bookId, sentenceId, indexInBook, sentence, wordsList);
+        return new Sentence(bookId, sentenceId, indexInBook, validatedSentence, wordsList);
     }
 
     private static IList<KeyPair> CreateKeyPairs(string sentence, string word)
