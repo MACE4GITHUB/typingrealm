@@ -38,6 +38,19 @@ namespace TypingRealm.TextProcessing
         {
             return textProcessor.GetWordsEnumerable(text)
                 .Select(word => textProcessor.NormalizeWord(word))
+                .Where(word => word.Length > 0)
+                .Distinct();
+        }
+
+        public static IEnumerable<string> GetNormalizedWordsEnumerable(
+            this ITextProcessor textProcessor,
+            string text,
+            LanguageInformation languageInformation)
+        {
+            return textProcessor.GetWordsEnumerable(text)
+                .Select(word => textProcessor.NormalizeWord(word))
+                .Where(word => languageInformation.IsAllLettersAllowed(word))
+                .Where(word => word.Length > 0)
                 .Distinct();
         }
     }

@@ -44,4 +44,53 @@ public class TextProcessorExtensionsTests : TextProcessingTestsBase
         Assert.Equal("Bcde.", sentences[1]);
         Assert.Equal(2, sentences.Count);
     }
+
+    [Fact]
+    public void GetWords_ShouldGetOnlyWordsWithAllowedCharacters_NonUnique()
+    {
+        var text = " abc. ab abc abcd! abc end. abc end.";
+
+        var languageInfo = Create<LanguageInformation>(
+            new LanguageInformationBuilder("Aabc"));
+
+        var words = _sut.GetWordsEnumerable(text, languageInfo)
+            .ToList();
+
+        Assert.Equal("Ab", words[0]);
+        Assert.Equal("abc", words[1]);
+        Assert.Equal("Abc", words[2]);
+        Assert.Equal("Abc", words[3]);
+        Assert.Equal(4, words.Count);
+    }
+
+    [Fact]
+    public void GetNormalizedWords_ShohuldGetNormalizedWords_Unique()
+    {
+        var text = " abC. Ab aBc ABCD! abc end. abc end. #,.";
+
+        var words = _sut.GetNormalizedWordsEnumerable(text)
+            .ToList();
+
+        Assert.Equal("abc", words[0]);
+        Assert.Equal("ab", words[1]);
+        Assert.Equal("abcd", words[2]);
+        Assert.Equal("end", words[3]);
+        Assert.Equal(4, words.Count);
+    }
+
+    [Fact]
+    public void GetNormalizedWords_ShouldGetNormalizedWords_Unique_AndWithinAllowedCharactersRange()
+    {
+        var text = " abC. Ab aBc ABCD! abc end. abc end. #,.";
+
+        var languageInfo = Create<LanguageInformation>(
+            new LanguageInformationBuilder("Aabc.!#, "));
+
+        var words = _sut.GetNormalizedWordsEnumerable(text, languageInfo)
+            .ToList();
+
+        Assert.Equal("abc", words[0]);
+        Assert.Equal("ab", words[1]);
+        Assert.Equal(2, words.Count);
+    }
 }
