@@ -127,5 +127,22 @@ namespace TypingRealm.Library.Tests.Importing
             Assert.Equal("...", sentence.Words.ToList()[3].Value);
             Assert.Equal(" .| ..|..|...|..|.. |. ", string.Join("|", sentence.Words.ToList()[3].KeyPairs.Select(kp => kp.Value)));
         }
+
+        [Theory, AutoDomainData]
+        public void ShouldCountKeyPairsInWord_EndToEnd(BookId bookId, int indexInBook)
+        {
+            Fixture.Register<ITextProcessor>(() => new TextProcessor());
+            var e2eSut = Fixture.Create<SentenceFactory>();
+
+            var text = "sasasasa, sentence...";
+            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+
+            var word = sentence.Words.First();
+            Assert.Equal("Sasasasa,", word.Value);
+
+            var keyPairs = word.KeyPairs.ToList();
+
+            Assert.True(word.KeyPairs.Where(kp => kp.Value == "sa").All(kp => kp.CountInWord == 3));
+        }
     }
 }
