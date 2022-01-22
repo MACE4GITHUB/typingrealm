@@ -144,5 +144,22 @@ namespace TypingRealm.Library.Tests.Importing
 
             Assert.True(word.KeyPairs.Where(kp => kp.Value == "sa").All(kp => kp.CountInWord == 3));
         }
+
+        [Theory, AutoDomainData]
+        public void ShouldCreateSentence_WhenMultipleSentences_EndToEnd(
+            BookId bookId, int indexInBook)
+        {
+            Fixture.Register<ITextProcessor>(() => new TextProcessor());
+            var e2eSut = Fixture.Create<SentenceFactory>();
+
+            var text = " sentence, one.  sentence two?..";
+
+            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+            var words = sentence.Words.ToList();
+
+            Assert.Equal("Sentence, one. Sentence two?..", sentence.Value);
+            Assert.Equal("Sentence,", words[0].Value);
+            Assert.Equal("two?..", words[^1].Value);
+        }
     }
 }
