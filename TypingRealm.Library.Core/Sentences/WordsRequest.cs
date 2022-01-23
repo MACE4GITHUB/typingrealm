@@ -13,6 +13,9 @@ public sealed class WordsRequest
 
     public bool IsValid()
     {
+        if (Contains == null)
+            return false;
+
         if (Type == WordsRequestType.Random)
         {
             if (Contains.Any())

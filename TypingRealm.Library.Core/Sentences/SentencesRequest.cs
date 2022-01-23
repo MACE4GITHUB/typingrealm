@@ -20,6 +20,9 @@ public sealed class SentencesRequest
 
     public bool IsValid()
     {
+        if (Contains == null)
+            return false;
+
         if (Type == SentencesRequestType.Random)
         {
             if (Contains.Any())
