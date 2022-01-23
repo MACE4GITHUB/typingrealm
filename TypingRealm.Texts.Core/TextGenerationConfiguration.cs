@@ -5,6 +5,16 @@ using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Texts;
 
+public sealed record TextGenerationConfigurationDto(string Language, IEnumerable<string>? Contains = null)
+{
+    public static TextGenerationConfigurationDto ToDto(TextGenerationConfiguration configuration)
+    {
+        return new TextGenerationConfigurationDto(
+            configuration.Language,
+            configuration.ShouldContain);
+    }
+}
+
 public sealed record TextGenerationConfiguration
 {
     private const int StandardMinimumLength = 300;

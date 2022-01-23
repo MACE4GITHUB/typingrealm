@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 
@@ -30,5 +29,3 @@ public sealed class TextsController : TyrController
                 shouldContain: configuration.Contains));
     }
 }
-
-public sealed record TextGenerationConfigurationDto(string Language, IEnumerable<string>? Contains = null);

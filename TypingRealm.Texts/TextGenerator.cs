@@ -43,8 +43,11 @@ public sealed class TextGenerator : ITextGenerator
 
         while (builder.Length < Math.Min(requiredLength, MaxAllowedTextLength))
         {
-            var text = await textRetriever.RetrieveTextAsync()
+            var text = await textRetriever.RetrieveTextAsync(shouldContain)
                 .ConfigureAwait(false);
+
+            if (string.IsNullOrWhiteSpace(text))
+                throw new InvalidOperationException("Text retriever returned empty value.");
 
             var textPartsEnumerable = configuration.TextStructure switch
             {

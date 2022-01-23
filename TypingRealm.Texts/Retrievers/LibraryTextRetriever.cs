@@ -21,8 +21,12 @@ public sealed class LibraryTextRetriever : ITextRetriever
     public async ValueTask<string> RetrieveTextAsync(IEnumerable<string>? contains = null)
     {
         var request = SentencesRequest.Random(100, 2);
-        if (contains != null)
+        if (contains != null && contains.Any())
+        {
             request.Contains = contains;
+            request.Type = SentencesRequestType.ContainingKeyPairs;
+            request.ConsecutiveCount = 1;
+        }
 
         var sentences = await _client.GetSentencesAsync(request, Language)
             .ConfigureAwait(false);

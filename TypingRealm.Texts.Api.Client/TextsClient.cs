@@ -28,11 +28,11 @@ public sealed class TextsClient : ITextsClient
         EndpointAuthentication authentication,
         CancellationToken cancellationToken)
     {
-        return _serviceClient.PostAsync<TextGenerationConfiguration, GeneratedText>(
+        return _serviceClient.PostAsync<TextGenerationConfigurationDto, GeneratedText>(
             ServiceName,
             $"{RoutePrefix}/generate",
             authentication,
-            configuration,
+            TextGenerationConfigurationDto.ToDto(configuration),
             cancellationToken);
     }
 }
