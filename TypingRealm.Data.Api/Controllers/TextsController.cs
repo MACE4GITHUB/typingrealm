@@ -102,6 +102,9 @@ namespace TypingRealm.Data.Api.Controllers
                     .Take(maxShouldContainSlow));
             }
 
+            // Temporarily disable self-improvement mode until I figure out & refactor all this shitty code.
+            shouldContain.Clear();
+
             //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
             var config = Texts.TextGenerationConfiguration.SelfImprovement(
                 new(language), textStructure: textStructure, shouldContain: shouldContain);
