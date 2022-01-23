@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using TypingRealm.Library.Api.Client;
+using TypingRealm.Library.Sentences;
 using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Texts;
@@ -16,119 +19,97 @@ public sealed class TextGenerator : ITextGenerator
 {
     private const int MaxAllowedTextLength = 1000;
 
-    private readonly TextRetrieverResolver _textRetrieverResolver;
-    private readonly ITextProcessor _textProcessor;
+    private readonly ISentencesClient _libraryClient;
 
-    public TextGenerator(
-        TextRetrieverResolver textRetrieverResolver,
-        ITextProcessor textProcessor)
+    public TextGenerator(ISentencesClient libraryClient)
     {
-        _textRetrieverResolver = textRetrieverResolver;
-        _textProcessor = textProcessor;
+        _libraryClient = libraryClient;
     }
 
     public async ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration)
     {
-        var requiredLength = configuration.MinimumLength;
-        var shouldContain = configuration.IsLowerCase
-            ? configuration.ShouldContain.Select(part => part.ToLowerInvariant())
-            : configuration.ShouldContain;
+        var count = 1000;
+        var customQuerySuccess = true;
 
-        var textRetriever = _textRetrieverResolver(configuration.Language);
+        IEnumerable<string> data;
+        if (configuration.TextStructure == TextStructure.Words)
+        {
+            var wordsRequest = configuration.ShouldContain.Any()
+                ? WordsRequest.ContainingKeyPairs(configuration.ShouldContain, count)
+                : WordsRequest.Random(count);
 
+            data = (await _libraryClient.GetWordsAsync(wordsRequest, configuration.Language)
+                .ConfigureAwait(false))
+                .Where(x => !string.IsNullOrWhiteSpace(x.Trim()));
+        }
+        else
+        {
+            var sentencesRequest = configuration.ShouldContain.Any()
+                ? SentencesRequest.ContainingKeyPairs(configuration.ShouldContain, count)
+                : SentencesRequest.Random(count);
+
+            data = (await _libraryClient.GetSentencesAsync(sentencesRequest, configuration.Language)
+                .ConfigureAwait(false))
+                .Select(dto => dto.Value)
+                .Where(x => !string.IsNullOrWhiteSpace(x.Trim()));
+        }
+
+        if (!data.Any())
+        {
+            // If no specific data found - find any random sentences.
+            customQuerySuccess = false;
+
+            var request = SentencesRequest.Random(count);
+
+            data = (await _libraryClient.GetSentencesAsync(request, configuration.Language)
+                .ConfigureAwait(false))
+                .Select(dto => dto.Value)
+                .Where(x => !string.IsNullOrWhiteSpace(x.Trim()));
+        }
+
+        if (!data.Any())
+            throw new InvalidOperationException("There's no text data in Library service.");
+
+        var dataList = data.ToList();
         var builder = new StringBuilder();
 
-        var maxTries = 200; // Avoid endless loop because of missing shouldContain chunks.
-        var tries = 0;
-
-        while (builder.Length < Math.Min(requiredLength, MaxAllowedTextLength))
+        var mustLength = Math.Min(configuration.MinimumLength, MaxAllowedTextLength);
+        while (builder.Length < mustLength)
         {
-            var text = await textRetriever.RetrieveTextAsync(shouldContain)
-                .ConfigureAwait(false);
-
-            if (string.IsNullOrWhiteSpace(text))
-                throw new InvalidOperationException("Text retriever returned empty value.");
-
-            var textPartsEnumerable = configuration.TextStructure switch
-            {
-                TextStructure.Text => _textProcessor.GetSentencesEnumerable(text),
-                TextStructure.Words => _textProcessor.GetWordsEnumerable(text),
-                _ => throw new InvalidOperationException("Unknown text structure.")
-            };
+            // TODO: Use StringBuilder for transformations.
+            var randomTextPart = dataList[RandomNumberGenerator.GetInt32(0, dataList.Count)];
 
             if (configuration.IsLowerCase)
-                textPartsEnumerable = textPartsEnumerable.Select(part => part.ToLowerInvariant());
+                randomTextPart = randomTextPart.ToLowerInvariant();
 
             if (configuration.StripPunctuation)
-                textPartsEnumerable = textPartsEnumerable.Select(part =>
+            {
+                foreach (var character in TextConstants.PunctuationCharacters)
                 {
-                    foreach (var character in TextConstants.PunctuationCharacters)
-                    {
-                        part = part.Replace(character.ToString(), "");
-                    }
-
-                    return part;
-                });
+                    randomTextPart = randomTextPart.Replace(character.ToString(), "");
+                }
+            }
 
             if (configuration.StripNumbers)
-                textPartsEnumerable = textPartsEnumerable.Select(part =>
-                {
-                    foreach (var character in TextConstants.NumberCharacters)
-                    {
-                        part = part.Replace(character.ToString(), "");
-                    }
-
-                    return part;
-                });
-
-            foreach (var textPart in textPartsEnumerable)
             {
-                if (!IsAllowed(textPart, shouldContain) && tries < maxTries)
+                foreach (var character in TextConstants.NumberCharacters)
                 {
-                    tries++;
-                    continue;
+                    randomTextPart = randomTextPart.Replace(character.ToString(), "");
                 }
-
-                if (builder.Length == 0)
-                {
-                    builder.Append(textPart);
-                }
-                else
-                {
-                    builder.Append($" {textPart}");
-                }
-
-                if (builder.Length >= Math.Min(requiredLength, MaxAllowedTextLength))
-                    break;
             }
+
+            builder.Append($"{randomTextPart} ");
+
+            if (builder.Length >= mustLength)
+                break;
         }
 
-        if (configuration.CutLastSentence)
-        {
-            var mustLength = Math.Min(requiredLength, MaxAllowedTextLength);
+        if (configuration.CutLastSentence && builder.Length > mustLength)
+            builder.Remove(mustLength, builder.Length - mustLength);
 
-            if (builder.Length > mustLength)
-                builder.Remove(mustLength, builder.Length - mustLength);
-        }
+        if (builder[^1] == TextConstants.SpaceCharacter)
+            builder.Remove(builder.Length - 1, 1);
 
-        return new GeneratedText(builder.ToString());
-    }
-
-    private static bool IsAllowed(string word, IEnumerable<string> shouldContain)
-    {
-        if (!shouldContain.Any())
-            return true;
-
-        foreach (var piece in shouldContain)
-        {
-            if (word.Contains(piece))
-                return true;
-
-            if ((piece.First() == ' ' && word.StartsWith(piece[1..], StringComparison.Ordinal))
-                || (piece.Last() == ' ' && word.EndsWith(piece[0..^1], StringComparison.Ordinal)))
-                return true;
-        }
-
-        return false;
+        return new GeneratedText(builder.ToString(), customQuerySuccess);
     }
 }

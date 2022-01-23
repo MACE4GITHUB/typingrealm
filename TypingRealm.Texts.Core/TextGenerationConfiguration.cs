@@ -5,13 +5,14 @@ using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Texts;
 
-public sealed record TextGenerationConfigurationDto(string Language, IEnumerable<string>? Contains = null)
+public sealed record TextGenerationConfigurationDto(string Language, IEnumerable<string>? Contains = null, TextStructure TextStructure = TextStructure.Text)
 {
     public static TextGenerationConfigurationDto ToDto(TextGenerationConfiguration configuration)
     {
         return new TextGenerationConfigurationDto(
             configuration.Language,
-            configuration.ShouldContain);
+            configuration.ShouldContain,
+            configuration.TextStructure);
     }
 }
 

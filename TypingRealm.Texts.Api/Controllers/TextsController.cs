@@ -21,11 +21,13 @@ public sealed class TextsController : TyrController
         if (configuration.Contains == null)
             return await _textGenerator.GenerateTextAsync(
                 TextGenerationConfiguration.Standard(
-                    new(configuration.Language)));
+                    new(configuration.Language),
+                    textStructure: configuration.TextStructure));
 
         return await _textGenerator.GenerateTextAsync(
             TextGenerationConfiguration.SelfImprovement(
                 new(configuration.Language),
-                shouldContain: configuration.Contains));
+                shouldContain: configuration.Contains,
+                textStructure: configuration.TextStructure));
     }
 }
