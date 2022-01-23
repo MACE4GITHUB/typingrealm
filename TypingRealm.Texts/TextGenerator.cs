@@ -103,6 +103,14 @@ public sealed class TextGenerator : ITextGenerator
             }
         }
 
+        if (configuration.CutLastSentence)
+        {
+            var mustLength = Math.Min(requiredLength, MaxAllowedTextLength);
+
+            if (builder.Length > mustLength)
+                builder.Remove(mustLength, builder.Length - mustLength);
+        }
+
         return new GeneratedText(builder.ToString());
     }
 

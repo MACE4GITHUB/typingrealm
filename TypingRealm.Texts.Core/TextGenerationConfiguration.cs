@@ -73,7 +73,7 @@ public sealed record TextGenerationConfiguration
     public static TextGenerationConfiguration Standard(
         Language language,
         TextStructure textStructure = TextStructure.Text,
-        bool cutLastSentence = false)
+        bool cutLastSentence = true)
     {
         ArgumentNullException.ThrowIfNull(language);
         if (textStructure == TextStructure.Unspecified)
@@ -91,7 +91,7 @@ public sealed record TextGenerationConfiguration
     public static TextGenerationConfiguration SelfImprovement(
         Language language,
         TextStructure textStructure = TextStructure.Text,
-        bool cutLastSentence = false,
+        bool cutLastSentence = true,
         IEnumerable<string>? shouldContain = null)
     {
         if (shouldContain == null)
@@ -114,7 +114,7 @@ public sealed record TextGenerationConfiguration
         Language language,
         TextStructure textStructure = TextStructure.Text,
         int minimumLength = StandardMinimumLength,
-        bool cutLastSentence = false,
+        bool cutLastSentence = true,
         bool isLowerCase = false, bool stripPunctuation = false, bool stripNumbers = false,
         IEnumerable<string>? shouldContain = null)
     {
