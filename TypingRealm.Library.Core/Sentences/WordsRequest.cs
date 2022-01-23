@@ -11,6 +11,21 @@ public sealed class WordsRequest
     public IEnumerable<string> Contains { get; set; } = Enumerable.Empty<string>();
     public bool RawWords { get; set; }
 
+    public static WordsRequest Random(int count) => Random(count, 1);
+    public static WordsRequest Random(int count, int consecutiveCount) => new WordsRequest
+    {
+        Type = WordsRequestType.Random,
+        MaxCount = count,
+        ConsecutiveCount = consecutiveCount
+    };
+
+    public static WordsRequest ContainingKeyPairs(IEnumerable<string> keyPairs, int count) => new WordsRequest
+    {
+        Type = WordsRequestType.ContainingKeyPairs,
+        MaxCount = count,
+        Contains = keyPairs
+    };
+
     public bool IsValid()
     {
         if (Contains == null)

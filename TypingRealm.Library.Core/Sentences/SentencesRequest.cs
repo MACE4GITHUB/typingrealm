@@ -18,6 +18,20 @@ public sealed class SentencesRequest
         ConsecutiveCount = consecutiveCount
     };
 
+    public static SentencesRequest ContainingKeyPairs(IEnumerable<string> keyPairs, int count) => new SentencesRequest
+    {
+        Type = SentencesRequestType.ContainingKeyPairs,
+        MaxCount = count,
+        Contains = keyPairs
+    };
+
+    public static SentencesRequest ContainingWords(IEnumerable<string> words, int count) => new SentencesRequest
+    {
+        Type = SentencesRequestType.ContainingWords,
+        MaxCount = count,
+        Contains = words
+    };
+
     public bool IsValid()
     {
         if (Contains == null)
