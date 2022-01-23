@@ -5,4 +5,8 @@
     <RootNamespace>TypingRealm.Texts</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.TextProcessing\TypingRealm.TextProcessing.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -31,7 +31,7 @@ public sealed class TextGenerator : ITextGenerator
     {
         Validate(configuration);
 
-        var requiredLength = configuration.Length;
+        var requiredLength = configuration.MinimumLength;
         var shouldContain = configuration.IsLowerCase
             ? configuration.ShouldContain.Select(part => part.ToLowerInvariant())
             : configuration.ShouldContain;
@@ -48,7 +48,7 @@ public sealed class TextGenerator : ITextGenerator
             var text = await textRetriever.RetrieveTextAsync()
                 .ConfigureAwait(false);
 
-            var textPartsEnumerable = configuration.Structure switch
+            var textPartsEnumerable = configuration.TextStructure switch
             {
                 TextStructure.Text => _textProcessor.GetSentencesEnumerable(text),
                 TextStructure.Words => _textProcessor.GetWordsEnumerable(text),
@@ -107,7 +107,7 @@ public sealed class TextGenerator : ITextGenerator
 
     private static void Validate(TextGenerationConfiguration configuration)
     {
-        if (configuration.Length < 0 || configuration.Length > MaxAllowedTextLength)
+        if (configuration.MinimumLength < 0 || configuration.MinimumLength > MaxAllowedTextLength)
             throw new ArgumentException($"Invalid configuration: length should be positive number below or equal to {MaxAllowedTextLength}.");
 
         if (!SupportedLanguages.Languages.Contains(configuration.Language))

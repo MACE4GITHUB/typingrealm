@@ -74,7 +74,7 @@ namespace TypingRealm.Data.Api.Controllers
         [Route("generate")]
         public async ValueTask<ActionResult<string>> GenerateTextValue(
             int length,
-            TextStructure textType = TextStructure.Text,
+            TextStructure textStructure = TextStructure.Text,
             string? language = "en",
             int maxShouldContainErrors = 10,
             int maxShouldContainSlow = 10)
@@ -103,7 +103,8 @@ namespace TypingRealm.Data.Api.Controllers
             }
 
             //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
-            var config = new Texts.TextGenerationConfiguration(language, length, textType, false, false, false, shouldContain);
+            var config = Texts.TextGenerationConfiguration.SelfImprovement(
+                new(language), textStructure: textStructure, shouldContain: shouldContain);
             var generatedText = await _textsClient.GenerateTextAsync(config, EndpointAuthentication.Service, default);
             var textValue = generatedText.Value;
 
@@ -111,7 +112,7 @@ namespace TypingRealm.Data.Api.Controllers
 
             var configuration = new TextConfiguration(
                 TextType.Generated,
-                new Typing.TextGenerationConfiguration(length, shouldContain, textType),
+                new Typing.TextGenerationConfiguration(length, shouldContain, textStructure),
                 language);
 
             var text = new Text(textId, textValue, ProfileId, DateTime.UtcNow, false, configuration);
