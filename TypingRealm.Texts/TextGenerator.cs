@@ -29,8 +29,6 @@ public sealed class TextGenerator : ITextGenerator
 
     public async ValueTask<GeneratedText> GenerateTextAsync(TextGenerationConfiguration configuration)
     {
-        Validate(configuration);
-
         var requiredLength = configuration.MinimumLength;
         var shouldContain = configuration.IsLowerCase
             ? configuration.ShouldContain.Select(part => part.ToLowerInvariant())
@@ -103,15 +101,6 @@ public sealed class TextGenerator : ITextGenerator
         }
 
         return new GeneratedText(builder.ToString(), configuration);
-    }
-
-    private static void Validate(TextGenerationConfiguration configuration)
-    {
-        if (configuration.MinimumLength < 0 || configuration.MinimumLength > MaxAllowedTextLength)
-            throw new ArgumentException($"Invalid configuration: length should be positive number below or equal to {MaxAllowedTextLength}.");
-
-        if (!SupportedLanguages.Languages.Contains(configuration.Language))
-            throw new ArgumentException($"Language {configuration.Language} is not supported.");
     }
 
     private static bool IsAllowed(string word, IEnumerable<string> shouldContain)

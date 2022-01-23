@@ -8,6 +8,7 @@ namespace TypingRealm.Texts;
 public sealed record TextGenerationConfiguration
 {
     private const int StandardMinimumLength = 300;
+    private const int MaxAllowedLength = 1000;
 
     private TextGenerationConfiguration(
         Language language,
@@ -114,7 +115,8 @@ public sealed record TextGenerationConfiguration
         if (textStructure == TextStructure.Unspecified)
             throw new ArgumentException($"{nameof(textStructure)} is not set", nameof(textStructure));
 
-        // TODO: Consider validating range of "minimumLength", but unify it between domains.
+        if (minimumLength > MaxAllowedLength)
+            throw new ArgumentException($"{nameof(minimumLength)} exceed maximum allowed length of {MaxAllowedLength} characters.");
 
         return new TextGenerationConfiguration(
             language,
