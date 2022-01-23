@@ -100,7 +100,7 @@ public sealed class TextGenerator : ITextGenerator
             }
         }
 
-        return new GeneratedText(builder.ToString(), configuration);
+        return new GeneratedText(builder.ToString());
     }
 
     private static bool IsAllowed(string word, IEnumerable<string> shouldContain)

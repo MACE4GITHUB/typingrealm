@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TypingRealm.Texts;
 
@@ -8,5 +9,5 @@ namespace TypingRealm.Texts;
 public interface ITextRetriever
 {
     string Language { get; }
-    ValueTask<string> RetrieveTextAsync();
+    ValueTask<string> RetrieveTextAsync(IEnumerable<string>? contains = null);
 }

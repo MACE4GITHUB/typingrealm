@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ public abstract class HttpTextRetriever : ITextRetriever
     public string Language { get; }
     protected abstract string AllowedLetters { get; }
 
-    public async ValueTask<string> RetrieveTextAsync()
+    public async ValueTask<string> RetrieveTextAsync(IEnumerable<string>? contains = null)
     {
         using var httpClient = _httpClientFactory.CreateClient();
 
@@ -44,6 +45,10 @@ public abstract class HttpTextRetriever : ITextRetriever
             var text = ResponseHandler(content);
 
             if (string.IsNullOrWhiteSpace(text) || !text.All(character => AllowedLetters.Contains(character)))
+                continue;
+
+            // TODO: Validate every sentence separately and remove all sentences that don't have the requested part.
+            if (contains != null && !contains.Any(part => $" {text} ".Contains(part)))
                 continue;
 
             return text;

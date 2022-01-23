@@ -35,7 +35,7 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
 
     public string Language => _textRetriever.Language;
 
-    public async ValueTask<string> RetrieveTextAsync()
+    public async ValueTask<string> RetrieveTextAsync(IEnumerable<string>? contains = null)
     {
         ThrowIfDisposed();
 
@@ -62,10 +62,23 @@ public sealed class CachedTextRetriever : AsyncManagedDisposable, ITextRetriever
             }
 
             if (count < MinCacheSize)
-                return await _textRetriever.RetrieveTextAsync().ConfigureAwait(false);
+                return await _textRetriever.RetrieveTextAsync(contains).ConfigureAwait(false);
         }
 
         var cachedText = await _textCache.GetRandomTextAsync().ConfigureAwait(false);
+
+        if (contains != null)
+        {
+            // TODO: Validate every sentence separately and remove all sentences that don't have the needed part.
+
+            if (cachedText != null && contains.Any(part => $" {cachedText.Value} ".Contains(part)))
+                return cachedText.Value;
+
+            var nonCachedText = await _textRetriever.RetrieveTextAsync(contains)
+                .ConfigureAwait(false);
+
+            return nonCachedText;
+        }
 
         return cachedText == null
             ? await _textRetriever.RetrieveTextAsync().ConfigureAwait(false)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TypingRealm.Library.Api.Client;
 using TypingRealm.Library.Sentences;
@@ -17,10 +18,13 @@ public sealed class LibraryTextRetriever : ITextRetriever
 
     public string Language { get; }
 
-    public async ValueTask<string> RetrieveTextAsync()
+    public async ValueTask<string> RetrieveTextAsync(IEnumerable<string>? contains = null)
     {
-        var sentences = await _client.GetSentencesAsync(
-            SentencesRequest.Random(100, 2), Language)
+        var request = SentencesRequest.Random(100, 2);
+        if (contains != null)
+            request.Contains = contains;
+
+        var sentences = await _client.GetSentencesAsync(request, Language)
             .ConfigureAwait(false);
 
         return string.Join(" ", sentences.Select(s => s.Value));

@@ -17,7 +17,7 @@ public sealed class OfflineTextRetriever : ITextRetriever
 
     public string Language { get; }
 
-    public ValueTask<string> RetrieveTextAsync()
+    public ValueTask<string> RetrieveTextAsync(IEnumerable<string>? contains = null)
     {
         var index = RandomNumberGenerator.GetInt32(0, _texts.Count);
 
