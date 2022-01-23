@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 
@@ -16,8 +17,18 @@ public sealed class TextsController : TyrController
 
     [HttpPost]
     [Route("generate")]
-    public async ValueTask<ActionResult<GeneratedText>> GenerateText(TextGenerationConfiguration configuration)
+    public async ValueTask<ActionResult<GeneratedText>> GenerateText(TextGenerationConfigurationDto configuration)
     {
-        return await _textGenerator.GenerateTextAsync(configuration);
+        if (configuration.Contains == null)
+            return await _textGenerator.GenerateTextAsync(
+                TextGenerationConfiguration.Standard(
+                    new(configuration.Language)));
+
+        return await _textGenerator.GenerateTextAsync(
+            TextGenerationConfiguration.SelfImprovement(
+                new(configuration.Language),
+                shouldContain: configuration.Contains));
     }
 }
+
+public sealed record TextGenerationConfigurationDto(string Language, IEnumerable<string>? Contains = null);
