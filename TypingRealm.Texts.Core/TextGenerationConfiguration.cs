@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.TextProcessing;
 
@@ -63,6 +64,10 @@ public sealed record TextGenerationConfiguration
         TextStructure textStructure = TextStructure.Text,
         bool cutLastSentence = false)
     {
+        ArgumentNullException.ThrowIfNull(language);
+        if (textStructure == TextStructure.Unspecified)
+            throw new ArgumentException($"{nameof(textStructure)} is not set", nameof(textStructure));
+
         return new TextGenerationConfiguration(
             language,
             StandardMinimumLength,
@@ -80,6 +85,10 @@ public sealed record TextGenerationConfiguration
     {
         if (shouldContain == null)
             shouldContain = Enumerable.Empty<string>();
+
+        ArgumentNullException.ThrowIfNull(language);
+        if (textStructure == TextStructure.Unspecified)
+            throw new ArgumentException($"{nameof(textStructure)} is not set", nameof(textStructure));
 
         return new TextGenerationConfiguration(
             language,
@@ -100,6 +109,12 @@ public sealed record TextGenerationConfiguration
     {
         if (shouldContain == null)
             shouldContain = Enumerable.Empty<string>();
+
+        ArgumentNullException.ThrowIfNull(language);
+        if (textStructure == TextStructure.Unspecified)
+            throw new ArgumentException($"{nameof(textStructure)} is not set", nameof(textStructure));
+
+        // TODO: Consider validating range of "minimumLength", but unify it between domains.
 
         return new TextGenerationConfiguration(
             language,
