@@ -47,12 +47,16 @@ namespace TypingRealm.Typing
                 var rightKeyPair = rightDict[$"{keyPair.FromKey}->{keyPair.ToKey}"];
 
                 // TODO: Fix division by zero here ASAP.
+                var successfullyTyped = keyPair.SuccessfullyTyped + rightKeyPair.SuccessfullyTyped;
+                if (successfullyTyped == 0)
+                    successfullyTyped = 1; // Avoid division by zero.
+
                 yield return new KeyPairAggregatedData(
                     keyPair.FromKey, keyPair.ToKey,
                     // TODO: Recheck math here.
-                    ((keyPair.AverageDelay * keyPair.SuccessfullyTyped) + (rightKeyPair.AverageDelay * rightKeyPair.SuccessfullyTyped)) / (keyPair.SuccessfullyTyped + rightKeyPair.SuccessfullyTyped),
-                    ((keyPair.MinDelay * keyPair.SuccessfullyTyped) + (rightKeyPair.MinDelay * rightKeyPair.SuccessfullyTyped)) / (keyPair.SuccessfullyTyped + rightKeyPair.SuccessfullyTyped),
-                    ((keyPair.MaxDelay * keyPair.SuccessfullyTyped) + (rightKeyPair.MaxDelay * rightKeyPair.SuccessfullyTyped)) / (keyPair.SuccessfullyTyped + rightKeyPair.SuccessfullyTyped),
+                    ((keyPair.AverageDelay * keyPair.SuccessfullyTyped) + (rightKeyPair.AverageDelay * rightKeyPair.SuccessfullyTyped)) / successfullyTyped,
+                    ((keyPair.MinDelay * keyPair.SuccessfullyTyped) + (rightKeyPair.MinDelay * rightKeyPair.SuccessfullyTyped)) / successfullyTyped,
+                    ((keyPair.MaxDelay * keyPair.SuccessfullyTyped) + (rightKeyPair.MaxDelay * rightKeyPair.SuccessfullyTyped)) / successfullyTyped,
                     keyPair.SuccessfullyTyped + rightKeyPair.SuccessfullyTyped,
                     keyPair.MadeMistakes + rightKeyPair.MadeMistakes);
             }
