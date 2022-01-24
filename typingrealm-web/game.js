@@ -51,7 +51,7 @@ async function main() {
     const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
 
     let length = url.searchParams.get('length');
-    let textType = url.searchParams.get('textType');
+    let textType = url.searchParams.get('textStructure');
     if (textType != 'words' && textType != 'text') {
         textType = 'text';
     }
@@ -103,7 +103,7 @@ async function main() {
     const simulationSpeedMultiplierElement = document.getElementById('simulationSpeedMultiplier');
     const hintElement = document.getElementById('hint');
     const reportElement = document.getElementById('report');
-    const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&structure=${textType}&language=${language}&maxShouldContainErrors=${maxShouldContainErrors}&maxShouldContainSlow=${maxShouldContainSlow}`;
+    const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textStructure=${textType}&language=${language}&maxShouldContainErrors=${maxShouldContainErrors}&maxShouldContainSlow=${maxShouldContainSlow}`;
     const authTokenRequestUrl = `${PROFILES_URL}/api/local-auth/profile-token?sub=${profile}`;
     const dataSubmitUrl = `${DATA_URL}/api/usersessions/result`;
     const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable?language=${language}`;
