@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TypingRealm.Texts;
 using TypingRealm.Typing.Framework;
 
 namespace TypingRealm.Typing
@@ -8,7 +7,42 @@ namespace TypingRealm.Typing
     public sealed record TextGenerationConfiguration(
         int Length,
         IEnumerable<string> ShouldContain,
-        TextStructure GenerationTextType);
+        TextGenerationType TextGenerationType);
+
+    public enum TextGenerationType
+    {
+        Unspecified = 0,
+
+        GeneratedStardardText = 1,
+        GeneratedStandardWords = 2,
+        GeneratedSelfImprovementText = 3,
+        GeneratedSelfImprovementWords = 4,
+        Custom = 5
+    }
+
+    public static class TextGenerationConfigurationExtensions
+    {
+        public static TextGenerationType GetTextGenerationType(this Texts.TextGenerationConfiguration config)
+        {
+            if (config.StatisticsType == Texts.StatisticsType.Standard)
+            {
+                if (config.TextStructure == Texts.TextStructure.Text)
+                {
+                    if (config.IsSelfImprovement)
+                        return TextGenerationType.GeneratedSelfImprovementText;
+
+                    return TextGenerationType.GeneratedStardardText;
+                }
+
+                if (config.IsSelfImprovement)
+                    return TextGenerationType.GeneratedSelfImprovementWords;
+
+                return TextGenerationType.GeneratedStandardWords;
+            }
+
+            return TextGenerationType.Custom;
+        }
+    }
 
     public enum TextType
     {

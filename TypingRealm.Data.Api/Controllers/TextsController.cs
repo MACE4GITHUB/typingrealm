@@ -112,7 +112,7 @@ namespace TypingRealm.Data.Api.Controllers
 
             var configuration = new TextConfiguration(
                 TextType.Generated,
-                new Typing.TextGenerationConfiguration(length, shouldContain, textStructure),
+                new Typing.TextGenerationConfiguration(length, shouldContain, config.GetTextGenerationType()),
                 language);
 
             var text = new Text(textId, textValue, ProfileId, DateTime.UtcNow, false, configuration);

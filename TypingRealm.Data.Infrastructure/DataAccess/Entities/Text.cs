@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using TypingRealm.Texts;
 using TypingRealm.Typing;
 
 namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
@@ -27,7 +26,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
         public TextType TextType { get; set; }
         public int? GenerationLength { get; set; }
         public string? GenerationShouldContain { get; set; }
-        public TextStructure? GenerationTextType { get; set; }
+        public TextGenerationType? TextGenerationType { get; set; }
 
         [MaxLength(20)]
         public string Language { get; set; }
@@ -46,7 +45,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 GenerationLength = state.Configuration.TextGenerationConfiguration?.Length,
                 GenerationShouldContain = state.Configuration.TextGenerationConfiguration?.ShouldContain == null
                     ? null : string.Join(',', state.Configuration.TextGenerationConfiguration.ShouldContain),
-                GenerationTextType = state.Configuration.TextGenerationConfiguration?.GenerationTextType,
+                TextGenerationType = state.Configuration.TextGenerationConfiguration?.TextGenerationType,
                 Language = state.Configuration.Language
             };
         }
@@ -63,7 +62,7 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
                 new TextConfiguration(TextType, GenerationLength == null ? null : new Typing.TextGenerationConfiguration(
                     GenerationLength ?? throw new InvalidOperationException("GenerationLength is null in DB."),
                     GenerationShouldContain?.Split(',') ?? throw new InvalidOperationException("GenerationShouldContain is null in DB."),
-                    GenerationTextType ?? throw new InvalidOperationException("GenerationTextType is null in DB.")),
+                    TextGenerationType ?? throw new InvalidOperationException("GenerationTextType is null in DB.")),
                     Language));
         }
 
@@ -94,8 +93,8 @@ namespace TypingRealm.Data.Infrastructure.DataAccess.Entities
             if (GenerationShouldContain != from.GenerationShouldContain)
                 GenerationShouldContain = from.GenerationShouldContain;
 
-            if (GenerationTextType != from.GenerationTextType)
-                GenerationTextType = from.GenerationTextType;
+            if (TextGenerationType != from.TextGenerationType)
+                TextGenerationType = from.TextGenerationType;
 
             if (Language != from.Language)
                 Language = from.Language;
