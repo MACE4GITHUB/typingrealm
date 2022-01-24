@@ -46,6 +46,7 @@ namespace TypingRealm.Typing
 
                 var rightKeyPair = rightDict[$"{keyPair.FromKey}->{keyPair.ToKey}"];
 
+                // TODO: Fix division by zero here ASAP.
                 yield return new KeyPairAggregatedData(
                     keyPair.FromKey, keyPair.ToKey,
                     // TODO: Recheck math here.
