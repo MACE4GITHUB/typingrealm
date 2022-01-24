@@ -7,7 +7,7 @@ namespace TypingRealm.Typing
     /// </summary>
     public interface IUserTypingStatisticsStore
     {
-        ValueTask<UserTypingStatistics?> GetUserTypingStatisticsAsync(string userId, string language);
-        ValueTask SaveAsync(string userId, UserTypingStatistics userTypingStatistics, string language);
+        ValueTask<UserTypingStatistics?> GetUserTypingStatisticsAsync(string userId, string language, TextGenerationType textGenerationType);
+        ValueTask SaveAsync(string userId, UserTypingStatistics userTypingStatistics, string language, TextGenerationType textGenerationType);
     }
 }

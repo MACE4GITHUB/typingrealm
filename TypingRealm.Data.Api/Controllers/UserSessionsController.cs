@@ -109,21 +109,21 @@ namespace TypingRealm.Data.Api.Controllers
 
         [HttpGet]
         [Route("statistics")]
-        public async ValueTask<ActionResult<TypingReport>> GetTypingReport(string? language = "en")
+        public async ValueTask<ActionResult<TypingReport>> GetTypingReport(string? language = "en", TextGenerationType textGenerationType = TextGenerationType.GeneratedStardardText)
         {
             if (language == null)
                 language = "en";
 
-            var report = await _typingReportGenerator.GenerateReportAsync(ProfileId, language);
+            var report = await _typingReportGenerator.GenerateReportAsync(ProfileId, language, textGenerationType);
 
             return Ok(report);
         }
 
         [HttpGet]
         [Route("{userSessionId}/statistics")]
-        public async ValueTask<ActionResult<TypingReport>> GetTypingReportForUserSession(string userSessionId)
+        public async ValueTask<ActionResult<TypingReport>> GetTypingReportForUserSession(string userSessionId, TextGenerationType textGenerationType = TextGenerationType.GeneratedStardardText)
         {
-            var report = await _typingReportGenerator.GenerateReportForUserSessionAsync(userSessionId);
+            var report = await _typingReportGenerator.GenerateReportForUserSessionAsync(userSessionId, textGenerationType);
 
             return Ok(report);
         }
@@ -135,7 +135,7 @@ namespace TypingRealm.Data.Api.Controllers
             if (language == null)
                 language = "en";
 
-            var response = await _typingReportGenerator.GenerateHumanReadableReportAsync(ProfileId, language);
+            var response = await _typingReportGenerator.GenerateStandardHumanReadableReportAsync(ProfileId, language);
 
             return Ok(response);
         }

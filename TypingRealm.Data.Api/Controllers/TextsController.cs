@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using TypingRealm.Communication;
 using TypingRealm.Hosting;
 using TypingRealm.Profiles;
@@ -47,15 +48,18 @@ namespace TypingRealm.Data.Api.Controllers
         private readonly ITextRepository _textRepository;
         private readonly ITypingReportGenerator _typingReportGerenator;
         private readonly ITextsClient _textsClient;
+        private readonly ILogger<TextsController> _logger;
 
         public TextsController(
             ITextRepository textRepository,
             ITypingReportGenerator typingReportGenerator,
-            ITextsClient textsClient)
+            ITextsClient textsClient,
+            ILogger<TextsController> logger)
         {
             _textRepository = textRepository;
             _typingReportGerenator = typingReportGenerator;
             _textsClient = textsClient;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -87,7 +91,7 @@ namespace TypingRealm.Data.Api.Controllers
             if (Profile.Type == ProfileType.User)
             {
                 // Personalize text generation.
-                var data = await _typingReportGerenator.GenerateUserStatisticsAsync(Profile.ProfileId, language);
+                var data = await _typingReportGerenator.GenerateStandardUserStatisticsAsync(Profile.ProfileId, language);
 
                 shouldContain.AddRange(data.KeyPairs
                     .Where(x => x.FromKey?.Length == 1 && x.ToKey.Length == 1)
@@ -101,6 +105,8 @@ namespace TypingRealm.Data.Api.Controllers
                     .Select(x => $"{x.FromKey}{x.ToKey}")
                     .Take(maxShouldContainSlow));
             }
+
+            _logger.LogDebug("Generating text for user {ProfileId} containing {@Contains}.", ProfileId, shouldContain);
 
             //var textValue = await _textGenerator.GenerateTextAsync(new TextGenerationConfigurationDto(length, shouldContain, textType, language));
             var config = Texts.TextGenerationConfiguration.SelfImprovement(

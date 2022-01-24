@@ -17,7 +17,12 @@ namespace TypingRealm.Typing
         GeneratedStandardWords = 2,
         GeneratedSelfImprovementText = 3,
         GeneratedSelfImprovementWords = 4,
-        Custom = 5
+        Custom = 5,
+
+        /// <summary>
+        /// User posted text.
+        /// </summary>
+        NotGenerated = 10
     }
 
     public static class TextGenerationConfigurationExtensions
@@ -109,6 +114,8 @@ namespace TypingRealm.Typing
         public string Value => _state.Value;
         public bool IsArchived => _state.IsArchived;
         public string Language => _state.Configuration.Language;
+
+        public TextGenerationType TextGenerationType => _state.Configuration.TextGenerationConfiguration?.TextGenerationType ?? TextGenerationType.NotGenerated;
 
         public void MakePublic()
         {

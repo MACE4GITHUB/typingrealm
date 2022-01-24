@@ -12,14 +12,15 @@ namespace TypingRealm.Typing
 
     public interface ITypingReportGenerator
     {
-        ValueTask<TypingReport> GenerateReportAsync(string userId, string language);
-        ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId);
+        ValueTask<TypingReport> GenerateReportAsync(string userId, string language, TextGenerationType textGenerationType);
+        ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId, TextGenerationType textGenerationType);
 
         // Fun little method with experimentation.
-        ValueTask<string> GenerateHumanReadableReportAsync(string userId, string language);
+        ValueTask<string> GenerateStandardHumanReadableReportAsync(string userId, string language);
 
         // Fast cached user statistics.
-        ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId, string language);
+        ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId, string language, TextGenerationType textGenerationType);
+        ValueTask<UserTypingStatistics> GenerateStandardUserStatisticsAsync(string userId, string language);
     }
 
     public sealed record KeyPairAggregatedData(
@@ -56,9 +57,9 @@ namespace TypingRealm.Typing
             _textRepository = textRepository;
         }
 
-        public async ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId, string language)
+        public async ValueTask<UserTypingStatistics> GenerateUserStatisticsAsync(string userId, string language, TextGenerationType textGenerationType)
         {
-            var existingStatistics = await _userTypingStatisticsStore.GetUserTypingStatisticsAsync(userId, language)
+            var existingStatistics = await _userTypingStatisticsStore.GetUserTypingStatisticsAsync(userId, language, textGenerationType)
                 .ConfigureAwait(false);
 
             var userSessions = Enumerable.Empty<UserSession>();
@@ -95,6 +96,9 @@ namespace TypingRealm.Typing
 
                     if (textEntity.Language != language)
                         continue;
+
+                    if (textEntity.TextGenerationType != textGenerationType)
+                        continue; // Generate statistics only for requested text generation type.
 
                     var textAnalysisResult = await _textTypingResultValidator.ValidateAsync(text.Value, textTypingResult)
                         .ConfigureAwait(false);
@@ -134,7 +138,7 @@ namespace TypingRealm.Typing
                 x.Count(y => y.Type == KeyPairType.Mistake)));
 
             var result = MergeAndReturnNew(existingStatistics, new TypingReport(aggregatedResult, aggregatedData), textsTypedCount, lastHandledResultUtc);
-            await _userTypingStatisticsStore.SaveAsync(userId, result, language)
+            await _userTypingStatisticsStore.SaveAsync(userId, result, language, textGenerationType)
                 .ConfigureAwait(false);
 
             return result;
@@ -186,7 +190,7 @@ namespace TypingRealm.Typing
             return dict.Values;
         }
 
-        public async ValueTask<TypingReport> GenerateReportAsync(string userId, string language)
+        public async ValueTask<TypingReport> GenerateReportAsync(string userId, string language, TextGenerationType textGenerationType)
         {
             var results = new List<TextAnalysisResult>();
 
@@ -208,7 +212,7 @@ namespace TypingRealm.Typing
                     if (textEntity == null)
                         throw new InvalidOperationException("Text is not found.");
 
-                    if (textEntity.Language != language)
+                    if (textEntity.Language != language || textGenerationType != textEntity.TextGenerationType)
                         continue;
 
                     var textAnalysisResult = await _textTypingResultValidator.ValidateAsync(text.Value, textTypingResult)
@@ -246,7 +250,7 @@ namespace TypingRealm.Typing
             return new TypingReport(aggregatedResult, aggregatedData);
         }
 
-        public async ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId)
+        public async ValueTask<TypingReport> GenerateReportForUserSessionAsync(string userSessionId, TextGenerationType textGenerationType)
         {
             var results = new List<TextAnalysisResult>();
 
@@ -265,6 +269,14 @@ namespace TypingRealm.Typing
                 var text = typingSession.GetTypingSessionTextAtIndexOrDefault(textTypingResult.TypingSessionTextIndex);
                 if (text == null)
                     throw new InvalidOperationException("Text is not found in typing session.");
+
+                var textEntity = await _textRepository.FindAsync(text.TextId)
+                    .ConfigureAwait(false);
+                if (textEntity == null)
+                    throw new InvalidOperationException("Text is not found.");
+
+                if (textGenerationType != textEntity.TextGenerationType)
+                    continue;
 
                 var textAnalysisResult = await _textTypingResultValidator.ValidateAsync(text.Value, textTypingResult)
                     .ConfigureAwait(false);
@@ -300,10 +312,28 @@ namespace TypingRealm.Typing
             return new TypingReport(aggregatedResult, aggregatedData);
         }
 
-        public async ValueTask<string> GenerateHumanReadableReportAsync(string userId, string language)
+        public async ValueTask<UserTypingStatistics> GenerateStandardUserStatisticsAsync(string userId, string language)
         {
-            var statistics = await GenerateUserStatisticsAsync(userId, language)
+            var standardStatistics = await GenerateUserStatisticsAsync(userId, language, TextGenerationType.GeneratedStardardText)
                 .ConfigureAwait(false);
+
+            var selfImprovementStatistics = await GenerateUserStatisticsAsync(userId, language, TextGenerationType.GeneratedSelfImprovementText)
+                .ConfigureAwait(false);
+
+            var statistics = standardStatistics.Merge(selfImprovementStatistics);
+
+            return statistics;
+        }
+
+        public async ValueTask<string> GenerateStandardHumanReadableReportAsync(string userId, string language)
+        {
+            var standardStatistics = await GenerateUserStatisticsAsync(userId, language, TextGenerationType.GeneratedStardardText)
+                .ConfigureAwait(false);
+
+            var selfImprovementStatistics = await GenerateUserStatisticsAsync(userId, language, TextGenerationType.GeneratedSelfImprovementText)
+                .ConfigureAwait(false);
+
+            var statistics = standardStatistics.Merge(selfImprovementStatistics);
 
             var builder = new StringBuilder();
             builder.AppendLine($"Your average speed throughout all the time: {statistics.SpeedCpm.ToString("0.###")} CPM ({(statistics.SpeedCpm / 5).ToString("0.###")}).");
