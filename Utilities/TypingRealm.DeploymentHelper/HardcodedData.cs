@@ -14,6 +14,7 @@ public static class HardcodedData
 
             new Service(10, "Texts", DatabaseType.None, CacheType.Redis, ".", 30401, false),
             new Service(11, "Library", DatabaseType.Postgres, CacheType.None, ".", 30402, false),
+            new Service(12, "Typing", DatabaseType.Postgres, CacheType.Redis, ".", 30403, true),
 
             new Service(20, "Profiles", DatabaseType.None, CacheType.None, ".", 30103, true),
             new Service(30, "Data", DatabaseType.Postgres, CacheType.Redis, ".", 30400, true)

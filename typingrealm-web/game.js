@@ -13,7 +13,7 @@ async function main() {
     let profile = url.searchParams.get('profile');
 
     let PROFILES_URL = 'https://api.typingrealm.com/profiles';
-    let DATA_URL = 'https://api.typingrealm.com/data';
+    let DATA_URL = 'https://api.typingrealm.com/typing';
     let useDevAuth0Client = true;
     let env = url.searchParams.get('env');
     let language = url.searchParams.get('language');
@@ -34,17 +34,17 @@ async function main() {
 
         if (env == 'dev') {
             PROFILES_URL = 'https://dev.api.typingrealm.com/profiles';
-            DATA_URL = 'https://dev.api.typingrealm.com/data';
+            DATA_URL = 'https://dev.api.typingrealm.com/typing';
         }
 
         if (env == 'local') {
             PROFILES_URL = 'https://api.localhost/profiles';
-            DATA_URL = 'https://api.localhost/data';
+            DATA_URL = 'https://api.localhost/typing';
         }
 
         if (env == 'debug') {
             PROFILES_URL = 'http://localhost:30103';
-            DATA_URL = 'http://localhost:30400';
+            DATA_URL = 'http://localhost:30403';
         }
     }
 

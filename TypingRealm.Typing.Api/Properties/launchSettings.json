@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "TypingRealm.Typing.Api": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Debug",
+        "DISABLE_INFRASTRUCTURE": "True"
+      },
+      "applicationUrl": "http0.0.0.0:30402"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}"
+    }
+  }
+}

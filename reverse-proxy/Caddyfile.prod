@@ -15,5 +15,9 @@ api.typingrealm.com {
         reverse_proxy typingrealm-profiles:80
     }
 
+    handle_path /typing/* {
+        reverse_proxy typingrealm-typing:80
+    }
+
     respond 404
 }

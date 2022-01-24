@@ -20,7 +20,6 @@
     <ProjectReference Include="..\TypingRealm.Data.Resources\TypingRealm.Data.Resources.csproj" />
     <ProjectReference Include="..\TypingRealm.DataAccess.Postgres\TypingRealm.DataAccess.Postgres.csproj" />
     <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
-    <ProjectReference Include="..\TypingRealm.Typing\TypingRealm.Typing.csproj" />
   </ItemGroup>
 
 </Project>

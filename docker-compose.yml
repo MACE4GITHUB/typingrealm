@@ -89,3 +89,20 @@ services:
       - deployment/.env.debug
       - deployment/.env.debug.texts
 
+  debug-typingrealm-typing:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-typing
+    container_name: debug-typingrealm-typing
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30403:80
+    build:
+      context: .
+      dockerfile: TypingRealm.Typing.Api/Dockerfile
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - deployment/.env
+      - deployment/.env.debug
+      - deployment/.env.debug.typing
+

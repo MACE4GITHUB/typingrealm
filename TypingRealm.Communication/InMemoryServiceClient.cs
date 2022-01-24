@@ -19,7 +19,8 @@ namespace TypingRealm.Communication
                 ["data"] = Environment.GetEnvironmentVariable("DATA_URL") ?? "http://127.0.0.1:30400",
                 ["library"] = Environment.GetEnvironmentVariable("LIBRARY_URL") ?? "http://127.0.0.1:30402",
                 ["profiles"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30103",
-                ["texts"] = Environment.GetEnvironmentVariable("TEXTS_URL") ?? "http://127.0.0.1:30401"
+                ["texts"] = Environment.GetEnvironmentVariable("TEXTS_URL") ?? "http://127.0.0.1:30401",
+                ["typing"] = Environment.GetEnvironmentVariable("TYPING_URL") ?? "http://127.0.0.1:30403"
             };
 
         private readonly IHttpClientFactory _httpClientFactory;

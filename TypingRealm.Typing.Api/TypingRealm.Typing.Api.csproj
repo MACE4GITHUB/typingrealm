@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileTag>debug-typingrealm-typing</DockerfileTag>
+    <DockerfileRunEnvironmentFiles>../deployment/.env.debug</DockerfileRunEnvironmentFiles>
+    <DockerfileRunEnvironmentFiles>../deployment/.env.debug.typing</DockerfileRunEnvironmentFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
+    <ProjectReference Include="..\TypingRealm.Typing.Infrastructure\TypingRealm.Typing.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
