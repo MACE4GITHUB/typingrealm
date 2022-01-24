@@ -15,6 +15,12 @@ namespace TypingRealm.Typing
     {
         public UserTypingStatistics Merge(UserTypingStatistics selfImprovementStatistics)
         {
+            if (TextsTypedCount == 0)
+                return selfImprovementStatistics;
+
+            if (selfImprovementStatistics.TextsTypedCount == 0)
+                return this;
+
             return new UserTypingStatistics(
                 TextsTypedCount + selfImprovementStatistics.TextsTypedCount,
                 (SpeedCpm + selfImprovementStatistics.SpeedCpm) / 2,
