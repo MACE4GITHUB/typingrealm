@@ -1,12 +1,11 @@
 ﻿using TypingRealm.Common;
 
-namespace TypingRealm.TextProcessing
+namespace TypingRealm.TextProcessing;
+
+public sealed class Language : Identity
 {
-    public sealed class Language : Identity
+    public Language(string value) : base(value)
     {
-        public Language(string value) : base(value)
-        {
-            Validation.ValidateIn(value, TextConstants.SupportedLanguageValues);
-        }
+        Validation.ValidateIn(value, TextConstants.SupportedLanguageValues);
     }
 }

@@ -4,26 +4,25 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
 
-namespace TypingRealm.Messaging.Handlers
+namespace TypingRealm.Messaging.Handlers;
+
+public sealed class BroadcastMessageHandler : IMessageHandler<BroadcastMessage>
 {
-    public sealed class BroadcastMessageHandler : IMessageHandler<BroadcastMessage>
+    private readonly IConnectedClientStore _connectedClients;
+
+    public BroadcastMessageHandler(IConnectedClientStore connectedClients)
     {
-        private readonly IConnectedClientStore _connectedClients;
+        _connectedClients = connectedClients;
+    }
 
-        public BroadcastMessageHandler(IConnectedClientStore connectedClients)
-        {
-            _connectedClients = connectedClients;
-        }
+    public ValueTask HandleAsync(ConnectedClient sender, BroadcastMessage message, CancellationToken cancellationToken)
+    {
+        message.SenderId = sender.ClientId;
 
-        public ValueTask HandleAsync(ConnectedClient sender, BroadcastMessage message, CancellationToken cancellationToken)
-        {
-            message.SenderId = sender.ClientId;
+        var clients = _connectedClients.FindInGroups(sender.Groups);
 
-            var clients = _connectedClients.FindInGroups(sender.Groups);
-
-            return AsyncHelpers.WhenAll(clients
-                .Except(new[] { sender })
-                .Select(c => c.Connection.SendAsync(message, cancellationToken)));
-        }
+        return AsyncHelpers.WhenAll(clients
+            .Except(new[] { sender })
+            .Select(c => c.Connection.SendAsync(message, cancellationToken)));
     }
 }

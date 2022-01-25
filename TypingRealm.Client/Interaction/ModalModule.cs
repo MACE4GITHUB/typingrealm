@@ -1,17 +1,16 @@
-﻿namespace TypingRealm.Client.Interaction
+﻿namespace TypingRealm.Client.Interaction;
+
+public enum ModalModule
 {
-    public enum ModalModule
-    {
-        None,
+    None,
 
-        /// <summary>
-        /// Information about your character including name and some statistics.
-        /// </summary>
-        CharacterInfo,
+    /// <summary>
+    /// Information about your character including name and some statistics.
+    /// </summary>
+    CharacterInfo,
 
-        /// <summary>
-        /// Detailed description of your surroundings.
-        /// </summary>
-        PlaceDescription
-    }
+    /// <summary>
+    /// Detailed description of your surroundings.
+    /// </summary>
+    PlaceDescription
 }

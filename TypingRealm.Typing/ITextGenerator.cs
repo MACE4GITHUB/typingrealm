@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace TypingRealm.Typing
+namespace TypingRealm.Typing;
+
+public interface ITextGenerator
 {
-    public interface ITextGenerator
-    {
-        /// <summary>
-        /// Generates text based on configuration.
-        /// </summary>
-        ValueTask<string> GenerateTextAsync(TextGenerationConfigurationDto configuration);
-    }
+    /// <summary>
+    /// Generates text based on configuration.
+    /// </summary>
+    ValueTask<string> GenerateTextAsync(TextGenerationConfigurationDto configuration);
 }

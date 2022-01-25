@@ -2,23 +2,22 @@
 using TypingRealm.Authentication.Api.Filters;
 using TypingRealm.Profiles;
 
-namespace TypingRealm.Authentication.Api
+namespace TypingRealm.Authentication.Api;
+
+public abstract class TyrAuthorizeAttribute : TypeFilterAttribute
 {
-    public abstract class TyrAuthorizeAttribute : TypeFilterAttribute
+    protected TyrAuthorizeAttribute(string scope) : base(typeof(ScopeAuthorizationFilter))
     {
-        protected TyrAuthorizeAttribute(string scope) : base(typeof(ScopeAuthorizationFilter))
-        {
-            Arguments = new object[] { scope };
-        }
+        Arguments = new object[] { scope };
+    }
 
-        protected TyrAuthorizeAttribute(ProfileType profileType) : base(typeof(ProfileTypeAuthorizationFilter))
-        {
-            Arguments = new object[] { profileType };
-        }
+    protected TyrAuthorizeAttribute(ProfileType profileType) : base(typeof(ProfileTypeAuthorizationFilter))
+    {
+        Arguments = new object[] { profileType };
+    }
 
-        protected TyrAuthorizeAttribute(string scope, ProfileType profileType) : base(typeof(ScopeAndProfileTypeAuthorizationFilter))
-        {
-            Arguments = new object[] { scope, profileType };
-        }
+    protected TyrAuthorizeAttribute(string scope, ProfileType profileType) : base(typeof(ScopeAndProfileTypeAuthorizationFilter))
+    {
+        Arguments = new object[] { scope, profileType };
     }
 }

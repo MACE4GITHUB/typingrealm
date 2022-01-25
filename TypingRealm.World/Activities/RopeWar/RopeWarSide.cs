@@ -1,10 +1,9 @@
-﻿namespace TypingRealm.World.Activities.RopeWar
-{
-    public enum RopeWarSide
-    {
-        Unspecified = 0,
+﻿namespace TypingRealm.World.Activities.RopeWar;
 
-        Left = 1,
-        Right = 2
-    }
+public enum RopeWarSide
+{
+    Unspecified = 0,
+
+    Left = 1,
+    Right = 2
 }

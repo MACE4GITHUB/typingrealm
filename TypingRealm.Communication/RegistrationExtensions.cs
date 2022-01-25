@@ -2,18 +2,17 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TypingRealm.Authentication;
 
-namespace TypingRealm.Communication
+namespace TypingRealm.Communication;
+
+public static class RegistrationExtensions
 {
-    public static class RegistrationExtensions
+    public static IServiceCollection AddCommunication(this IServiceCollection services)
     {
-        public static IServiceCollection AddCommunication(this IServiceCollection services)
-        {
-            services.TryAddTransient<IProfileTokenService, AnonymousProfileTokenService>();
-            services.TryAddTransient<IServiceTokenService, AnonymousServiceTokenService>();
+        services.TryAddTransient<IProfileTokenService, AnonymousProfileTokenService>();
+        services.TryAddTransient<IServiceTokenService, AnonymousServiceTokenService>();
 
-            services.AddTransient<IServiceClient, InMemoryServiceClient>();
+        services.AddTransient<IServiceClient, InMemoryServiceClient>();
 
-            return services;
-        }
+        return services;
     }
 }

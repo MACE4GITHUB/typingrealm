@@ -1,18 +1,17 @@
-﻿namespace TypingRealm.Messaging
-{
-    public static class MessageExtensions
-    {
-        /// <summary>
-        /// Gets metadata from object if it is <see cref="ClientToServerMessageWithMetadata"/>,
-        /// otherwise returns empty <see cref="ClientToServerMessageMetadata"/>.
-        /// </summary>
-        public static ClientToServerMessageMetadata GetMetadataOrEmpty(this object message)
-        {
-            if (message is ClientToServerMessageWithMetadata messageWithMetadata
-                && messageWithMetadata.Metadata != null)
-                return messageWithMetadata.Metadata;
+﻿namespace TypingRealm.Messaging;
 
-            return ClientToServerMessageMetadata.CreateEmpty();
-        }
+public static class MessageExtensions
+{
+    /// <summary>
+    /// Gets metadata from object if it is <see cref="ClientToServerMessageWithMetadata"/>,
+    /// otherwise returns empty <see cref="ClientToServerMessageMetadata"/>.
+    /// </summary>
+    public static ClientToServerMessageMetadata GetMetadataOrEmpty(this object message)
+    {
+        if (message is ClientToServerMessageWithMetadata messageWithMetadata
+            && messageWithMetadata.Metadata != null)
+            return messageWithMetadata.Metadata;
+
+        return ClientToServerMessageMetadata.CreateEmpty();
     }
 }

@@ -4,42 +4,41 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace TypingRealm.Authentication.Api
+namespace TypingRealm.Authentication.Api;
+
+public sealed class HttpContextProfileTokenService : IProfileTokenService
 {
-    public sealed class HttpContextProfileTokenService : IProfileTokenService
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public HttpContextProfileTokenService(IHttpContextAccessor httpContextAccessor)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
-        public HttpContextProfileTokenService(IHttpContextAccessor httpContextAccessor)
+    public ValueTask<string> GetProfileAccessTokenAsync(CancellationToken cancellationToken)
+    {
+        if (_httpContextAccessor.HttpContext == null)
+            throw new NotSupportedException("HttpContext is not available, cannot acquire profile access token.");
+
+        if (_httpContextAccessor.HttpContext?.User?.Identity == null
+            || !_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
         {
-            _httpContextAccessor = httpContextAccessor;
+            throw new InvalidOperationException("Access token is not set on HTTP context. User is not authenticated.");
         }
 
-        public ValueTask<string> GetProfileAccessTokenAsync(CancellationToken cancellationToken)
-        {
-            if (_httpContextAccessor.HttpContext == null)
-                throw new NotSupportedException("HttpContext is not available, cannot acquire profile access token.");
+        // This might be an interesting feature.
+        // _httpContextAccessor.HttpContext.GetAccessTokenAsync() returns the token
+        // ONLY when it's the default scheme token, which is Profile scheme.
+        // So in theory, previous implementation was good for our use case.
 
-            if (_httpContextAccessor.HttpContext?.User?.Identity == null
-                || !_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-            {
-                throw new InvalidOperationException("Access token is not set on HTTP context. User is not authenticated.");
-            }
+        var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"]
+            .FirstOrDefault();
 
-            // This might be an interesting feature.
-            // _httpContextAccessor.HttpContext.GetAccessTokenAsync() returns the token
-            // ONLY when it's the default scheme token, which is Profile scheme.
-            // So in theory, previous implementation was good for our use case.
+        if (token == null || !token.StartsWith("Bearer ", StringComparison.Ordinal))
+            throw new InvalidOperationException("Access token is not set on HTTP context or has invalid format.");
 
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"]
-                .FirstOrDefault();
+        token = token.Remove(0, 7);
 
-            if (token == null || !token.StartsWith("Bearer ", StringComparison.Ordinal))
-                throw new InvalidOperationException("Access token is not set on HTTP context or has invalid format.");
-
-            token = token.Remove(0, 7);
-
-            return new ValueTask<string>(token);
-        }
+        return new ValueTask<string>(token);
     }
 }

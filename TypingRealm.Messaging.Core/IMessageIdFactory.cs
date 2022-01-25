@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Messaging
+﻿namespace TypingRealm.Messaging;
+
+public interface IMessageIdFactory
 {
-    public interface IMessageIdFactory
-    {
-        string CreateMessageId();
-    }
+    string CreateMessageId();
 }

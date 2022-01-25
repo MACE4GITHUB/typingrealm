@@ -6,11 +6,11 @@ using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources;
 using TypingRealm.World.Layers;
 
-namespace TypingRealm.World
+namespace TypingRealm.World;
+
+public sealed class LocationStore
 {
-    public sealed class LocationStore
-    {
-        public List<Location> Locations { get; } = new List<Location>
+    public List<Location> Locations { get; } = new List<Location>
         {
             Location.FromPersistenceState(new LocationPersistenceState
             {
@@ -32,78 +32,77 @@ namespace TypingRealm.World
                 Activities = new HashSet<Activity>()
             })
         };
+}
+
+public sealed class LocationRepository : ILocationRepository, IActivityStore
+{
+    private readonly LocationStore _locationStore;
+    private readonly IActivitiesClient _activitiesClient;
+
+    public LocationRepository(
+        LocationStore locationStore,
+        IActivitiesClient activitiesClient)
+    {
+        _locationStore = locationStore;
+        _activitiesClient = activitiesClient;
     }
 
-    public sealed class LocationRepository : ILocationRepository, IActivityStore
+    public Location? Find(string locationId)
     {
-        private readonly LocationStore _locationStore;
-        private readonly IActivitiesClient _activitiesClient;
+        return _locationStore.Locations.FirstOrDefault(l => l.LocationId == locationId);
+    }
 
-        public LocationRepository(
-            LocationStore locationStore,
-            IActivitiesClient activitiesClient)
+    public Location? FindLocationForCharacter(string characterId)
+    {
+        return _locationStore.Locations.FirstOrDefault(l => l.Characters.Contains(characterId));
+    }
+
+    public Location FindStartingLocation(string characterId)
+    {
+        return _locationStore.Locations.FirstOrDefault(l => l.LocationId == "1")!;
+    }
+
+    public Activity? GetCurrentCharacterActivityOrDefault(string characterId)
+    {
+        var location = _locationStore.Locations.FirstOrDefault(l => l.Characters.Contains(characterId));
+        if (location == null)
+            throw new InvalidOperationException("Location for this character does not exist.");
+
+        // TODO: Get descriptors instead of actual objects that can be modified.
+        // TODO: Query total list of activities, not just ropewar activities.
+        // And somehow get the STACK of activities for the character?..
+        var currentActivity = location.GetCurrentActivityOrDefault(characterId);
+
+        return currentActivity;
+    }
+
+    public void Save(Location location)
+    {
+        foreach (var @event in location.CommitDomainEvents())
         {
-            _locationStore = locationStore;
-            _activitiesClient = activitiesClient;
-        }
-
-        public Location? Find(string locationId)
-        {
-            return _locationStore.Locations.FirstOrDefault(l => l.LocationId == locationId);
-        }
-
-        public Location? FindLocationForCharacter(string characterId)
-        {
-            return _locationStore.Locations.FirstOrDefault(l => l.Characters.Contains(characterId));
-        }
-
-        public Location FindStartingLocation(string characterId)
-        {
-            return _locationStore.Locations.FirstOrDefault(l => l.LocationId == "1")!;
-        }
-
-        public Activity? GetCurrentCharacterActivityOrDefault(string characterId)
-        {
-            var location = _locationStore.Locations.FirstOrDefault(l => l.Characters.Contains(characterId));
-            if (location == null)
-                throw new InvalidOperationException("Location for this character does not exist.");
-
-            // TODO: Get descriptors instead of actual objects that can be modified.
-            // TODO: Query total list of activities, not just ropewar activities.
-            // And somehow get the STACK of activities for the character?..
-            var currentActivity = location.GetCurrentActivityOrDefault(characterId);
-
-            return currentActivity;
-        }
-
-        public void Save(Location location)
-        {
-            foreach (var @event in location.CommitDomainEvents())
+            if (@event.Type == DomainEventType.ActivityStarted)
             {
-                if (@event.Type == DomainEventType.ActivityStarted)
-                {
-                    HandleActivityStarted(@event.ActivityId, @event.ActivityType);
-                }
+                HandleActivityStarted(@event.ActivityId, @event.ActivityType);
             }
         }
+    }
 
-        private Location GetLocationForActivity(string activityId)
-        {
-            var location = _locationStore.Locations.SingleOrDefault(l => l.HasActivity(activityId));
-            if (location == null)
-                throw new InvalidOperationException("No such activity found in any of the locations.");
+    private Location GetLocationForActivity(string activityId)
+    {
+        var location = _locationStore.Locations.SingleOrDefault(l => l.HasActivity(activityId));
+        if (location == null)
+            throw new InvalidOperationException("No such activity found in any of the locations.");
 
-            return location;
-        }
+        return location;
+    }
 
-        private void HandleActivityStarted(string activityId, ActivityType activityType)
-        {
-            var location = GetLocationForActivity(activityId);
-            var characters = location.GetAllCharactersInActivity(activityId);
+    private void HandleActivityStarted(string activityId, ActivityType activityType)
+    {
+        var location = GetLocationForActivity(activityId);
+        var characters = location.GetAllCharactersInActivity(activityId);
 
-            var activityResource = new ActivityResource(activityId, activityType, characters);
-            _activitiesClient.StartActivityAsync(activityResource, default)
-                .AsTask().GetAwaiter().GetResult();
-        }
+        var activityResource = new ActivityResource(activityId, activityType, characters);
+        _activitiesClient.StartActivityAsync(activityResource, default)
+            .AsTask().GetAwaiter().GetResult();
     }
 }

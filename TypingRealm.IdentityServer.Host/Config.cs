@@ -1,26 +1,26 @@
 ﻿using System.Collections.Generic;
 using Duende.IdentityServer.Models;
 
-namespace TypingRealm.IdentityServer.Host
-{
-    public static class Config
-    {
-        public static IEnumerable<IdentityResource> IdentityResources =>
-            new IdentityResource[]
-            {
-                new IdentityResources.OpenId()
-            };
+namespace TypingRealm.IdentityServer.Host;
 
-        public static IEnumerable<ApiScope> ApiScopes =>
-            new ApiScope[]
-            {
+public static class Config
+{
+    public static IEnumerable<IdentityResource> IdentityResources =>
+        new IdentityResource[]
+        {
+                new IdentityResources.OpenId()
+        };
+
+    public static IEnumerable<ApiScope> ApiScopes =>
+        new ApiScope[]
+        {
                 new ApiScope("service", "TypingRealm internal service-to-service communication."),
                 new ApiScope("diagnostics", "TypingRealm internal diagnostics scope for diagnostics operations.")
-            };
+        };
 
-        public static IEnumerable<Client> Clients =>
-            new Client[]
-            {
+    public static IEnumerable<Client> Clients =>
+        new Client[]
+        {
                 new Client
                 {
                     ClientId = "service",
@@ -50,6 +50,5 @@ namespace TypingRealm.IdentityServer.Host
                     },
                     AccessTokenLifetime = 60
                 }
-            };
-    }
+        };
 }

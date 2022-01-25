@@ -1,16 +1,15 @@
-﻿namespace TypingRealm.Messaging
-{
-    [Message]
-    public sealed class AcknowledgeReceived
-    {
-#pragma warning disable CS8618
-        public AcknowledgeReceived() { }
-#pragma warning restore CS8618
-        public AcknowledgeReceived(string messageId)
-        {
-            MessageId = messageId;
-        }
+﻿namespace TypingRealm.Messaging;
 
-        public string MessageId { get; set; }
+[Message]
+public sealed class AcknowledgeReceived
+{
+#pragma warning disable CS8618
+    public AcknowledgeReceived() { }
+#pragma warning restore CS8618
+    public AcknowledgeReceived(string messageId)
+    {
+        MessageId = messageId;
     }
+
+    public string MessageId { get; set; }
 }

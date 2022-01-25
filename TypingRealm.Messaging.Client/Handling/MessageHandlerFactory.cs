@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TypingRealm.Messaging.Client.Handling
+namespace TypingRealm.Messaging.Client.Handling;
+
+public sealed class MessageHandlerFactory : IMessageHandlerFactory
 {
-    public sealed class MessageHandlerFactory : IMessageHandlerFactory
+    private readonly IServiceProvider _serviceProvider;
+
+    public MessageHandlerFactory(IServiceProvider serviceProvider)
     {
-        private readonly IServiceProvider _serviceProvider;
+        _serviceProvider = serviceProvider;
+    }
 
-        public MessageHandlerFactory(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
-        public IEnumerable<IMessageHandler<TMessage>> GetHandlersFor<TMessage>()
-        {
-            return _serviceProvider.GetServices<IMessageHandler<TMessage>>();
-        }
+    public IEnumerable<IMessageHandler<TMessage>> GetHandlersFor<TMessage>()
+    {
+        return _serviceProvider.GetServices<IMessageHandler<TMessage>>();
     }
 }

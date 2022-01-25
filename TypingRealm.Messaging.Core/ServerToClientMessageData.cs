@@ -1,11 +1,10 @@
-﻿namespace TypingRealm.Messaging
+﻿namespace TypingRealm.Messaging;
+
+public sealed class ServerToClientMessageData : MessageData
 {
-    public sealed class ServerToClientMessageData : MessageData
-    {
 #pragma warning disable CS8618
-        public ServerToClientMessageData() { }
+    public ServerToClientMessageData() { }
 #pragma warning restore CS8618
 
-        public ServerToClientMessageMetadata? Metadata { get; set; }
-    }
+    public ServerToClientMessageMetadata? Metadata { get; set; }
 }

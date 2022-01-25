@@ -5,52 +5,51 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.World.Layers;
 
-namespace TypingRealm.World.Movement
+namespace TypingRealm.World.Movement;
+
+public sealed class MoveToLocationHandler : LayerHandler<MoveToLocation>
 {
-    public sealed class MoveToLocationHandler : LayerHandler<MoveToLocation>
+    private readonly ILocationRepository _locationStore;
+
+    public MoveToLocationHandler(
+        ICharacterActivityStore characterActivityStore,
+        ILocationRepository locationStore)
+        : base(characterActivityStore, Layer.World)
     {
-        private readonly ILocationRepository _locationStore;
+        _locationStore = locationStore;
+    }
 
-        public MoveToLocationHandler(
-            ICharacterActivityStore characterActivityStore,
-            ILocationRepository locationStore)
-            : base(characterActivityStore, Layer.World)
+    protected override ValueTask HandleMessageAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
+    {
+        var characterId = sender.ClientId;
+        var location = _locationStore.FindLocationForCharacter(characterId);
+
+        if (location == null)
         {
-            _locationStore = locationStore;
+            // Character has never connected yet.
+            throw new InvalidOperationException("Cannot move between locations. Did not join the world yet.");
         }
 
-        protected override ValueTask HandleMessageAsync(ConnectedClient sender, MoveToLocation message, CancellationToken cancellationToken)
-        {
-            var characterId = sender.ClientId;
-            var location = _locationStore.FindLocationForCharacter(characterId);
+        // Consider using sender.Group to get current location.
+        if (sender.Group != location.LocationId)
+            throw new InvalidOperationException("Current group of player is not equal to location. Synchronization mismatch.");
 
-            if (location == null)
-            {
-                // Character has never connected yet.
-                throw new InvalidOperationException("Cannot move between locations. Did not join the world yet.");
-            }
+        if (!location.Locations.Contains(message.LocationId))
+            throw new InvalidOperationException("Cannot move to this location from another location.");
 
-            // Consider using sender.Group to get current location.
-            if (sender.Group != location.LocationId)
-                throw new InvalidOperationException("Current group of player is not equal to location. Synchronization mismatch.");
+        var newLocation = _locationStore.Find(message.LocationId);
+        if (newLocation == null)
+            throw new InvalidOperationException("Location does not exist.");
 
-            if (!location.Locations.Contains(message.LocationId))
-                throw new InvalidOperationException("Cannot move to this location from another location.");
+        // TODO: Transaction?
+        location.RemoveCharacter(characterId);
+        _locationStore.Save(location);
 
-            var newLocation = _locationStore.Find(message.LocationId);
-            if (newLocation == null)
-                throw new InvalidOperationException("Location does not exist.");
+        newLocation.AddCharacter(characterId);
+        _locationStore.Save(newLocation);
 
-            // TODO: Transaction?
-            location.RemoveCharacter(characterId);
-            _locationStore.Save(location);
+        sender.Group = newLocation.LocationId;
 
-            newLocation.AddCharacter(characterId);
-            _locationStore.Save(newLocation);
-
-            sender.Group = newLocation.LocationId;
-
-            return default;
-        }
+        return default;
     }
 }

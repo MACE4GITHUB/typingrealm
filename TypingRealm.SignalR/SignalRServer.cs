@@ -8,129 +8,128 @@ using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connections;
 
-namespace TypingRealm.SignalR
+namespace TypingRealm.SignalR;
+
+public sealed class SignalRServer : AsyncManagedDisposable, ISignalRServer
 {
-    public sealed class SignalRServer : AsyncManagedDisposable, ISignalRServer
+    private readonly ILogger<SignalRServer> _logger;
+    private readonly IScopedConnectionHandler _connectionHandler;
+    private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+    private readonly List<Task> _connectionProcessors = new List<Task>();
+    private readonly ISignalRConnectionFactory _signalRConnectionFactory;
+    private readonly ConcurrentDictionary<string, SignalRConnectionResource> _notificators
+        = new ConcurrentDictionary<string, SignalRConnectionResource>();
+
+    public SignalRServer(
+        ILogger<SignalRServer> logger,
+        IScopedConnectionHandler connectionHandler,
+        ISignalRConnectionFactory signalRConnectionFactory)
     {
-        private readonly ILogger<SignalRServer> _logger;
-        private readonly IScopedConnectionHandler _connectionHandler;
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private readonly List<Task> _connectionProcessors = new List<Task>();
-        private readonly ISignalRConnectionFactory _signalRConnectionFactory;
-        private readonly ConcurrentDictionary<string, SignalRConnectionResource> _notificators
-            = new ConcurrentDictionary<string, SignalRConnectionResource>();
+        _logger = logger;
+        _connectionHandler = connectionHandler;
+        _signalRConnectionFactory = signalRConnectionFactory;
+    }
 
-        public SignalRServer(
-            ILogger<SignalRServer> logger,
-            IScopedConnectionHandler connectionHandler,
-            ISignalRConnectionFactory signalRConnectionFactory)
+    public void NotifyReceived(string connectionId, object message)
+    {
+        _notificators.TryGetValue(connectionId, out var resource);
+
+        // This happens when server threw an exception but did not disconnect the client, and the client did not disconnect and tries to send more messages.
+        if (resource == null)
+            throw new InvalidOperationException($"Connection {connectionId} does not exist.");
+
+        resource.Notificator.NotifyReceived(message);
+    }
+
+    public void StartHandling(HubCallerContext context, IClientProxy caller)
+        => _ = HandleAsync(context, caller);
+
+    public async Task StopHandling(string connectionId)
+    {
+        if (_notificators.TryGetValue(connectionId, out var resource))
+            await resource.CancelAsync().ConfigureAwait(false);
+    }
+
+    private async Task HandleAsync(HubCallerContext context, IClientProxy caller)
+    {
+        string connectionDetails;
+
+        try
         {
-            _logger = logger;
-            _connectionHandler = connectionHandler;
-            _signalRConnectionFactory = signalRConnectionFactory;
+            connectionDetails = $"{context.ConnectionId}, {context.UserIdentifier}, {context.User.Identity?.Name}";
+        }
+        catch (Exception exception)
+        {
+            connectionDetails = "Failed to get details";
+            _logger.LogError(exception, "Failed to get connection details.");
         }
 
-        public void NotifyReceived(string connectionId, object message)
+        try
         {
-            _notificators.TryGetValue(connectionId, out var resource);
+            using var localCts = new CancellationTokenSource();
+            using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                _cts.Token, localCts.Token);
 
-            // This happens when server threw an exception but did not disconnect the client, and the client did not disconnect and tries to send more messages.
-            if (resource == null)
-                throw new InvalidOperationException($"Connection {connectionId} does not exist.");
+            var notificator = new Notificator();
+            var connection = _signalRConnectionFactory.CreateProtobufConnectionForServer(caller, notificator);
 
-            resource.Notificator.NotifyReceived(message);
+            var task = _connectionHandler
+                .HandleAsync(connection, combinedCts.Token)
+                .HandleCancellationAsync(exception =>
+                {
+                    _logger.LogDebug(
+                        exception,
+                        "Cancellation request received for client: {ConnectionDetails}",
+                        connectionDetails);
+                })
+                .HandleExceptionAsync<Exception>(exception =>
+                {
+                    _logger.LogError(
+                        exception,
+                        "Error happened while handling SignalR connection: {ConnectionDetails}",
+                        connectionDetails);
+                });
+
+            var resource = new SignalRConnectionResource(
+                notificator,
+                async () =>
+                {
+                    localCts.Cancel();
+                    await task.ConfigureAwait(false);
+                });
+
+            _notificators.TryAdd(context.ConnectionId, resource);
+
+            _connectionProcessors.Add(task);
+            _connectionProcessors.RemoveAll(t => t.IsCompleted);
+
+            await task.ConfigureAwait(false);
+
+            // Warning: when exception is thrown inside the task, cancellation token is not canceled (only disposed).
+            await resource.CancelAsync().ConfigureAwait(false);
         }
-
-        public void StartHandling(HubCallerContext context, IClientProxy caller)
-            => _ = HandleAsync(context, caller);
-
-        public async Task StopHandling(string connectionId)
+        catch (Exception exception)
         {
-            if (_notificators.TryGetValue(connectionId, out var resource))
-                await resource.CancelAsync().ConfigureAwait(false);
+            _logger.LogError(
+                exception,
+                "Error happened when creating or handling SignalR connection: {ConnectionDetails}",
+                connectionDetails);
         }
-
-        private async Task HandleAsync(HubCallerContext context, IClientProxy caller)
+        finally
         {
-            string connectionDetails;
+            // Disconnect the client from the server side.
+            context.Abort();
 
-            try
-            {
-                connectionDetails = $"{context.ConnectionId}, {context.UserIdentifier}, {context.User.Identity?.Name}";
-            }
-            catch (Exception exception)
-            {
-                connectionDetails = "Failed to get details";
-                _logger.LogError(exception, "Failed to get connection details.");
-            }
-
-            try
-            {
-                using var localCts = new CancellationTokenSource();
-                using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(
-                    _cts.Token, localCts.Token);
-
-                var notificator = new Notificator();
-                var connection = _signalRConnectionFactory.CreateProtobufConnectionForServer(caller, notificator);
-
-                var task = _connectionHandler
-                    .HandleAsync(connection, combinedCts.Token)
-                    .HandleCancellationAsync(exception =>
-                    {
-                        _logger.LogDebug(
-                            exception,
-                            "Cancellation request received for client: {ConnectionDetails}",
-                            connectionDetails);
-                    })
-                    .HandleExceptionAsync<Exception>(exception =>
-                    {
-                        _logger.LogError(
-                            exception,
-                            "Error happened while handling SignalR connection: {ConnectionDetails}",
-                            connectionDetails);
-                    });
-
-                var resource = new SignalRConnectionResource(
-                    notificator,
-                    async () =>
-                    {
-                        localCts.Cancel();
-                        await task.ConfigureAwait(false);
-                    });
-
-                _notificators.TryAdd(context.ConnectionId, resource);
-
-                _connectionProcessors.Add(task);
-                _connectionProcessors.RemoveAll(t => t.IsCompleted);
-
-                await task.ConfigureAwait(false);
-
-                // Warning: when exception is thrown inside the task, cancellation token is not canceled (only disposed).
-                await resource.CancelAsync().ConfigureAwait(false);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(
-                    exception,
-                    "Error happened when creating or handling SignalR connection: {ConnectionDetails}",
-                    connectionDetails);
-            }
-            finally
-            {
-                // Disconnect the client from the server side.
-                context.Abort();
-
-                _notificators.TryRemove(context.ConnectionId, out _);
-            }
+            _notificators.TryRemove(context.ConnectionId, out _);
         }
+    }
 
-        protected override async ValueTask DisposeManagedResourcesAsync()
-        {
-            _cts.Cancel();
+    protected override async ValueTask DisposeManagedResourcesAsync()
+    {
+        _cts.Cancel();
 
-            await Task.WhenAll(_connectionProcessors).ConfigureAwait(false);
+        await Task.WhenAll(_connectionProcessors).ConfigureAwait(false);
 
-            _cts.Dispose();
-        }
+        _cts.Dispose();
     }
 }

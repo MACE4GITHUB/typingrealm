@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Messaging
+﻿namespace TypingRealm.Messaging;
+
+public interface IClientToServerMessageMetadataFactory
 {
-    public interface IClientToServerMessageMetadataFactory
-    {
-        ClientToServerMessageMetadata CreateFor(object message);
-    }
+    ClientToServerMessageMetadata CreateFor(object message);
 }

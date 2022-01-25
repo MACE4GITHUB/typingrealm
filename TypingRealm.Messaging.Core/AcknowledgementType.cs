@@ -1,11 +1,10 @@
-﻿namespace TypingRealm.Messaging
-{
-    public enum AcknowledgementType
-    {
-        Unspecified = 0,
+﻿namespace TypingRealm.Messaging;
 
-        None = 1,
-        Received = 2,
-        Handled = 3
-    }
+public enum AcknowledgementType
+{
+    Unspecified = 0,
+
+    None = 1,
+    Received = 2,
+    Handled = 3
 }

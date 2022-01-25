@@ -7,73 +7,72 @@ using TypingRealm.Client.Interaction;
 using TypingRealm.Profiles.Api.Client;
 using TypingRealm.Profiles.Api.Resources;
 
-namespace TypingRealm.Client.MainMenu
+namespace TypingRealm.Client.MainMenu;
+
+public sealed class MainMenuStateManager : SyncManagedDisposable, IChangeDetector
 {
-    public sealed class MainMenuStateManager : SyncManagedDisposable, IChangeDetector
+    private readonly object _updateStateLock = new object();
+    private readonly ICharactersClient _charactersClient;
+
+    private readonly MainMenuState _currentState;
+    private readonly BehaviorSubject<MainMenuState> _stateSubject;
+
+    public MainMenuStateManager(
+        ICharactersClient charactersClient,
+        MainMenuState state)
     {
-        private readonly object _updateStateLock = new object();
-        private readonly ICharactersClient _charactersClient;
+        _charactersClient = charactersClient;
 
-        private readonly MainMenuState _currentState;
-        private readonly BehaviorSubject<MainMenuState> _stateSubject;
+        _currentState = state;
+        _stateSubject = new BehaviorSubject<MainMenuState>(_currentState);
 
-        public MainMenuStateManager(
-            ICharactersClient charactersClient,
-            MainMenuState state)
+        _ = GetCharacters(); // Fire and forget.
+    }
+
+    public IObservable<MainMenuState> StateObservable => _stateSubject;
+    public void NotifyChanged()
+    {
+        try
         {
-            _charactersClient = charactersClient;
+            ThrowIfDisposed();
 
-            _currentState = state;
-            _stateSubject = new BehaviorSubject<MainMenuState>(_currentState);
-
-            _ = GetCharacters(); // Fire and forget.
+            _stateSubject.OnNext(_currentState);
         }
-
-        public IObservable<MainMenuState> StateObservable => _stateSubject;
-        public void NotifyChanged()
+        catch (ObjectDisposedException)
         {
-            try
+            // TODO: Log.
+        }
+    }
+
+    // Can be made private.
+    public async Task GetCharacters()
+    {
+        var characters = await _charactersClient.GetAllByProfileIdAsync(default)
+            .ConfigureAwait(false);
+
+        UpdateCharacters(characters);
+    }
+
+    protected override void DisposeManagedResources()
+    {
+        _stateSubject.Dispose();
+    }
+
+    private void UpdateCharacters(IEnumerable<CharacterResource> characters)
+    {
+        lock (_updateStateLock)
+        {
+            foreach (var character in _currentState.Characters.Where(c => !characters.Any(x => x.CharacterId == c.CharacterId)))
             {
-                ThrowIfDisposed();
-
-                _stateSubject.OnNext(_currentState);
+                _currentState.RemoveSelectCharacterTyper(character.CharacterId);
             }
-            catch (ObjectDisposedException)
+
+            foreach (var character in characters)
             {
-                // TODO: Log.
+                _currentState.SyncSelectCharacterTyper(character.CharacterId, character.Name);
             }
-        }
 
-        // Can be made private.
-        public async Task GetCharacters()
-        {
-            var characters = await _charactersClient.GetAllByProfileIdAsync(default)
-                .ConfigureAwait(false);
-
-            UpdateCharacters(characters);
-        }
-
-        protected override void DisposeManagedResources()
-        {
-            _stateSubject.Dispose();
-        }
-
-        private void UpdateCharacters(IEnumerable<CharacterResource> characters)
-        {
-            lock (_updateStateLock)
-            {
-                foreach (var character in _currentState.Characters.Where(c => !characters.Any(x => x.CharacterId == c.CharacterId)))
-                {
-                    _currentState.RemoveSelectCharacterTyper(character.CharacterId);
-                }
-
-                foreach (var character in characters)
-                {
-                    _currentState.SyncSelectCharacterTyper(character.CharacterId, character.Name);
-                }
-
-                _stateSubject.OnNext(_currentState);
-            }
+            _stateSubject.OnNext(_currentState);
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Client.Interaction
+﻿namespace TypingRealm.Client.Interaction;
+
+public interface IChangeDetector
 {
-    public interface IChangeDetector
-    {
-        void NotifyChanged();
-    }
+    void NotifyChanged();
 }

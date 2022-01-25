@@ -3,51 +3,50 @@ using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Profiles.Activities;
 using TypingRealm.Profiles.Api.Resources;
 
-namespace TypingRealm.Profiles.Api.Controllers
+namespace TypingRealm.Profiles.Api.Controllers;
+
+[Route("api/[controller]")]
+public sealed class ActivitiesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    public sealed class ActivitiesController : ControllerBase
+    private readonly IActivityRepository _activityRepository;
+
+    public ActivitiesController(IActivityRepository activityRepository)
     {
-        private readonly IActivityRepository _activityRepository;
+        _activityRepository = activityRepository;
+    }
 
-        public ActivitiesController(IActivityRepository activityRepository)
-        {
-            _activityRepository = activityRepository;
-        }
+    [HttpGet("current/{characterId}")]
+    public ValueTask<ActionResult<ActivityResource>> GetCurrentActivity(string characterId)
+    {
+        var activity = _activityRepository.FindActiveActivityForCharacter(characterId);
+        if (activity == null)
+            return new ValueTask<ActionResult<ActivityResource>>(NotFound("Activity for the character does not exist."));
 
-        [HttpGet("current/{characterId}")]
-        public ValueTask<ActionResult<ActivityResource>> GetCurrentActivity(string characterId)
-        {
-            var activity = _activityRepository.FindActiveActivityForCharacter(characterId);
-            if (activity == null)
-                return new ValueTask<ActionResult<ActivityResource>>(NotFound("Activity for the character does not exist."));
+        return new ValueTask<ActionResult<ActivityResource>>(
+            new ActivityResource(activity.ActivityId, activity.Type, activity.CharacterIds));
+    }
 
-            return new ValueTask<ActionResult<ActivityResource>>(
-                new ActivityResource(activity.ActivityId, activity.Type, activity.CharacterIds));
-        }
+    [HttpPost]
+    public ValueTask<ActionResult> StartActivity(ActivityResource activity)
+    {
+        if (!_activityRepository.ValidateCharactersDoNotHaveActiveActivity(activity.CharacterIds))
+            return new ValueTask<ActionResult>(BadRequest("Some characters are already in a different activity."));
 
-        [HttpPost]
-        public ValueTask<ActionResult> StartActivity(ActivityResource activity)
-        {
-            if (!_activityRepository.ValidateCharactersDoNotHaveActiveActivity(activity.CharacterIds))
-                return new ValueTask<ActionResult>(BadRequest("Some characters are already in a different activity."));
+        _activityRepository.Save(new Activity(activity.ActivityId, activity.Type, activity.CharacterIds));
+        return new ValueTask<ActionResult>(Ok());
+    }
 
-            _activityRepository.Save(new Activity(activity.ActivityId, activity.Type, activity.CharacterIds));
-            return new ValueTask<ActionResult>(Ok());
-        }
+    [HttpDelete]
+    [Route("{activityId}")]
+    public ValueTask<ActionResult> FinishActivity(string activityId)
+    {
+        var activity = _activityRepository.Find(activityId);
+        if (activity == null)
+            return new ValueTask<ActionResult>(NotFound("Activity is not found."));
 
-        [HttpDelete]
-        [Route("{activityId}")]
-        public ValueTask<ActionResult> FinishActivity(string activityId)
-        {
-            var activity = _activityRepository.Find(activityId);
-            if (activity == null)
-                return new ValueTask<ActionResult>(NotFound("Activity is not found."));
+        activity.Finish();
 
-            activity.Finish();
-
-            _activityRepository.Save(activity);
-            return new ValueTask<ActionResult>(Ok());
-        }
+        _activityRepository.Save(activity);
+        return new ValueTask<ActionResult>(Ok());
     }
 }

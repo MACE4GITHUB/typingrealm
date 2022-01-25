@@ -7,22 +7,21 @@ using TypingRealm.Messaging.Handling;
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Messaging.Tests.Handling
+namespace TypingRealm.Messaging.Tests.Handling;
+
+public class MessageHandlerFactoryTests : TestsBase
 {
-    public class MessageHandlerFactoryTests : TestsBase
+    [Theory, AutoMoqData]
+    public void ShouldGetAllHandlers(
+        [Frozen] Mock<IServiceProvider> services,
+        MessageHandlerFactory sut)
     {
-        [Theory, AutoMoqData]
-        public void ShouldGetAllHandlers(
-            [Frozen]Mock<IServiceProvider> services,
-            MessageHandlerFactory sut)
-        {
-            var handlers = Fixture.CreateMany<IMessageHandler<TestMessage>>();
-            services.Setup(x => x.GetService(typeof(IEnumerable<IMessageHandler<TestMessage>>)))
-                .Returns(handlers);
+        var handlers = Fixture.CreateMany<IMessageHandler<TestMessage>>();
+        services.Setup(x => x.GetService(typeof(IEnumerable<IMessageHandler<TestMessage>>)))
+            .Returns(handlers);
 
-            var result = sut.GetHandlersFor<TestMessage>();
+        var result = sut.GetHandlersFor<TestMessage>();
 
-            Assert.Equal(handlers, result);
-        }
+        Assert.Equal(handlers, result);
     }
 }

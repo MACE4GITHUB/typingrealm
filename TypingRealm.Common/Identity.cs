@@ -1,16 +1,15 @@
 ﻿using System;
 
-namespace TypingRealm.Common
+namespace TypingRealm.Common;
+
+/// <summary>
+/// String identity.
+/// </summary>
+public abstract class Identity : Primitive<string>
 {
-    /// <summary>
-    /// String identity.
-    /// </summary>
-    public abstract class Identity : Primitive<string>
+    protected Identity(string value) : base(value)
     {
-        protected Identity(string value) : base(value)
-        {
-            if (value.Trim().Length == 0)
-                throw new ArgumentException("String identity cannot be empty.");
-        }
+        if (value.Trim().Length == 0)
+            throw new ArgumentException("String identity cannot be empty.");
     }
 }

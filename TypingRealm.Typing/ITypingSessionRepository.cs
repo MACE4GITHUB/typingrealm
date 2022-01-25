@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace TypingRealm.Typing
+namespace TypingRealm.Typing;
+
+public interface ITypingSessionRepository
 {
-    public interface ITypingSessionRepository
-    {
-        ValueTask<TypingSession?> FindAsync(string typingSessionId);
-        ValueTask SaveAsync(TypingSession typingSession);
-        ValueTask<string> NextIdAsync();
-    }
+    ValueTask<TypingSession?> FindAsync(string typingSessionId);
+    ValueTask SaveAsync(TypingSession typingSession);
+    ValueTask<string> NextIdAsync();
 }

@@ -1,11 +1,10 @@
 ﻿using TypingRealm.Common;
 
-namespace TypingRealm.Domain.Movement
+namespace TypingRealm.Domain.Movement;
+
+public sealed class LocationId : Identity
 {
-    public sealed class LocationId : Identity
+    public LocationId(string value) : base(value)
     {
-        public LocationId(string value) : base(value)
-        {
-        }
     }
 }

@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using TypingRealm.Data.Resources;
 
-namespace TypingRealm.Data.Api.Client
+namespace TypingRealm.Data.Api.Client;
+
+public interface ILocationsClient
 {
-    public interface ILocationsClient
-    {
-        ValueTask<Location> GetLocationAsync(string locationId, CancellationToken cancellationToken);
-    }
+    ValueTask<Location> GetLocationAsync(string locationId, CancellationToken cancellationToken);
 }

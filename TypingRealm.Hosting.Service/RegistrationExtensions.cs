@@ -9,61 +9,60 @@ using TypingRealm.Messaging.Serialization.Protobuf;
 using TypingRealm.SignalR;
 using TypingRealm.Tcp;
 
-namespace TypingRealm.Hosting.Service
+namespace TypingRealm.Hosting.Service;
+
+public static class RegistrationExtensions
 {
-    public static class RegistrationExtensions
+    public static MessageTypeCacheBuilder UseTcpHost(this IServiceCollection services, IConfiguration configuration, int port)
     {
-        public static MessageTypeCacheBuilder UseTcpHost(this IServiceCollection services, IConfiguration configuration, int port)
-        {
-            Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
-            var builder = SetupCommonMessagingServiceDependencies(services);
+        Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
+        var builder = SetupCommonMessagingServiceDependencies(services);
 
-            // Authentication.
-            builder.AddTyrServiceWithoutAspNetAuthentication();
+        // Authentication.
+        builder.AddTyrServiceWithoutAspNetAuthentication();
 
-            // TCP, Protobuf.
-            services
-                .AddProtobuf() // Already has a call to AddProtobufMessageSerializer.
-                .AddTcpServer(port)
-                .AddHostedService<TcpServerHostedService>();
+        // TCP, Protobuf.
+        services
+            .AddProtobuf() // Already has a call to AddProtobufMessageSerializer.
+            .AddTcpServer(port)
+            .AddHostedService<TcpServerHostedService>();
 
-            // Use this to serialize/deserialize messages in JSON instead of protobuf base64 string.
-            // This can be removed for total Protobuf serialization mode.
-            services.AddJson();
+        // Use this to serialize/deserialize messages in JSON instead of protobuf base64 string.
+        // This can be removed for total Protobuf serialization mode.
+        services.AddJson();
 
-            return builder;
-        }
+        return builder;
+    }
 
-        public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services, IConfiguration configuration)
-        {
-            Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
-            Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(services);
-            var builder = SetupCommonMessagingServiceDependencies(services);
+    public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services, IConfiguration configuration)
+    {
+        Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
+        Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(services);
+        var builder = SetupCommonMessagingServiceDependencies(services);
 
-            // Authentication.
-            builder.AddTyrServiceAuthentication();
+        // Authentication.
+        builder.AddTyrServiceAuthentication();
 
-            // SignalR.
-            services.AddSignalR();
-            services.RegisterMessageHub();
+        // SignalR.
+        services.AddSignalR();
+        services.RegisterMessageHub();
 
-            // Message serialization.
-            services.AddJson();
+        // Message serialization.
+        services.AddJson();
 
-            // Use this to enable protobuf base64 string message serializer instead of json.
-            // This can be removed for total JSON serialization mode.
-            services.AddProtobufMessageSerializer();
+        // Use this to enable protobuf base64 string message serializer instead of json.
+        // This can be removed for total JSON serialization mode.
+        services.AddProtobufMessageSerializer();
 
-            return builder;
-        }
+        return builder;
+    }
 
-        private static MessageTypeCacheBuilder SetupCommonMessagingServiceDependencies(IServiceCollection services)
-        {
-            services.RegisterMessaging();
+    private static MessageTypeCacheBuilder SetupCommonMessagingServiceDependencies(IServiceCollection services)
+    {
+        services.RegisterMessaging();
 
-            var builder = services.AddSerializationCore();
+        var builder = services.AddSerializationCore();
 
-            return builder;
-        }
+        return builder;
     }
 }

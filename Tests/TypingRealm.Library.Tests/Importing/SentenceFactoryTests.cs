@@ -10,219 +10,218 @@ using TypingRealm.Testing;
 using TypingRealm.TextProcessing;
 using Xunit;
 
-namespace TypingRealm.Library.Tests.Importing
+namespace TypingRealm.Library.Tests.Importing;
+
+public class SentenceFactoryTests : LibraryTestsBase
 {
-    public class SentenceFactoryTests : LibraryTestsBase
+    private readonly Mock<ITextProcessor> _textProcessor;
+    private readonly SentenceFactory _sut;
+
+    public SentenceFactoryTests()
     {
-        private readonly Mock<ITextProcessor> _textProcessor;
-        private readonly SentenceFactory _sut;
+        _textProcessor = Freeze<ITextProcessor>();
+        _sut = Fixture.Create<SentenceFactory>();
+    }
 
-        public SentenceFactoryTests()
+    [Theory, AutoDomainData]
+    public void ShouldCreateSentence_WithValidMetadata_EndToEnd(BookId bookId, int indexInBook)
+    {
+        Fixture.Register<ITextProcessor>(() => new TextProcessor());
+        var e2eSut = Fixture.Create<SentenceFactory>();
+
+        var text = "Simple validated, $ validated - validated Simple; sentENce?";
+        var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+
+        Assert.False(string.IsNullOrWhiteSpace(sentence.SentenceId));
+        Assert.NotEqual(Guid.Empty, Guid.Parse(sentence.SentenceId));
+        Assert.Equal(bookId, sentence.BookId);
+        Assert.Equal(indexInBook, sentence.IndexInBook);
+        Assert.Equal(text, sentence.Value);
+
+        var words = sentence.Words.ToList();
+        Assert.True(words.All(word => sentence.SentenceId == word.SentenceId));
+
+        Assert.Equal("Simple", words[0].Value);
+        Assert.Equal(1, words[0].CountInSentence);
+        Assert.Equal("simple", words[0].RawValue);
+        Assert.Equal(2, words[0].RawCountInSentence);
+        Assert.Equal("validated,", words[1].Value);
+        Assert.Equal(1, words[1].CountInSentence);
+        Assert.Equal("validated", words[1].RawValue);
+        Assert.Equal(3, words[1].RawCountInSentence);
+        Assert.Equal("$", words[2].Value);
+        Assert.Equal(1, words[2].CountInSentence);
+        Assert.Equal("", words[2].RawValue);
+        Assert.Equal(0, words[2].RawCountInSentence);
+        Assert.Equal("validated", words[3].Value);
+        Assert.Equal(2, words[3].CountInSentence);
+        Assert.Equal("validated", words[3].RawValue);
+        Assert.Equal(3, words[3].RawCountInSentence);
+        Assert.Equal("-", words[4].Value);
+        Assert.Equal(1, words[4].CountInSentence);
+        Assert.Equal("", words[4].RawValue);
+        Assert.Equal(0, words[4].RawCountInSentence);
+        Assert.Equal("validated", words[5].Value);
+        Assert.Equal(2, words[5].CountInSentence);
+        Assert.Equal("validated", words[5].RawValue);
+        Assert.Equal(3, words[5].RawCountInSentence);
+        Assert.Equal("Simple;", words[6].Value);
+        Assert.Equal(1, words[6].CountInSentence);
+        Assert.Equal("simple", words[6].RawValue);
+        Assert.Equal(2, words[6].RawCountInSentence);
+        Assert.Equal("sentENce?", words[7].Value);
+        Assert.Equal(1, words[7].CountInSentence);
+        Assert.Equal("sentence", words[7].RawValue);
+        Assert.Equal(1, words[7].RawCountInSentence);
+
+        var keyPairs = words[1].KeyPairs.ToList();
+
+        Assert.Equal(" v", keyPairs[0].Value);
+        Assert.Equal(" va", keyPairs[1].Value);
+
+        var pairs = "va val al ali li lid id ida da dat at ate te ted ed ed, d,";
+        Assert.Equal(pairs, string.Join(" ", keyPairs.Skip(2).Take(keyPairs.Count - 4).Select(kp => kp.Value)));
+
+        Assert.Equal("d, ", keyPairs[^2].Value);
+        Assert.Equal(", ", keyPairs[^1].Value);
+
+        Assert.True(keyPairs.All(x => x.CountInWord == 1));
+        Assert.Equal(3, keyPairs[1].CountInSentence);
+        Assert.Equal(3, keyPairs[4].CountInSentence);
+        Assert.True(keyPairs.Take(keyPairs.Count - 4).All(x => x.CountInSentence == 3));
+        Assert.True(keyPairs.Skip(keyPairs.Count - 4).All(x => x.CountInSentence == 1));
+
+        Assert.Equal(-1, keyPairs[0].IndexInWord);
+        Assert.Equal(-1, keyPairs[1].IndexInWord);
+        Assert.Equal(0, keyPairs[2].IndexInWord);
+        Assert.Equal(0, keyPairs[3].IndexInWord);
+
+        var index = -1;
+        var skip = true;
+        foreach (var keyPair in keyPairs)
         {
-            _textProcessor = Freeze<ITextProcessor>();
-            _sut = Fixture.Create<SentenceFactory>();
-        }
+            Assert.Equal(index, keyPair.IndexInWord);
 
-        [Theory, AutoDomainData]
-        public void ShouldCreateSentence_WithValidMetadata_EndToEnd(BookId bookId, int indexInBook)
-        {
-            Fixture.Register<ITextProcessor>(() => new TextProcessor());
-            var e2eSut = Fixture.Create<SentenceFactory>();
-
-            var text = "Simple validated, $ validated - validated Simple; sentENce?";
-            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
-
-            Assert.False(string.IsNullOrWhiteSpace(sentence.SentenceId));
-            Assert.NotEqual(Guid.Empty, Guid.Parse(sentence.SentenceId));
-            Assert.Equal(bookId, sentence.BookId);
-            Assert.Equal(indexInBook, sentence.IndexInBook);
-            Assert.Equal(text, sentence.Value);
-
-            var words = sentence.Words.ToList();
-            Assert.True(words.All(word => sentence.SentenceId == word.SentenceId));
-
-            Assert.Equal("Simple", words[0].Value);
-            Assert.Equal(1, words[0].CountInSentence);
-            Assert.Equal("simple", words[0].RawValue);
-            Assert.Equal(2, words[0].RawCountInSentence);
-            Assert.Equal("validated,", words[1].Value);
-            Assert.Equal(1, words[1].CountInSentence);
-            Assert.Equal("validated", words[1].RawValue);
-            Assert.Equal(3, words[1].RawCountInSentence);
-            Assert.Equal("$", words[2].Value);
-            Assert.Equal(1, words[2].CountInSentence);
-            Assert.Equal("", words[2].RawValue);
-            Assert.Equal(0, words[2].RawCountInSentence);
-            Assert.Equal("validated", words[3].Value);
-            Assert.Equal(2, words[3].CountInSentence);
-            Assert.Equal("validated", words[3].RawValue);
-            Assert.Equal(3, words[3].RawCountInSentence);
-            Assert.Equal("-", words[4].Value);
-            Assert.Equal(1, words[4].CountInSentence);
-            Assert.Equal("", words[4].RawValue);
-            Assert.Equal(0, words[4].RawCountInSentence);
-            Assert.Equal("validated", words[5].Value);
-            Assert.Equal(2, words[5].CountInSentence);
-            Assert.Equal("validated", words[5].RawValue);
-            Assert.Equal(3, words[5].RawCountInSentence);
-            Assert.Equal("Simple;", words[6].Value);
-            Assert.Equal(1, words[6].CountInSentence);
-            Assert.Equal("simple", words[6].RawValue);
-            Assert.Equal(2, words[6].RawCountInSentence);
-            Assert.Equal("sentENce?", words[7].Value);
-            Assert.Equal(1, words[7].CountInSentence);
-            Assert.Equal("sentence", words[7].RawValue);
-            Assert.Equal(1, words[7].RawCountInSentence);
-
-            var keyPairs = words[1].KeyPairs.ToList();
-
-            Assert.Equal(" v", keyPairs[0].Value);
-            Assert.Equal(" va", keyPairs[1].Value);
-
-            var pairs = "va val al ali li lid id ida da dat at ate te ted ed ed, d,";
-            Assert.Equal(pairs, string.Join(" ", keyPairs.Skip(2).Take(keyPairs.Count - 4).Select(kp => kp.Value)));
-
-            Assert.Equal("d, ", keyPairs[^2].Value);
-            Assert.Equal(", ", keyPairs[^1].Value);
-
-            Assert.True(keyPairs.All(x => x.CountInWord == 1));
-            Assert.Equal(3, keyPairs[1].CountInSentence);
-            Assert.Equal(3, keyPairs[4].CountInSentence);
-            Assert.True(keyPairs.Take(keyPairs.Count - 4).All(x => x.CountInSentence == 3));
-            Assert.True(keyPairs.Skip(keyPairs.Count - 4).All(x => x.CountInSentence == 1));
-
-            Assert.Equal(-1, keyPairs[0].IndexInWord);
-            Assert.Equal(-1, keyPairs[1].IndexInWord);
-            Assert.Equal(0, keyPairs[2].IndexInWord);
-            Assert.Equal(0, keyPairs[3].IndexInWord);
-
-            var index = -1;
-            var skip = true;
-            foreach (var keyPair in keyPairs)
+            if (skip)
             {
-                Assert.Equal(index, keyPair.IndexInWord);
-
-                if (skip)
-                {
-                    skip = false;
-                    continue;
-                }
-
-                else
-                {
-                    skip = true;
-                    index++;
-                }
+                skip = false;
+                continue;
             }
 
-            Assert.Equal(SentenceType.Normal, sentence.Type);
+            else
+            {
+                skip = true;
+                index++;
+            }
         }
 
-        [Theory, AutoDomainData]
-        public void ShouldCreateSentence_WithWeirdFormat_EndToEnd(BookId bookId, int indexInBook)
-        {
-            Fixture.Register<ITextProcessor>(() => new TextProcessor());
-            var e2eSut = Fixture.Create<SentenceFactory>();
+        Assert.Equal(SentenceType.Normal, sentence.Type);
+    }
 
-            var text = "  -$ Simple sentence ... . soME other sentence. # , . ! ? another; sentence-  ";
-            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+    [Theory, AutoDomainData]
+    public void ShouldCreateSentence_WithWeirdFormat_EndToEnd(BookId bookId, int indexInBook)
+    {
+        Fixture.Register<ITextProcessor>(() => new TextProcessor());
+        var e2eSut = Fixture.Create<SentenceFactory>();
 
-            Assert.Equal("-$ Simple sentence ... SoME other sentence. # ,. Another; sentence-.", sentence.Value);
-            Assert.Equal("-$", sentence.Words.First().Value);
-            Assert.Equal("...", sentence.Words.ToList()[3].Value);
-            Assert.Equal(" .| ..|..|...|..|.. |. ", string.Join("|", sentence.Words.ToList()[3].KeyPairs.Select(kp => kp.Value)));
+        var text = "  -$ Simple sentence ... . soME other sentence. # , . ! ? another; sentence-  ";
+        var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
 
-            Assert.Equal(SentenceType.Other, sentence.Type);
-        }
+        Assert.Equal("-$ Simple sentence ... SoME other sentence. # ,. Another; sentence-.", sentence.Value);
+        Assert.Equal("-$", sentence.Words.First().Value);
+        Assert.Equal("...", sentence.Words.ToList()[3].Value);
+        Assert.Equal(" .| ..|..|...|..|.. |. ", string.Join("|", sentence.Words.ToList()[3].KeyPairs.Select(kp => kp.Value)));
 
-        [Theory, AutoDomainData]
-        public void ShouldCountKeyPairsInWord_EndToEnd(BookId bookId, int indexInBook)
-        {
-            Fixture.Register<ITextProcessor>(() => new TextProcessor());
-            var e2eSut = Fixture.Create<SentenceFactory>();
+        Assert.Equal(SentenceType.Other, sentence.Type);
+    }
 
-            var text = "sasasasa, sentence...";
-            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+    [Theory, AutoDomainData]
+    public void ShouldCountKeyPairsInWord_EndToEnd(BookId bookId, int indexInBook)
+    {
+        Fixture.Register<ITextProcessor>(() => new TextProcessor());
+        var e2eSut = Fixture.Create<SentenceFactory>();
 
-            var word = sentence.Words.First();
-            Assert.Equal("Sasasasa,", word.Value);
+        var text = "sasasasa, sentence...";
+        var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
 
-            var keyPairs = word.KeyPairs.ToList();
+        var word = sentence.Words.First();
+        Assert.Equal("Sasasasa,", word.Value);
 
-            Assert.True(word.KeyPairs.Where(kp => kp.Value == "sa").All(kp => kp.CountInWord == 3));
-            Assert.Equal(SentenceType.Normal, sentence.Type);
-        }
+        var keyPairs = word.KeyPairs.ToList();
 
-        [Theory, AutoDomainData]
-        public void ShouldCreateSentence_WhenMultipleSentences_EndToEnd(
-            BookId bookId, int indexInBook)
-        {
-            Fixture.Register<ITextProcessor>(() => new TextProcessor());
-            var e2eSut = Fixture.Create<SentenceFactory>();
+        Assert.True(word.KeyPairs.Where(kp => kp.Value == "sa").All(kp => kp.CountInWord == 3));
+        Assert.Equal(SentenceType.Normal, sentence.Type);
+    }
 
-            var text = " sentence, one.  sentence two?.. - \"Sentence three?\"";
+    [Theory, AutoDomainData]
+    public void ShouldCreateSentence_WhenMultipleSentences_EndToEnd(
+        BookId bookId, int indexInBook)
+    {
+        Fixture.Register<ITextProcessor>(() => new TextProcessor());
+        var e2eSut = Fixture.Create<SentenceFactory>();
 
-            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
-            var words = sentence.Words.ToList();
+        var text = " sentence, one.  sentence two?.. - \"Sentence three?\"";
 
-            Assert.Equal("Sentence, one. Sentence two?.. - \"Sentence three?\"", sentence.Value);
-            Assert.Equal("Sentence,", words[0].Value);
-            Assert.Equal("two?..", words[3].Value);
-            Assert.Equal("three?\"", words[^1].Value);
-            Assert.Equal(SentenceType.Normal, sentence.Type);
-        }
+        var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+        var words = sentence.Words.ToList();
 
-        [Theory, AutoDomainData]
-        public void ShouldNotHaveDotAfterQuotes(
-            BookId bookId, int indexInBook)
-        {
-            Fixture.Register<ITextProcessor>(() => new TextProcessor());
-            var e2eSut = Fixture.Create<SentenceFactory>();
+        Assert.Equal("Sentence, one. Sentence two?.. - \"Sentence three?\"", sentence.Value);
+        Assert.Equal("Sentence,", words[0].Value);
+        Assert.Equal("two?..", words[3].Value);
+        Assert.Equal("three?\"", words[^1].Value);
+        Assert.Equal(SentenceType.Normal, sentence.Type);
+    }
 
-            var text = " sentence, one?\"";
+    [Theory, AutoDomainData]
+    public void ShouldNotHaveDotAfterQuotes(
+        BookId bookId, int indexInBook)
+    {
+        Fixture.Register<ITextProcessor>(() => new TextProcessor());
+        var e2eSut = Fixture.Create<SentenceFactory>();
 
-            var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
-            var words = sentence.Words.ToList();
+        var text = " sentence, one?\"";
 
-            Assert.Equal("Sentence, one?\"", sentence.Value);
-            Assert.Equal(SentenceType.Normal, sentence.Type);
-        }
+        var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
+        var words = sentence.Words.ToList();
 
-        // TODO: Rewrite this test with more examples / inline data.
-        [Theory, AutoDomainData]
-        public void ShouldHaveSentenceWithOtherType_WhenMultiplePunctuationSignsInARow_ExceptQuotesDotQuestionExclamation(
-            BookId bookId, int indexInBook)
-        {
-            Fixture.Register<ITextProcessor>(() => new TextProcessor());
-            var e2eSut = Fixture.Create<SentenceFactory>();
+        Assert.Equal("Sentence, one?\"", sentence.Value);
+        Assert.Equal(SentenceType.Normal, sentence.Type);
+    }
 
-            var sentence = e2eSut.CreateSentence(bookId, "Sentence ## one", indexInBook);
-            Assert.Equal(SentenceType.Other, sentence.Type);
+    // TODO: Rewrite this test with more examples / inline data.
+    [Theory, AutoDomainData]
+    public void ShouldHaveSentenceWithOtherType_WhenMultiplePunctuationSignsInARow_ExceptQuotesDotQuestionExclamation(
+        BookId bookId, int indexInBook)
+    {
+        Fixture.Register<ITextProcessor>(() => new TextProcessor());
+        var e2eSut = Fixture.Create<SentenceFactory>();
 
-            sentence = e2eSut.CreateSentence(bookId, "Sentence!\"", indexInBook);
-            Assert.Equal(SentenceType.Normal, sentence.Type);
+        var sentence = e2eSut.CreateSentence(bookId, "Sentence ## one", indexInBook);
+        Assert.Equal(SentenceType.Other, sentence.Type);
 
-            sentence = e2eSut.CreateSentence(bookId, "Sentence.\"", indexInBook);
-            Assert.Equal(SentenceType.Normal, sentence.Type);
+        sentence = e2eSut.CreateSentence(bookId, "Sentence!\"", indexInBook);
+        Assert.Equal(SentenceType.Normal, sentence.Type);
 
-            sentence = e2eSut.CreateSentence(bookId, "Sentence\"?", indexInBook);
-            Assert.Equal(SentenceType.Normal, sentence.Type);
+        sentence = e2eSut.CreateSentence(bookId, "Sentence.\"", indexInBook);
+        Assert.Equal(SentenceType.Normal, sentence.Type);
 
-            sentence = e2eSut.CreateSentence(bookId, "Sentence.?", indexInBook);
-            Assert.Equal(SentenceType.Other, sentence.Type);
+        sentence = e2eSut.CreateSentence(bookId, "Sentence\"?", indexInBook);
+        Assert.Equal(SentenceType.Normal, sentence.Type);
 
-            sentence = e2eSut.CreateSentence(bookId, "Sentence.!", indexInBook);
-            Assert.Equal(SentenceType.Other, sentence.Type);
-        }
+        sentence = e2eSut.CreateSentence(bookId, "Sentence.?", indexInBook);
+        Assert.Equal(SentenceType.Other, sentence.Type);
 
-        [Fact]
-        public void AddLibraryDomain_ShouldRegisterTransient()
-        {
-            var serviceProvider = new ServiceCollection()
-                .AddLibraryDomain()
-                .BuildServiceProvider();
+        sentence = e2eSut.CreateSentence(bookId, "Sentence.!", indexInBook);
+        Assert.Equal(SentenceType.Other, sentence.Type);
+    }
 
-            serviceProvider.AssertRegisteredTransient<ISentenceFactory, SentenceFactory>();
-        }
+    [Fact]
+    public void AddLibraryDomain_ShouldRegisterTransient()
+    {
+        var serviceProvider = new ServiceCollection()
+            .AddLibraryDomain()
+            .BuildServiceProvider();
+
+        serviceProvider.AssertRegisteredTransient<ISentenceFactory, SentenceFactory>();
     }
 }

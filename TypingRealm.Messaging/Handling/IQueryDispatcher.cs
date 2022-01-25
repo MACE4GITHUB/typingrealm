@@ -2,14 +2,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Handling
+namespace TypingRealm.Messaging.Handling;
+
+public interface IQueryDispatcher
 {
-    public interface IQueryDispatcher
-    {
-        ValueTask<object> DispatchAsync(
-            ConnectedClient sender,
-            object message,
-            Type responseType,
-            CancellationToken cancellationToken);
-    }
+    ValueTask<object> DispatchAsync(
+        ConnectedClient sender,
+        object message,
+        Type responseType,
+        CancellationToken cancellationToken);
 }

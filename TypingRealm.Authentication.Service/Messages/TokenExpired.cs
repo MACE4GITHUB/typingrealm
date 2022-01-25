@@ -1,9 +1,8 @@
 ﻿using TypingRealm.Messaging;
 
-namespace TypingRealm.Authentication.Service.Messages
+namespace TypingRealm.Authentication.Service.Messages;
+
+[Message]
+public sealed class TokenExpired
 {
-    [Message]
-    public sealed class TokenExpired
-    {
-    }
 }

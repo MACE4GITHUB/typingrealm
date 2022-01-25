@@ -1,10 +1,9 @@
-﻿namespace TypingRealm.Client.Interaction
+﻿namespace TypingRealm.Client.Interaction;
+
+public interface IInputHandler
 {
-    public interface IInputHandler
-    {
-        void Type(char character);
-        void Backspace();
-        void Escape();
-        void Tab();
-    }
+    void Type(char character);
+    void Backspace();
+    void Escape();
+    void Tab();
 }

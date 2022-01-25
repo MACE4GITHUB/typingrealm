@@ -2,48 +2,47 @@
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Messaging.Tests.Connections
+namespace TypingRealm.Messaging.Tests.Connections;
+
+public class ConnectionExtensionsTests : TestsBase
 {
-    public class ConnectionExtensionsTests : TestsBase
+    [Theory, AutoMoqData]
+    public void WithLocking_ShouldWrapConnectionInLockingConnection(
+        IConnection connection, ILock sendLock, ILock receiveLock)
     {
-        [Theory, AutoMoqData]
-        public void WithLocking_ShouldWrapConnectionInLockingConnection(
-            IConnection connection, ILock sendLock, ILock receiveLock)
-        {
-            var sut = connection.WithLocking(sendLock, receiveLock);
+        var sut = connection.WithLocking(sendLock, receiveLock);
 
-            Assert.IsType<LockingConnection>(sut);
-            Assert.Equal(connection, GetPrivateField(sut, "_connection"));
-            Assert.Equal(sendLock, GetPrivateField(sut, "_sendLock"));
-            Assert.Equal(receiveLock, GetPrivateField(sut, "_receiveLock"));
-        }
+        Assert.IsType<LockingConnection>(sut);
+        Assert.Equal(connection, GetPrivateField(sut, "_connection"));
+        Assert.Equal(sendLock, GetPrivateField(sut, "_sendLock"));
+        Assert.Equal(receiveLock, GetPrivateField(sut, "_receiveLock"));
+    }
 
-        [Theory, AutoMoqData]
-        public void WithNotificator_ShouldSetNotificator(
-            Notificator notificator,
-            IMessageSender sut)
-        {
-            var connection = sut.WithNotificator(notificator);
+    [Theory, AutoMoqData]
+    public void WithNotificator_ShouldSetNotificator(
+        Notificator notificator,
+        IMessageSender sut)
+    {
+        var connection = sut.WithNotificator(notificator);
 
-            Assert.Equal(notificator, GetPrivateField(connection, "_notificator"));
-        }
+        Assert.Equal(notificator, GetPrivateField(connection, "_notificator"));
+    }
 
-        [Theory, AutoMoqData]
-        public void WithNotificator_ShouldSetMessageSender(IMessageSender sut)
-        {
-            var connection = sut.WithNotificator(Create<Notificator>());
+    [Theory, AutoMoqData]
+    public void WithNotificator_ShouldSetMessageSender(IMessageSender sut)
+    {
+        var connection = sut.WithNotificator(Create<Notificator>());
 
-            Assert.Equal(sut, GetPrivateField(connection, "_messageSender"));
-        }
+        Assert.Equal(sut, GetPrivateField(connection, "_messageSender"));
+    }
 
-        [Theory, AutoMoqData]
-        public void WithReceiveAcknowledgement_ShouldWrapConnection(
-            IConnection connection)
-        {
-            var sut = connection.WithReceiveAcknowledgement();
+    [Theory, AutoMoqData]
+    public void WithReceiveAcknowledgement_ShouldWrapConnection(
+        IConnection connection)
+    {
+        var sut = connection.WithReceiveAcknowledgement();
 
-            Assert.IsType<ReceivedAcknowledgingConnection>(sut);
-            Assert.Equal(connection, GetPrivateField(sut, "_connection"));
-        }
+        Assert.IsType<ReceivedAcknowledgingConnection>(sut);
+        Assert.Equal(connection, GetPrivateField(sut, "_connection"));
     }
 }

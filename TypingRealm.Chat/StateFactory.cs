@@ -1,19 +1,18 @@
 ﻿using TypingRealm.Messaging.Updating;
 
-namespace TypingRealm.Chat
+namespace TypingRealm.Chat;
+
+public sealed class StateFactory : IUpdateFactory
 {
-    public sealed class StateFactory : IUpdateFactory
+    private readonly MessageLog _messageLog;
+
+    public StateFactory(MessageLog messageLog)
     {
-        private readonly MessageLog _messageLog;
+        _messageLog = messageLog;
+    }
 
-        public StateFactory(MessageLog messageLog)
-        {
-            _messageLog = messageLog;
-        }
-
-        public object GetUpdateFor(string clientId)
-        {
-            return _messageLog;
-        }
+    public object GetUpdateFor(string clientId)
+    {
+        return _messageLog;
     }
 }

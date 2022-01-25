@@ -1,24 +1,23 @@
 ﻿using System.Reflection;
 using AutoFixture.Kernel;
 
-namespace TypingRealm.Messaging.Tests.SpecimenBuilders
+namespace TypingRealm.Messaging.Tests.SpecimenBuilders;
+
+public class ClientWithConnectionBuilder : ISpecimenBuilder
 {
-    public class ClientWithConnectionBuilder : ISpecimenBuilder
+    private readonly IConnection _connection;
+
+    public ClientWithConnectionBuilder(IConnection connection)
     {
-        private readonly IConnection _connection;
+        _connection = connection;
+    }
 
-        public ClientWithConnectionBuilder(IConnection connection)
-        {
-            _connection = connection;
-        }
+    public object Create(object request, ISpecimenContext context)
+    {
+        if (!(request is ParameterInfo pi)
+            || pi.ParameterType != typeof(IConnection))
+            return new NoSpecimen();
 
-        public object Create(object request, ISpecimenContext context)
-        {
-            if (!(request is ParameterInfo pi)
-                || pi.ParameterType != typeof(IConnection))
-                return new NoSpecimen();
-
-            return _connection;
-        }
+        return _connection;
     }
 }

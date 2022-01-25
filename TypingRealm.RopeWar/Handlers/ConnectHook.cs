@@ -4,38 +4,37 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
 
-namespace TypingRealm.RopeWar.Handlers
+namespace TypingRealm.RopeWar.Handlers;
+
+public sealed class ConnectHook : IConnectHook
 {
-    public sealed class ConnectHook : IConnectHook
+    private readonly IContestStore _contestStore;
+    private readonly ICharacterStateService _characterStateService;
+
+    public ConnectHook(IContestStore contestStore, ICharacterStateService characterStateService)
     {
-        private readonly IContestStore _contestStore;
-        private readonly ICharacterStateService _characterStateService;
+        _contestStore = contestStore;
+        _characterStateService = characterStateService;
+    }
 
-        public ConnectHook(IContestStore contestStore, ICharacterStateService characterStateService)
+    public async ValueTask HandleAsync(Connect connect, CancellationToken cancellationToken)
+    {
+        var contest = _contestStore.FindActiveByContestantId(connect.ClientId);
+        if (contest != null)
         {
-            _contestStore = contestStore;
-            _characterStateService = characterStateService;
+            // Already in contest.
+            connect.Group = contest.ContestId;
+            return;
         }
 
-        public async ValueTask HandleAsync(Connect connect, CancellationToken cancellationToken)
+        var canJoin = await _characterStateService.CanJoinRopeWarContestAsync(connect.ClientId, connect.Group, cancellationToken)
+            .ConfigureAwait(false);
+
+        try
         {
-            var contest = _contestStore.FindActiveByContestantId(connect.ClientId);
-            if (contest != null)
-            {
-                // Already in contest.
-                connect.Group = contest.ContestId;
-                return;
-            }
-
-            var canJoin = await _characterStateService.CanJoinRopeWarContestAsync(connect.ClientId, connect.Group, cancellationToken)
-                .ConfigureAwait(false);
-
-            try
-            {
-                if (!canJoin)
-                    throw new InvalidOperationException($"Cannot join contest {connect.Group}.");
-            }
-            catch { }
+            if (!canJoin)
+                throw new InvalidOperationException($"Cannot join contest {connect.Group}.");
         }
+        catch { }
     }
 }

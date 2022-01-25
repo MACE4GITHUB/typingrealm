@@ -2,56 +2,55 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Tests.Connections
+namespace TypingRealm.Messaging.Tests.Connections;
+
+public sealed class TestLock : ILock
 {
-    public sealed class TestLock : ILock
+    public enum State
     {
-        public enum State
+        None,
+        Started,
+        Canceled,
+        Completed
+    }
+
+    public bool WaitComplete { get; set; }
+    public bool ReleaseComplete { get; set; }
+
+    public State WaitState { get; private set; }
+    public State ReleaseState { get; private set; }
+
+    public async ValueTask ReleaseAsync(CancellationToken cancellationToken)
+    {
+        ReleaseState = State.Started;
+
+        while (!ReleaseComplete)
         {
-            None,
-            Started,
-            Canceled,
-            Completed
+            await Task.Yield();
         }
 
-        public bool WaitComplete { get; set; }
-        public bool ReleaseComplete { get; set; }
+        ReleaseState = State.Completed;
+    }
 
-        public State WaitState { get; private set; }
-        public State ReleaseState { get; private set; }
+    public async ValueTask WaitAsync(CancellationToken cancellationToken)
+    {
+        WaitState = State.Started;
 
-        public async ValueTask ReleaseAsync(CancellationToken cancellationToken)
+        while (!WaitComplete)
         {
-            ReleaseState = State.Started;
+            await Task.Yield();
 
-            while (!ReleaseComplete)
+            try
             {
-                await Task.Yield();
+                cancellationToken.ThrowIfCancellationRequested();
             }
-
-            ReleaseState = State.Completed;
-        }
-
-        public async ValueTask WaitAsync(CancellationToken cancellationToken)
-        {
-            WaitState = State.Started;
-
-            while (!WaitComplete)
+            catch (OperationCanceledException)
             {
-                await Task.Yield();
-
-                try
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-                catch (OperationCanceledException)
-                {
-                    WaitState = State.Canceled;
-                    throw;
-                }
+                WaitState = State.Canceled;
+                throw;
             }
-
-            WaitState = State.Completed;
         }
+
+        WaitState = State.Completed;
     }
 }

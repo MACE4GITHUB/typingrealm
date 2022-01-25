@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Typing.Framework
+﻿namespace TypingRealm.Typing.Framework;
+
+public interface IIdentifiable
 {
-    public interface IIdentifiable
-    {
-        string Id { get; }
-    }
+    string Id { get; }
 }

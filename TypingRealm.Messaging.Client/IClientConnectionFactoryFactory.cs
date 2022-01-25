@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Messaging.Client
+﻿namespace TypingRealm.Messaging.Client;
+
+public interface IClientConnectionFactoryFactory
 {
-    public interface IClientConnectionFactoryFactory
-    {
-        IClientConnectionFactory CreateClientConnectionFactoryFor(string connectionString);
-    }
+    IClientConnectionFactory CreateClientConnectionFactoryFor(string connectionString);
 }

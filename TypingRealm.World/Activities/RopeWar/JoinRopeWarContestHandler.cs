@@ -3,29 +3,28 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.World.Layers;
 
-namespace TypingRealm.World.Activities.RopeWar
+namespace TypingRealm.World.Activities.RopeWar;
+
+public sealed class JoinRopeWarContestHandler : LayerHandler<JoinRopeWarContest>
 {
-    public sealed class JoinRopeWarContestHandler : LayerHandler<JoinRopeWarContest>
+    private readonly ILocationRepository _locationStore;
+
+    public JoinRopeWarContestHandler(
+        ICharacterActivityStore characterActivityStore,
+        ILocationRepository locationStore)
+        : base(characterActivityStore, Layer.World)
     {
-        private readonly ILocationRepository _locationStore;
+        _locationStore = locationStore;
+    }
 
-        public JoinRopeWarContestHandler(
-            ICharacterActivityStore characterActivityStore,
-            ILocationRepository locationStore)
-            : base(characterActivityStore, Layer.World)
-        {
-            _locationStore = locationStore;
-        }
+    protected override ValueTask HandleMessageAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
+    {
+        var characterId = sender.ClientId;
+        var location = _locationStore.FindLocationForClient(sender);
 
-        protected override ValueTask HandleMessageAsync(ConnectedClient sender, JoinRopeWarContest message, CancellationToken cancellationToken)
-        {
-            var characterId = sender.ClientId;
-            var location = _locationStore.FindLocationForClient(sender);
+        location.JoinRopeWarContest(characterId, message.RopeWarId, message.Side);
 
-            location.JoinRopeWarContest(characterId, message.RopeWarId, message.Side);
-
-            _locationStore.Save(location);
-            return default;
-        }
+        _locationStore.Save(location);
+        return default;
     }
 }

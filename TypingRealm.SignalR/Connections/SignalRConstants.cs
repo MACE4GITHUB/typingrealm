@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.SignalR.Connections
+﻿namespace TypingRealm.SignalR.Connections;
+
+internal static class SignalRConstants
 {
-    internal static class SignalRConstants
-    {
-        public static string Send => "Send";
-    }
+    public static string Send => "Send";
 }

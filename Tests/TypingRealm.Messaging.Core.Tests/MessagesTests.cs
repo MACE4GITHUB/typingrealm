@@ -4,145 +4,144 @@ using TypingRealm.Messaging.Messages;
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Messaging.Tests
+namespace TypingRealm.Messaging.Tests;
+
+public class MessagesTests : TestsBase
 {
-    public class MessagesTests : TestsBase
+    public class TestBroadcastMessage : BroadcastMessage
     {
-        public class TestBroadcastMessage : BroadcastMessage
-        {
-            public TestBroadcastMessage() : base()
-            {
-            }
-
-            public TestBroadcastMessage(string senderId) : base(senderId)
-            {
-            }
-        }
-
-        public class TestAbstractMessageData : MessageData
+        public TestBroadcastMessage() : base()
         {
         }
 
-        [Fact]
-        public void ShouldHaveTestsForAllMessages()
+        public TestBroadcastMessage(string senderId) : base(senderId)
         {
-            Assert.Equal(10, typeof(Announce).Assembly.GetTypes().Count(
-                t => t.GetCustomAttribute<MessageAttribute>() != null));
         }
+    }
 
-        [Theory, AutoMoqData]
-        public void AnnounceMessage(string message)
-        {
-            AssertSerializable<Announce>();
+    public class TestAbstractMessageData : MessageData
+    {
+    }
 
-            var sut = new Announce(message);
-            Assert.Equal(message, sut.Message);
-        }
+    [Fact]
+    public void ShouldHaveTestsForAllMessages()
+    {
+        Assert.Equal(10, typeof(Announce).Assembly.GetTypes().Count(
+            t => t.GetCustomAttribute<MessageAttribute>() != null));
+    }
 
-        [Theory, AutoMoqData]
-        public void DisconnectedMessage(string reason)
-        {
-            AssertSerializable<Disconnected>();
+    [Theory, AutoMoqData]
+    public void AnnounceMessage(string message)
+    {
+        AssertSerializable<Announce>();
 
-            var sut = new Disconnected(reason);
-            Assert.Equal(reason, sut.Reason);
-        }
+        var sut = new Announce(message);
+        Assert.Equal(message, sut.Message);
+    }
 
-        [Fact]
-        public void DisconnectMessage()
-        {
-            AssertSerializable<Disconnect>();
-        }
+    [Theory, AutoMoqData]
+    public void DisconnectedMessage(string reason)
+    {
+        AssertSerializable<Disconnected>();
 
-        [Theory, AutoMoqData]
-        public void ConnectMessage(
-            string clientId,
-            string group)
-        {
-            Assert.NotNull(Connect.DefaultGroup);
-            AssertSerializable<Connect>();
+        var sut = new Disconnected(reason);
+        Assert.Equal(reason, sut.Reason);
+    }
 
-            var sut = new Connect(clientId);
-            Assert.Equal(clientId, sut.ClientId);
-            Assert.Equal(Connect.DefaultGroup, sut.Group);
+    [Fact]
+    public void DisconnectMessage()
+    {
+        AssertSerializable<Disconnect>();
+    }
 
-            sut = new Connect(clientId, group);
-            Assert.Equal(clientId, sut.ClientId);
-            Assert.Equal(group, sut.Group);
+    [Theory, AutoMoqData]
+    public void ConnectMessage(
+        string clientId,
+        string group)
+    {
+        Assert.NotNull(Connect.DefaultGroup);
+        AssertSerializable<Connect>();
 
-            sut = new Connect();
-            Assert.Equal(Connect.DefaultGroup, sut.Group);
-        }
+        var sut = new Connect(clientId);
+        Assert.Equal(clientId, sut.ClientId);
+        Assert.Equal(Connect.DefaultGroup, sut.Group);
 
-        [Theory, AutoMoqData]
-        public void BroadcastMessage(string senderId)
-        {
-            AssertSerializable<TestBroadcastMessage>();
+        sut = new Connect(clientId, group);
+        Assert.Equal(clientId, sut.ClientId);
+        Assert.Equal(group, sut.Group);
 
-            var sut = new TestBroadcastMessage(senderId);
-            Assert.Equal(senderId, sut.SenderId);
-        }
+        sut = new Connect();
+        Assert.Equal(Connect.DefaultGroup, sut.Group);
+    }
 
-        [Theory, AutoMoqData]
-        public void AcknowledgeReceived(string messageId)
-        {
-            AssertSerializable<AcknowledgeReceived>();
+    [Theory, AutoMoqData]
+    public void BroadcastMessage(string senderId)
+    {
+        AssertSerializable<TestBroadcastMessage>();
 
-            var sut = new AcknowledgeReceived(messageId);
-            Assert.Equal(messageId, sut.MessageId);
-        }
+        var sut = new TestBroadcastMessage(senderId);
+        Assert.Equal(senderId, sut.SenderId);
+    }
 
-        [Theory, AutoMoqData]
-        public void AcknowledgeHandled(string messageId)
-        {
-            AssertSerializable<AcknowledgeHandled>();
+    [Theory, AutoMoqData]
+    public void AcknowledgeReceived(string messageId)
+    {
+        AssertSerializable<AcknowledgeReceived>();
 
-            var sut = new AcknowledgeHandled(messageId);
-            Assert.Equal(messageId, sut.MessageId);
-        }
+        var sut = new AcknowledgeReceived(messageId);
+        Assert.Equal(messageId, sut.MessageId);
+    }
 
-        [Theory, AutoMoqData]
-        public void AbstractMessageData(
-            string data,
-            string typeId)
-        {
-            AssertSerializable<TestAbstractMessageData>();
+    [Theory, AutoMoqData]
+    public void AcknowledgeHandled(string messageId)
+    {
+        AssertSerializable<AcknowledgeHandled>();
 
-            var sut = new TestAbstractMessageData();
-            Assert.Null(sut.Data);
-            Assert.Null(sut.TypeId);
+        var sut = new AcknowledgeHandled(messageId);
+        Assert.Equal(messageId, sut.MessageId);
+    }
 
-            sut.Data = data;
-            sut.TypeId = typeId;
-            Assert.Equal(data, sut.Data);
-            Assert.Equal(typeId, sut.TypeId);
+    [Theory, AutoMoqData]
+    public void AbstractMessageData(
+        string data,
+        string typeId)
+    {
+        AssertSerializable<TestAbstractMessageData>();
 
-            sut.Data = null!;
-            sut.TypeId = null!;
-            Assert.Null(sut.Data);
-            Assert.Null(sut.TypeId);
-        }
+        var sut = new TestAbstractMessageData();
+        Assert.Null(sut.Data);
+        Assert.Null(sut.TypeId);
 
-        [Theory, AutoMoqData]
-        public void ClientToServerMessageData(ClientToServerMessageData sut)
-        {
-            AssertSerializable<ClientToServerMessageData>();
-            Assert.IsAssignableFrom<MessageData>(sut);
+        sut.Data = data;
+        sut.TypeId = typeId;
+        Assert.Equal(data, sut.Data);
+        Assert.Equal(typeId, sut.TypeId);
 
-            // Metadata can be null.
-            sut.Metadata = null;
-            Assert.Null(sut.Metadata);
-        }
+        sut.Data = null!;
+        sut.TypeId = null!;
+        Assert.Null(sut.Data);
+        Assert.Null(sut.TypeId);
+    }
 
-        [Theory, AutoMoqData]
-        public void ServerToClientMessageData(ServerToClientMessageData sut)
-        {
-            AssertSerializable<ServerToClientMessageData>();
-            Assert.IsAssignableFrom<MessageData>(sut);
+    [Theory, AutoMoqData]
+    public void ClientToServerMessageData(ClientToServerMessageData sut)
+    {
+        AssertSerializable<ClientToServerMessageData>();
+        Assert.IsAssignableFrom<MessageData>(sut);
 
-            // Metadata can be null.
-            sut.Metadata = null;
-            Assert.Null(sut.Metadata);
-        }
+        // Metadata can be null.
+        sut.Metadata = null;
+        Assert.Null(sut.Metadata);
+    }
+
+    [Theory, AutoMoqData]
+    public void ServerToClientMessageData(ServerToClientMessageData sut)
+    {
+        AssertSerializable<ServerToClientMessageData>();
+        Assert.IsAssignableFrom<MessageData>(sut);
+
+        // Metadata can be null.
+        sut.Metadata = null;
+        Assert.Null(sut.Metadata);
     }
 }

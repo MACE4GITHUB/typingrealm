@@ -10,103 +10,102 @@ using TypingRealm.Messaging.Updating;
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Domain.Tests
+namespace TypingRealm.Domain.Tests;
+
+public class ConnectionInitializerTests : TestsBase
 {
-    public class ConnectionInitializerTests : TestsBase
+    [Theory, AutoDomainData]
+    public async Task ShouldThrow_WhenFirstMessageIsNotJoin(
+        IConnection connection,
+        ConnectionInitializer sut)
     {
-        [Theory, AutoDomainData]
-        public async Task ShouldThrow_WhenFirstMessageIsNotJoin(
-            IConnection connection,
-            ConnectionInitializer sut)
-        {
-            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
-                .ReturnsAsync(Create<TestMessage>());
+        Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+            .ReturnsAsync(Create<TestMessage>());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await sut.ConnectAsync(connection, Cts.Token));
-        }
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await sut.ConnectAsync(connection, Cts.Token));
+    }
 
-        [Theory, AutoDomainData]
-        public async Task ShouldThrow_WhenPlayerDoesNotExist(
-            IConnection connection,
-            PlayerId playerId,
-            [Frozen]Mock<IPlayerRepository> playerRepository,
-            ConnectionInitializer sut)
-        {
-            var joinMessage = Fixture.Build<Join>()
-                .With(x => x.PlayerId, playerId)
-                .Create();
+    [Theory, AutoDomainData]
+    public async Task ShouldThrow_WhenPlayerDoesNotExist(
+        IConnection connection,
+        PlayerId playerId,
+        [Frozen] Mock<IPlayerRepository> playerRepository,
+        ConnectionInitializer sut)
+    {
+        var joinMessage = Fixture.Build<Join>()
+            .With(x => x.PlayerId, playerId)
+            .Create();
 
-            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
-                .ReturnsAsync(joinMessage);
+        Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+            .ReturnsAsync(joinMessage);
 
-            playerRepository.Setup(x => x.Find(playerId))
-                .Returns<Player>(null);
+        playerRepository.Setup(x => x.Find(playerId))
+            .Returns<Player>(null);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await sut.ConnectAsync(connection, Cts.Token));
-        }
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await sut.ConnectAsync(connection, Cts.Token));
+    }
 
-        [Theory, AutoDomainData]
-        public async Task ShouldUsePlayerIdAsClientId(
-            IConnection connection,
-            PlayerId playerId,
-            ConnectionInitializer sut)
-        {
-            var joinMessage = Fixture.Build<Join>()
-                .With(x => x.PlayerId, playerId)
-                .Create();
+    [Theory, AutoDomainData]
+    public async Task ShouldUsePlayerIdAsClientId(
+        IConnection connection,
+        PlayerId playerId,
+        ConnectionInitializer sut)
+    {
+        var joinMessage = Fixture.Build<Join>()
+            .With(x => x.PlayerId, playerId)
+            .Create();
 
-            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
-                .ReturnsAsync(joinMessage);
+        Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+            .ReturnsAsync(joinMessage);
 
-            var client = await sut.ConnectAsync(connection, Cts.Token);
+        var client = await sut.ConnectAsync(connection, Cts.Token);
 
-            Assert.Equal(playerId, client.ClientId);
-        }
+        Assert.Equal(playerId, client.ClientId);
+    }
 
-        [Theory, AutoDomainData]
-        public async Task ShouldSetConnectionAndUpdateDetector(
-            IConnection connection,
-            PlayerId playerId,
-            [Frozen]IUpdateDetector updateDetector,
-            ConnectionInitializer sut)
-        {
-            var joinMessage = Fixture.Build<Join>()
-                .With(x => x.PlayerId, playerId)
-                .Create();
+    [Theory, AutoDomainData]
+    public async Task ShouldSetConnectionAndUpdateDetector(
+        IConnection connection,
+        PlayerId playerId,
+        [Frozen] IUpdateDetector updateDetector,
+        ConnectionInitializer sut)
+    {
+        var joinMessage = Fixture.Build<Join>()
+            .With(x => x.PlayerId, playerId)
+            .Create();
 
-            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
-                .ReturnsAsync(joinMessage);
+        Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+            .ReturnsAsync(joinMessage);
 
-            var client = await sut.ConnectAsync(connection, Cts.Token);
+        var client = await sut.ConnectAsync(connection, Cts.Token);
 
-            Assert.Equal(connection, client.Connection);
-            Assert.Equal(updateDetector, GetPrivateField(client, "_updateDetector"));
-        }
+        Assert.Equal(connection, client.Connection);
+        Assert.Equal(updateDetector, GetPrivateField(client, "_updateDetector"));
+    }
 
-        [Theory, AutoDomainData]
-        public async Task ShouldUsePlayerUniquePositionAsGroup(
-            IConnection connection,
-            Player player,
-            [Frozen]Mock<IPlayerRepository> playerRepository,
-            ConnectionInitializer sut)
-        {
-            var state = player.GetState();
+    [Theory, AutoDomainData]
+    public async Task ShouldUsePlayerUniquePositionAsGroup(
+        IConnection connection,
+        Player player,
+        [Frozen] Mock<IPlayerRepository> playerRepository,
+        ConnectionInitializer sut)
+    {
+        var state = player.GetState();
 
-            var joinMessage = Fixture.Build<Join>()
-                .With(x => x.PlayerId, state.PlayerId)
-                .Create();
+        var joinMessage = Fixture.Build<Join>()
+            .With(x => x.PlayerId, state.PlayerId)
+            .Create();
 
-            Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
-                .ReturnsAsync(joinMessage);
+        Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
+            .ReturnsAsync(joinMessage);
 
-            playerRepository.Setup(x => x.Find(state.PlayerId))
-                .Returns(player);
+        playerRepository.Setup(x => x.Find(state.PlayerId))
+            .Returns(player);
 
-            var client = await sut.ConnectAsync(connection, Cts.Token);
+        var client = await sut.ConnectAsync(connection, Cts.Token);
 
-            Assert.Equal($"location_{state.LocationId}", client.Group);
-        }
+        Assert.Equal($"location_{state.LocationId}", client.Group);
     }
 }

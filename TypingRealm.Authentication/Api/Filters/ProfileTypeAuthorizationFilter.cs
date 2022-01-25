@@ -2,23 +2,22 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using TypingRealm.Profiles;
 
-namespace TypingRealm.Authentication.Api.Filters
+namespace TypingRealm.Authentication.Api.Filters;
+
+public sealed class ProfileTypeAuthorizationFilter : IAuthorizationFilter
 {
-    public sealed class ProfileTypeAuthorizationFilter : IAuthorizationFilter
+    private readonly ProfileType _profileType;
+
+    public ProfileTypeAuthorizationFilter(ProfileType profileType)
     {
-        private readonly ProfileType _profileType;
+        _profileType = profileType;
+    }
 
-        public ProfileTypeAuthorizationFilter(ProfileType profileType)
-        {
-            _profileType = profileType;
-        }
+    public void OnAuthorization(AuthorizationFilterContext context)
+    {
+        var profile = Profile.GetProfileForUser(context.HttpContext.User);
 
-        public void OnAuthorization(AuthorizationFilterContext context)
-        {
-            var profile = Profile.GetProfileForUser(context.HttpContext.User);
-
-            if (profile.Type != _profileType)
-                context.Result = new ForbidResult();
-        }
+        if (profile.Type != _profileType)
+            context.Result = new ForbidResult();
     }
 }

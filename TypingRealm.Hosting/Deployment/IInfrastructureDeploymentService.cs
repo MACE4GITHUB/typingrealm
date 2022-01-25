@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Hosting.Deployment
+namespace TypingRealm.Hosting.Deployment;
+
+public interface IInfrastructureDeploymentService
 {
-    public interface IInfrastructureDeploymentService
-    {
-        ValueTask DeployInfrastructureAsync(CancellationToken cancellationToken);
-    }
+    ValueTask DeployInfrastructureAsync(CancellationToken cancellationToken);
 }

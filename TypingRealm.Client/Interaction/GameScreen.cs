@@ -1,12 +1,11 @@
-﻿namespace TypingRealm.Client.Interaction
-{
-    public enum GameScreen
-    {
-        MainMenu,
-        CharacterCreation,
-        World,
-        RopeWar,
+﻿namespace TypingRealm.Client.Interaction;
 
-        Exit = -1
-    }
+public enum GameScreen
+{
+    MainMenu,
+    CharacterCreation,
+    World,
+    RopeWar,
+
+    Exit = -1
 }

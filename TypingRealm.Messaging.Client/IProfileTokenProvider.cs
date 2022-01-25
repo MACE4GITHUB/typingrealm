@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Client
+namespace TypingRealm.Messaging.Client;
+
+public interface IProfileTokenProvider
 {
-    public interface IProfileTokenProvider
-    {
-        ValueTask<string> SignInAsync(CancellationToken cancellationToken);
-    }
+    ValueTask<string> SignInAsync(CancellationToken cancellationToken);
 }

@@ -1,8 +1,7 @@
-﻿namespace TypingRealm.Combat
+﻿namespace TypingRealm.Combat;
+
+public interface ICombatRoomStore
 {
-    public interface ICombatRoomStore
-    {
-        CombatRoom FindInBattle(string playerId);
-        CombatRoom FindOrCreate(string combatRoomId, string playerId);
-    }
+    CombatRoom FindInBattle(string playerId);
+    CombatRoom FindOrCreate(string combatRoomId, string playerId);
 }

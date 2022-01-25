@@ -4,61 +4,61 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace TypingRealm.Typing.Tests
+namespace TypingRealm.Typing.Tests;
+
+public record Input(string TextValue, TextTypingResult TextTypingResult);
+public class TextTypingResultValidatorTests
 {
-    public record Input(string TextValue, TextTypingResult TextTypingResult);
-    public class TextTypingResultValidatorTests
+    private readonly TextTypingResultValidator _sut;
+
+    public TextTypingResultValidatorTests()
     {
-        private readonly TextTypingResultValidator _sut;
+        _sut = new TextTypingResultValidator();
+    }
 
-        public TextTypingResultValidatorTests()
+    [Fact]
+    public async Task ShouldProduceCorrectResults()
+    {
+        for (var i = 0; i < GetTestData().Count(); i++)
         {
-            _sut = new TextTypingResultValidator();
+            await TestData(i);
         }
+    }
 
-        [Fact]
-        public async Task ShouldProduceCorrectResults()
+    [Fact]
+    public Task ShouldHandleSimpleText() => TestData(0);
+
+    [Fact]
+    public Task ShouldHandleFirstCapitalCharacter() => TestData(1);
+
+    [Fact]
+    public Task ShouldHandleCorrections() => TestData(2);
+
+    [Fact]
+    public Task ShouldHandleJustBackspaces() => TestData(3);
+
+    [Fact]
+    public Task ShouldHandleCapitalCharactersInTheMiddle() => TestData(4);
+
+    [Fact]
+    public Task ShouldHandleMistakeInFirstCharacter() => TestData(5);
+
+    private async Task TestData(int index)
+    {
+        var data = GetTestData(index);
+        var result = await _sut.ValidateAsync(data.Key.TextValue, data.Key.TextTypingResult);
+
+        Assert.Equal(Math.Floor(data.Value.SpeedCpm), Math.Floor(result.SpeedCpm));
+        Assert.True(data.Value.KeyPairs.SequenceEqual(result.KeyPairs));
+    }
+
+    private KeyValuePair<Input, TextAnalysisResult> GetTestData(int index)
+        => GetTestData().ToList()[index];
+
+    private IEnumerable<KeyValuePair<Input, TextAnalysisResult>> GetTestData()
+    {
+        return new[]
         {
-            for (var i = 0; i < GetTestData().Count(); i++)
-            {
-                await TestData(i);
-            }
-        }
-
-        [Fact]
-        public Task ShouldHandleSimpleText() => TestData(0);
-
-        [Fact]
-        public Task ShouldHandleFirstCapitalCharacter() => TestData(1);
-
-        [Fact]
-        public Task ShouldHandleCorrections() => TestData(2);
-
-        [Fact]
-        public Task ShouldHandleJustBackspaces() => TestData(3);
-
-        [Fact]
-        public Task ShouldHandleCapitalCharactersInTheMiddle() => TestData(4);
-
-        [Fact]
-        public Task ShouldHandleMistakeInFirstCharacter() => TestData(5);
-
-        private async Task TestData(int index)
-        {
-            var data = GetTestData(index);
-            var result = await _sut.ValidateAsync(data.Key.TextValue, data.Key.TextTypingResult);
-
-            Assert.Equal(Math.Floor(data.Value.SpeedCpm), Math.Floor(result.SpeedCpm));
-            Assert.True(data.Value.KeyPairs.SequenceEqual(result.KeyPairs));
-        }
-
-        private KeyValuePair<Input, TextAnalysisResult> GetTestData(int index)
-            => GetTestData().ToList()[index];
-
-        private IEnumerable<KeyValuePair<Input, TextAnalysisResult>> GetTestData()
-        {
-            return new[]
-            {
                 new KeyValuePair<Input, TextAnalysisResult>(
                     new Input("test", MakeTextTypingResult(new[]
                     {
@@ -235,11 +235,10 @@ namespace TypingRealm.Typing.Tests
                         new KeyPair("s", "t", "t", 20, KeyPairType.Correct, 0)
                     }))
             };
-        }
+    }
 
-        private TextTypingResult MakeTextTypingResult(IEnumerable<KeyPressEvent> events)
-        {
-            return new TextTypingResult("", 1, DateTime.UtcNow, DateTime.UtcNow, events);
-        }
+    private TextTypingResult MakeTextTypingResult(IEnumerable<KeyPressEvent> events)
+    {
+        return new TextTypingResult("", 1, DateTime.UtcNow, DateTime.UtcNow, events);
     }
 }

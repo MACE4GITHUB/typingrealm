@@ -1,9 +1,8 @@
 ﻿using TypingRealm.Client.Typing;
 
-namespace TypingRealm.Client.MainMenu
+namespace TypingRealm.Client.MainMenu;
+
+public sealed record SelectCharacter(
+    string CharacterId, string Name, Typer Typer)
 {
-    public sealed record SelectCharacter(
-        string CharacterId, string Name, Typer Typer)
-    {
-    }
 }

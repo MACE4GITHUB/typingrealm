@@ -1,9 +1,8 @@
-﻿namespace TypingRealm.Chat.ConsoleApp
+﻿namespace TypingRealm.Chat.ConsoleApp;
+
+public sealed class Character
 {
-    public sealed class Character
-    {
 #pragma warning disable CS8618
-        public string characterId { get; set; }
+    public string characterId { get; set; }
 #pragma warning restore CS8618
-    }
 }

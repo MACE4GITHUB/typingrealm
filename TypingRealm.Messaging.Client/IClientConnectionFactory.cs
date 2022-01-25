@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Client
+namespace TypingRealm.Messaging.Client;
+
+public interface IClientConnectionFactory
 {
-    public interface IClientConnectionFactory
-    {
-        ValueTask<ConnectionWithDisconnect> ConnectAsync(CancellationToken cancellationToken);
-    }
+    ValueTask<ConnectionWithDisconnect> ConnectAsync(CancellationToken cancellationToken);
 }

@@ -2,62 +2,61 @@
 using System.Threading.Tasks;
 using Xunit;
 
-namespace TypingRealm.Tests
+namespace TypingRealm.Tests;
+
+public class TestAsyncManagedDisposable : AsyncManagedDisposable
 {
-    public class TestAsyncManagedDisposable : AsyncManagedDisposable
+    public bool IsDisposed { get; set; }
+    public int WaitBeforeDisposingMs { get; set; }
+
+    protected override async ValueTask DisposeManagedResourcesAsync()
     {
-        public bool IsDisposed { get; set; }
-        public int WaitBeforeDisposingMs { get; set; }
+        if (WaitBeforeDisposingMs > 0)
+            await Task.Delay(WaitBeforeDisposingMs);
 
-        protected override async ValueTask DisposeManagedResourcesAsync()
-        {
-            if (WaitBeforeDisposingMs > 0)
-                await Task.Delay(WaitBeforeDisposingMs);
+        IsDisposed = true;
+    }
+}
 
-            IsDisposed = true;
-        }
+public class AsyncManagedDisposableTests : IDisposable
+{
+    private readonly TestAsyncManagedDisposable _sut;
+
+    public AsyncManagedDisposableTests()
+    {
+        _sut = new TestAsyncManagedDisposable();
     }
 
-    public class AsyncManagedDisposableTests : IDisposable
+    public void Dispose()
     {
-        private readonly TestAsyncManagedDisposable _sut;
+        _sut.Dispose();
+    }
 
-        public AsyncManagedDisposableTests()
-        {
-            _sut = new TestAsyncManagedDisposable();
-        }
+    [Fact]
+    public void ShouldInheritManagedDisposable()
+    {
+        Assert.IsAssignableFrom<ManagedDisposable>(_sut);
+    }
 
-        public void Dispose()
-        {
-            _sut.Dispose();
-        }
+    [Fact]
+    public void ShouldDisposeSync()
+    {
+        _sut.Dispose();
+        Assert.True(_sut.IsDisposed);
+    }
 
-        [Fact]
-        public void ShouldInheritManagedDisposable()
-        {
-            Assert.IsAssignableFrom<ManagedDisposable>(_sut);
-        }
+    [Fact]
+    public async Task ShouldDisposeAsync()
+    {
+        await _sut.DisposeAsync();
+        Assert.True(_sut.IsDisposed);
+    }
 
-        [Fact]
-        public void ShouldDisposeSync()
-        {
-            _sut.Dispose();
-            Assert.True(_sut.IsDisposed);
-        }
-
-        [Fact]
-        public async Task ShouldDisposeAsync()
-        {
-            await _sut.DisposeAsync();
-            Assert.True(_sut.IsDisposed);
-        }
-
-        [Fact]
-        public async Task ShouldDisposeSyncAfterWaiting()
-        {
-            _sut.WaitBeforeDisposingMs = 100;
-            _sut.Dispose();
-            Assert.True(_sut.IsDisposed);
-        }
+    [Fact]
+    public async Task ShouldDisposeSyncAfterWaiting()
+    {
+        _sut.WaitBeforeDisposingMs = 100;
+        _sut.Dispose();
+        Assert.True(_sut.IsDisposed);
     }
 }

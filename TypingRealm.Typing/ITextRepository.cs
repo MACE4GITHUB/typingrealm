@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace TypingRealm.Typing
+namespace TypingRealm.Typing;
+
+public interface ITextRepository
 {
-    public interface ITextRepository
-    {
-        ValueTask<Text?> FindAsync(string textId);
-        ValueTask SaveAsync(Text text);
-        ValueTask<string> NextIdAsync();
-    }
+    ValueTask<Text?> FindAsync(string textId);
+    ValueTask SaveAsync(Text text);
+    ValueTask<string> NextIdAsync();
 }

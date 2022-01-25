@@ -2,22 +2,21 @@
 using System.Threading.Tasks;
 using TypingRealm.Messaging.Connections;
 
-namespace TypingRealm.SignalR
+namespace TypingRealm.SignalR;
+
+public sealed class SignalRConnectionResource
 {
-    public sealed class SignalRConnectionResource
+    private readonly Func<Task> _cancel;
+
+    public SignalRConnectionResource(
+        Notificator notificator,
+        Func<Task> cancel)
     {
-        private readonly Func<Task> _cancel;
-
-        public SignalRConnectionResource(
-            Notificator notificator,
-            Func<Task> cancel)
-        {
-            Notificator = notificator;
-            _cancel = cancel;
-        }
-
-        public Notificator Notificator { get; }
-
-        public Task CancelAsync() => _cancel();
+        Notificator = notificator;
+        _cancel = cancel;
     }
+
+    public Notificator Notificator { get; }
+
+    public Task CancelAsync() => _cancel();
 }

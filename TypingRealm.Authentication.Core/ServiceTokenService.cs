@@ -7,59 +7,59 @@ using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Authentication.OAuth;
 
-namespace TypingRealm.Authentication
+namespace TypingRealm.Authentication;
+
+/// <summary>
+/// Issues a new Service token for S2S communication or gets a cached one.
+/// If you need to get current service token from HTTP request, use
+/// <see cref="IProfileTokenService"/>. It is still named Service and not
+/// Issuer, because in future it's implementation might even take this token
+/// from the Http request if we decide to send both user and client tokens
+/// in separate headers.
+/// </summary>
+public interface IServiceTokenService
 {
-    /// <summary>
-    /// Issues a new Service token for S2S communication or gets a cached one.
-    /// If you need to get current service token from HTTP request, use
-    /// <see cref="IProfileTokenService"/>. It is still named Service and not
-    /// Issuer, because in future it's implementation might even take this token
-    /// from the Http request if we decide to send both user and client tokens
-    /// in separate headers.
-    /// </summary>
-    public interface IServiceTokenService
+    ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken);
+    ValueTask<string> GetServiceAccessTokenAsync(ClientCredentials credentials, CancellationToken cancellationToken);
+}
+
+// It needs to be public because it is used by API.
+// TODO: Split this entity and API entity, make fields CamelCase with serialization attributes.
+public sealed record TokenResponse
+{
+    public string? access_token { get; set; }
+    public string? scope { get; set; }
+    public int expires_in { get; set; }
+    public string? token_type { get; set; }
+}
+
+public sealed class ServiceTokenService : IServiceTokenService
+{
+    private readonly IAuthenticationInformationProvider _authenticationInformationProvider;
+
+    public ServiceTokenService(IAuthenticationInformationProvider authenticationInformationProvider)
     {
-        ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken);
-        ValueTask<string> GetServiceAccessTokenAsync(ClientCredentials credentials, CancellationToken cancellationToken);
+        _authenticationInformationProvider = authenticationInformationProvider;
     }
 
-    // It needs to be public because it is used by API.
-    // TODO: Split this entity and API entity, make fields CamelCase with serialization attributes.
-    public sealed record TokenResponse
+    public ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken)
     {
-        public string? access_token { get; set; }
-        public string? scope { get; set; }
-        public int expires_in { get; set; }
-        public string? token_type { get; set; }
+        var authenticationInformation = _authenticationInformationProvider.GetServiceAuthenticationInformation();
+        if (authenticationInformation.ServiceClientId == null || authenticationInformation.ServiceClientSecret == null)
+            throw new InvalidOperationException("Client credentials authentication information is not set for service.");
+
+        return GetServiceAccessTokenAsync(new ClientCredentials(
+            authenticationInformation.ServiceClientId,
+            authenticationInformation.ServiceClientSecret,
+            Enumerable.Empty<string>()), cancellationToken);
     }
 
-    public sealed class ServiceTokenService : IServiceTokenService
+    public async ValueTask<string> GetServiceAccessTokenAsync(ClientCredentials credentials, CancellationToken cancellationToken)
     {
-        private readonly IAuthenticationInformationProvider _authenticationInformationProvider;
+        var authenticationInformation = _authenticationInformationProvider.GetServiceAuthenticationInformation();
 
-        public ServiceTokenService(IAuthenticationInformationProvider authenticationInformationProvider)
-        {
-            _authenticationInformationProvider = authenticationInformationProvider;
-        }
-
-        public ValueTask<string> GetServiceAccessTokenAsync(CancellationToken cancellationToken)
-        {
-            var authenticationInformation = _authenticationInformationProvider.GetServiceAuthenticationInformation();
-            if (authenticationInformation.ServiceClientId == null || authenticationInformation.ServiceClientSecret == null)
-                throw new InvalidOperationException("Client credentials authentication information is not set for service.");
-
-            return GetServiceAccessTokenAsync(new ClientCredentials(
-                authenticationInformation.ServiceClientId,
-                authenticationInformation.ServiceClientSecret,
-                Enumerable.Empty<string>()), cancellationToken);
-        }
-
-        public async ValueTask<string> GetServiceAccessTokenAsync(ClientCredentials credentials, CancellationToken cancellationToken)
-        {
-            var authenticationInformation = _authenticationInformationProvider.GetServiceAuthenticationInformation();
-
-            using var httpClient = new HttpClient();
-            var parameters = new List<KeyValuePair<string?, string?>>
+        using var httpClient = new HttpClient();
+        var parameters = new List<KeyValuePair<string?, string?>>
             {
                 new KeyValuePair<string?, string?>("client_id", credentials.ClientId),
                 new KeyValuePair<string?, string?>("client_secret", credentials.ClientSecret),
@@ -67,25 +67,24 @@ namespace TypingRealm.Authentication
                 new KeyValuePair<string?, string?>("grant_type", "client_credentials")
             };
 
-            if (credentials.Scopes.Any())
-                parameters.Add(new("scope", string.Join(' ', credentials.Scopes)));
+        if (credentials.Scopes.Any())
+            parameters.Add(new("scope", string.Join(' ', credentials.Scopes)));
 
-            using var content = new FormUrlEncodedContent(parameters);
+        using var content = new FormUrlEncodedContent(parameters);
 
-            var response = await httpClient.PostAsync(authenticationInformation.TokenEndpoint, content, cancellationToken)
-                .ConfigureAwait(false);
+        var response = await httpClient.PostAsync(authenticationInformation.TokenEndpoint, content, cancellationToken)
+            .ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync(cancellationToken)
-                .ConfigureAwait(false);
-            var tokenData = JsonSerializer.Deserialize<TokenResponse>(json);
+        response.EnsureSuccessStatusCode();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken)
+            .ConfigureAwait(false);
+        var tokenData = JsonSerializer.Deserialize<TokenResponse>(json);
 
-            if (tokenData?.access_token == null)
-                throw new InvalidOperationException("Access token is null, invalid conversion from token endpoint response.");
+        if (tokenData?.access_token == null)
+            throw new InvalidOperationException("Access token is null, invalid conversion from token endpoint response.");
 
-            // TODO: Cache this token and renew only when expired / about to expire.
-            // Make sure caching is registered as singletone as this class is transient as of now.
-            return tokenData.access_token;
-        }
+        // TODO: Cache this token and renew only when expired / about to expire.
+        // Make sure caching is registered as singletone as this class is transient as of now.
+        return tokenData.access_token;
     }
 }

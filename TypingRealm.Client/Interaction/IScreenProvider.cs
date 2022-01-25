@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Client.Interaction
+﻿namespace TypingRealm.Client.Interaction;
+
+public interface IScreenProvider
 {
-    public interface IScreenProvider
-    {
-        IScreen GetCurrentScreen();
-    }
+    IScreen GetCurrentScreen();
 }

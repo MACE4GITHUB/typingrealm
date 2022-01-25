@@ -1,40 +1,39 @@
 ﻿using System.Collections.Generic;
 
-namespace TypingRealm.Client.Typing
+namespace TypingRealm.Client.Typing;
+
+public sealed class ComponentPool
 {
-    public sealed class ComponentPool
+    private readonly ITyperPool _focusTyperPool;
+    private readonly Dictionary<Typer, IInputComponent> _components
+        = new Dictionary<Typer, IInputComponent>();
+
+    public ComponentPool(ITyperPool focusTyperPool)
     {
-        private readonly ITyperPool _focusTyperPool;
-        private readonly Dictionary<Typer, IInputComponent> _components
-            = new Dictionary<Typer, IInputComponent>();
+        _focusTyperPool = focusTyperPool;
+    }
 
-        public ComponentPool(ITyperPool focusTyperPool)
+    public IInputComponent? FocusedComponent { get; set; } // TODO: Remove public setter.
+
+    public void TestTyped(Typer typer)
+    {
+        if (FocusedComponent != null)
+            return;
+
+        if (_components.ContainsKey(typer))
         {
-            _focusTyperPool = focusTyperPool;
+            FocusedComponent = _components[typer];
+            _components[typer].IsFocused = true;
         }
+    }
 
-        public IInputComponent? FocusedComponent { get; set; } // TODO: Remove public setter.
+    public InputComponent MakeInputComponent()
+    {
+        var typer = _focusTyperPool.MakeUniqueTyper();
 
-        public void TestTyped(Typer typer)
-        {
-            if (FocusedComponent != null)
-                return;
+        var component = new InputComponent(typer);
+        _components.Add(typer, component);
 
-            if (_components.ContainsKey(typer))
-            {
-                FocusedComponent = _components[typer];
-                _components[typer].IsFocused = true;
-            }
-        }
-
-        public InputComponent MakeInputComponent()
-        {
-            var typer = _focusTyperPool.MakeUniqueTyper();
-
-            var component = new InputComponent(typer);
-            _components.Add(typer, component);
-
-            return component;
-        }
+        return component;
     }
 }

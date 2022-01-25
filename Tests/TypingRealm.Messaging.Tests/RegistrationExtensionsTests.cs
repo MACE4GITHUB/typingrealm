@@ -12,122 +12,121 @@ using TypingRealm.Messaging.Updating;
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Messaging.Tests
+namespace TypingRealm.Messaging.Tests;
+
+public class TestMessageHandler : IMessageHandler<TestMessage>
 {
-    public class TestMessageHandler : IMessageHandler<TestMessage>
+    public ValueTask HandleAsync(ConnectedClient sender, TestMessage message, CancellationToken cancellationToken)
     {
-        public ValueTask HandleAsync(ConnectedClient sender, TestMessage message, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
+}
+
+public class TestResponse { }
+public class TestQueryHandler : IQueryHandler<TestMessage, TestResponse>
+{
+    public ValueTask<TestResponse> HandleAsync(
+        ConnectedClient sender,
+        TestMessage queryMessage,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class TestUpdateFactory : IUpdateFactory
+{
+    public object GetUpdateFor(string clientId)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class TestConnectionInitializer : IConnectionInitializer
+{
+    public ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class RegistrationExtensionsTests : TestsBase
+{
+    private readonly IServiceProvider _provider;
+
+    public RegistrationExtensionsTests()
+    {
+        _provider = new ServiceCollection()
+            .AddLogging()
+            .AddSerializationCore().Services
+            .RegisterMessaging()
+            .BuildServiceProvider();
     }
 
-    public class TestResponse { }
-    public class TestQueryHandler : IQueryHandler<TestMessage, TestResponse>
+    [Theory]
+    [InlineData(typeof(IConnectHook), typeof(EmptyConnectHook))]
+    [InlineData(typeof(IConnectionInitializer), typeof(ConnectInitializer))]
+    [InlineData(typeof(IScopedConnectionHandler), typeof(ScopedConnectionHandler))]
+    [InlineData(typeof(IConnectionHandler), typeof(ConnectionHandler))]
+    [InlineData(typeof(IMessageDispatcher), typeof(MessageDispatcher))]
+    [InlineData(typeof(IMessageHandlerFactory), typeof(MessageHandlerFactory))]
+    [InlineData(typeof(IQueryDispatcher), typeof(QueryDispatcher))]
+    [InlineData(typeof(IQueryHandlerFactory), typeof(QueryHandlerFactory))]
+    [InlineData(typeof(IUpdater), typeof(AnnouncingUpdater))]
+    [InlineData(typeof(IMessageHandler<Announce>), typeof(AnnounceHandler))]
+    [InlineData(typeof(IMessageHandler<Disconnect>), typeof(DisconnectHandler))]
+    public void ShouldRegisterTransientTypes(Type interfaceType, Type implementationType)
     {
-        public ValueTask<TestResponse> HandleAsync(
-            ConnectedClient sender,
-            TestMessage queryMessage,
-            CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        _provider.AssertRegisteredTransient(interfaceType, implementationType);
     }
 
-    public class TestUpdateFactory : IUpdateFactory
+    [Theory]
+    [InlineData(typeof(IUpdateDetector), typeof(UpdateDetector))]
+    [InlineData(typeof(IConnectedClientStore), typeof(ConnectedClientStore))]
+    [InlineData(typeof(QueryHandlerMethodCache), typeof(QueryHandlerMethodCache))]
+    public void ShouldRegisterSingletonTypes(Type interfaceType, Type implementationType)
     {
-        public object GetUpdateFor(string clientId)
-        {
-            throw new NotImplementedException();
-        }
+        _provider.AssertRegisteredSingleton(interfaceType, implementationType);
     }
 
-    public class TestConnectionInitializer : IConnectionInitializer
+    [Fact]
+    public void ShouldRegisterHandler()
     {
-        public ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        var provider = new ServiceCollection()
+            .RegisterHandler<TestMessage, TestMessageHandler>()
+            .BuildServiceProvider();
+
+        provider.AssertRegisteredTransient(typeof(IMessageHandler<TestMessage>), typeof(TestMessageHandler));
     }
 
-    public class RegistrationExtensionsTests : TestsBase
+    [Fact]
+    public void ShouldRegisterQueryHandler()
     {
-        private readonly IServiceProvider _provider;
+        var provider = new ServiceCollection()
+            .RegisterQueryHandler<TestMessage, TestQueryHandler, TestResponse>()
+            .BuildServiceProvider();
 
-        public RegistrationExtensionsTests()
-        {
-            _provider = new ServiceCollection()
-                .AddLogging()
-                .AddSerializationCore().Services
-                .RegisterMessaging()
-                .BuildServiceProvider();
-        }
+        provider.AssertRegisteredTransient(typeof(IQueryHandler<TestMessage, TestResponse>), typeof(TestQueryHandler));
+    }
 
-        [Theory]
-        [InlineData(typeof(IConnectHook), typeof(EmptyConnectHook))]
-        [InlineData(typeof(IConnectionInitializer), typeof(ConnectInitializer))]
-        [InlineData(typeof(IScopedConnectionHandler), typeof(ScopedConnectionHandler))]
-        [InlineData(typeof(IConnectionHandler), typeof(ConnectionHandler))]
-        [InlineData(typeof(IMessageDispatcher), typeof(MessageDispatcher))]
-        [InlineData(typeof(IMessageHandlerFactory), typeof(MessageHandlerFactory))]
-        [InlineData(typeof(IQueryDispatcher), typeof(QueryDispatcher))]
-        [InlineData(typeof(IQueryHandlerFactory), typeof(QueryHandlerFactory))]
-        [InlineData(typeof(IUpdater), typeof(AnnouncingUpdater))]
-        [InlineData(typeof(IMessageHandler<Announce>), typeof(AnnounceHandler))]
-        [InlineData(typeof(IMessageHandler<Disconnect>), typeof(DisconnectHandler))]
-        public void ShouldRegisterTransientTypes(Type interfaceType, Type implementationType)
-        {
-            _provider.AssertRegisteredTransient(interfaceType, implementationType);
-        }
+    [Fact]
+    public void UseUpdateFactory_ShouldRegisterUpdaterAndCustomUpdateFactoryTransient()
+    {
+        var provider = new ServiceCollection()
+            .UseUpdateFactory<TestUpdateFactory>()
+            .BuildServiceProvider();
 
-        [Theory]
-        [InlineData(typeof(IUpdateDetector), typeof(UpdateDetector))]
-        [InlineData(typeof(IConnectedClientStore), typeof(ConnectedClientStore))]
-        [InlineData(typeof(QueryHandlerMethodCache), typeof(QueryHandlerMethodCache))]
-        public void ShouldRegisterSingletonTypes(Type interfaceType, Type implementationType)
-        {
-            _provider.AssertRegisteredSingleton(interfaceType, implementationType);
-        }
+        provider.AssertRegisteredTransient<IUpdater, Updater>();
+        provider.AssertRegisteredTransient<IUpdateFactory, TestUpdateFactory>();
+    }
 
-        [Fact]
-        public void ShouldRegisterHandler()
-        {
-            var provider = new ServiceCollection()
-                .RegisterHandler<TestMessage, TestMessageHandler>()
-                .BuildServiceProvider();
+    [Fact]
+    public void UseConnectionInitializer_ShouldRegisterCustomConnectionInitializerTransient()
+    {
+        var provider = new ServiceCollection()
+            .UseConnectionInitializer<TestConnectionInitializer>()
+            .BuildServiceProvider();
 
-            provider.AssertRegisteredTransient(typeof(IMessageHandler<TestMessage>), typeof(TestMessageHandler));
-        }
-
-        [Fact]
-        public void ShouldRegisterQueryHandler()
-        {
-            var provider = new ServiceCollection()
-                .RegisterQueryHandler<TestMessage, TestQueryHandler, TestResponse>()
-                .BuildServiceProvider();
-
-            provider.AssertRegisteredTransient(typeof(IQueryHandler<TestMessage, TestResponse>), typeof(TestQueryHandler));
-        }
-
-        [Fact]
-        public void UseUpdateFactory_ShouldRegisterUpdaterAndCustomUpdateFactoryTransient()
-        {
-            var provider = new ServiceCollection()
-                .UseUpdateFactory<TestUpdateFactory>()
-                .BuildServiceProvider();
-
-            provider.AssertRegisteredTransient<IUpdater, Updater>();
-            provider.AssertRegisteredTransient<IUpdateFactory, TestUpdateFactory>();
-        }
-
-        [Fact]
-        public void UseConnectionInitializer_ShouldRegisterCustomConnectionInitializerTransient()
-        {
-            var provider = new ServiceCollection()
-                .UseConnectionInitializer<TestConnectionInitializer>()
-                .BuildServiceProvider();
-
-            provider.AssertRegisteredTransient<IConnectionInitializer, TestConnectionInitializer>();
-        }
+        provider.AssertRegisteredTransient<IConnectionInitializer, TestConnectionInitializer>();
     }
 }

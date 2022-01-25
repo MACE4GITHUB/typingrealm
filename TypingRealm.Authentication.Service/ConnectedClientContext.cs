@@ -6,66 +6,65 @@ using System.Threading.Tasks;
 using TypingRealm.Authentication.Service.Messages;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.Authentication.Service
+namespace TypingRealm.Authentication.Service;
+
+public sealed class ConnectedClientContext : AsyncManagedDisposable, IConnectedClientContext
 {
-    public sealed class ConnectedClientContext : AsyncManagedDisposable, IConnectedClientContext
+    private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+    private ConnectedClient? _connectedClient;
+    private ClaimsPrincipal? _claimsPrincipal;
+    private JwtSecurityToken? _securityToken;
+    private Task? _notifyAboutExpiration;
+
+    public string GetAccessToken() => _securityToken?.RawData ?? throw new InvalidOperationException("Access token is not set.");
+
+    public void SetAuthenticatedContext(ClaimsPrincipal claimsPrincipal, JwtSecurityToken securityToken)
     {
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private ConnectedClient? _connectedClient;
-        private ClaimsPrincipal? _claimsPrincipal;
-        private JwtSecurityToken? _securityToken;
-        private Task? _notifyAboutExpiration;
+        if (claimsPrincipal == null)
+            throw new ArgumentNullException(nameof(claimsPrincipal));
 
-        public string GetAccessToken() => _securityToken?.RawData ?? throw new InvalidOperationException("Access token is not set.");
+        if (securityToken == null)
+            throw new ArgumentNullException(nameof(securityToken));
 
-        public void SetAuthenticatedContext(ClaimsPrincipal claimsPrincipal, JwtSecurityToken securityToken)
+        _claimsPrincipal = claimsPrincipal;
+        _securityToken = securityToken;
+    }
+
+    public void SetConnectedClient(ConnectedClient connectedClient)
+    {
+        if (_claimsPrincipal == null || _securityToken == null)
+            throw new InvalidOperationException("Token is not set.");
+
+        if (connectedClient == null)
+            throw new ArgumentNullException(nameof(connectedClient));
+
+        _connectedClient = connectedClient;
+        _notifyAboutExpiration = NotifyAboutExpirationAsync(_cts.Token);
+    }
+
+    protected override async ValueTask DisposeManagedResourcesAsync()
+    {
+        _cts.Cancel();
+
+        if (_notifyAboutExpiration != null)
+            await _notifyAboutExpiration.ConfigureAwait(false);
+
+        _cts.Dispose();
+    }
+
+    private async Task NotifyAboutExpirationAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
         {
-            if (claimsPrincipal == null)
-                throw new ArgumentNullException(nameof(claimsPrincipal));
+            await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
-            if (securityToken == null)
-                throw new ArgumentNullException(nameof(securityToken));
+            if (_connectedClient == null || _securityToken == null)
+                continue;
 
-            _claimsPrincipal = claimsPrincipal;
-            _securityToken = securityToken;
-        }
-
-        public void SetConnectedClient(ConnectedClient connectedClient)
-        {
-            if (_claimsPrincipal == null || _securityToken == null)
-                throw new InvalidOperationException("Token is not set.");
-
-            if (connectedClient == null)
-                throw new ArgumentNullException(nameof(connectedClient));
-
-            _connectedClient = connectedClient;
-            _notifyAboutExpiration = NotifyAboutExpirationAsync(_cts.Token);
-        }
-
-        protected override async ValueTask DisposeManagedResourcesAsync()
-        {
-            _cts.Cancel();
-
-            if (_notifyAboutExpiration != null)
-                await _notifyAboutExpiration.ConfigureAwait(false);
-
-            _cts.Dispose();
-        }
-
-        private async Task NotifyAboutExpirationAsync(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
+            if (DateTime.UtcNow > _securityToken.ValidTo - TimeSpan.FromMinutes(1))
             {
-                await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-
-                if (_connectedClient == null || _securityToken == null)
-                    continue;
-
-                if (DateTime.UtcNow > _securityToken.ValidTo - TimeSpan.FromMinutes(1))
-                {
-                    await _connectedClient.Connection.SendAsync(new TokenExpired(), cancellationToken)
-                        .ConfigureAwait(false);
-                }
+                await _connectedClient.Connection.SendAsync(new TokenExpired(), cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
     }

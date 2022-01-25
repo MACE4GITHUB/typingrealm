@@ -1,9 +1,8 @@
-﻿namespace TypingRealm.Communication
+﻿namespace TypingRealm.Communication;
+
+public enum EndpointAuthenticationType
 {
-    public enum EndpointAuthenticationType
-    {
-        Anonymous,
-        Profile,
-        Service
-    }
+    Anonymous,
+    Profile,
+    Service
 }

@@ -2,40 +2,39 @@
 using System.Reactive.Subjects;
 using TypingRealm.Client.Interaction;
 
-namespace TypingRealm.Client.CharacterCreation
+namespace TypingRealm.Client.CharacterCreation;
+
+public sealed class CharacterCreationStateManager : SyncManagedDisposable, IChangeDetector
 {
-    public sealed class CharacterCreationStateManager : SyncManagedDisposable, IChangeDetector
+    private readonly object _updateStateLock = new object();
+
+    private readonly CharacterCreationState _currentState;
+    private readonly BehaviorSubject<CharacterCreationState> _stateSubject;
+
+    public CharacterCreationStateManager(
+        CharacterCreationState state)
     {
-        private readonly object _updateStateLock = new object();
+        _currentState = state;
+        _stateSubject = new BehaviorSubject<CharacterCreationState>(_currentState);
+    }
 
-        private readonly CharacterCreationState _currentState;
-        private readonly BehaviorSubject<CharacterCreationState> _stateSubject;
-
-        public CharacterCreationStateManager(
-            CharacterCreationState state)
+    public IObservable<CharacterCreationState> StateObservable => _stateSubject;
+    public void NotifyChanged()
+    {
+        try
         {
-            _currentState = state;
-            _stateSubject = new BehaviorSubject<CharacterCreationState>(_currentState);
-        }
+            ThrowIfDisposed();
 
-        public IObservable<CharacterCreationState> StateObservable => _stateSubject;
-        public void NotifyChanged()
+            _stateSubject.OnNext(_currentState);
+        }
+        catch (ObjectDisposedException)
         {
-            try
-            {
-                ThrowIfDisposed();
-
-                _stateSubject.OnNext(_currentState);
-            }
-            catch (ObjectDisposedException)
-            {
-                // TODO: Log.
-            }
+            // TODO: Log.
         }
+    }
 
-        protected override void DisposeManagedResources()
-        {
-            _stateSubject.Dispose();
-        }
+    protected override void DisposeManagedResources()
+    {
+        _stateSubject.Dispose();
     }
 }

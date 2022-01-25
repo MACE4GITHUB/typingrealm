@@ -9,73 +9,72 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 
-namespace TypingRealm.Hosting
+namespace TypingRealm.Hosting;
+
+public sealed class WebApiStartupFilter : IStartupFilter
 {
-    public sealed class WebApiStartupFilter : IStartupFilter
+    private const string CorsPolicyName = "CorsPolicy";
+
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
     {
-        private const string CorsPolicyName = "CorsPolicy";
-
-        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+        return app =>
         {
-            return app =>
-            {
-                ConfigureCommonTyrApp(app);
+            ConfigureCommonTyrApp(app);
 
-                next(app);
-            };
-        }
+            next(app);
+        };
+    }
 
-        public static void ConfigureCommonTyrApp(IApplicationBuilder app, Action<IEndpointRouteBuilder>? configureEndpoints = null)
+    public static void ConfigureCommonTyrApp(IApplicationBuilder app, Action<IEndpointRouteBuilder>? configureEndpoints = null)
+    {
+        // Forward HTTP errors throughout services call chain.
+        app.UseExceptionHandler(exceptionHandlerApp =>
         {
-            // Forward HTTP errors throughout services call chain.
-            app.UseExceptionHandler(exceptionHandlerApp =>
+            exceptionHandlerApp.Run(context =>
             {
-                exceptionHandlerApp.Run(context =>
+                var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                if (contextFeature?.Error is HttpRequestException exception)
                 {
-                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    if (contextFeature?.Error is HttpRequestException exception)
-                    {
                         // TODO: Consider forwarding only 403, 400 or 404 forwarding might be undesired.
                         context.Response.StatusCode = (int)(exception.StatusCode ?? HttpStatusCode.InternalServerError);
-                    }
+                }
 
-                    return Task.CompletedTask;
-                });
+                return Task.CompletedTask;
             });
+        });
 
-            app.UseRouting();
-            app.UseCors(CorsPolicyName);
-            app.UseAuthentication();
-            app.UseAuthorization();
+        app.UseRouting();
+        app.UseCors(CorsPolicyName);
+        app.UseAuthentication();
+        app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers().RequireAuthorization();
+            endpoints.MapHealthChecks("ping", new HealthCheckOptions
             {
-                endpoints.MapControllers().RequireAuthorization();
-                endpoints.MapHealthChecks("ping", new HealthCheckOptions
-                {
-                    Predicate = _ => false
-                });
-                endpoints.MapHealthChecks("health", new HealthCheckOptions
-                {
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });
-                endpoints.MapHealthChecks("health/services", new HealthCheckOptions
-                {
-                    Predicate = reg => reg.Tags.Contains("service"),
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });
-                endpoints.MapHealthChecks("health/infrastructure", new HealthCheckOptions
-                {
-                    Predicate = reg => reg.Tags.Contains("infrastructure"),
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });
-
-                configureEndpoints?.Invoke(endpoints);
+                Predicate = _ => false
+            });
+            endpoints.MapHealthChecks("health", new HealthCheckOptions
+            {
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            endpoints.MapHealthChecks("health/services", new HealthCheckOptions
+            {
+                Predicate = reg => reg.Tags.Contains("service"),
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            endpoints.MapHealthChecks("health/infrastructure", new HealthCheckOptions
+            {
+                Predicate = reg => reg.Tags.Contains("infrastructure"),
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
-            // TODO: Check whether it's Development environment and only then enable swagger.
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+            configureEndpoints?.Invoke(endpoints);
+        });
+
+        // TODO: Check whether it's Development environment and only then enable swagger.
+        app.UseSwagger();
+        app.UseSwaggerUI();
     }
 }

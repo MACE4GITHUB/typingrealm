@@ -2,25 +2,24 @@
 using TypingRealm.Messaging.Client;
 using TypingRealm.Messaging.Serialization.Protobuf;
 
-namespace TypingRealm.Tcp.Client
+namespace TypingRealm.Tcp.Client;
+
+public sealed class TcpProtobufClientConnectionFactoryFactory : IClientConnectionFactoryFactory
 {
-    public sealed class TcpProtobufClientConnectionFactoryFactory : IClientConnectionFactoryFactory
+    private readonly IProtobufConnectionFactory _factory;
+
+    public TcpProtobufClientConnectionFactoryFactory(
+        IProtobufConnectionFactory factory)
     {
-        private readonly IProtobufConnectionFactory _factory;
+        _factory = factory;
+    }
 
-        public TcpProtobufClientConnectionFactoryFactory(
-            IProtobufConnectionFactory factory)
-        {
-            _factory = factory;
-        }
+    public IClientConnectionFactory CreateClientConnectionFactoryFor(string connectionString)
+    {
+        var host = connectionString.Split(",")[0];
+        var port = Convert.ToInt32(connectionString.Split(",")[1]);
 
-        public IClientConnectionFactory CreateClientConnectionFactoryFor(string connectionString)
-        {
-            var host = connectionString.Split(",")[0];
-            var port = Convert.ToInt32(connectionString.Split(",")[1]);
-
-            return new TcpProtobufClientConnectionFactory(
-                _factory, host, port);
-        }
+        return new TcpProtobufClientConnectionFactory(
+            _factory, host, port);
     }
 }

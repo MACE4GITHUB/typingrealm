@@ -4,103 +4,102 @@ using System.Threading.Tasks;
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Tests
+namespace TypingRealm.Tests;
+
+public partial class TaskExtensionsTests
 {
-    public partial class TaskExtensionsTests
+    [Fact]
+    public async Task WithCancellation_ShouldSucceedWhenCompleted()
     {
-        [Fact]
-        public async Task WithCancellation_ShouldSucceedWhenCompleted()
+        using var cts = new CancellationTokenSource();
+
+        var result = Task.Run(async () =>
         {
-            using var cts = new CancellationTokenSource();
+            await Task.Delay(1);
+        }).WithCancellationAsync(cts.Token);
+        await result;
+        cts.Cancel();
 
-            var result = Task.Run(async () =>
-            {
-                await Task.Delay(1);
-            }).WithCancellationAsync(cts.Token);
-            await result;
-            cts.Cancel();
+        Assert.True(result.IsCompletedSuccessfully);
+    }
 
-            Assert.True(result.IsCompletedSuccessfully);
-        }
-
-        [Fact]
-        public async Task WithCancellation_ShouldThrowWhenCancellationRequested()
+    [Fact]
+    public async Task WithCancellation_ShouldThrowWhenCancellationRequested()
+    {
+        var task = Task.Run(async () =>
         {
-            var task = Task.Run(async () =>
-            {
-                await Task.Delay(Timeout.Infinite);
-            });
+            await Task.Delay(Timeout.Infinite);
+        });
 
-            using var cts = new CancellationTokenSource();
-            var result = task.WithCancellationAsync(cts.Token);
+        using var cts = new CancellationTokenSource();
+        var result = task.WithCancellationAsync(cts.Token);
 
-            cts.Cancel();
-            await Assert.ThrowsAsync<OperationCanceledException>(() => result);
-            Assert.True(result.IsCanceled);
-        }
+        cts.Cancel();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => result);
+        Assert.True(result.IsCanceled);
+    }
 
-        [Fact]
-        public async Task WithCancellation_ShouldAwaitTargetTaskWhenExceptionIsThrown()
+    [Fact]
+    public async Task WithCancellation_ShouldAwaitTargetTaskWhenExceptionIsThrown()
+    {
+        using var cts = new CancellationTokenSource();
+
+        var result = Task.Run(async () =>
         {
-            using var cts = new CancellationTokenSource();
+            await Task.Delay(10);
+            throw new TestException();
+        }).WithCancellationAsync(cts.Token);
 
-            var result = Task.Run(async () =>
-            {
-                await Task.Delay(10);
-                throw new TestException();
-            }).WithCancellationAsync(cts.Token);
+        await Assert.ThrowsAsync<TestException>(() => result);
+        Assert.True(result.IsFaulted);
+    }
 
-            await Assert.ThrowsAsync<TestException>(() => result);
-            Assert.True(result.IsFaulted);
-        }
+    [Fact]
+    public async Task WithCancellationWithValue_ShouldSucceedWhenCompleted()
+    {
+        using var cts = new CancellationTokenSource();
 
-        [Fact]
-        public async Task WithCancellationWithValue_ShouldSucceedWhenCompleted()
+        var result = Task.Run(async () =>
         {
-            using var cts = new CancellationTokenSource();
+            await Task.Delay(1);
+            return 10;
+        }).WithCancellationAsync(cts.Token);
+        var value = await result;
+        cts.Cancel();
 
-            var result = Task.Run(async () =>
-            {
-                await Task.Delay(1);
-                return 10;
-            }).WithCancellationAsync(cts.Token);
-            var value = await result;
-            cts.Cancel();
+        Assert.Equal(10, value);
+        Assert.True(result.IsCompletedSuccessfully);
+    }
 
-            Assert.Equal(10, value);
-            Assert.True(result.IsCompletedSuccessfully);
-        }
-
-        [Fact]
-        public async Task WithCancellationWithValue_ShouldThrowWhenCancellationRequested()
+    [Fact]
+    public async Task WithCancellationWithValue_ShouldThrowWhenCancellationRequested()
+    {
+        var task = Task.Run(async () =>
         {
-            var task = Task.Run(async () =>
-            {
-                await Task.Delay(Timeout.Infinite);
-                return 10;
-            });
+            await Task.Delay(Timeout.Infinite);
+            return 10;
+        });
 
-            using var cts = new CancellationTokenSource();
-            var result = task.WithCancellationAsync(cts.Token);
+        using var cts = new CancellationTokenSource();
+        var result = task.WithCancellationAsync(cts.Token);
 
-            cts.Cancel();
-            await Assert.ThrowsAsync<OperationCanceledException>(() => result);
-            Assert.True(result.IsCanceled);
-        }
+        cts.Cancel();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => result);
+        Assert.True(result.IsCanceled);
+    }
 
-        [Fact]
-        public async Task WithCancellationWithValue_ShouldAwaitTargetTaskWhenExceptionIsThrown()
+    [Fact]
+    public async Task WithCancellationWithValue_ShouldAwaitTargetTaskWhenExceptionIsThrown()
+    {
+        using var cts = new CancellationTokenSource();
+
+        var result = Task.Run<int>(async () =>
         {
-            using var cts = new CancellationTokenSource();
+            await Task.Delay(10);
+            throw new TestException();
+        }).WithCancellationAsync(cts.Token);
 
-            var result = Task.Run<int>(async () =>
-            {
-                await Task.Delay(10);
-                throw new TestException();
-            }).WithCancellationAsync(cts.Token);
-
-            await Assert.ThrowsAsync<TestException>(() => result);
-            Assert.True(result.IsFaulted);
-        }
+        await Assert.ThrowsAsync<TestException>(() => result);
+        Assert.True(result.IsFaulted);
     }
 }

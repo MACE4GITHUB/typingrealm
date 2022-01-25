@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Domain.Movement
+﻿namespace TypingRealm.Domain.Movement;
+
+public interface ILocationStore
 {
-    public interface ILocationStore
-    {
-        Location? Find(LocationId locationId);
-    }
+    Location? Find(LocationId locationId);
 }

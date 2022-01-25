@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Client.Interaction
+﻿namespace TypingRealm.Client.Interaction;
+
+public interface IOutputHandler
 {
-    public interface IOutputHandler
-    {
-        void PrintState();
-    }
+    void PrintState();
 }

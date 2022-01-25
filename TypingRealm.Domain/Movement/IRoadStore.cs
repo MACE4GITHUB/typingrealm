@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Domain.Movement
+﻿namespace TypingRealm.Domain.Movement;
+
+public interface IRoadStore
 {
-    public interface IRoadStore
-    {
-        Road? Find(RoadId roadId);
-    }
+    Road? Find(RoadId roadId);
 }

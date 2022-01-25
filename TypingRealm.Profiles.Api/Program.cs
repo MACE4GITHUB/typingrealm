@@ -5,17 +5,16 @@ using TypingRealm.Profiles.Api.Controllers;
 using TypingRealm.Profiles.Infrastructure;
 
 [assembly: ApiController]
-namespace TypingRealm.Profiles.Api
-{
-    public static class Program
-    {
-        public static async Task Main()
-        {
-            var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(CharactersController).Assembly);
-            builder.Services.RegisterProfilesApi();
+namespace TypingRealm.Profiles.Api;
 
-            var app = builder.Build();
-            await app.RunAsync();
-        }
+public static class Program
+{
+    public static async Task Main()
+    {
+        var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(CharactersController).Assembly);
+        builder.Services.RegisterProfilesApi();
+
+        var app = builder.Build();
+        await app.RunAsync();
     }
 }

@@ -2,18 +2,17 @@
 using Microsoft.Extensions.Hosting;
 using TypingRealm.Hosting.Service;
 
-namespace TypingRealm.World.Server
-{
-    public static class Program
-    {
-        public static async Task Main()
-        {
-            using var host = HostFactory.CreateSignalRHostBuilder(builder =>
-            {
-                builder.AddWorld();
-            }).Build();
+namespace TypingRealm.World.Server;
 
-            await host.RunAsync().ConfigureAwait(false);
-        }
+public static class Program
+{
+    public static async Task Main()
+    {
+        using var host = HostFactory.CreateSignalRHostBuilder(builder =>
+        {
+            builder.AddWorld();
+        }).Build();
+
+        await host.RunAsync().ConfigureAwait(false);
     }
 }

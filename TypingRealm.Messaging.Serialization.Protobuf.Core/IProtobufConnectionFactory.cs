@@ -1,10 +1,9 @@
 ﻿using System.IO;
 
-namespace TypingRealm.Messaging.Serialization.Protobuf
+namespace TypingRealm.Messaging.Serialization.Protobuf;
+
+public interface IProtobufConnectionFactory
 {
-    public interface IProtobufConnectionFactory
-    {
-        IConnection CreateProtobufConnectionForClient(Stream stream);
-        IConnection CreateProtobufConnectionForServer(Stream stream);
-    }
+    IConnection CreateProtobufConnectionForClient(Stream stream);
+    IConnection CreateProtobufConnectionForServer(Stream stream);
 }

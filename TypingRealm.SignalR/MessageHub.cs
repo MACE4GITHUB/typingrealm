@@ -3,34 +3,33 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.SignalR
+namespace TypingRealm.SignalR;
+
+public sealed class MessageHub : Hub
 {
-    public sealed class MessageHub : Hub
+    private readonly ISignalRServer _server;
+
+    public MessageHub(ISignalRServer server)
     {
-        private readonly ISignalRServer _server;
+        _server = server;
+    }
 
-        public MessageHub(ISignalRServer server)
-        {
-            _server = server;
-        }
+    public void Send(ClientToServerMessageData message)
+    {
+        _server.NotifyReceived(Context.ConnectionId, message);
+    }
 
-        public void Send(ClientToServerMessageData message)
-        {
-            _server.NotifyReceived(Context.ConnectionId, message);
-        }
+    public override Task OnConnectedAsync()
+    {
+        _server.StartHandling(Context, Clients.Caller);
 
-        public override Task OnConnectedAsync()
-        {
-            _server.StartHandling(Context, Clients.Caller);
+        return base.OnConnectedAsync();
+    }
 
-            return base.OnConnectedAsync();
-        }
+    public override async Task OnDisconnectedAsync(Exception exception)
+    {
+        await _server.StopHandling(Context.ConnectionId).ConfigureAwait(false);
 
-        public override async Task OnDisconnectedAsync(Exception exception)
-        {
-            await _server.StopHandling(Context.ConnectionId).ConfigureAwait(false);
-
-            await base.OnDisconnectedAsync(exception).ConfigureAwait(false);
-        }
+        await base.OnDisconnectedAsync(exception).ConfigureAwait(false);
     }
 }

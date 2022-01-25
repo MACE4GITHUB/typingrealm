@@ -1,9 +1,8 @@
-﻿namespace TypingRealm.Authentication.Api
+﻿namespace TypingRealm.Authentication.Api;
+
+public sealed class ScopedAttribute : TyrAuthorizeAttribute
 {
-    public sealed class ScopedAttribute : TyrAuthorizeAttribute
+    public ScopedAttribute(string scope) : base(scope)
     {
-        public ScopedAttribute(string scope) : base(scope)
-        {
-        }
     }
 }

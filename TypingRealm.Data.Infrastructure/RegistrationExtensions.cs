@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace TypingRealm.Data.Infrastructure
+namespace TypingRealm.Data.Infrastructure;
+
+public static class RegistrationExtensions
 {
-    public static class RegistrationExtensions
+    public static IServiceCollection RegisterDataApi(this IServiceCollection services)
     {
-        public static IServiceCollection RegisterDataApi(this IServiceCollection services)
-        {
-            services.AddSingleton<ILocationRepository, InMemoryLocationRepository>();
-            return services;
-        }
+        services.AddSingleton<ILocationRepository, InMemoryLocationRepository>();
+        return services;
     }
 }

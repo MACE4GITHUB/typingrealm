@@ -1,9 +1,8 @@
-﻿namespace TypingRealm.Authentication.Api
+﻿namespace TypingRealm.Authentication.Api;
+
+public sealed class SuperAdminScopedAttribute : TyrAuthorizeAttribute
 {
-    public sealed class SuperAdminScopedAttribute : TyrAuthorizeAttribute
+    public SuperAdminScopedAttribute() : base(TyrScopes.SuperAdmin)
     {
-        public SuperAdminScopedAttribute() : base(TyrScopes.SuperAdmin)
-        {
-        }
     }
 }

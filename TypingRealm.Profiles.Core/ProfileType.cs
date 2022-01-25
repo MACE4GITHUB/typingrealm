@@ -1,22 +1,21 @@
-﻿namespace TypingRealm.Profiles
+﻿namespace TypingRealm.Profiles;
+
+public enum ProfileType
 {
-    public enum ProfileType
-    {
-        Unspecified,
+    Unspecified,
 
-        /// <summary>
-        /// If user is not authenticated (no token, invalid token).
-        /// </summary>
-        Anonymous = 1,
+    /// <summary>
+    /// If user is not authenticated (no token, invalid token).
+    /// </summary>
+    Anonymous = 1,
 
-        /// <summary>
-        /// If request is authenticated, but there is no sub claim (CC token).
-        /// </summary>
-        Service = 2,
+    /// <summary>
+    /// If request is authenticated, but there is no sub claim (CC token).
+    /// </summary>
+    Service = 2,
 
-        /// <summary>
-        /// If user is authenticated with valid user sub claim.
-        /// </summary>
-        User = 3
-    }
+    /// <summary>
+    /// If user is authenticated with valid user sub claim.
+    /// </summary>
+    User = 3
 }

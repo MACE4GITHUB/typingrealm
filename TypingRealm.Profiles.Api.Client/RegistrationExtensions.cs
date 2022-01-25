@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace TypingRealm.Profiles.Api.Client
+namespace TypingRealm.Profiles.Api.Client;
+
+public static class RegistrationExtensions
 {
-    public static class RegistrationExtensions
+    public static IServiceCollection AddProfileApiClients(this IServiceCollection services)
     {
-        public static IServiceCollection AddProfileApiClients(this IServiceCollection services)
-        {
-            return services.AddTransient<ICharactersClient, CharactersClient>()
-                .AddTransient<IActivitiesClient, ActivitiesClient>();
-        }
+        return services.AddTransient<ICharactersClient, CharactersClient>()
+            .AddTransient<IActivitiesClient, ActivitiesClient>();
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace TypingRealm.Domain
+﻿namespace TypingRealm.Domain;
+
+public interface IPlayerRepository
 {
-    public interface IPlayerRepository
-    {
-        Player? Find(PlayerId playerId);
-        void Save(Player player);
-    }
+    Player? Find(PlayerId playerId);
+    void Save(Player player);
 }

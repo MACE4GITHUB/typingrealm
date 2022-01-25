@@ -3,29 +3,28 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
 
-namespace TypingRealm.World
+namespace TypingRealm.World;
+
+public sealed class ConnectHook : IConnectHook
 {
-    public sealed class ConnectHook : IConnectHook
+    private readonly ILocationRepository _locationStore;
+
+    public ConnectHook(ILocationRepository locationStore)
     {
-        private readonly ILocationRepository _locationStore;
+        _locationStore = locationStore;
+    }
 
-        public ConnectHook(ILocationRepository locationStore)
+    public ValueTask HandleAsync(Connect connect, CancellationToken cancellationToken)
+    {
+        var location = _locationStore.FindLocationForCharacter(connect.ClientId);
+        if (location == null)
         {
-            _locationStore = locationStore;
+            location = _locationStore.FindStartingLocation(connect.ClientId); // First time joining the World.
+            location.AddCharacter(connect.ClientId);
+            _locationStore.Save(location);
         }
 
-        public ValueTask HandleAsync(Connect connect, CancellationToken cancellationToken)
-        {
-            var location = _locationStore.FindLocationForCharacter(connect.ClientId);
-            if (location == null)
-            {
-                location = _locationStore.FindStartingLocation(connect.ClientId); // First time joining the World.
-                location.AddCharacter(connect.ClientId);
-                _locationStore.Save(location);
-            }
-
-            connect.Group = location.LocationId;
-            return default;
-        }
+        connect.Group = location.LocationId;
+        return default;
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace TypingRealm.Messaging.Serialization
+namespace TypingRealm.Messaging.Serialization;
+
+public interface IMessageSerializer
 {
-    public interface IMessageSerializer
-    {
-        string Serialize(object instance);
-        object Deserialize(string data, Type messageType);
-    }
+    string Serialize(object instance);
+    object Deserialize(string data, Type messageType);
 }

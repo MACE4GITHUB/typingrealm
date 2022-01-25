@@ -1,6 +1,5 @@
-﻿namespace TypingRealm.Client.Interaction
+﻿namespace TypingRealm.Client.Interaction;
+
+public interface IScreenHandler : IInputHandler, IOutputHandler
 {
-    public interface IScreenHandler : IInputHandler, IOutputHandler
-    {
-    }
 }

@@ -1,6 +1,5 @@
-﻿namespace TypingRealm.Profiles.Api.Resources.Data
-{
-    public sealed record CreateCharacterDto(string Name);
+﻿namespace TypingRealm.Profiles.Api.Resources.Data;
 
-    public sealed record UpdateCharacterDto(string Name);
-}
+public sealed record CreateCharacterDto(string Name);
+
+public sealed record UpdateCharacterDto(string Name);

@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.RopeWar
+namespace TypingRealm.RopeWar;
+
+public interface ICharacterStateService
 {
-    public interface ICharacterStateService
-    {
-        ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken);
-    }
+    ValueTask<bool> CanJoinRopeWarContestAsync(string characterId, string contestId, CancellationToken cancellationToken);
 }

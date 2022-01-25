@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Profiles.Api.Client
+﻿namespace TypingRealm.Profiles.Api.Client;
+
+public static class ServiceConfiguration
 {
-    public static class ServiceConfiguration
-    {
-        public static readonly string ServiceName = "profiles";
-    }
+    public static readonly string ServiceName = "profiles";
 }

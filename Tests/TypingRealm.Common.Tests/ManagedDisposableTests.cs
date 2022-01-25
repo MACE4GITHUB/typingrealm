@@ -3,128 +3,127 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace TypingRealm.Tests
+namespace TypingRealm.Tests;
+
+public class TestManagedDisposable : ManagedDisposable
 {
-    public class TestManagedDisposable : ManagedDisposable
+    public bool IsDisposed { get; set; }
+    public bool IsDisposedAsync { get; set; }
+
+    public void PublicThrowIfDisposed() => ThrowIfDisposed();
+
+    protected override void DisposeManagedResources()
     {
-        public bool IsDisposed { get; set; }
-        public bool IsDisposedAsync { get; set; }
-
-        public void PublicThrowIfDisposed() => ThrowIfDisposed();
-
-        protected override void DisposeManagedResources()
-        {
-            IsDisposed = true;
-        }
-
-        protected override ValueTask DisposeManagedResourcesAsync()
-        {
-            IsDisposedAsync = true;
-            return default;
-        }
+        IsDisposed = true;
     }
 
-    public class ManagedDisposableTests : IDisposable
+    protected override ValueTask DisposeManagedResourcesAsync()
     {
-        private readonly TestManagedDisposable _sut;
+        IsDisposedAsync = true;
+        return default;
+    }
+}
 
-        public ManagedDisposableTests()
-        {
-            _sut = new TestManagedDisposable();
+public class ManagedDisposableTests : IDisposable
+{
+    private readonly TestManagedDisposable _sut;
 
-            // Valid initial state.
-            Assert.False(_sut.IsDisposed);
-            Assert.False(_sut.IsDisposedAsync);
-            _sut.PublicThrowIfDisposed(); // Doesn't throw.
-        }
+    public ManagedDisposableTests()
+    {
+        _sut = new TestManagedDisposable();
 
-        public void Dispose()
-        {
-            _sut.Dispose();
-        }
+        // Valid initial state.
+        Assert.False(_sut.IsDisposed);
+        Assert.False(_sut.IsDisposedAsync);
+        _sut.PublicThrowIfDisposed(); // Doesn't throw.
+    }
 
-        [Fact]
-        public void ThrowIfDisposed_ShouldNotBeVirtual() // So we can test it only here.
-        {
-            Assert.False(typeof(ManagedDisposable).GetMethod("ThrowIfDisposed", BindingFlags.Instance | BindingFlags.NonPublic)?.IsVirtual);
-        }
+    public void Dispose()
+    {
+        _sut.Dispose();
+    }
 
-        [Fact]
-        public void ShouldDisposeOnlySync()
-        {
-            _sut.Dispose();
+    [Fact]
+    public void ThrowIfDisposed_ShouldNotBeVirtual() // So we can test it only here.
+    {
+        Assert.False(typeof(ManagedDisposable).GetMethod("ThrowIfDisposed", BindingFlags.Instance | BindingFlags.NonPublic)?.IsVirtual);
+    }
 
-            Assert.True(_sut.IsDisposed);
-            Assert.False(_sut.IsDisposedAsync);
-        }
+    [Fact]
+    public void ShouldDisposeOnlySync()
+    {
+        _sut.Dispose();
 
-        [Fact]
-        public async Task ShouldDisposeOnlyAsync()
-        {
-            await _sut.DisposeAsync();
+        Assert.True(_sut.IsDisposed);
+        Assert.False(_sut.IsDisposedAsync);
+    }
 
-            Assert.False(_sut.IsDisposed);
-            Assert.True(_sut.IsDisposedAsync);
-        }
+    [Fact]
+    public async Task ShouldDisposeOnlyAsync()
+    {
+        await _sut.DisposeAsync();
 
-        [Fact]
-        public async Task ShouldNotDisposeAsyncAfterSync()
-        {
-            _sut.Dispose();
-            _sut.IsDisposed = false;
+        Assert.False(_sut.IsDisposed);
+        Assert.True(_sut.IsDisposedAsync);
+    }
 
-            await _sut.DisposeAsync();
+    [Fact]
+    public async Task ShouldNotDisposeAsyncAfterSync()
+    {
+        _sut.Dispose();
+        _sut.IsDisposed = false;
 
-            Assert.False(_sut.IsDisposed);
-            Assert.False(_sut.IsDisposedAsync);
-        }
+        await _sut.DisposeAsync();
 
-        [Fact]
-        public async Task ShouldNotDisposeSyncAfterAsync()
-        {
-            await _sut.DisposeAsync();
-            _sut.IsDisposedAsync = false;
+        Assert.False(_sut.IsDisposed);
+        Assert.False(_sut.IsDisposedAsync);
+    }
 
-            _sut.Dispose();
+    [Fact]
+    public async Task ShouldNotDisposeSyncAfterAsync()
+    {
+        await _sut.DisposeAsync();
+        _sut.IsDisposedAsync = false;
 
-            Assert.False(_sut.IsDisposed);
-            Assert.False(_sut.IsDisposedAsync);
-        }
+        _sut.Dispose();
 
-        [Fact]
-        public void ShouldNotDisposeSyncMultipleTimes()
-        {
-            _sut.Dispose();
-            _sut.IsDisposed = false;
+        Assert.False(_sut.IsDisposed);
+        Assert.False(_sut.IsDisposedAsync);
+    }
 
-            _sut.Dispose();
-            Assert.False(_sut.IsDisposed);
-        }
+    [Fact]
+    public void ShouldNotDisposeSyncMultipleTimes()
+    {
+        _sut.Dispose();
+        _sut.IsDisposed = false;
 
-        [Fact]
-        public async Task ShouldNotDisposeAsyncMultipleTimes()
-        {
-            await _sut.DisposeAsync();
-            _sut.IsDisposedAsync = false;
+        _sut.Dispose();
+        Assert.False(_sut.IsDisposed);
+    }
 
-            await _sut.DisposeAsync();
-            Assert.False(_sut.IsDisposedAsync);
-        }
+    [Fact]
+    public async Task ShouldNotDisposeAsyncMultipleTimes()
+    {
+        await _sut.DisposeAsync();
+        _sut.IsDisposedAsync = false;
 
-        [Fact]
-        public void ShouldThrowOnActionWhenAlreadyDisposedSync()
-        {
-            _sut.Dispose();
+        await _sut.DisposeAsync();
+        Assert.False(_sut.IsDisposedAsync);
+    }
 
-            Assert.Throws<ObjectDisposedException>(() => _sut.PublicThrowIfDisposed());
-        }
+    [Fact]
+    public void ShouldThrowOnActionWhenAlreadyDisposedSync()
+    {
+        _sut.Dispose();
 
-        [Fact]
-        public async Task ShouldThrowOnActionWhenAlreadyDisposedAsync()
-        {
-            await _sut.DisposeAsync();
+        Assert.Throws<ObjectDisposedException>(() => _sut.PublicThrowIfDisposed());
+    }
 
-            Assert.Throws<ObjectDisposedException>(() => _sut.PublicThrowIfDisposed());
-        }
+    [Fact]
+    public async Task ShouldThrowOnActionWhenAlreadyDisposedAsync()
+    {
+        await _sut.DisposeAsync();
+
+        Assert.Throws<ObjectDisposedException>(() => _sut.PublicThrowIfDisposed());
     }
 }

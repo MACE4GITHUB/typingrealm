@@ -4,48 +4,47 @@ using System.IO;
 using System.Linq;
 using ProtoBuf.Meta;
 
-namespace TypingRealm.Messaging.Serialization.Protobuf
+namespace TypingRealm.Messaging.Serialization.Protobuf;
+
+// TODO: Unit test this class. Possibly together with ProtobufStreamSerializer.
+public sealed class ProtobufMessageSerializer : IMessageSerializer
 {
-    // TODO: Unit test this class. Possibly together with ProtobufStreamSerializer.
-    public sealed class ProtobufMessageSerializer : IMessageSerializer
+    private readonly RuntimeTypeModel _model;
+
+    public ProtobufMessageSerializer(IEnumerable<Type> types)
     {
-        private readonly RuntimeTypeModel _model;
+        _model = RuntimeTypeModel.Create();
 
-        public ProtobufMessageSerializer(IEnumerable<Type> types)
+        foreach (var type in types)
         {
-            _model = RuntimeTypeModel.Create();
-
-            foreach (var type in types)
-            {
-                _model.Add(type, false)
-                    .Add(type
-                        .GetProperties()
-                        .Select(property => property.Name)
-                        .OrderBy(name => name)
-                        .ToArray());
-            }
-
-            // TODO: uncomment this for better performance.
-            //_model.Compile();
+            _model.Add(type, false)
+                .Add(type
+                    .GetProperties()
+                    .Select(property => property.Name)
+                    .OrderBy(name => name)
+                    .ToArray());
         }
 
-        public object Deserialize(string data, Type messageType)
-        {
-            ReadOnlySpan<byte> span = Convert.FromBase64String(data);
+        // TODO: uncomment this for better performance.
+        //_model.Compile();
+    }
 
-            return _model.Deserialize(messageType, span);
-        }
+    public object Deserialize(string data, Type messageType)
+    {
+        ReadOnlySpan<byte> span = Convert.FromBase64String(data);
 
-        public string Serialize(object instance)
-        {
-            using var stream = new MemoryStream();
+        return _model.Deserialize(messageType, span);
+    }
 
-            _model.Serialize(stream, instance);
+    public string Serialize(object instance)
+    {
+        using var stream = new MemoryStream();
 
-            // TODO: Consider using ReadOnlySpan for better performance (bytes instead of string).
-            var serialized = Convert.ToBase64String(stream.ToArray());
+        _model.Serialize(stream, instance);
 
-            return serialized;
-        }
+        // TODO: Consider using ReadOnlySpan for better performance (bytes instead of string).
+        var serialized = Convert.ToBase64String(stream.ToArray());
+
+        return serialized;
     }
 }

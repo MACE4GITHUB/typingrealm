@@ -3,22 +3,21 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Messages;
 
-namespace TypingRealm.Messaging.Handlers
+namespace TypingRealm.Messaging.Handlers;
+
+public class DisconnectHandler : IMessageHandler<Disconnect>
 {
-    public class DisconnectHandler : IMessageHandler<Disconnect>
+    private readonly IConnectedClientStore _store;
+
+    public DisconnectHandler(IConnectedClientStore store)
     {
-        private readonly IConnectedClientStore _store;
+        _store = store;
+    }
 
-        public DisconnectHandler(IConnectedClientStore store)
-        {
-            _store = store;
-        }
+    public ValueTask HandleAsync(ConnectedClient sender, Disconnect message, CancellationToken cancellationToken)
+    {
+        _store.Remove(sender.ClientId);
 
-        public ValueTask HandleAsync(ConnectedClient sender, Disconnect message, CancellationToken cancellationToken)
-        {
-            _store.Remove(sender.ClientId);
-
-            return sender.Connection.SendAsync(new Disconnected("Requested."), cancellationToken);
-        }
+        return sender.Connection.SendAsync(new Disconnected("Requested."), cancellationToken);
     }
 }

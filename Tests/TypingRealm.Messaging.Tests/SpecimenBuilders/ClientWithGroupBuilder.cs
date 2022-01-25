@@ -1,25 +1,24 @@
 ﻿using System.Reflection;
 using AutoFixture.Kernel;
 
-namespace TypingRealm.Messaging.Tests.SpecimenBuilders
+namespace TypingRealm.Messaging.Tests.SpecimenBuilders;
+
+public class ClientWithGroupBuilder : ISpecimenBuilder
 {
-    public class ClientWithGroupBuilder : ISpecimenBuilder
+    private readonly string _group;
+
+    public ClientWithGroupBuilder(string group)
     {
-        private readonly string _group;
+        _group = group;
+    }
 
-        public ClientWithGroupBuilder(string group)
-        {
-            _group = group;
-        }
+    public object Create(object request, ISpecimenContext context)
+    {
+        if (!(request is ParameterInfo pi)
+            || pi.ParameterType != typeof(string)
+            || pi.Name != "group")
+            return new NoSpecimen();
 
-        public object Create(object request, ISpecimenContext context)
-        {
-            if (!(request is ParameterInfo pi)
-                || pi.ParameterType != typeof(string)
-                || pi.Name != "group")
-                return new NoSpecimen();
-
-            return _group;
-        }
+        return _group;
     }
 }

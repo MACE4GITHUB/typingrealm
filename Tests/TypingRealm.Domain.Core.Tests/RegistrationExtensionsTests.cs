@@ -6,30 +6,29 @@ using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
 using Xunit;
 
-namespace TypingRealm.Domain.Tests
+namespace TypingRealm.Domain.Tests;
+
+public class RegistrationExtensionsTests
 {
-    public class RegistrationExtensionsTests
+    [Fact]
+    public void AddDomainCore_ShouldAddAllMessagesFromDomainAssemblyAndOnlyThem()
     {
-        [Fact]
-        public void AddDomainCore_ShouldAddAllMessagesFromDomainAssemblyAndOnlyThem()
-        {
-            var services = new ServiceCollection();
-            _ = new MessageTypeCacheBuilder(services)
-                .AddDomainCore();
+        var services = new ServiceCollection();
+        _ = new MessageTypeCacheBuilder(services)
+            .AddDomainCore();
 
-            var messages = services.BuildServiceProvider()
-                .GetRequiredService<IMessageTypeCache>()
-                .GetAllTypes()
-                .Select(x => x.Value)
-                .ToList();
+        var messages = services.BuildServiceProvider()
+            .GetRequiredService<IMessageTypeCache>()
+            .GetAllTypes()
+            .Select(x => x.Value)
+            .ToList();
 
-            var asmMessages = typeof(Join).Assembly
-                .GetTypes()
-                .Where(x => x.GetCustomAttribute<MessageAttribute>() != null)
-                .OrderBy(x => x.FullName)
-                .ToList();
+        var asmMessages = typeof(Join).Assembly
+            .GetTypes()
+            .Where(x => x.GetCustomAttribute<MessageAttribute>() != null)
+            .OrderBy(x => x.FullName)
+            .ToList();
 
-            Assert.Equal(asmMessages, messages);
-        }
+        Assert.Equal(asmMessages, messages);
     }
 }

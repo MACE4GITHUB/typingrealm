@@ -2,26 +2,25 @@
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Serialization;
 
-namespace TypingRealm.Chat
+namespace TypingRealm.Chat;
+
+public static class RegistrationExtensions
 {
-    public static class RegistrationExtensions
+    public static MessageTypeCacheBuilder AddChat(this MessageTypeCacheBuilder messageTypes)
     {
-        public static MessageTypeCacheBuilder AddChat(this MessageTypeCacheBuilder messageTypes)
-        {
-            var services = messageTypes.Services;
+        var services = messageTypes.Services;
 
-            services
-                .AddSingleton<MessageLog>()
-                .UseUpdateFactory<StateFactory>()
-                .RegisterHandler<Say, SayHandler>();
+        services
+            .AddSingleton<MessageLog>()
+            .UseUpdateFactory<StateFactory>()
+            .RegisterHandler<Say, SayHandler>();
 
-            messageTypes.AddChatMessages();
-            return messageTypes;
-        }
+        messageTypes.AddChatMessages();
+        return messageTypes;
+    }
 
-        public static MessageTypeCacheBuilder AddChatMessages(this MessageTypeCacheBuilder builder)
-        {
-            return builder.AddMessageTypesFromAssembly(typeof(Say).Assembly);
-        }
+    public static MessageTypeCacheBuilder AddChatMessages(this MessageTypeCacheBuilder builder)
+    {
+        return builder.AddMessageTypesFromAssembly(typeof(Say).Assembly);
     }
 }

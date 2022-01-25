@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Data.Api.Client
+﻿namespace TypingRealm.Data.Api.Client;
+
+public static class ServiceConfiguration
 {
-    public static class ServiceConfiguration
-    {
-        public static readonly string ServiceName = "data";
-    }
+    public static readonly string ServiceName = "data";
 }

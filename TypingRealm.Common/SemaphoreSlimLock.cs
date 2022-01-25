@@ -1,30 +1,29 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm
+namespace TypingRealm;
+
+public sealed class SemaphoreSlimLock : SyncManagedDisposable, ILock
 {
-    public sealed class SemaphoreSlimLock : SyncManagedDisposable, ILock
+    private readonly SemaphoreSlim _mutex = new SemaphoreSlim(1, 1);
+
+    public ValueTask ReleaseAsync(CancellationToken cancellationToken)
     {
-        private readonly SemaphoreSlim _mutex = new SemaphoreSlim(1, 1);
+        ThrowIfDisposed();
 
-        public ValueTask ReleaseAsync(CancellationToken cancellationToken)
-        {
-            ThrowIfDisposed();
+        _mutex.Release();
+        return default;
+    }
 
-            _mutex.Release();
-            return default;
-        }
+    public async ValueTask WaitAsync(CancellationToken cancellationToken)
+    {
+        ThrowIfDisposed();
 
-        public async ValueTask WaitAsync(CancellationToken cancellationToken)
-        {
-            ThrowIfDisposed();
+        await _mutex.WaitAsync(cancellationToken).ConfigureAwait(false);
+    }
 
-            await _mutex.WaitAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        protected override void DisposeManagedResources()
-        {
-            _mutex.Dispose();
-        }
+    protected override void DisposeManagedResources()
+    {
+        _mutex.Dispose();
     }
 }

@@ -1,9 +1,8 @@
 ﻿using TypingRealm.Messaging;
 
-namespace TypingRealm.Domain.Messages
+namespace TypingRealm.Domain.Messages;
+
+[Message]
+public sealed class TurnAround
 {
-    [Message]
-    public sealed class TurnAround
-    {
-    }
 }

@@ -1,30 +1,29 @@
 ﻿using System;
 using System.Linq;
 
-namespace TypingRealm.TextProcessing
+namespace TypingRealm.TextProcessing;
+
+public sealed class LanguageInformation
 {
-    public sealed class LanguageInformation
+    public LanguageInformation(Language language, string allowedCharacters)
     {
-        public LanguageInformation(Language language, string allowedCharacters)
-        {
-            ArgumentNullException.ThrowIfNull(language);
-            ArgumentNullException.ThrowIfNull(allowedCharacters);
+        ArgumentNullException.ThrowIfNull(language);
+        ArgumentNullException.ThrowIfNull(allowedCharacters);
 
-            if (allowedCharacters == string.Empty)
-                throw new ArgumentException("Allowed characters should have at least one character.");
+        if (allowedCharacters == string.Empty)
+            throw new ArgumentException("Allowed characters should have at least one character.");
 
-            Language = language;
-            AllowedCharacters = allowedCharacters;
-        }
+        Language = language;
+        AllowedCharacters = allowedCharacters;
+    }
 
-        public Language Language { get; }
-        public string AllowedCharacters { get; }
+    public Language Language { get; }
+    public string AllowedCharacters { get; }
 
-        public bool IsAllLettersAllowed(string text)
-        {
-            ArgumentNullException.ThrowIfNull(text);
+    public bool IsAllLettersAllowed(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
 
-            return text.All(character => AllowedCharacters.Contains(character));
-        }
+        return text.All(character => AllowedCharacters.Contains(character));
     }
 }

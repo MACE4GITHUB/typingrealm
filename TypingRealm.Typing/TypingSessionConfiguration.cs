@@ -1,4 +1,3 @@
-﻿namespace TypingRealm.Typing
-{
-    public sealed record TypingSessionConfiguration;
-}
+﻿namespace TypingRealm.Typing;
+
+public sealed record TypingSessionConfiguration;

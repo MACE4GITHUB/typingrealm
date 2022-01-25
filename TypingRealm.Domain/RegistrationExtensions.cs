@@ -4,26 +4,25 @@ using TypingRealm.Domain.Movement;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 
-namespace TypingRealm.Domain
+namespace TypingRealm.Domain;
+
+public static class RegistrationExtensions
 {
-    public static class RegistrationExtensions
+    public static IServiceCollection AddDomain(this IServiceCollection services)
     {
-        public static IServiceCollection AddDomain(this IServiceCollection services)
-        {
-            services.AddTransient<IConnectionInitializer, ConnectionInitializer>();
-            services.UseUpdateFactory<UpdateFactory>();
+        services.AddTransient<IConnectionInitializer, ConnectionInitializer>();
+        services.UseUpdateFactory<UpdateFactory>();
 
-            services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
+        services.RegisterHandler<MoveToLocation, MoveToLocationHandler>();
 
-            services.RegisterHandler<EnterRoad, RoadMovementHandler>();
-            services.RegisterHandler<Move, RoadMovementHandler>();
-            services.RegisterHandler<TurnAround, RoadMovementHandler>();
+        services.RegisterHandler<EnterRoad, RoadMovementHandler>();
+        services.RegisterHandler<Move, RoadMovementHandler>();
+        services.RegisterHandler<TurnAround, RoadMovementHandler>();
 
-            services.RegisterHandler<TeleportPlayerToLocation, TeleportPlayerToLocationHandler>();
+        services.RegisterHandler<TeleportPlayerToLocation, TeleportPlayerToLocationHandler>();
 
-            services.AddTransient<IPlayerPersistenceFactory, PlayerPersistenceFactory>();
+        services.AddTransient<IPlayerPersistenceFactory, PlayerPersistenceFactory>();
 
-            return services;
-        }
+        return services;
     }
 }

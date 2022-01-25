@@ -3,69 +3,68 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TypingRealm.Authentication.OAuth.Configuration;
 
-namespace TypingRealm.Authentication.OAuth
+namespace TypingRealm.Authentication.OAuth;
+
+public static class AuthenticationInformationBuilderExtensions
 {
-    public static class AuthenticationInformationBuilderExtensions
+    public static AuthenticationInformationBuilder UseAuthenticationProvider(
+        this AuthenticationInformationBuilder builder,
+        AuthenticationProviderConfiguration configuration)
     {
-        public static AuthenticationInformationBuilder UseAuthenticationProvider(
-            this AuthenticationInformationBuilder builder,
-            AuthenticationProviderConfiguration configuration)
+        var parameters = builder.AuthenticationInformation.TokenValidationParameters;
+
+        builder.AuthenticationInformation.Issuer = configuration.Issuer;
+        builder.AuthenticationInformation.AuthorizationEndpoint = configuration.AuthorizationEndpoint;
+        builder.AuthenticationInformation.TokenEndpoint = configuration.TokenEndpoint;
+
+        builder.AuthenticationInformation.RequireHttpsMetadata = configuration.RequireHttpsMetadata;
+
+        builder.AuthenticationInformation.ServiceClientId = configuration.ServiceClientId;
+        builder.AuthenticationInformation.ServiceClientSecret = configuration.ServiceClientSecret;
+
+        parameters.ValidAudiences = new[] { configuration.Audience };
+        parameters.ValidIssuer = configuration.Issuer;
+        parameters.IssuerSigningKey = null;
+        parameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
         {
-            var parameters = builder.AuthenticationInformation.TokenValidationParameters;
+            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                $"{parameters.ValidIssuer}.well-known/openid-configuration",
+                new OpenIdConnectConfigurationRetriever(),
+                new HttpDocumentRetriever
+                {
+                    RequireHttps = configuration.RequireHttpsMetadata
+                });
 
-            builder.AuthenticationInformation.Issuer = configuration.Issuer;
-            builder.AuthenticationInformation.AuthorizationEndpoint = configuration.AuthorizationEndpoint;
-            builder.AuthenticationInformation.TokenEndpoint = configuration.TokenEndpoint;
+            var openIdConfig = configurationManager.GetConfigurationAsync(CancellationToken.None).GetAwaiter().GetResult();
 
-            builder.AuthenticationInformation.RequireHttpsMetadata = configuration.RequireHttpsMetadata;
+            return openIdConfig.SigningKeys;
+        };
 
-            builder.AuthenticationInformation.ServiceClientId = configuration.ServiceClientId;
-            builder.AuthenticationInformation.ServiceClientSecret = configuration.ServiceClientSecret;
+        return builder;
+    }
 
-            parameters.ValidAudiences = new[] { configuration.Audience };
-            parameters.ValidIssuer = configuration.Issuer;
-            parameters.IssuerSigningKey = null;
-            parameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
-            {
-                var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                    $"{parameters.ValidIssuer}.well-known/openid-configuration",
-                    new OpenIdConnectConfigurationRetriever(),
-                    new HttpDocumentRetriever
-                    {
-                        RequireHttps = configuration.RequireHttpsMetadata
-                    });
+    public static AuthenticationInformationBuilder UseAuth0Provider(this AuthenticationInformationBuilder builder, bool isDevelopment = false)
+    {
+        if (isDevelopment)
+            return builder.UseAuthenticationProvider(new DevelopmentAuth0AuthenticationConfiguration());
 
-                var openIdConfig = configurationManager.GetConfigurationAsync(CancellationToken.None).GetAwaiter().GetResult();
+        return builder.UseAuthenticationProvider(new Auth0AuthenticationConfiguration());
+    }
 
-                return openIdConfig.SigningKeys;
-            };
+    public static AuthenticationInformationBuilder UseIdentityServerProvider(this AuthenticationInformationBuilder builder)
+    {
+        return builder.UseAuthenticationProvider(new IdentityServerAuthenticationConfiguration());
+    }
 
-            return builder;
-        }
+    public static AuthenticationInformationBuilder UseLocalProvider(this AuthenticationInformationBuilder builder)
+    {
+        builder.UseAuthenticationProvider(new LocalAuthenticationConfiguration());
 
-        public static AuthenticationInformationBuilder UseAuth0Provider(this AuthenticationInformationBuilder builder, bool isDevelopment = false)
-        {
-            if (isDevelopment)
-                return builder.UseAuthenticationProvider(new DevelopmentAuth0AuthenticationConfiguration());
+        var parameters = builder.AuthenticationInformation.TokenValidationParameters;
 
-            return builder.UseAuthenticationProvider(new Auth0AuthenticationConfiguration());
-        }
+        parameters.IssuerSigningKeyResolver = null;
+        parameters.IssuerSigningKey = LocalAuthentication.SecurityKey;
 
-        public static AuthenticationInformationBuilder UseIdentityServerProvider(this AuthenticationInformationBuilder builder)
-        {
-            return builder.UseAuthenticationProvider(new IdentityServerAuthenticationConfiguration());
-        }
-
-        public static AuthenticationInformationBuilder UseLocalProvider(this AuthenticationInformationBuilder builder)
-        {
-            builder.UseAuthenticationProvider(new LocalAuthenticationConfiguration());
-
-            var parameters = builder.AuthenticationInformation.TokenValidationParameters;
-
-            parameters.IssuerSigningKeyResolver = null;
-            parameters.IssuerSigningKey = LocalAuthentication.SecurityKey;
-
-            return builder;
-        }
+        return builder;
     }
 }

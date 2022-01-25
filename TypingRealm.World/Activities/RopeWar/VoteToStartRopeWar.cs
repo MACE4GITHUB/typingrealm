@@ -1,9 +1,8 @@
 ﻿using TypingRealm.Messaging;
 
-namespace TypingRealm.World.Activities.RopeWar
+namespace TypingRealm.World.Activities.RopeWar;
+
+[Message]
+public sealed class VoteToStartRopeWar
 {
-    [Message]
-    public sealed class VoteToStartRopeWar
-    {
-    }
 }

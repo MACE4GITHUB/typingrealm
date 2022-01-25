@@ -1,7 +1,6 @@
-﻿namespace TypingRealm.Messaging.Client
+﻿namespace TypingRealm.Messaging.Client;
+
+public interface IMessageProcessorFactory
 {
-    public interface IMessageProcessorFactory
-    {
-        IMessageProcessor CreateMessageProcessorFor(string connectionString);
-    }
+    IMessageProcessor CreateMessageProcessorFor(string connectionString);
 }

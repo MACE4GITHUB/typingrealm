@@ -1,11 +1,10 @@
 ﻿using TypingRealm.Profiles;
 
-namespace TypingRealm.Authentication.Api
+namespace TypingRealm.Authentication.Api;
+
+public sealed class UserScopedAttribute : TyrAuthorizeAttribute
 {
-    public sealed class UserScopedAttribute : TyrAuthorizeAttribute
+    public UserScopedAttribute() : base(ProfileType.User)
     {
-        public UserScopedAttribute() : base(ProfileType.User)
-        {
-        }
     }
 }

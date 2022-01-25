@@ -1,10 +1,9 @@
-﻿namespace TypingRealm.Client.Typing
+﻿namespace TypingRealm.Client.Typing;
+
+public interface ITyperInformation
 {
-    public interface ITyperInformation
-    {
-        string Typed { get; }
-        string Error { get; }
-        string NotTyped { get; }
-        bool IsStartedTyping { get; }
-    }
+    string Typed { get; }
+    string Error { get; }
+    string NotTyped { get; }
+    bool IsStartedTyping { get; }
 }

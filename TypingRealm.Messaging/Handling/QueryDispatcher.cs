@@ -2,21 +2,20 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Handling
+namespace TypingRealm.Messaging.Handling;
+
+// TODO: Unit test.
+public sealed class QueryDispatcher : IQueryDispatcher
 {
-    // TODO: Unit test.
-    public sealed class QueryDispatcher : IQueryDispatcher
+    private readonly IQueryHandlerFactory _queryHandlerFactory;
+
+    public QueryDispatcher(IQueryHandlerFactory queryHandlerFactory)
     {
-        private readonly IQueryHandlerFactory _queryHandlerFactory;
+        _queryHandlerFactory = queryHandlerFactory;
+    }
 
-        public QueryDispatcher(IQueryHandlerFactory queryHandlerFactory)
-        {
-            _queryHandlerFactory = queryHandlerFactory;
-        }
-
-        public ValueTask<object> DispatchAsync(ConnectedClient sender, object message, Type responseType, CancellationToken cancellationToken)
-        {
-            return _queryHandlerFactory.GetHandlerAndHandleAsync(sender, message, responseType, cancellationToken);
-        }
+    public ValueTask<object> DispatchAsync(ConnectedClient sender, object message, Type responseType, CancellationToken cancellationToken)
+    {
+        return _queryHandlerFactory.GetHandlerAndHandleAsync(sender, message, responseType, cancellationToken);
     }
 }

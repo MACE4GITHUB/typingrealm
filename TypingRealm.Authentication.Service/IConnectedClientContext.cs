@@ -2,12 +2,11 @@
 using System.Security.Claims;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.Authentication.Service
+namespace TypingRealm.Authentication.Service;
+
+public interface IConnectedClientContext
 {
-    public interface IConnectedClientContext
-    {
-        string GetAccessToken();
-        void SetAuthenticatedContext(ClaimsPrincipal claimsPrincipal, JwtSecurityToken securityToken);
-        void SetConnectedClient(ConnectedClient connectedClient);
-    }
+    string GetAccessToken();
+    void SetAuthenticatedContext(ClaimsPrincipal claimsPrincipal, JwtSecurityToken securityToken);
+    void SetConnectedClient(ConnectedClient connectedClient);
 }

@@ -1,10 +1,9 @@
-﻿namespace TypingRealm.Domain.Movement
-{
-    public enum MovementDirection
-    {
-        Unspecified = 0,
+﻿namespace TypingRealm.Domain.Movement;
 
-        Forward = 1,
-        Backward = 2
-    }
+public enum MovementDirection
+{
+    Unspecified = 0,
+
+    Forward = 1,
+    Backward = 2
 }

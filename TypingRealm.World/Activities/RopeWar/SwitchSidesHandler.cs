@@ -3,28 +3,27 @@ using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.World.Layers;
 
-namespace TypingRealm.World.Activities.RopeWar
+namespace TypingRealm.World.Activities.RopeWar;
+
+public sealed class SwitchSidesHandler : LayerHandler<SwitchSides>
 {
-    public sealed class SwitchSidesHandler : LayerHandler<SwitchSides>
+    private readonly ILocationRepository _locationStore;
+
+    public SwitchSidesHandler(
+        ICharacterActivityStore characterActivityStore, ILocationRepository locationStore)
+        : base(characterActivityStore, Layer.RopeWar)
     {
-        private readonly ILocationRepository _locationStore;
+        _locationStore = locationStore;
+    }
 
-        public SwitchSidesHandler(
-            ICharacterActivityStore characterActivityStore, ILocationRepository locationStore)
-            : base(characterActivityStore, Layer.RopeWar)
-        {
-            _locationStore = locationStore;
-        }
+    protected override ValueTask HandleMessageAsync(ConnectedClient sender, SwitchSides message, CancellationToken cancellationToken)
+    {
+        var location = _locationStore.FindLocationForClient(sender);
+        var characterId = sender.ClientId;
 
-        protected override ValueTask HandleMessageAsync(ConnectedClient sender, SwitchSides message, CancellationToken cancellationToken)
-        {
-            var location = _locationStore.FindLocationForClient(sender);
-            var characterId = sender.ClientId;
+        location.SwitchSidesInRopeWar(characterId);
 
-            location.SwitchSidesInRopeWar(characterId);
-
-            _locationStore.Save(location);
-            return default;
-        }
+        _locationStore.Save(location);
+        return default;
     }
 }

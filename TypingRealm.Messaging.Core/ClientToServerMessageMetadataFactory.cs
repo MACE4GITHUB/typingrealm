@@ -1,22 +1,21 @@
-﻿namespace TypingRealm.Messaging
+﻿namespace TypingRealm.Messaging;
+
+public sealed class ClientToServerMessageMetadataFactory : IClientToServerMessageMetadataFactory
 {
-    public sealed class ClientToServerMessageMetadataFactory : IClientToServerMessageMetadataFactory
+    private readonly IMessageIdFactory _messageIdFactory;
+
+    public ClientToServerMessageMetadataFactory(IMessageIdFactory messageIdFactory)
     {
-        private readonly IMessageIdFactory _messageIdFactory;
+        _messageIdFactory = messageIdFactory;
+    }
 
-        public ClientToServerMessageMetadataFactory(IMessageIdFactory messageIdFactory)
-        {
-            _messageIdFactory = messageIdFactory;
-        }
+    public ClientToServerMessageMetadata CreateFor(object message)
+    {
+        var metadata = ClientToServerMessageMetadata.CreateEmpty();
+        metadata.MessageId = _messageIdFactory.CreateMessageId();
 
-        public ClientToServerMessageMetadata CreateFor(object message)
-        {
-            var metadata = ClientToServerMessageMetadata.CreateEmpty();
-            metadata.MessageId = _messageIdFactory.CreateMessageId();
+        // Load any metadata from attributes here.
 
-            // Load any metadata from attributes here.
-
-            return metadata;
-        }
+        return metadata;
     }
 }
