@@ -57,7 +57,7 @@ namespace TypingRealm.Configuration
                 }
             }
 
-            if (!DebugHelpers.IsDevelopment())
+            if (!DebugHelpers.IsDeployment())
             {
                 configuration = configurationBuilder.Build();
 
