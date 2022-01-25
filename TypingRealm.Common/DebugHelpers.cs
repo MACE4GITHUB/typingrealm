@@ -2,6 +2,8 @@
 
 namespace TypingRealm
 {
+    // TODO: Do not use static class, move out this configuration to a proper
+    // IConfiguration dependency and unit test it.
     public static class DebugHelpers
     {
         /// <summary>
