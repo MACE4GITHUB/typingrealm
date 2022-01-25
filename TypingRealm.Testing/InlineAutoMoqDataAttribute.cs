@@ -1,9 +1,9 @@
 ﻿using AutoFixture.Xunit2;
 
-namespace TypingRealm.Testing
+namespace TypingRealm.Testing;
+
+public sealed class InlineAutoMoqDataAttribute : InlineAutoDataAttribute
 {
-    public class InlineAutoMoqDataAttribute : InlineAutoDataAttribute
-    {
-        public InlineAutoMoqDataAttribute(params object[] objects) : base(new AutoMoqDataAttribute(), objects) { }
-    }
+    public InlineAutoMoqDataAttribute(params object[] objects)
+        : base(new AutoMoqDataAttribute(), objects) { }
 }

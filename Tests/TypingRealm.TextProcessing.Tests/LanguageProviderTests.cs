@@ -13,7 +13,7 @@ public class LanguageProviderTests : TextProcessingTestsBase
     [Theory, AutoDomainData]
     public async Task ShouldThrow_WhenLanguageIsInvalid(Language language)
     {
-        SetStringPrimitiveValue(language, nameof(Language.Value), "wrong");
+        SetPrimitiveValue(language, nameof(Language.Value), "wrong");
 
         await AssertThrowsAsync<NotSupportedException>(
             async () => await _sut.FindLanguageInformationAsync(language));

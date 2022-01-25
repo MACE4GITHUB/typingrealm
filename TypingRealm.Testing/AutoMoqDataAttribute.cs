@@ -4,22 +4,23 @@ using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
 using TypingRealm.Messaging;
 
-namespace TypingRealm.Testing
+namespace TypingRealm.Testing;
+
+public sealed class AutoMoqDataAttribute : AutoDataAttribute
 {
-    public class AutoMoqDataAttribute : AutoDataAttribute
+    public AutoMoqDataAttribute() : base(() => CreateFixture()) { }
+    public AutoMoqDataAttribute(bool configureMembers)
+        : base(() => CreateFixture(configureMembers)) { }
+
+    public static Fixture CreateFixture(bool configureMembers = true)
     {
-        public AutoMoqDataAttribute() : base(() => CreateFixture()) { }
-        public AutoMoqDataAttribute(bool configureMembers) : base(() => CreateFixture(configureMembers)) { }
+        var fixture = new Fixture();
+        fixture.Customize(new AutoMoqCustomization { ConfigureMembers = configureMembers });
+        fixture.Register<Stream>(() => new MemoryStream());
 
-        public static Fixture CreateFixture(bool configureMembers = true)
-        {
-            var fixture = new Fixture();
-            fixture.Customize(new AutoMoqCustomization { ConfigureMembers = configureMembers });
+        // TODO: Move out to Connections domain.
+        fixture.Customize<ConnectedClient>(x => x.OmitAutoProperties());
 
-            fixture.Register<Stream>(() => new MemoryStream());
-            fixture.Customize<ConnectedClient>(x => x.OmitAutoProperties());
-
-            return fixture;
-        }
+        return fixture;
     }
 }

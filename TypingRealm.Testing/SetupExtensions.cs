@@ -2,14 +2,13 @@
 using System.Threading.Tasks;
 using Moq.Language.Flow;
 
-namespace TypingRealm.Testing
+namespace TypingRealm.Testing;
+
+public static class SetupExtensions
 {
-    public static class SetupExtensions
+    public static void ThrowsAsync<T>(this ISetup<T, ValueTask> setup, Exception exception)
+        where T : class
     {
-        public static void ThrowsAsync<T>(this ISetup<T, ValueTask> setup, Exception exception)
-            where T : class
-        {
-            setup.Returns(new ValueTask(Task.FromException(exception)));
-        }
+        setup.Returns(new ValueTask(Task.FromException(exception)));
     }
 }

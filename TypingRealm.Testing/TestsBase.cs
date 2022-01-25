@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading;
@@ -8,135 +10,188 @@ using AutoFixture.Kernel;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Common;
-using TypingRealm.Messaging;
 using Xunit;
 
-namespace TypingRealm.Testing
+namespace TypingRealm.Testing;
+
+/// <summary>
+/// Test helper containing a bunch of methods to simplify unit testing.
+/// </summary>
+public abstract class TestsBase : IDisposable
 {
-    public abstract class TestsBase : IDisposable
+    // Used for creating instances with custom ISpecimenBuilder.
+    private readonly object _lock = new();
+
+    protected TestsBase() : this(AutoMoqDataAttribute.CreateFixture()) { }
+    protected TestsBase(IFixture fixture)
     {
-        // Used for creating instances with custom ISpecimenBuilder.
-        private readonly object _lock = new object();
+        Fixture = fixture;
+        Cts = new CancellationTokenSource();
+    }
 
-        protected TestsBase()
+    /// <summary>
+    /// Fixture instance with auto Domain data customizations.
+    /// </summary>
+    protected IFixture Fixture { get; }
+
+    /// <summary>
+    /// Cancellation token source that is created separately per every test.
+    /// </summary>
+    protected CancellationTokenSource Cts { get; }
+
+    void IDisposable.Dispose()
+    {
+        Cts.Dispose();
+    }
+
+    /// <summary>
+    /// Waits for 100 ms.
+    /// </summary>
+    protected static ValueTask Wait() => Wait(100);
+    protected static async ValueTask Wait(int milliseconds)
+        => await Task.Delay(milliseconds).ConfigureAwait(false);
+
+    protected T Create<T>() => Fixture.Create<T>();
+    protected T Create<T>(params ISpecimenBuilder[] builders)
+    {
+        lock (_lock)
         {
-            Fixture = AutoMoqDataAttribute.CreateFixture();
-        }
-
-        protected TestsBase(IFixture fixture)
-        {
-            Fixture = fixture;
-        }
-
-        protected void SetStringPrimitiveValue(object instance, string propertyName, object value)
-        {
-            var field = typeof(Primitive<string>).GetField($"<{propertyName}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
-            field!.SetValue(instance, value);
-        }
-
-        protected virtual IFixture Fixture { get; }
-        protected CancellationTokenSource Cts { get; } = new CancellationTokenSource();
-
-        protected T Create<T>() => Fixture.Create<T>();
-        protected T Create<T>(params ISpecimenBuilder[] builders)
-        {
-            lock (_lock)
+            foreach (var builder in builders)
             {
-                foreach (var builder in builders)
-                {
-                    Fixture.Customizations.Add(builder);
-                }
-
-                var result = Fixture.Create<T>();
-
-                foreach (var builder in builders)
-                {
-                    Fixture.Customizations.Remove(builder);
-                }
-
-                return result;
+                Fixture.Customizations.Add(builder);
             }
-        }
 
-        protected virtual IServiceCollection GetServiceCollection()
-        {
-            return new ServiceCollection()
-                .AddLogging();
-        }
+            var result = Fixture.Create<T>();
 
-        protected virtual IServiceProvider GetServiceProvider() => GetServiceCollection().BuildServiceProvider();
-
-        protected TestException NewTestException()
-            => Fixture.Create<TestException>();
-
-        protected void AssertSerializable<T>()
-        {
-            // This will use default parameterless constructor and assign all properties.
-            var message = Create<T>();
-
-            // This will throw if there's no default parameterless constructor.
-            var result = JsonSerializer.Deserialize<T>(
-                JsonSerializer.Serialize(message));
-
-            AssertRecursivePropertiesEqual(message!, result!);
-        }
-
-        private void AssertRecursivePropertiesEqual(object expectedMessage, object actualMessage)
-        {
-            foreach (var property in expectedMessage.GetType().GetProperties())
+            foreach (var builder in builders)
             {
-                var propertyType = property.PropertyType;
-
-                if (propertyType.GetCustomAttribute<MessageAttribute>() != null)
-                {
-                    AssertRecursivePropertiesEqual(
-                        property.GetValue(expectedMessage)!,
-                        property.GetValue(actualMessage)!);
-                }
+                Fixture.Customizations.Remove(builder);
             }
-        }
 
-        protected ValueTask Wait() => Wait(100);
-        protected async ValueTask Wait(int milliseconds)
-            => await Task.Delay(milliseconds).ConfigureAwait(false);
-
-        protected object? GetPrivateField(object instance, string fieldName)
-            => instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(instance);
-
-        protected async ValueTask<TException> AssertThrowsAsync<TException>(Func<Task> taskFactory, TException exception)
-            where TException : Exception
-        {
-            var thrown = await Assert.ThrowsAsync<TException>(() => taskFactory()).ConfigureAwait(false);
-            Assert.Equal(exception, thrown);
-
-            return thrown;
-        }
-
-        protected async ValueTask<TException> AssertThrowsAsync<TException>(Func<ValueTask> vtFactory, TException exception)
-            where TException : Exception
-        {
-            var thrown = await Assert.ThrowsAsync<TException>(() => vtFactory().AsTask()).ConfigureAwait(false);
-            Assert.Equal(exception, thrown);
-
-            return thrown;
-        }
-
-        protected async ValueTask<TException> AssertThrowsAsync<TException>(Func<ValueTask> vtFactory)
-            where TException : Exception
-        {
-            return await Assert.ThrowsAsync<TException>(() => vtFactory().AsTask()).ConfigureAwait(false);
-        }
-
-        protected Task<Exception> SwallowAnyAsync(Task task)
-            => Assert.ThrowsAnyAsync<Exception>(() => task);
-
-        protected Mock<T> Freeze<T>() where T : class
-            => Fixture.Freeze<Mock<T>>();
-
-        public void Dispose()
-        {
-            Cts.Cancel();
-            Cts.Dispose();
+            return result;
         }
     }
+
+    protected Mock<T> Freeze<T>() where T : class => Fixture.Freeze<Mock<T>>();
+
+    /// <summary>
+    /// Changes the value of a class that is inherited from <see cref="Primitive{TValue}"/>.
+    /// </summary>
+    protected static void SetPrimitiveValue<TValue>(object instance, string propertyName, TValue value)
+    {
+        var field = typeof(Primitive<TValue>).GetField(
+            $"<{propertyName}>k__BackingField",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        field!.SetValue(instance, value);
+    }
+
+    protected static object? GetPrivateField(object instance, string fieldName) => instance
+        .GetType()
+        .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)?
+        .GetValue(instance);
+
+    /// <summary>
+    /// Gets new ServiceCollection with enabled Logging. Can be overridden to
+    /// register additional dependencies by default.
+    /// </summary>
+    protected virtual IServiceCollection GetServiceCollection()
+    {
+        return new ServiceCollection()
+            .AddLogging();
+    }
+
+    /// <summary>
+    /// Gets new ServiceProvider using <see cref="GetServiceCollection"/> method.
+    /// </summary>
+    protected IServiceProvider GetServiceProvider() => GetServiceCollection().BuildServiceProvider();
+
+    /// <summary>
+    /// Creates new <see cref="TestException"/> instance.
+    /// </summary>
+    protected TestException NewTestException() => Fixture.Create<TestException>();
+
+    /// <summary>
+    /// Ensures that all public properties of a class can be read or assigned by
+    /// serializer.
+    /// </summary>
+    protected void AssertSerializable<T>()
+    {
+        // This will use default parameterless constructor and assign all properties.
+        var instance = Create<T>();
+
+        // This will throw if there's no default parameterless constructor.
+        var result = JsonSerializer.Deserialize<T>(
+            JsonSerializer.Serialize(instance));
+
+        AssertDeepEqual(instance!, result!);
+    }
+
+    protected void AssertDeepEqual(object leftInstance, object rightInstance)
+    {
+        var leftType = leftInstance.GetType();
+        var rightType = rightInstance.GetType();
+
+        if (leftType.IsValueType
+            || leftType.IsPrimitive
+            || leftType == typeof(string))
+        {
+            Assert.Equal(leftType, rightType);
+            Assert.Equal(leftInstance, rightInstance);
+            return;
+        }
+
+        if (leftType.GetInterface(nameof(IEnumerable)) != null)
+        {
+            // Do not compare types here, it can be different (mocked) collections.
+
+            var leftItems = ((IEnumerable)leftInstance).Cast<object>().ToList();
+            var rightItems = ((IEnumerable)rightInstance).Cast<object>().ToList();
+
+            Assert.Equal(leftItems.Count, rightItems.Count);
+
+            for (var i = 0; i < leftItems.Count; i++)
+            {
+                AssertDeepEqual(leftItems[i], rightItems[i]);
+            }
+
+            return;
+        }
+
+        foreach (var property in leftType.GetProperties())
+        {
+            Assert.Equal(leftType, rightType);
+
+            AssertDeepEqual(
+                property.GetValue(leftInstance)!,
+                property.GetValue(rightInstance)!);
+        }
+    }
+
+    protected static async ValueTask<TException> AssertThrowsAsync<TException>(Func<Task> taskFactory, TException exception)
+        where TException : Exception
+    {
+        var thrown = await Assert.ThrowsAsync<TException>(() => taskFactory()).ConfigureAwait(false);
+        Assert.Equal(exception, thrown);
+
+        return thrown;
+    }
+
+    protected static async ValueTask<TException> AssertThrowsAsync<TException>(Func<ValueTask> vtFactory, TException exception)
+        where TException : Exception
+    {
+        var thrown = await Assert.ThrowsAsync<TException>(() => vtFactory().AsTask()).ConfigureAwait(false);
+        Assert.Equal(exception, thrown);
+
+        return thrown;
+    }
+
+    protected static async ValueTask<TException> AssertThrowsAsync<TException>(Func<ValueTask> vtFactory)
+        where TException : Exception
+    {
+        return await Assert.ThrowsAsync<TException>(() => vtFactory().AsTask()).ConfigureAwait(false);
+    }
+
+    protected static Task<Exception> SwallowAnyAsync(Task task)
+        => Assert.ThrowsAnyAsync<Exception>(() => task);
 }
