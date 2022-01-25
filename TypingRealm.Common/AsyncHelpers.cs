@@ -16,7 +16,7 @@ namespace TypingRealm
 
             // We cannot await Task to create ValueTask, because then we lose
             // AggregateException (InnerExceptions).
-            return new ValueTask(Task.WhenAll(valueTasks
+            return new(Task.WhenAll(valueTasks
                 .Where(vt => !vt.IsCompletedSuccessfully)
                 .Select(vt => vt.AsTask())));
         }
