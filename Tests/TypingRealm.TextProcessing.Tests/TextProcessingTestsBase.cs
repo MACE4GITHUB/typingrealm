@@ -3,7 +3,6 @@ using System.Reflection;
 using AutoFixture;
 using AutoFixture.Kernel;
 using AutoFixture.Xunit2;
-using TypingRealm.Common;
 using TypingRealm.Testing;
 
 namespace TypingRealm.TextProcessing.Tests;

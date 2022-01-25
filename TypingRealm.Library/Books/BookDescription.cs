@@ -1,6 +1,4 @@
-﻿using TypingRealm.Common;
-
-namespace TypingRealm.Library.Books;
+﻿namespace TypingRealm.Library.Books;
 
 public sealed class BookDescription : Primitive<string>
 {

@@ -2,7 +2,7 @@
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Common.Tests;
+namespace TypingRealm.Tests;
 
 public class PrimitiveTests : TestsBase
 {

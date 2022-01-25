@@ -9,7 +9,6 @@ using AutoFixture;
 using AutoFixture.Kernel;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using TypingRealm.Common;
 using Xunit;
 
 namespace TypingRealm.Testing;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TypingRealm.Common;
+namespace TypingRealm;
 
 public abstract class Primitive<TValue>
 {

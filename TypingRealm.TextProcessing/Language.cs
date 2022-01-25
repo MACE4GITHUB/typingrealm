@@ -1,6 +1,4 @@
-﻿using TypingRealm.Common;
-
-namespace TypingRealm.TextProcessing;
+﻿namespace TypingRealm.TextProcessing;
 
 public sealed class Language : Identity
 {

@@ -1,6 +1,4 @@
-﻿using TypingRealm.Common;
-
-namespace TypingRealm.Domain;
+﻿namespace TypingRealm.Domain;
 
 public sealed class PlayerId : Identity
 {

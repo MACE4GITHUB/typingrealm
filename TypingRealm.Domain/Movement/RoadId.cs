@@ -1,6 +1,4 @@
-﻿using TypingRealm.Common;
-
-namespace TypingRealm.Domain.Movement;
+﻿namespace TypingRealm.Domain.Movement;
 
 public sealed class RoadId : Identity
 {

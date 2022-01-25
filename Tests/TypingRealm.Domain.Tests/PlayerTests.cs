@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoFixture;
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Domain.Movement;
