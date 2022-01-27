@@ -39,7 +39,7 @@ public class PrimitiveTests : TestsBase
     [Fact]
     public void ShouldNotThrow_WhenExplicitelyNullableStructIsNull()
     {
-        // TODO: Do not allow nullable structs, throw ArgumentNull exception.
+        // Consider not allowing nullable structs, throw ArgumentNull exception.
         int? value = null;
 
         Assert.Null(new TestPrimitive<int?>(value).Value);
