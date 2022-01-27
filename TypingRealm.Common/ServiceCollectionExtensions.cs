@@ -7,6 +7,13 @@ namespace TypingRealm;
 
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Decorates a dependency wrapping an instance of Decorator around another
+    /// class based off the same type. Decorator should accept its base
+    /// interface into its constructor.
+    /// Lifetime of the decorator instance will be the same as of the previously
+    /// registered instance.
+    /// </summary>
     public static IServiceCollection Decorate<TInterface, TDecorator>(this IServiceCollection services)
         where TDecorator : TInterface
     {
@@ -28,6 +35,12 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Decorates a dependency wrapping an instance of Decorator around another
+    /// class based off the same type. Decorator should accept its base
+    /// interface into its constructor.
+    /// Lifetime of the decorator instance will be as specified in the method.
+    /// </summary>
     public static IServiceCollection Decorate<TInterface, TDecorator>(
         this IServiceCollection services,
         ServiceLifetime decoratorLifetime)
