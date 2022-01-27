@@ -6,7 +6,7 @@ namespace TypingRealm.Tests;
 
 public class IdentityTests
 {
-    public class TestIdentity : Identity
+    private class TestIdentity : Identity
     {
         public TestIdentity(string value) : base(value)
         {

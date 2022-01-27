@@ -53,7 +53,7 @@ public class AsyncManagedDisposableTests : IDisposable
     }
 
     [Fact]
-    public async Task ShouldDisposeSyncAfterWaiting()
+    public void ShouldDisposeSyncAfterWaiting()
     {
         _sut.WaitBeforeDisposingMs = 100;
         _sut.Dispose();

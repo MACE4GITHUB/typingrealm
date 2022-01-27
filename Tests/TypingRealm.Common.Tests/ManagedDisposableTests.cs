@@ -70,7 +70,10 @@ public class ManagedDisposableTests : IDisposable
     [Fact]
     public async Task ShouldNotDisposeAsyncAfterSync()
     {
+#pragma warning disable CA1849 // Call async methods when in an async method
         _sut.Dispose();
+#pragma warning restore CA1849
+
         _sut.IsDisposed = false;
 
         await _sut.DisposeAsync();
@@ -85,7 +88,9 @@ public class ManagedDisposableTests : IDisposable
         await _sut.DisposeAsync();
         _sut.IsDisposedAsync = false;
 
+#pragma warning disable CA1849 // Call async methods when in an async method
         _sut.Dispose();
+#pragma warning restore CA1849
 
         Assert.False(_sut.IsDisposed);
         Assert.False(_sut.IsDisposedAsync);

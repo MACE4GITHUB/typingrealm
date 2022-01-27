@@ -49,20 +49,16 @@ public abstract class Primitive<TValue>
 
     public static bool operator ==(Primitive<TValue>? left, Primitive<TValue>? right)
     {
-        if (left is null)
-        {
-            if (right is null)
-                return true;
-
-            return false;
-        }
-
-        return left.Equals(right);
+        return left is null
+            ? right is null
+            : left.Equals(right);
     }
 
     public static bool operator !=(Primitive<TValue>? left, Primitive<TValue>? right)
         => !(left == right);
 
+#pragma warning disable CA2225 // It's a base class, we cannot introduce this method.
     public static implicit operator TValue(Primitive<TValue> identity)
+#pragma warning restore CA2225
         => identity.Value;
 }

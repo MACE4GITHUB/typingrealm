@@ -260,6 +260,14 @@ dotnet_diagnostic.CA1848.severity = silent
 # Allow builder methods (services registration, custom factories).
 dotnet_diagnostic.IDE0058.severity = silent
 
+# I don't implement unmanaged code so I don't need to conform to Disposable pattern.
+dotnet_diagnostic.CA1063.severity = silent
+dotnet_diagnostic.CA1816.severity = silent
+dotnet_diagnostic.S3881.severity = silent
+
+# We can override == operator for domain-specific logic.
+dotnet_diagnostic.S3875.severity = silent
+
 
 
 # === Tests ===
@@ -270,6 +278,12 @@ dotnet_diagnostic.CA2007.severity = none
 
 # CA1707: Underscores in method names
 dotnet_diagnostic.CA1707.severity = none
+
+# No need to fret over accessibility in unit tests.
+dotnet_diagnostic.CA1034.severity = none
+
+# Can be empty interfaces in tests, for testing purposes.
+dotnet_diagnostic.CA1040.severity = none
 
 # === .NET Core API ===
 [*.Api/**]

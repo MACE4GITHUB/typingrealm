@@ -110,7 +110,7 @@ public partial class TaskExtensionsTests : TestsBase
     public async Task HandleCancellation_ShouldNotHandleWhenNoException()
     {
         var isHandled = false;
-        await Task.Run(() => { }).HandleExceptionAsync<OperationCanceledException>(e => isHandled = true);
+        await Task.Run(() => { }).HandleCancellationAsync(e => isHandled = true);
 
         Assert.False(isHandled);
     }
@@ -127,6 +127,8 @@ public partial class TaskExtensionsTests : TestsBase
 
             await task;
         }).SwallowCancellationAsync();
+
+        AssertSuccessful();
     }
 
     [Fact]
@@ -134,6 +136,8 @@ public partial class TaskExtensionsTests : TestsBase
     {
         await Task.Run(() => throw new OperationCanceledException())
             .SwallowCancellationAsync();
+
+        AssertSuccessful();
     }
 
     [Fact]
@@ -141,6 +145,8 @@ public partial class TaskExtensionsTests : TestsBase
     {
         await Task.Run(() => throw new TaskCanceledException())
             .SwallowCancellationAsync();
+
+        AssertSuccessful();
     }
 
     [Fact]

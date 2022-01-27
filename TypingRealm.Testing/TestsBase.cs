@@ -193,4 +193,11 @@ public abstract class TestsBase : IDisposable
 
     protected static Task<Exception> SwallowAnyAsync(Task task)
         => Assert.ThrowsAnyAsync<Exception>(() => task);
+
+    protected static void AssertSuccessful()
+    {
+        // This method does nothing, it is being ran at the end of unit tests to
+        // indicate that test has been successfully completed without exceptions.
+        // It's mainly used to get rid of analyzer warnings when it is intended.
+    }
 }

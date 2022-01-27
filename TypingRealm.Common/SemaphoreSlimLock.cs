@@ -5,7 +5,7 @@ namespace TypingRealm;
 
 public sealed class SemaphoreSlimLock : SyncManagedDisposable, ILock
 {
-    private readonly SemaphoreSlim _mutex = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _mutex = new(1, 1);
 
     public ValueTask ReleaseAsync(CancellationToken cancellationToken)
     {

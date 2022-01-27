@@ -12,7 +12,6 @@ namespace TypingRealm;
 /// Use <see cref="ThrowIfDisposed"/> method on all methods that shouldn't
 /// work when the object has already been disposed.
 /// </summary>
-#pragma warning disable S3881, CA1063, CA1816 // Disposable pattern.
 public abstract class ManagedDisposable : IDisposable, IAsyncDisposable
 {
     private bool _isDisposed;
@@ -44,7 +43,6 @@ public abstract class ManagedDisposable : IDisposable, IAsyncDisposable
     protected abstract ValueTask DisposeManagedResourcesAsync();
     protected abstract void DisposeManagedResources();
 }
-#pragma warning restore S3881, CA1063, CA1816
 
 /// <summary>
 /// Use this class when resources are disposed synchronously.
