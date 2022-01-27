@@ -48,6 +48,37 @@ public static class AssertServiceProviderExtensions
         return i1;
     }
 
+    public static object AssertRegisteredScoped(
+        this IServiceProvider provider,
+        Type interfaceType,
+        Type implementationType)
+    {
+        var i1 = provider.AssertRegistered(interfaceType, implementationType);
+        var i2 = provider.AssertRegistered(interfaceType, implementationType);
+
+        using var scope1 = provider.CreateScope();
+        var i3 = scope1.ServiceProvider.AssertRegistered(interfaceType, implementationType);
+
+        using var scope2 = provider.CreateScope();
+        var i4 = scope2.ServiceProvider.AssertRegistered(interfaceType, implementationType);
+
+        Assert.Equal(i1, i2);
+        Assert.NotEqual(i1, i3);
+        Assert.NotEqual(i1, i4);
+        Assert.NotEqual(i3, i4);
+
+        return i1;
+    }
+
+    public static TImplementation AssertRegistered<TInterface, TImplementation>(
+        this IServiceProvider provider, ServiceLifetime lifetime) => lifetime switch
+        {
+            ServiceLifetime.Transient => AssertRegisteredTransient<TInterface, TImplementation>(provider),
+            ServiceLifetime.Scoped => AssertRegisteredScoped<TInterface, TImplementation>(provider),
+            ServiceLifetime.Singleton => AssertRegisteredSingleton<TInterface, TImplementation>(provider),
+            _ => throw new InvalidOperationException()
+        };
+
     public static TImplementation AssertRegistered<TInterface, TImplementation>(this IServiceProvider provider)
         => (TImplementation)provider.AssertRegistered(typeof(TInterface), typeof(TImplementation));
 
@@ -56,4 +87,7 @@ public static class AssertServiceProviderExtensions
 
     public static TImplementation AssertRegisteredSingleton<TInterface, TImplementation>(this IServiceProvider provider)
         => (TImplementation)provider.AssertRegisteredSingleton(typeof(TInterface), typeof(TImplementation));
+
+    public static TImplementation AssertRegisteredScoped<TInterface, TImplementation>(this IServiceProvider provider)
+        => (TImplementation)provider.AssertRegisteredScoped(typeof(TInterface), typeof(TImplementation));
 }
