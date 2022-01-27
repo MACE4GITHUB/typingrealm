@@ -128,8 +128,6 @@ public partial class TaskExtensionsTests : TestsBase
     [Fact]
     public async Task SwallowCancellation_ShouldSwallowCancellationException()
     {
-        var thrown = new OperationCanceledException();
-
         await Task.Run(() => throw new OperationCanceledException())
             .SwallowCancellationAsync();
     }

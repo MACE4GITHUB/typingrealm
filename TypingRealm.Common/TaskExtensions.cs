@@ -58,6 +58,10 @@ public static class TaskExtensions
         return await task.ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Adds CancellationToken with given delay to the task. After the delay the
+    /// task will be canceled.
+    /// </summary>
     public static async Task WithTimeoutAsync(
         this Task task, TimeSpan timeout)
     {
@@ -67,6 +71,10 @@ public static class TaskExtensions
             .ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Adds CancellationToken with given delay to the task. After the delay the
+    /// task will be canceled.
+    /// </summary>
     public static async Task<TResult> WithTimeoutAsync<TResult>(
         this Task<TResult> task, TimeSpan timeout)
     {
