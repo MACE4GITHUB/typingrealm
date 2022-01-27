@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace TypingRealm;
 
+/// <summary>
+/// Primitive base class that can be used instead of to avoid primitive obsession,
+/// like BookDescription, ProfileName etc. It's also a basis for the
+/// <see cref="Identity"/> class.
+/// When value is struct - null values are allowed. For classes null values
+/// would lead to <see cref="ArgumentNullException"/>.
+/// </summary>
 public abstract class Primitive<TValue>
 {
     protected Primitive(TValue value)
