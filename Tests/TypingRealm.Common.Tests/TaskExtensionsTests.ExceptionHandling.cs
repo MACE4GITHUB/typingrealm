@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Tests;
@@ -16,7 +17,7 @@ public sealed class TestSynchronizationContext : SynchronizationContext
     }
 }
 
-public partial class TaskExtensionsTests
+public partial class TaskExtensionsTests : TestsBase
 {
     [Fact]
     public async Task HandleException_ShouldHandleException()
@@ -66,9 +67,8 @@ public partial class TaskExtensionsTests
 
         await Task.Run(async () =>
         {
-            using var cts = new CancellationTokenSource();
-            cts.Cancel();
-            await Task.Delay(Timeout.Infinite, cts.Token);
+            Cts.Cancel();
+            await Task.Delay(Timeout.Infinite, Cts.Token);
         }).HandleCancellationAsync(e => exception = e);
 
         Assert.IsAssignableFrom<OperationCanceledException>(exception);
@@ -120,9 +120,8 @@ public partial class TaskExtensionsTests
     {
         await Task.Run(async () =>
         {
-            using var cts = new CancellationTokenSource();
-            cts.Cancel();
-            await Task.Delay(Timeout.Infinite, cts.Token);
+            Cts.Cancel();
+            await Task.Delay(Timeout.Infinite, Cts.Token);
         }).SwallowCancellationAsync();
     }
 
