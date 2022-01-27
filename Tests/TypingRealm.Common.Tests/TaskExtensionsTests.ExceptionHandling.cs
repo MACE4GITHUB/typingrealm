@@ -120,8 +120,12 @@ public partial class TaskExtensionsTests : TestsBase
     {
         await Task.Run(async () =>
         {
+            var task = Task.Delay(Timeout.Infinite, Cts.Token);
+
+            await Wait();
             Cts.Cancel();
-            await Task.Delay(Timeout.Infinite, Cts.Token);
+
+            await task;
         }).SwallowCancellationAsync();
     }
 
