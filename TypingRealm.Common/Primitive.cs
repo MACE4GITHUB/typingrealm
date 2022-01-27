@@ -24,7 +24,15 @@ public abstract class Primitive<TValue>
 
     public sealed override int GetHashCode()
     {
-        return Value!.GetHashCode();
+        var typeHashCode = GetType().GetHashCode();
+
+        unchecked // Overflow is fine.
+        {
+            var hash = 17;
+            hash = (hash * 23) + Value?.GetHashCode() ?? 0;
+            hash = (hash * 23) + typeHashCode;
+            return hash;
+        }
     }
 
     public sealed override string? ToString()

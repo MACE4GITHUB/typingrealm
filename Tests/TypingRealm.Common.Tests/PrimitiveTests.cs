@@ -61,12 +61,6 @@ public class PrimitiveTests : TestsBase
     }
 
     [Theory, AutoMoqData]
-    public void ShouldGetTheSameHashCodeAsValue(TestPrimitive<string> sut)
-    {
-        Assert.Equal(sut.Value.GetHashCode(), sut.GetHashCode());
-    }
-
-    [Theory, AutoMoqData]
     public void ShouldCompareByValue(TestPrimitive<string> sut)
     {
         var sameSut = new TestPrimitive<string>(sut.Value);
@@ -87,12 +81,11 @@ public class PrimitiveTests : TestsBase
     }
 
     [Theory, AutoMoqData]
-    public void GetHashCode_ReturnsTheSameResultForDifferentTypes(TestPrimitive<string> sut)
+    public void GetHashCode_ShouldBeDifferent_ForDifferentTypes(TestPrimitive<string> sut)
     {
-        // TODO: Change this behavior or DO NOT EVER put the same primitives in the same collection.
         var anotherTypeSut = new StringTestPrimitive(sut.Value);
 
-        Assert.Equal(sut.GetHashCode(), anotherTypeSut.GetHashCode());
+        Assert.NotEqual(sut.GetHashCode(), anotherTypeSut.GetHashCode());
     }
 
     [Theory, AutoMoqData]
