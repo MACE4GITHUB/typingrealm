@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TypingRealm;
 
@@ -10,7 +11,11 @@ namespace TypingRealm;
 /// When value is struct - null values are allowed. For classes null values
 /// would lead to <see cref="ArgumentNullException"/>.
 /// </summary>
+#pragma warning disable S4035 // Classes implementing "IEquatable<T>" should be sealed
 public abstract class Primitive<TValue>
+#pragma warning restore S4035
+    : IEquatable<Primitive<TValue>>,
+    IEqualityComparer<Primitive<TValue>>
 {
     protected Primitive(TValue value)
     {
@@ -24,9 +29,29 @@ public abstract class Primitive<TValue>
 
     public sealed override bool Equals(object? obj)
     {
-        return GetType() == obj?.GetType() // Test that types are exactly the same.
-            && obj is Primitive<TValue> other
-            && EqualityComparer<TValue>.Default.Equals(Value, other.Value);
+        if (GetType() != obj?.GetType())
+            return false;
+
+        return Equals(this, obj as Primitive<TValue>);
+    }
+
+    public bool Equals(Primitive<TValue>? other)
+    {
+        if (GetType() != other?.GetType())
+            return false;
+
+        return Equals(this, other);
+    }
+
+    public bool Equals(Primitive<TValue>? x, Primitive<TValue>? y)
+    {
+        if (x == null && y == null)
+            return true;
+
+        if (x == null || y == null)
+            return false;
+
+        return EqualityComparer<TValue>.Default.Equals(x.Value, y.Value);
     }
 
     public sealed override int GetHashCode()
@@ -40,6 +65,11 @@ public abstract class Primitive<TValue>
             hash = (hash * 23) + typeHashCode;
             return hash;
         }
+    }
+
+    public int GetHashCode([DisallowNull] Primitive<TValue> obj)
+    {
+        return obj.GetHashCode();
     }
 
     public sealed override string? ToString()

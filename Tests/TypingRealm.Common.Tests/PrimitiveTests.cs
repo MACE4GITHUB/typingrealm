@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TypingRealm.Testing;
 using Xunit;
 
@@ -128,13 +129,66 @@ public class PrimitiveTests : TestsBase
     [Fact]
     public void EqualityShouldBeSealed()
     {
-        Assert.True(typeof(Primitive<>).GetMethod(nameof(Primitive<int>.Equals))?.IsFinal);
-        Assert.True(typeof(Primitive<>).GetMethod(nameof(Primitive<int>.GetHashCode))?.IsFinal);
+        var equalsMethods = typeof(Primitive<>).GetMethods()
+            .Where(method => method.Name == nameof(Primitive<int>.Equals)
+                && method.IsVirtual);
+
+        var getHashCodeMethods = typeof(Primitive<>).GetMethods()
+            .Where(method => method.Name == nameof(Primitive<int>.GetHashCode)
+                && method.IsVirtual);
+
+        Assert.True(equalsMethods.Any());
+        Assert.True(getHashCodeMethods.Any());
+
+        foreach (var equalsMethod in equalsMethods)
+        {
+            Assert.True(equalsMethod.IsFinal);
+        }
+
+        foreach (var getHashCodeMethod in getHashCodeMethods)
+        {
+            Assert.True(getHashCodeMethod.IsFinal);
+        }
     }
 
     [Fact]
     public void ToStringShouldBeSealed()
     {
         Assert.True(typeof(Primitive<>).GetMethod(nameof(Identity.ToString))?.IsFinal);
+    }
+
+    [Fact]
+    public void ShouldHaveEqualityComparer_Equals()
+    {
+        var sut1 = new StringTestPrimitive("value");
+        var sut2 = new StringTestPrimitive("value");
+        var sut3 = new StringTestPrimitive("other");
+
+        Assert.True(sut1.Equals(sut1, sut2));
+        Assert.True(sut3.Equals(sut1, sut2));
+        Assert.False(sut3.Equals(sut3, sut2));
+    }
+
+    [Fact]
+    public void ShouldHaveEqualityComparer_Equals_AndCheckForNulls()
+    {
+        var sut1 = new StringTestPrimitive("value");
+        var sut3 = new StringTestPrimitive("other");
+
+        Assert.False(sut1.Equals(sut1, null));
+        Assert.False(sut1!.Equals(null, sut1));
+        Assert.True(sut3.Equals((StringTestPrimitive?)null, (StringTestPrimitive?)null));
+    }
+
+    [Fact]
+    public void ShouldHaveEqualityComparer_GetHashCode()
+    {
+        var sut1 = new StringTestPrimitive("value");
+        var sut2 = new StringTestPrimitive("value");
+        var sut3 = new StringTestPrimitive("other");
+
+        Assert.Equal(sut1.GetHashCode(), sut1.GetHashCode(sut2));
+        Assert.Equal(sut1.GetHashCode(), sut3.GetHashCode(sut2));
+        Assert.NotEqual(sut1.GetHashCode(), sut1.GetHashCode(sut3));
     }
 }

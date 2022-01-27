@@ -265,9 +265,6 @@ dotnet_diagnostic.CA1063.severity = silent
 dotnet_diagnostic.CA1816.severity = silent
 dotnet_diagnostic.S3881.severity = silent
 
-# We can override == operator for domain-specific logic.
-dotnet_diagnostic.S3875.severity = silent
-
 
 
 # === Tests ===
