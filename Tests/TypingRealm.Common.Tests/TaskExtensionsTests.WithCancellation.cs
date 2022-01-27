@@ -37,6 +37,34 @@ public partial class TaskExtensionsTests : TestsBase
     }
 
     [Fact]
+    public async Task WithTimeout_ShouldSucceedWhenCompleted()
+    {
+        var result = Task.Run(async () =>
+        {
+            await Task.Delay(1);
+        }).WithTimeoutAsync(TimeSpan.FromSeconds(2));
+        await result;
+        Cts.Cancel();
+
+        Assert.True(result.IsCompletedSuccessfully);
+    }
+
+    [Fact]
+    public async Task WithTimeoutWithValue_ShouldSucceedWhenCompleted()
+    {
+        var result = Task.Run(async () =>
+        {
+            await Task.Delay(1);
+            return 10;
+        }).WithTimeoutAsync(TimeSpan.FromSeconds(2));
+        var value = await result;
+        Cts.Cancel();
+
+        Assert.Equal(10, value);
+        Assert.True(result.IsCompletedSuccessfully);
+    }
+
+    [Fact]
     public async Task WithCancellation_ShouldThrowWhenCancellationRequested()
     {
         var task = Task.Run(async () =>
@@ -68,6 +96,37 @@ public partial class TaskExtensionsTests : TestsBase
     }
 
     [Fact]
+    public async Task WithTimeout_ShouldThrowWhenCancellationRequested()
+    {
+        var task = Task.Run(async () =>
+        {
+            await Task.Delay(Timeout.Infinite);
+        });
+
+        var result = task.WithTimeoutAsync(TimeSpan.FromMilliseconds(1));
+
+        Cts.Cancel();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => result);
+        Assert.True(result.IsCanceled);
+    }
+
+    [Fact]
+    public async Task WithTimeoutWithValue_ShouldThrowWhenCancellationRequested()
+    {
+        var task = Task.Run(async () =>
+        {
+            await Task.Delay(Timeout.Infinite);
+            return 10;
+        });
+
+        var result = task.WithTimeoutAsync(TimeSpan.FromMilliseconds(1));
+
+        Cts.Cancel();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => result);
+        Assert.True(result.IsCanceled);
+    }
+
+    [Fact]
     public async Task WithCancellation_ShouldAwaitTargetTaskWhenExceptionIsThrown()
     {
         var result = Task.Run(async () =>
@@ -88,6 +147,32 @@ public partial class TaskExtensionsTests : TestsBase
             await Task.Delay(10);
             throw new TestException();
         }).WithCancellationAsync(Cts.Token);
+
+        await Assert.ThrowsAsync<TestException>(() => result);
+        Assert.True(result.IsFaulted);
+    }
+
+    [Fact]
+    public async Task WithTimeout_ShouldAwaitTargetTaskWhenExceptionIsThrown()
+    {
+        var result = Task.Run(async () =>
+        {
+            await Task.Delay(10);
+            throw new TestException();
+        }).WithTimeoutAsync(TimeSpan.FromSeconds(2));
+
+        await Assert.ThrowsAsync<TestException>(() => result);
+        Assert.True(result.IsFaulted);
+    }
+
+    [Fact]
+    public async Task WithTimeoutWithValue_ShouldAwaitTargetTaskWhenExceptionIsThrown()
+    {
+        var result = Task.Run<int>(async () =>
+        {
+            await Task.Delay(10);
+            throw new TestException();
+        }).WithTimeoutAsync(TimeSpan.FromSeconds(2));
 
         await Assert.ThrowsAsync<TestException>(() => result);
         Assert.True(result.IsFaulted);
