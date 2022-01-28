@@ -223,6 +223,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypingRealm.Profiles.Core.T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messaging", "Messaging", "{ADAC6276-91AB-4CDF-8EE0-4F727E4018BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Serialization", "TypingRealm.Serialization\TypingRealm.Serialization.csproj", "{B640656C-6F47-4896-909E-68067B096898}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -545,6 +547,10 @@ Global
 		{835A9F1D-1B21-4620-A9DB-5B233FBB7759}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{835A9F1D-1B21-4620-A9DB-5B233FBB7759}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{835A9F1D-1B21-4620-A9DB-5B233FBB7759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B640656C-6F47-4896-909E-68067B096898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B640656C-6F47-4896-909E-68067B096898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B640656C-6F47-4896-909E-68067B096898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B640656C-6F47-4896-909E-68067B096898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -647,6 +653,7 @@ Global
 		{E1228DCD-FFB9-4D54-9440-685B458A05BE} = {BC27E087-5CF8-4B05-BDC3-C6621BED5921}
 		{835A9F1D-1B21-4620-A9DB-5B233FBB7759} = {BDC0D1F6-6554-4178-8D58-7BAB50626252}
 		{ADAC6276-91AB-4CDF-8EE0-4F727E4018BC} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
+		{B640656C-6F47-4896-909E-68067B096898} = {C00AAAEB-23DF-4B66-9326-E73C29F075D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

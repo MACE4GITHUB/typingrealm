@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using TypingRealm.Serialization;
 
 namespace TypingRealm.Communication;
 
@@ -14,11 +14,14 @@ public sealed class InMemoryTyrCache : SyncManagedDisposable, ITyrCache, IDistri
     private readonly ConcurrentDictionary<string, Lazy<SemaphoreSlimLock>> _locks
         = new ConcurrentDictionary<string, Lazy<SemaphoreSlimLock>>();
     private readonly IMemoryCache _cache;
+    private readonly ISerializer _serializer;
 
     public InMemoryTyrCache(
-        IMemoryCache cache)
+        IMemoryCache cache,
+        ISerializer serializer)
     {
         _cache = cache;
+        _serializer = serializer;
     }
 
     public ILock AcquireDistributedLock(string name, TimeSpan expiration)
@@ -37,7 +40,7 @@ public sealed class InMemoryTyrCache : SyncManagedDisposable, ITyrCache, IDistri
     {
         _cache.TryGetValue<string>(GetCacheKey(key), out var value);
 
-        return Deserialize<T>(value);
+        return _serializer.Deserialize<T>(value);
     }
 
     public async ValueTask MergeCollectionAsync<T>(string key, IEnumerable<T> collection, bool isUnique = true)
@@ -46,56 +49,25 @@ public sealed class InMemoryTyrCache : SyncManagedDisposable, ITyrCache, IDistri
         if (_cache.TryGetValue<string>(GetCacheKey(key), out var value))
         {
             existing.AddRange(
-                Deserialize<IEnumerable<T>>(value));
+                _serializer.Deserialize<IEnumerable<T>>(value) ?? throw new InvalidOperationException($"Could not deserialize collection from key {key}."));
         }
 
         var all = existing.Concat(collection);
         if (isUnique)
             all = all.Distinct();
 
-        _cache.Set(GetCacheKey(key), Serialize(all));
+        _cache.Set(GetCacheKey(key), _serializer.Serialize(all));
     }
 
     public async ValueTask SetValueAsync<T>(string key, T value, TimeSpan? expiration = null)
     {
         if (expiration == null)
-            _cache.Set(GetCacheKey(key), value);
+            _cache.Set(GetCacheKey(key), _serializer.Serialize(value));
         else
-            _cache.Set(GetCacheKey(key), value, expiration.Value);
+            _cache.Set(GetCacheKey(key), _serializer.Serialize(value), expiration.Value);
     }
 
     private string GetCacheKey(string key) => $"service_cache_{key}";
-
-    // TODO: Move to Common or to some serialization project.
-    private bool CanBeConverted<T>() => typeof(T).IsPrimitive || typeof(T) == typeof(string);
-    private bool TryConvert<T>(string value, out T convertedValue)
-    {
-        if (!CanBeConverted<T>())
-        {
-            convertedValue = default;
-            return false;
-        }
-
-        convertedValue = (T)Convert.ChangeType(value, typeof(T));
-        return true;
-    }
-    private T Deserialize<T>(string value)
-    {
-        if (TryConvert<T>(value, out var result))
-            return result;
-
-        // TODO: Use camelcase names on serialization and deserialization,
-        // move serialization logic to a separate abstraction.
-        var deserialized = JsonSerializer.Deserialize<T>(value);
-        if (deserialized == null)
-            throw new InvalidOperationException("Could not deserialize cached value.");
-
-        return deserialized;
-    }
-    private string Serialize(object value)
-    {
-        return JsonSerializer.Serialize(value);
-    }
 
     private string GetLockKey(string name)
     {

@@ -21,6 +21,7 @@
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
     <ProjectReference Include="..\TypingRealm.Logging\TypingRealm.Logging.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Serialization\TypingRealm.Serialization.csproj" />
   </ItemGroup>
 
 </Project>

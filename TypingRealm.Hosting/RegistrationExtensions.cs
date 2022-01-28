@@ -11,6 +11,7 @@ using TypingRealm.Communication;
 using TypingRealm.Communication.Redis;
 using TypingRealm.Hosting.Deployment;
 using TypingRealm.Hosting.HealthChecks;
+using TypingRealm.Serialization;
 
 namespace TypingRealm.Hosting;
 
@@ -69,6 +70,7 @@ public static class RegistrationExtensions
     {
         services.AddHttpClient();
         services.AddCommunication();
+        services.AddSerialization();
 
         // Technology specific.
         if (DebugHelpers.UseInfrastructure)
