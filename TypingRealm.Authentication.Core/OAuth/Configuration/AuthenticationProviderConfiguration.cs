@@ -6,8 +6,8 @@ public abstract record AuthenticationProviderConfiguration(
     string TokenEndpoint,
     string AuthorizationEndpoint,
     string PkceClientId,
-    string ServiceClientId,
-    string ServiceClientSecret)
+    string? ServiceClientId,
+    string? ServiceClientSecret)
 {
     public bool RequireHttpsMetadata { get; set; } = true;
 }

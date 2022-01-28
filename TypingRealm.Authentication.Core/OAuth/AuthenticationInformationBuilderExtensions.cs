@@ -48,7 +48,7 @@ public static class AuthenticationInformationBuilderExtensions
         if (isDevelopment)
             return builder.UseAuthenticationProvider(new DevelopmentAuth0AuthenticationConfiguration());
 
-        return builder.UseAuthenticationProvider(new Auth0AuthenticationConfiguration());
+        return builder.UseAuthenticationProvider(new ProductionAuth0AuthenticationConfiguration());
     }
 
     public static AuthenticationInformationBuilder UseIdentityServerProvider(this AuthenticationInformationBuilder builder)

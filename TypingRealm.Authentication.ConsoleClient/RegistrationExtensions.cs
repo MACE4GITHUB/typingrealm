@@ -22,7 +22,7 @@ public static class RegistrationExtensions
     {
         services.AddAccessTokenProvider();
 
-        var auth0Config = new Auth0AuthenticationConfiguration();
+        var auth0Config = new ProductionAuth0AuthenticationConfiguration();
         services.AddSingleton<IProfileTokenProvider>(
             _ => new PkceProfileTokenProvider(auth0Config.Issuer, auth0Config.PkceClientId));
 
