@@ -70,11 +70,16 @@ public sealed class Profile
     /// </summary>
     public static Profile GetProfileForUser(ClaimsPrincipal user)
     {
+        ArgumentNullException.ThrowIfNull(user);
+
         if (user.Identity == null || !user.Identity.IsAuthenticated)
             return Anonymous();
 
         if (user.Identity.Name == null /* This is not a human. */)
             return ForService();
+
+        // We need to return Service type here whenever Name == null, because
+        // this method is being used by middleware to get current operation's Profile.
 
         return new(user.Identity.Name);
     }

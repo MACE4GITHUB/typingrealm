@@ -219,6 +219,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Archive", "Archive", "{E122
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{8D038269-3513-439D-8A0A-E89FD49F2899}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingRealm.Profiles.Core.Tests", "Tests\TypingRealm.Profiles.Core.Tests\TypingRealm.Profiles.Core.Tests.csproj", "{835A9F1D-1B21-4620-A9DB-5B233FBB7759}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -537,6 +539,10 @@ Global
 		{79E6EE72-F07B-4A5C-9327-D54389AFBE05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79E6EE72-F07B-4A5C-9327-D54389AFBE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79E6EE72-F07B-4A5C-9327-D54389AFBE05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{835A9F1D-1B21-4620-A9DB-5B233FBB7759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{835A9F1D-1B21-4620-A9DB-5B233FBB7759}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{835A9F1D-1B21-4620-A9DB-5B233FBB7759}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{835A9F1D-1B21-4620-A9DB-5B233FBB7759}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -637,6 +643,7 @@ Global
 		{5AB56553-E32C-42F5-8D04-37A2236713E0} = {4B79F737-A120-46CD-9476-A4401220BFAB}
 		{B11C4B93-7D6D-4C17-BF0F-83675C98E0F6} = {792AC347-74FB-4A4E-AD3B-D78B344D17BB}
 		{E1228DCD-FFB9-4D54-9440-685B458A05BE} = {BC27E087-5CF8-4B05-BDC3-C6621BED5921}
+		{835A9F1D-1B21-4620-A9DB-5B233FBB7759} = {BDC0D1F6-6554-4178-8D58-7BAB50626252}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCBE02AB-E010-400D-99F3-DE372EABFDE7}

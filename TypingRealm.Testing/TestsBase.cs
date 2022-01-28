@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -199,5 +200,20 @@ public abstract class TestsBase : IDisposable
         // This method does nothing, it is being ran at the end of unit tests to
         // indicate that test has been successfully completed without exceptions.
         // It's mainly used to get rid of analyzer warnings when it is intended.
+    }
+
+    protected static ClaimsPrincipal NewPrincipal(string? sub, bool isAuthenticated)
+    {
+        var claims = new[]
+        {
+            sub == null
+                ? new Claim("other", "other")
+                : new Claim("sub", sub)
+        };
+
+        if (!isAuthenticated)
+            return new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+        return new ClaimsPrincipal(new ClaimsIdentity(claims: claims, authenticationType: "bearer", nameType: "sub", roleType: "role"));
     }
 }
