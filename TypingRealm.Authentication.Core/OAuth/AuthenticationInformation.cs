@@ -46,9 +46,9 @@ public sealed class AuthenticationInformationBuilder
         if (string.IsNullOrEmpty(AuthenticationInformation.SchemeName)
             || string.IsNullOrEmpty(AuthenticationInformation.Issuer)
             || string.IsNullOrEmpty(AuthenticationInformation.AuthorizationEndpoint)
-            || string.IsNullOrEmpty(AuthenticationInformation.TokenEndpoint)
-            || string.IsNullOrEmpty(AuthenticationInformation.ServiceClientId)
-            || string.IsNullOrEmpty(AuthenticationInformation.ServiceClientSecret))
+            || string.IsNullOrEmpty(AuthenticationInformation.TokenEndpoint))
+            //|| string.IsNullOrEmpty(AuthenticationInformation.ServiceClientId)
+            //|| string.IsNullOrEmpty(AuthenticationInformation.ServiceClientSecret))
             throw new InvalidOperationException("Authentication information has empty fields.");
 
         return AuthenticationInformation;
