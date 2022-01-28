@@ -14,29 +14,30 @@ namespace TypingRealm;
 /// </summary>
 public abstract class ManagedDisposable : IDisposable, IAsyncDisposable
 {
-    private bool _isDisposed;
+    // TODO: Unit test this property.
+    public bool IsDisposed { get; private set; }
 
     public async ValueTask DisposeAsync()
     {
-        if (_isDisposed)
+        if (IsDisposed)
             return;
 
         await DisposeManagedResourcesAsync().ConfigureAwait(false);
-        _isDisposed = true;
+        IsDisposed = true;
     }
 
     public void Dispose()
     {
-        if (_isDisposed)
+        if (IsDisposed)
             return;
 
         DisposeManagedResources();
-        _isDisposed = true;
+        IsDisposed = true;
     }
 
     protected void ThrowIfDisposed()
     {
-        if (_isDisposed)
+        if (IsDisposed)
             throw new ObjectDisposedException(GetType().FullName);
     }
 
