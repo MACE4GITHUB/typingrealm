@@ -71,7 +71,6 @@ public static class RegistrationExtensions
         services.AddCommunication();
 
         // Technology specific.
-        services.TryAddRedisGlobalCaching(configuration);
         services.TryAddRedisServiceCaching(configuration);
 
         // Deployment of infrastructure from all hosts.

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,28 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
 namespace TypingRealm.Communication.Redis;
-
-public sealed class GlobalCacheProvider : IGlobalCacheProvider
-{
-    private readonly string _cacheConnectionString;
-
-    public GlobalCacheProvider(string cacheConnectionString)
-    {
-        _cacheConnectionString = cacheConnectionString;
-    }
-
-    public async ValueTask<ITyrCache> GetGlobalCacheAsync(string keyPrefix = "")
-    {
-        // TODO: Implement some kind of multiplexer pool.
-
-        var multiplexer = await ConnectionMultiplexer.ConnectAsync(_cacheConnectionString)
-            .ConfigureAwait(false);
-
-        var cache = new RedisTyrCache(multiplexer, keyPrefix);
-
-        return cache;
-    }
-}
 
 public sealed class ServiceCacheProvider : IServiceCacheProvider
 {
@@ -66,7 +46,7 @@ public sealed class RedisTyrCache : ITyrCache
         _keyPrefix = keyPrefix;
     }
 
-    public IDistributedLock AcquireDistributedLock(TimeSpan expiration)
+    public ILock AcquireDistributedLock(TimeSpan expiration)
     {
         return new RedisDistributedLock(_database, _keyPrefix, expiration);
     }
@@ -91,18 +71,34 @@ public sealed class RedisTyrCache : ITyrCache
         return deserialized;
     }
 
-    public async ValueTask SetValueAsync<T>(string key, T value)
+    public async ValueTask MergeCollectionAsync<T>(string key, IEnumerable<T> collection, bool isUnique = true)
+    {
+        var existing = await GetValueAsync<IEnumerable<T>>(key)
+            .ConfigureAwait(false);
+
+        if (existing == null)
+            existing = new List<T>();
+
+        var all = existing.Concat(collection);
+        if (isUnique)
+            all = all.Distinct();
+
+        await SetValueAsync(key, all)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask SetValueAsync<T>(string key, T value, TimeSpan? expiration = null)
     {
         if (typeof(T) == typeof(string))
         {
-            await _database.StringSetAsync(GetRedisKey(key), value as string)
+            await _database.StringSetAsync(GetRedisKey(key), value as string, expiry: expiration)
                 .ConfigureAwait(false);
 
             return;
         }
 
         var serialized = JsonSerializer.Serialize(value);
-        await _database.StringSetAsync(GetRedisKey(key), serialized)
+        await _database.StringSetAsync(GetRedisKey(key), serialized, expiry: expiration)
             .ConfigureAwait(false);
     }
 
@@ -112,7 +108,7 @@ public sealed class RedisTyrCache : ITyrCache
     }
 }
 
-public sealed class RedisDistributedLock : IDistributedLock
+public sealed class RedisDistributedLock : ILock
 {
     private readonly IDatabaseAsync _database;
     private readonly string _keyPrefix;
@@ -172,33 +168,6 @@ public sealed class RedisDistributedLock : IDistributedLock
 
 public static class RegistrationExtensions
 {
-    public static IServiceCollection TryAddRedisGlobalCaching(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        var cacheConnectionString = configuration.GetConnectionString("CacheConnection");
-        if (cacheConnectionString == null)
-            return services;
-
-        services.AddSingleton<IGlobalCacheProvider>(
-            _ => new GlobalCacheProvider(cacheConnectionString));
-
-        return services;
-    }
-
-    public static IServiceCollection AddRedisGlobalCaching(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        var cacheConnectionString = configuration.GetConnectionString("CacheConnection");
-        if (cacheConnectionString == null)
-            throw new InvalidOperationException("CacheConnection connection string is not set.");
-
-        TryAddRedisGlobalCaching(services, configuration);
-
-        return services;
-    }
-
     public static IServiceCollection TryAddRedisServiceCaching(
         this IServiceCollection services,
         IConfiguration configuration)
