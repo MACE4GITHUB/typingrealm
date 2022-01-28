@@ -5,7 +5,7 @@ namespace TypingRealm.Hosting;
 
 public abstract class TyrController : Controller
 {
-    protected Profile Profile => Profile.GetProfileForUser(User);
+    protected AuthenticatedProfile Profile => AuthenticatedProfile.GetProfileForUser(User);
 
     protected ProfileId ProfileId => Profile.ProfileId;
 }

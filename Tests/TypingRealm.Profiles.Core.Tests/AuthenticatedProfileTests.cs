@@ -4,12 +4,12 @@ using Xunit;
 
 namespace TypingRealm.Profiles.Core.Tests;
 
-public class ProfileTests : TestsBase
+public class AuthenticatedProfileTests : TestsBase
 {
     [Fact]
     public void AnonymousProfile_ShouldHaveAnonymousType()
     {
-        var sut = Profile.Anonymous();
+        var sut = AuthenticatedProfile.Anonymous();
 
         Assert.Equal(ProfileType.Anonymous, sut.Type);
     }
@@ -17,7 +17,7 @@ public class ProfileTests : TestsBase
     [Fact]
     public void AnonymousProfile_ShouldNotBeAuthenticated()
     {
-        var sut = Profile.Anonymous();
+        var sut = AuthenticatedProfile.Anonymous();
 
         Assert.False(sut.IsAuthenticated);
     }
@@ -25,7 +25,7 @@ public class ProfileTests : TestsBase
     [Fact]
     public void AnonymousProfile_ShouldHaveAnonymousProfileId()
     {
-        var sut = Profile.Anonymous();
+        var sut = AuthenticatedProfile.Anonymous();
 
         Assert.Equal(ProfileId.AnonymousUserId, sut.ProfileId);
     }
@@ -36,7 +36,7 @@ public class ProfileTests : TestsBase
         var principal = NewPrincipal(sub, false);
         Assert.False(principal.Identity!.IsAuthenticated);
 
-        var sut = Profile.GetProfileForUser(principal);
+        var sut = AuthenticatedProfile.GetProfileForUser(principal);
 
         Assert.Equal(ProfileType.Anonymous, sut.Type);
     }
@@ -47,7 +47,7 @@ public class ProfileTests : TestsBase
         var principal = NewPrincipal(null, false);
         Assert.False(principal.Identity!.IsAuthenticated);
 
-        var sut = Profile.GetProfileForUser(principal);
+        var sut = AuthenticatedProfile.GetProfileForUser(principal);
 
         Assert.Equal(ProfileType.Anonymous, sut.Type);
     }
@@ -58,7 +58,7 @@ public class ProfileTests : TestsBase
         var principal = NewPrincipal(sub, true);
         Assert.True(principal.Identity!.IsAuthenticated);
 
-        var sut = Profile.GetProfileForUser(principal);
+        var sut = AuthenticatedProfile.GetProfileForUser(principal);
 
         Assert.Equal(ProfileType.User, sut.Type);
     }
@@ -66,7 +66,7 @@ public class ProfileTests : TestsBase
     [Fact]
     public void ServiceProfile_ShouldHaveServiceType_WhenAuthenticated()
     {
-        var sut = Profile.ForService();
+        var sut = AuthenticatedProfile.ForService();
 
         Assert.Equal(ProfileType.Service, sut.Type);
     }
@@ -77,7 +77,7 @@ public class ProfileTests : TestsBase
         var principal = NewPrincipal(null, true);
         Assert.True(principal.Identity!.IsAuthenticated);
 
-        var sut = Profile.GetProfileForUser(principal);
+        var sut = AuthenticatedProfile.GetProfileForUser(principal);
 
         Assert.Equal(ProfileType.Service, sut.Type);
     }
@@ -86,6 +86,6 @@ public class ProfileTests : TestsBase
     public void UserProfile_ShouldThrow_WhenClaimsPrincipalIsNull()
     {
         Assert.Throws<ArgumentNullException>(
-            () => Profile.GetProfileForUser(null!));
+            () => AuthenticatedProfile.GetProfileForUser(null!));
     }
 }

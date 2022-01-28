@@ -15,7 +15,7 @@ public sealed class ProfileTypeAuthorizationFilter : IAuthorizationFilter
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-        var profile = Profile.GetProfileForUser(context.HttpContext.User);
+        var profile = AuthenticatedProfile.GetProfileForUser(context.HttpContext.User);
 
         if (profile.Type != _profileType)
             context.Result = new ForbidResult();

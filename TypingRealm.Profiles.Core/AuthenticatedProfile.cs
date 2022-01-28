@@ -9,13 +9,13 @@ namespace TypingRealm.Profiles;
 /// a wrapper around User's Identity (from the access token).
 /// Profile can be of 3 types: User, Service and Anonymous.
 /// </summary>
-public sealed class Profile
+public sealed class AuthenticatedProfile
 {
     /// <summary>
     /// Creates a new Profile from the User's Identity (from the access token).
     /// </summary>
     /// <param name="userId">Authenticated user's Identity.</param>
-    private Profile(string userId)
+    private AuthenticatedProfile(string userId)
     {
         ProfileId = ProfileId.ForUser(userId);
         Type = ProfileType.User;
@@ -28,7 +28,7 @@ public sealed class Profile
     /// <param name="type">Profile type: Service or Anonymous.</param>
     /// <exception cref="InvalidOperationException">Thrown when User profile
     /// type is specified.</exception>
-    private Profile(ProfileType type)
+    private AuthenticatedProfile(ProfileType type)
     {
         if (type == ProfileType.User)
             throw new InvalidOperationException("Cannot create User profile without ProfileId.");
@@ -60,15 +60,15 @@ public sealed class Profile
     /// </summary>
     public bool IsAuthenticated => Type != ProfileType.Anonymous;
 
-    public static Profile Anonymous() => new(ProfileType.Anonymous);
-    public static Profile ForService() => new(ProfileType.Service);
+    public static AuthenticatedProfile Anonymous() => new(ProfileType.Anonymous);
+    public static AuthenticatedProfile ForService() => new(ProfileType.Service);
 
     /// <summary>
     /// Gets Profile from ClaimsPrincipal of the authenticated request.
     /// If the User is not authenticated - returns Anonymous profile.
     /// If the request is authenticated with CC token - returns Service profile.
     /// </summary>
-    public static Profile GetProfileForUser(ClaimsPrincipal user)
+    public static AuthenticatedProfile GetProfileForUser(ClaimsPrincipal user)
     {
         ArgumentNullException.ThrowIfNull(user);
 

@@ -265,6 +265,10 @@ dotnet_diagnostic.CA1063.severity = silent
 dotnet_diagnostic.CA1816.severity = silent
 dotnet_diagnostic.S3881.severity = silent
 
+# Too many false positives, trying to convert if statements.
+# Review this from time to time (enable, review, disable).
+dotnet_diagnostic.IDE0046.severity = silent
+
 
 
 # === Tests ===
