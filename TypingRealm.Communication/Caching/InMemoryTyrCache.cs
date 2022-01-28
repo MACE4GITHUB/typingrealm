@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -7,30 +8,34 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace TypingRealm.Communication;
 
-public sealed class InMemoryTyrCache : ITyrCache
+// Should be singleton and registered only when UseInfrastructure = false.
+public sealed class InMemoryTyrCache : SyncManagedDisposable, ITyrCache, IDistributedLockProvider
 {
-    private readonly ILock _distributedLock;
-    private readonly string _keyPrefix;
+    private readonly ConcurrentDictionary<string, Lazy<SemaphoreSlimLock>> _locks
+        = new ConcurrentDictionary<string, Lazy<SemaphoreSlimLock>>();
     private readonly IMemoryCache _cache;
 
     public InMemoryTyrCache(
-        IMemoryCache cache,
-        ILock distributedLock,
-        string keyPrefix)
+        IMemoryCache cache)
     {
         _cache = cache;
-        _distributedLock = distributedLock;
-        _keyPrefix = $"service_cache_{keyPrefix}";
     }
 
-    public ILock AcquireDistributedLock(TimeSpan expiration)
+    public ILock AcquireDistributedLock(string name, TimeSpan expiration)
     {
-        return _distributedLock;
+        var @lock = _locks.GetOrAdd(GetLockKey(GetLockKey(name)), _ => new(() => new SemaphoreSlimLock()));
+        if (@lock.Value.IsDisposed)
+        {
+            _locks.TryUpdate(GetLockKey(GetLockKey(name)), new(() => new SemaphoreSlimLock()), @lock);
+            return AcquireDistributedLock(GetLockKey(name), expiration);
+        }
+
+        return @lock.Value;
     }
 
     public async ValueTask<T?> GetValueAsync<T>(string key)
     {
-        _cache.TryGetValue<string>(GetKey(key), out var value);
+        _cache.TryGetValue<string>(GetCacheKey(key), out var value);
 
         return Deserialize<T>(value);
     }
@@ -38,7 +43,7 @@ public sealed class InMemoryTyrCache : ITyrCache
     public async ValueTask MergeCollectionAsync<T>(string key, IEnumerable<T> collection, bool isUnique = true)
     {
         var existing = new List<T>();
-        if (_cache.TryGetValue<string>(GetKey(key), out var value))
+        if (_cache.TryGetValue<string>(GetCacheKey(key), out var value))
         {
             existing.AddRange(
                 Deserialize<IEnumerable<T>>(value));
@@ -48,18 +53,18 @@ public sealed class InMemoryTyrCache : ITyrCache
         if (isUnique)
             all = all.Distinct();
 
-        _cache.Set(GetKey(key), Serialize(all));
+        _cache.Set(GetCacheKey(key), Serialize(all));
     }
 
     public async ValueTask SetValueAsync<T>(string key, T value, TimeSpan? expiration = null)
     {
         if (expiration == null)
-            _cache.Set(GetKey(key), value);
+            _cache.Set(GetCacheKey(key), value);
         else
-            _cache.Set(GetKey(key), value, expiration.Value);
+            _cache.Set(GetCacheKey(key), value, expiration.Value);
     }
 
-    private string GetKey(string key) => $"{_keyPrefix}_{key}";
+    private string GetCacheKey(string key) => $"service_cache_{key}";
 
     // TODO: Move to Common or to some serialization project.
     private bool CanBeConverted<T>() => typeof(T).IsPrimitive || typeof(T) == typeof(string);
@@ -90,5 +95,18 @@ public sealed class InMemoryTyrCache : ITyrCache
     private string Serialize(object value)
     {
         return JsonSerializer.Serialize(value);
+    }
+
+    private string GetLockKey(string name)
+    {
+        return $"lock_{name}";
+    }
+
+    protected override void DisposeManagedResources()
+    {
+        foreach (var @lock in _locks.Values)
+        {
+            @lock.Value.Dispose();
+        }
     }
 }

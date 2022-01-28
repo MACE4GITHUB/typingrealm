@@ -13,6 +13,23 @@ public static class RegistrationExtensions
 
         services.AddTransient<IServiceClient, InMemoryServiceClient>();
 
+        // Consider splitting this part to a separate TypingRealm.Caching project.
+        services.AddCaching();
+
+        return services;
+    }
+
+    public static IServiceCollection AddCaching(this IServiceCollection services)
+    {
+        services.AddMemoryCache();
+
+        if (!DebugHelpers.UseInfrastructure)
+        {
+            services.AddSingleton<InMemoryTyrCache>();
+            services.AddSingleton<ITyrCache>(provider => provider.GetRequiredService<InMemoryTyrCache>());
+            services.AddTransient<IDistributedLockProvider>(provider => provider.GetRequiredService<InMemoryTyrCache>());
+        }
+
         return services;
     }
 }

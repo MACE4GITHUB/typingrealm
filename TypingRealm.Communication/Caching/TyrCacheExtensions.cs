@@ -11,6 +11,6 @@ public static class TyrCacheExtensions
     /// <summary>
     /// Acquires distributed lock with default expiration time of 1 hour.
     /// </summary>
-    public static ILock AcquireDistributedLock(this ITyrCache cache)
-        => cache.AcquireDistributedLock(TimeSpan.FromHours(1));
+    public static ILock AcquireDistributedLock(this IDistributedLockProvider distributedLockProvider, string name)
+        => distributedLockProvider.AcquireDistributedLock(name, TimeSpan.FromHours(1));
 }
