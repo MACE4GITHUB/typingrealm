@@ -24,7 +24,7 @@ public sealed class ServiceGenerator
 
         var lines = services.Where(s => s.RawServiceName != Constants.AuthorityServiceName)
             .OrderBy(s => s.ServiceName)
-            .Select(s => @$"{new string(' ', 16)}[""{s.ServiceName}""] = Environment.GetEnvironmentVariable(""{s.ServiceName.ToUpperInvariant()}_URL"") ?? ""http://127.0.0.1:{s.Port}"",")
+            .Select(s => @$"{new string(' ', 12)}[""{s.ServiceName}""] = Environment.GetEnvironmentVariable(""{s.ServiceName.ToUpperInvariant()}_URL"") ?? ""http://127.0.0.1:{s.Port}"",")
             .ToList();
 
         lines[^1] = lines[^1][0..^1];
@@ -280,6 +280,7 @@ public sealed class ServiceGenerator
         string? rootNamespace = null,
         bool isHost = false)
     {
+        var anythingChanged = false;
         XDocument document;
         using (var stream = File.OpenRead(fileName))
         {
@@ -316,12 +317,14 @@ public sealed class ServiceGenerator
                         group.Add(new XText("  "));
                         group.Add(newElement);
                         group.Add(new XText("\n  "));
+
+                        anythingChanged = true;
                     }
                 }
             }
         }
 
-        static void UpdateElementInPropertyGroup(XDocument document, string elementName, string value, bool addAsArrayItem = false)
+        void UpdateElementInPropertyGroup(XDocument document, string elementName, string value, bool addAsArrayItem = false)
         {
             var propertyGroup = document.Root!.Element("PropertyGroup");
             if (propertyGroup == null)
@@ -335,11 +338,16 @@ public sealed class ServiceGenerator
                     propertyGroup.Add(new XText("  "));
                     propertyGroup.Add(new XElement(elementName, value));
                     propertyGroup.Add(new XText("\n  "));
+
+                    anythingChanged = true;
                 }
                 else
                 {
                     if (element.Value != value)
+                    {
                         element.Value = value;
+                        anythingChanged = true;
+                    }
                 }
             }
             else
@@ -351,11 +359,16 @@ public sealed class ServiceGenerator
                 propertyGroup.Add(new XText("  "));
                 propertyGroup.Add(new XElement(elementName, value));
                 propertyGroup.Add(new XText("\n  "));
+
+                anythingChanged = true;
             }
         }
 
-        var xws = new XmlWriterSettings { OmitXmlDeclaration = true };
-        using var xw = XmlWriter.Create(fileName, xws);
-        document.Save(xw);
+        if (anythingChanged)
+        {
+            var xws = new XmlWriterSettings { OmitXmlDeclaration = true };
+            using var xw = XmlWriter.Create(fileName, xws);
+            document.Save(xw);
+        }
     }
 }
