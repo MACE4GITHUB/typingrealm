@@ -29,6 +29,7 @@ public static class Constants
 
     public static string CommunicationProjectName => $"{RawProjectName}.Communication";
     public static string HostingProjectName => $"{RawProjectName}.Hosting";
+    public static string ServiceHostingProjectName => $"{RawProjectName}.Hosting.Service";
 
     public static IEnumerable<string> ExternalNetworksForHostProdCompose => new[]
     {

@@ -31,6 +31,10 @@ api.typingrealm.com {
         reverse_proxy typingrealm-typing:80
     }
 
+    handle_path /typingduels/* {
+        reverse_proxy typingrealm-typingduels:80
+    }
+
     respond 404
 }
 
@@ -63,6 +67,10 @@ dev.api.typingrealm.com {
         reverse_proxy dev-typingrealm-typing:80
     }
 
+    handle_path /typingduels/* {
+        reverse_proxy dev-typingrealm-typingduels:80
+    }
+
     respond 404
 }
 
@@ -93,6 +101,10 @@ api.localhost {
 
     handle_path /typing/* {
         reverse_proxy local-typingrealm-typing:80
+    }
+
+    handle_path /typingduels/* {
+        reverse_proxy local-typingrealm-typingduels:80
     }
 
     respond 404

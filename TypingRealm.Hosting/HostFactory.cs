@@ -11,8 +11,8 @@ public static class HostFactory
     {
         var builder = WebApplication.CreateBuilder();
         builder.Configuration.AddTyrConfiguration();
-        builder.Services.UseWebApiHost(builder.Configuration, controllersAssembly);
         builder.Logging.AddTyrLogging(builder.Configuration);
+        builder.Services.UseWebApiHost(builder.Configuration, controllersAssembly);
 
         return builder;
     }

@@ -106,3 +106,20 @@ services:
       - deployment/.env.debug
       - deployment/.env.debug.typing
 
+  debug-typingrealm-typingduels:
+    image: ${DOCKER_REGISTRY-}debug-typingrealm-typingduels
+    container_name: debug-typingrealm-typingduels
+    networks:
+      - debug-typingrealm-net
+    ports:
+      - 30404:80
+    build:
+      context: .
+      dockerfile: TypingRealm.TypingDuels.Api/Dockerfile
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - deployment/.env
+      - deployment/.env.debug
+      - deployment/.env.debug.typingduels
+

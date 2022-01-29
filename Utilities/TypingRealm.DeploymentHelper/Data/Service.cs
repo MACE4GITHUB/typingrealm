@@ -35,7 +35,7 @@ public sealed record Service(
     string DockerBuildContext,
     int Port,
     bool AddToReverseProxyInProduction,
-    ServiceType serviceType = ServiceType.Api)
+    ServiceType ServiceType = ServiceType.Api)
 {
     public IEnumerable<string>? Envs { get; set; }
 

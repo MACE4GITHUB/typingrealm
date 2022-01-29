@@ -131,6 +131,66 @@ public sealed class ServiceGenerator
             File.WriteAllText(path, sb.ToString());
         }
 
+        void CreateProgramCs(Service service)
+        {
+            var path = Path.Combine(rootFolder, service.ServiceProjects.ApiPath, "Program.cs");
+            if (File.Exists(path))
+                return;
+
+            var sb = new StringBuilder();
+            sb.AppendLine("using Microsoft.AspNetCore.Mvc;");
+
+            if (service.ServiceType == ServiceType.SignalR)
+                sb.AppendLine("using TypingRealm.Hosting.Service;");
+            else
+                sb.AppendLine("using TypingRealm.Hosting;");
+
+
+            sb.AppendLine();
+            sb.AppendLine("[assembly: ApiController]");
+            if (service.ServiceType == ServiceType.Api)
+                sb.AppendLine(@"var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(ControllersAssembly).Assembly);");
+            else
+                sb.AppendLine(@"var builder = HostFactory.CreateSignalRApplicationBuilder(typeof(ControllersAssembly).Assembly);");
+
+            sb.AppendLine();
+            sb.AppendLine("await builder.Build().RunAsync();");
+
+            sb.AppendLine();
+            sb.AppendLine(@"internal sealed class ControllersAssembly { }");
+
+            File.WriteAllText(path, sb.ToString());
+        }
+
+        void RewriteLaunchSettingsFile(Service service)
+        {
+            var folderPath = Path.Combine(rootFolder, service.ServiceProjects.ApiPath, "Properties");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var path = Path.Combine(folderPath, "launchSettings.json");
+
+            var sb = new StringBuilder();
+            sb.AppendLine(@$"{{");
+            sb.AppendLine(@$"  ""profiles"": {{");
+            sb.AppendLine(@$"    ""{service.ServiceProjects.ApiPath}"": {{");
+            sb.AppendLine(@$"      ""commandName"": ""Project"",");
+            sb.AppendLine(@$"      ""environmentVariables"": {{");
+            sb.AppendLine(@$"        ""ASPNETCORE_ENVIRONMENT"": ""Debug"",");
+            sb.AppendLine(@$"        ""DISABLE_INFRASTRUCTURE"": ""True""");
+            sb.AppendLine(@$"      }},");
+            sb.AppendLine($@"      ""applicationUrl"": ""http://0.0.0.0:{service.Port}""");
+            sb.AppendLine($@"    }},");
+            sb.AppendLine($@"    ""Docker"": {{");
+            sb.AppendLine($@"      ""commandName"": ""Docker"",");
+            sb.AppendLine(@"      ""launchUrl"": ""{Scheme}://{ServiceHost}:{ServicePort}""");
+            sb.AppendLine(@"    }");
+            sb.AppendLine(@"  }");
+            sb.AppendLine(@"}");
+
+            File.WriteAllText(path, sb.ToString());
+        }
+
         // Core project.
         {
             var file = PrepareFolder(rootFolder, service.ServiceProjects.CorePath);
@@ -212,7 +272,9 @@ public sealed class ServiceGenerator
             var projects = new[]
             {
                 service.ServiceProjects.InfrastructurePath,
-                Constants.HostingProjectName
+                service.ServiceType == ServiceType.SignalR
+                    ? Constants.ServiceHostingProjectName
+                    : Constants.HostingProjectName
             };
 
             if (!File.Exists(file))
@@ -223,6 +285,9 @@ public sealed class ServiceGenerator
             {
                 UpdateProjectFile(service, file, includeProjects: projects, isHost: true);
             }
+
+            RewriteLaunchSettingsFile(service);
+            CreateProgramCs(service);
         }
     }
 

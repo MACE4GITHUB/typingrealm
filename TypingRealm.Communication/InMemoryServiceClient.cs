@@ -20,7 +20,8 @@ public sealed class InMemoryServiceClient : IServiceClient
             ["library"] = Environment.GetEnvironmentVariable("LIBRARY_URL") ?? "http://127.0.0.1:30402",
             ["profiles"] = Environment.GetEnvironmentVariable("PROFILES_URL") ?? "http://127.0.0.1:30103",
             ["texts"] = Environment.GetEnvironmentVariable("TEXTS_URL") ?? "http://127.0.0.1:30401",
-            ["typing"] = Environment.GetEnvironmentVariable("TYPING_URL") ?? "http://127.0.0.1:30403"
+            ["typing"] = Environment.GetEnvironmentVariable("TYPING_URL") ?? "http://127.0.0.1:30403",
+            ["typingduels"] = Environment.GetEnvironmentVariable("TYPINGDUELS_URL") ?? "http://127.0.0.1:30404"
         };
 
     private readonly IHttpClientFactory _httpClientFactory;

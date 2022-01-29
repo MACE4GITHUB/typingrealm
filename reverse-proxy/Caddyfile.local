@@ -28,5 +28,9 @@ api.localhost {
         reverse_proxy local-typingrealm-typing:80
     }
 
+    handle_path /typingduels/* {
+        reverse_proxy local-typingrealm-typingduels:80
+    }
+
     respond 404
 }

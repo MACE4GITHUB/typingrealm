@@ -6,7 +6,7 @@
         "ASPNETCORE_ENVIRONMENT": "Debug",
         "DISABLE_INFRASTRUCTURE": "True"
       },
-      "applicationUrl": "http0.0.0.0:30402"
+      "applicationUrl": "http://0.0.0.0:30403"
     },
     "Docker": {
       "commandName": "Docker",

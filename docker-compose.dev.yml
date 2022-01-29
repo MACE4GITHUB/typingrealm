@@ -5,6 +5,7 @@ networks:
   dev-typingrealm-texts-net:
   dev-typingrealm-library-net:
   dev-typingrealm-typing-net:
+  dev-typingrealm-typingduels-net:
   dev-typingrealm-profiles-net:
   dev-typingrealm-data-net:
   dev-typingrealm-web-ui-net:
@@ -226,6 +227,58 @@ services:
       - deployment/.env
       - deployment/.env.dev
       - deployment/.env.dev.typing
+
+  dev-typingrealm-typingduels:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-typingduels
+    container_name: dev-typingrealm-typingduels
+    networks:
+      - dev-typingrealm-net
+      - infra-tyr_typingrealm-infra-net
+      - dev-typingrealm-typingduels-net
+    build:
+      context: .
+      dockerfile: TypingRealm.TypingDuels.Api/Dockerfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - deployment/.env
+      - deployment/.env.dev
+      - deployment/.env.dev.typingduels
+
+  dev-typingrealm-typingduels-postgres:
+    image: postgres
+    container_name: dev-typingrealm-typingduels-postgres
+    networks:
+      - dev-typingrealm-typingduels-net
+    ports:
+      - 31332:5432
+    volumes:
+      - ./infrastructure-data/dev/typingduels/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.5g
+    env_file:
+      - deployment/.env
+      - deployment/.env.dev
+      - deployment/.env.dev.typingduels
+
+  dev-typingrealm-typingduels-redis:
+    image: redis
+    container_name: dev-typingrealm-typingduels-redis
+    networks:
+      - dev-typingrealm-typingduels-net
+    ports:
+      - 31379:6379
+    volumes:
+      - ./infrastructure-data/dev/typingduels/redis:/data
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1.5g
+    env_file:
+      - deployment/.env
+      - deployment/.env.dev
+      - deployment/.env.dev.typingduels
 
   dev-typingrealm-web-ui:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-web-ui

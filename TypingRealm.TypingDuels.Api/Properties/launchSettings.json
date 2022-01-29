@@ -1,12 +1,12 @@
 {
   "profiles": {
-    "TypingRealm.Library.Api": {
+    "TypingRealm.TypingDuels.Api": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Debug",
         "DISABLE_INFRASTRUCTURE": "True"
       },
-      "applicationUrl": "http://0.0.0.0:30402"
+      "applicationUrl": "http://0.0.0.0:30404"
     },
     "Docker": {
       "commandName": "Docker",

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,16 @@ namespace TypingRealm.Hosting.Service;
 
 public static class HostFactory
 {
+    public static WebApplicationBuilder CreateSignalRApplicationBuilder(Assembly controllersAssembly)
+    {
+        var builder = WebApplication.CreateBuilder();
+        builder.Configuration.AddTyrConfiguration();
+        builder.Logging.AddTyrLogging(builder.Configuration);
+        builder.Services.UseSignalRHost(builder.Configuration, controllersAssembly);
+
+        return builder;
+    }
+
     public static IHostBuilder CreateSignalRHostBuilder(
         Action<MessageTypeCacheBuilder> configureServices,
         Action<IApplicationBuilder>? configureApp = null)
