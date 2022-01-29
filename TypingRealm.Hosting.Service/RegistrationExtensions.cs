@@ -53,7 +53,8 @@ public static class RegistrationExtensions
 
         // Use this to enable protobuf base64 string message serializer instead of json.
         // This can be removed for total JSON serialization mode.
-        services.AddProtobufMessageSerializer();
+        // For browsers we obviously want it commented out.
+        //services.AddProtobufMessageSerializer();
 
         return builder;
     }

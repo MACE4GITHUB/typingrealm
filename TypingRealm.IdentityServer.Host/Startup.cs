@@ -11,8 +11,8 @@ public class Startup
 
         _ = services.AddIdentityServer(options =>
         {
-                // This can be turned off, if we turn off AudienceValidation everywhere as well.
-                options.EmitStaticAudienceClaim = true;
+            // This can be turned off, if we turn off AudienceValidation everywhere as well.
+            options.EmitStaticAudienceClaim = true;
         })
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScopes)
