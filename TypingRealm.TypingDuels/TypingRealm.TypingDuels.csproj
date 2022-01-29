@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Messaging\TypingRealm.Messaging.csproj" />
     <ProjectReference Include="..\TypingRealm.TypingDuels.Core\TypingRealm.TypingDuels.Core.csproj" />
   </ItemGroup>
 

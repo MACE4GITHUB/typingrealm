@@ -7,6 +7,12 @@
 [Message]
 public sealed class Connect
 {
+    // TODO: !!! Validate this message's ClientId when handling Connect message.
+    // Currently if Character authentication is disabled - any user with a valid token can send ANY client id.
+    // Take TOKEN SUB claim by default instead of this message's property.
+    // Possibly even rename this message to ConnectCharacter and only use it to connect characters in the game,
+    // do not use it at all for connecting with token to some auxiliary realtime system.
+
     public const string DefaultGroup = "Lobby";
 
 #pragma warning disable CS8618

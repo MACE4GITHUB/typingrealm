@@ -13,12 +13,15 @@ namespace TypingRealm.Hosting.Service;
 
 public static class HostFactory
 {
-    public static WebApplicationBuilder CreateSignalRApplicationBuilder(Assembly controllersAssembly)
+    public static WebApplicationBuilder CreateSignalRApplicationBuilder(
+        Assembly controllersAssembly, Action<MessageTypeCacheBuilder> configureMessageTypes)
     {
         var builder = WebApplication.CreateBuilder();
         builder.Configuration.AddTyrConfiguration();
         builder.Logging.AddTyrLogging(builder.Configuration);
-        builder.Services.UseSignalRHost(builder.Configuration, controllersAssembly);
+
+        var messageTypeCacheBuilder = builder.Services.UseSignalRHost(builder.Configuration, controllersAssembly);
+        configureMessageTypes(messageTypeCacheBuilder);
 
         return builder;
     }

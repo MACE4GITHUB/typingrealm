@@ -30,6 +30,18 @@ public static class RegistrationExtensions
         return builder.AddMessageTypesFromAssembly(typeof(Authenticate).Assembly);
     }
 
+    /// <summary>
+    /// Use this method in domains that need to check that Character belongs to the actual Profile.
+    /// </summary>
+    public static IServiceCollection AddCharacterAuthentication(this IServiceCollection services)
+    {
+        // Authorize Character: first message after authentication should be
+        // Connect message with valid Character belonging to current Profile.
+        services.AddTransient<IConnectHook, AuthorizeConnectHook>();
+
+        return services;
+    }
+
     internal static MessageTypeCacheBuilder AddMessagingServiceAuthentication(this MessageTypeCacheBuilder builder)
     {
         var services = builder.Services;
@@ -48,10 +60,6 @@ public static class RegistrationExtensions
 
         // To query Characters API.
         services.AddProfileApiClients();
-
-        // Authorize Character: first message after authentication should be
-        // Connect message with valid Character belonging to current Profile.
-        services.AddTransient<IConnectHook, AuthorizeConnectHook>();
 
         return builder;
     }

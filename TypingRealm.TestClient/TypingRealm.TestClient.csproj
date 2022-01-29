@@ -29,6 +29,7 @@
     <ProjectReference Include="..\TypingRealm.SignalR.Client\TypingRealm.SignalR.Client.csproj" />
     <ProjectReference Include="..\TypingRealm.SignalR\TypingRealm.SignalR.csproj" />
     <ProjectReference Include="..\TypingRealm.Tcp.Client\TypingRealm.Tcp.Client.csproj" />
+    <ProjectReference Include="..\TypingRealm.TypingDuels\TypingRealm.TypingDuels.csproj" />
     <ProjectReference Include="..\TypingRealm.World\TypingRealm.World.csproj" />
   </ItemGroup>
 

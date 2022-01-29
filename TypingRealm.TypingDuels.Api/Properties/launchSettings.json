@@ -4,7 +4,8 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Debug",
-        "DISABLE_INFRASTRUCTURE": "True"
+        "DISABLE_INFRASTRUCTURE": "True",
+        "SERVICE_AUTHORITY": "http://127.0.0.1:30000/"
       },
       "applicationUrl": "http://0.0.0.0:30404"
     },

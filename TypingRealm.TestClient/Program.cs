@@ -17,6 +17,7 @@ using TypingRealm.RopeWar;
 using TypingRealm.SignalR;
 using TypingRealm.SignalR.Client;
 using TypingRealm.Tcp.Client;
+using TypingRealm.TypingDuels;
 using TypingRealm.World;
 
 namespace TypingRealm.TestClient;
@@ -40,6 +41,7 @@ public static class Program
             "rw" => RopeWarSignalR(),
             "rwt" => RopeWarTcp(),
             "w" => WorldSignalR(),
+            "td" => TypingDuelsSignalR(),
             _ => throw new InvalidOperationException("Invalid type of connection")
         }).ConfigureAwait(false);
     }
@@ -110,6 +112,49 @@ public static class Program
             .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
             .AddSignalRConnectionFactory()
             .UseSignalRClientConnectionFactory("http://127.0.0.1:30102/hub")
+            .RegisterClientMessaging();
+
+        var provider = services.BuildServiceProvider();
+
+        // HACK: Authenticate early on so application freezes only in the beginning (fill the cache).
+        var tokenProvider = provider.GetRequiredService<IProfileTokenProvider>();
+        _ = await tokenProvider.SignInAsync(default).ConfigureAwait(false);
+
+        var messageTypes = provider.GetRequiredService<IMessageTypeCache>()
+            .GetAllTypes()
+            .Select(idToType => idToType.Value)
+            .ToList();
+
+        var messageProcessor = provider.GetRequiredService<IMessageProcessor>();
+        var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+
+        await Handle(messageProcessor, messageTypes, tokenProvider, httpClientFactory).ConfigureAwait(false);
+    }
+
+    public static async Task TypingDuelsSignalR()
+    {
+        var services = new ServiceCollection();
+
+        services.AddAuth0ProfileTokenProvider();
+        /*if (DebugHelpers.UseDevelopmentAuthentication)
+        {*/
+            Console.Write("Profile for local token: ");
+            var profile = Console.ReadLine() ?? "default";
+
+            services.AddLocalProfileTokenProvider(profile);
+        //}
+
+        services
+            .AddHttpClient()
+            .AddLogging() // TODO: Log only to file, console is needed for UI.
+            .AddSerializationCore()
+            .AddTyrAuthenticationMessages()
+            .AddTypingDuelsMessages()
+            .Services
+            .AddJson()
+            .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
+            .AddSignalRConnectionFactory()
+            .UseSignalRClientConnectionFactory("http://127.0.0.1:30404/hub")
             .RegisterClientMessaging();
 
         var provider = services.BuildServiceProvider();
@@ -227,11 +272,12 @@ public static class Program
 
         Console.Write("Character name: ");
         var characterName = Console.ReadLine();
-        if (string.IsNullOrEmpty(characterName))
+        /*if (string.IsNullOrEmpty(characterName))
             throw new InvalidOperationException("Character name cannot be empty.");
 
         var characterId = await CreateCharacterAsync(httpClientFactory, tokenProvider, characterName)
-            .ConfigureAwait(false);
+            .ConfigureAwait(false);*/
+        var characterId = characterName!;
 
         using var cts = new CancellationTokenSource();
         await processor.ConnectAsync(characterId, cts.Token).ConfigureAwait(false);
