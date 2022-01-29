@@ -20,6 +20,13 @@ public sealed record ServiceProjects(
     };
 }
 
+public enum ServiceType
+{
+    Api,
+    SignalR,
+    Tcp
+}
+
 public sealed record Service(
     int Index, /* Unique 0-99 index for port mapping mainly. */
     string RawServiceName,
@@ -27,7 +34,8 @@ public sealed record Service(
     CacheType CacheType,
     string DockerBuildContext,
     int Port,
-    bool AddToReverseProxyInProduction)
+    bool AddToReverseProxyInProduction,
+    ServiceType serviceType = ServiceType.Api)
 {
     public IEnumerable<string>? Envs { get; set; }
 

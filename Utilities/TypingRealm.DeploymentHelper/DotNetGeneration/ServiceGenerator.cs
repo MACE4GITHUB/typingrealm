@@ -234,7 +234,9 @@ public sealed class ServiceGenerator
         bool isHost = false)
     {
         var sb = new StringBuilder();
-        sb.AppendLine(@"<Project Sdk=""Microsoft.NET.Sdk"">");
+        sb.AppendLine(isHost
+            ? @"<Project Sdk=""Microsoft.NET.Sdk.Web"">"
+            : @"<Project Sdk=""Microsoft.NET.Sdk"">");
         sb.AppendLine();
         sb.AppendLine("  <PropertyGroup>");
         sb.AppendLine($"    <TargetFramework>{NetVersion}</TargetFramework>");
@@ -244,12 +246,12 @@ public sealed class ServiceGenerator
 
         if (isHost)
         {
-            sb.AppendLine("<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>");
+            sb.AppendLine("    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>");
 
             // TODO: Unify this and "debug" constant with other generators.
-            sb.AppendLine($"<DockerfileTag>debug-{Constants.ProjectName}-{service.ServiceName}</DockerfileTag>");
-            sb.AppendLine($"<DockerfileRunEnvironmentFiles>../deployment/.env.debug</DockerfileRunEnvironmentFiles>");
-            sb.AppendLine($"<DockerfileRunEnvironmentFiles>../deployment/.env.debug.{service.ServiceName}</DockerfileRunEnvironmentFiles>");
+            sb.AppendLine($"    <DockerfileTag>debug-{Constants.ProjectName}-{service.ServiceName}</DockerfileTag>");
+            sb.AppendLine($"    <DockerfileRunEnvironmentFiles>../deployment/.env.debug</DockerfileRunEnvironmentFiles>");
+            sb.AppendLine($"    <DockerfileRunEnvironmentFiles>../deployment/.env.debug.{service.ServiceName}</DockerfileRunEnvironmentFiles>");
         }
 
         sb.AppendLine("  </PropertyGroup>");
