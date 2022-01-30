@@ -12,12 +12,12 @@ namespace TypingRealm.Hosting.Service;
 public sealed record TokenData(string token);
 
 [Route("api/realtime-auth")]
-public sealed class AuthenticationController : TyrController
+public sealed class RealtimeAuthenticationController : TyrController
 {
     private readonly ITyrCache _cache;
     private readonly IServiceTokenService _serviceTokenService;
 
-    public AuthenticationController(ITyrCache cache, IServiceTokenService serviceTokenService)
+    public RealtimeAuthenticationController(ITyrCache cache, IServiceTokenService serviceTokenService)
     {
         _cache = cache;
         _serviceTokenService = serviceTokenService;
