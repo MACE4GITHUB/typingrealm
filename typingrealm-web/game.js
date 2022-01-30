@@ -66,7 +66,22 @@ async function main() {
         async function start() {
             try {
                 await connection.start();
+
                 console.log("SignalR Connected.");
+
+                var accessToken = await getToken();
+                await connection.invoke("Send", {
+                    metadata: {
+                        messageId: "initial-authentication",
+                        acknowledgementType: 3
+                    },
+                    data: JSON.stringify({
+                        accessToken: accessToken
+                    }),
+                    typeId: "TypingRealm.Authentication.Service.Messages.Authenticate"
+                });
+
+                console.log("SignalR Authenticated.");
             } catch (err) {
                 console.log(err);
                 setTimeout(start, 5000);
@@ -197,21 +212,11 @@ async function main() {
 
 
     const connection = await connectToTypingDuels();
-    var accessToken = await getToken();
     try {
         connection.on("Send", (message) => {
             console.log(message);
-        });
 
-        await connection.invoke("Send", {
-            metadata: {
-                messageId: "initial-authentication",
-                acknowledgementType: 3
-            },
-            data: JSON.stringify({
-                accessToken: accessToken
-            }),
-            typeId: "TypingRealm.Authentication.Service.Messages.Authenticate"
+            handle(message);
         });
 
         await connection.invoke("Send", {
@@ -229,6 +234,20 @@ async function main() {
     }
 
     await renderNewText();
+
+    async function handle(message) {
+        if (message.typeId == 'TypingRealm.Authentication.Service.Messages.TokenExpired') {
+            console.log('Re-sending a new token.');
+
+            let accessToken = await getToken();
+            await connection.invoke('Send', {
+                data: JSON.stringify({
+                    accessToken: accessToken
+                }),
+                typeId: 'TypingRealm.Authentication.Service.Messages.Authenticate'
+            })
+        }
+    }
 
 
 
