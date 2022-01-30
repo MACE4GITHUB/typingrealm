@@ -7,11 +7,11 @@ using TypingRealm.Profiles.Api.Client;
 
 namespace TypingRealm.Authentication.Service;
 
-public sealed class AuthorizeConnectHook : IConnectHook
+public sealed class AuthorizeCharacterConnectHook : IConnectHook
 {
     private readonly ICharactersClient _charactersClient;
 
-    public AuthorizeConnectHook(ICharactersClient charactersClient)
+    public AuthorizeCharacterConnectHook(ICharactersClient charactersClient)
     {
         _charactersClient = charactersClient;
     }

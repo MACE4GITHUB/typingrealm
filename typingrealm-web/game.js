@@ -6,6 +6,7 @@ async function main() {
     // Data shouldn't be reset/modified after typing has been completed and before data has been sent.
 
     const createAuth0Client = window.createAuth0Client;
+    const signalR = window.signalR;
     let auth0 = undefined;
 
     const url_string = window.location.href;
@@ -14,6 +15,8 @@ async function main() {
 
     let PROFILES_URL = 'https://api.typingrealm.com/profiles';
     let DATA_URL = 'https://api.typingrealm.com/typing';
+    let TYPINGDUELS_URL = 'https://api.typingrealm.com/typingduels';
+    let IDENTITY_SERVER_URL = 'https://api.typingrealm.com/identityserver';
     let useDevAuth0Client = true;
     let env = url.searchParams.get('env');
     let language = url.searchParams.get('language');
@@ -35,17 +38,49 @@ async function main() {
         if (env == 'dev') {
             PROFILES_URL = 'https://dev.api.typingrealm.com/profiles';
             DATA_URL = 'https://dev.api.typingrealm.com/typing';
+            TYPINGDUELS_URL = 'https://dev.api.typingrealm.com/typingduels';
+            IDENTITY_SERVER_URL = 'https://dev.api.typingrealm.com/identityserver';
         }
 
         if (env == 'local') {
             PROFILES_URL = 'https://api.localhost/profiles';
             DATA_URL = 'https://api.localhost/typing';
+            TYPINGDUELS_URL = 'https://api.localhost/typingduels';
+            IDENTITY_SERVER_URL = 'https://api.localhost/identityserver';
         }
 
         if (env == 'debug') {
             PROFILES_URL = 'http://localhost:30103';
             DATA_URL = 'http://localhost:30403';
+            TYPINGDUELS_URL = 'http://127.0.0.1:30404';
+            IDENTITY_SERVER_URL = 'http://127.0.0.1:30000';
         }
+    }
+
+    async function connectToTypingDuels() {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(`${TYPINGDUELS_URL}/hub`,  { accessTokenFactory: () => getToken() })
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        async function start() {
+            try {
+                await connection.start();
+                console.log("SignalR Connected.");
+            } catch (err) {
+                console.log(err);
+                setTimeout(start, 5000);
+            }
+        };
+
+        connection.onclose(async () => {
+            await start();
+        });
+
+        // Start the connection.
+        await start();
+
+        return connection;
     }
 
     const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
@@ -104,7 +139,8 @@ async function main() {
     const hintElement = document.getElementById('hint');
     const reportElement = document.getElementById('report');
     const textRequestUrl = `${TEXT_GENERATION_URL}?length=${length}&textStructure=${textType}&language=${language}&maxShouldContainErrors=${maxShouldContainErrors}&maxShouldContainSlow=${maxShouldContainSlow}`;
-    const authTokenRequestUrl = `${PROFILES_URL}/api/local-auth/profile-token?sub=${profile}`;
+    //const authTokenRequestUrl = `${PROFILES_URL}/api/local-auth/profile-token?sub=${profile}`;
+    const authTokenRequestUrl = `${IDENTITY_SERVER_URL}/api/local/user-token?sub=${profile}`;
     const dataSubmitUrl = `${DATA_URL}/api/usersessions/result`;
     const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable?language=${language}`;
 
@@ -159,7 +195,43 @@ async function main() {
     document.addEventListener('keydown', processKeyDown);
     document.addEventListener('keyup', processKeyUp);
 
-    renderNewText();
+
+    const connection = await connectToTypingDuels();
+    var accessToken = await getToken();
+    try {
+        connection.on("Send", (message) => {
+            console.log(message);
+        });
+
+        await connection.invoke("Send", {
+            metadata: {
+                messageId: "initial-authentication",
+                acknowledgementType: 3
+            },
+            data: JSON.stringify({
+                accessToken: accessToken
+            }),
+            typeId: "TypingRealm.Authentication.Service.Messages.Authenticate"
+        });
+
+        await connection.invoke("Send", {
+            metadata: {
+                messageId: "initial-status",
+                acknowledgementType: 2
+            },
+            data: JSON.stringify({
+                typedCharactersCount: 20
+            }),
+            typeId: "TypingRealm.TypingDuels.Typed"
+        })
+    } catch (error) {
+        console.log(error);
+    }
+
+    await renderNewText();
+
+
+
 
     function isKeySymbol(event) {
         return (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90)

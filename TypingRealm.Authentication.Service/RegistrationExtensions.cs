@@ -37,7 +37,7 @@ public static class RegistrationExtensions
     {
         // Authorize Character: first message after authentication should be
         // Connect message with valid Character belonging to current Profile.
-        services.AddTransient<IConnectHook, AuthorizeConnectHook>();
+        services.AddTransient<IConnectHook, AuthorizeCharacterConnectHook>();
 
         return services;
     }

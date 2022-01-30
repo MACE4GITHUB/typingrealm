@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TypingRealm.Authentication.OAuth;
 
@@ -48,13 +50,20 @@ public sealed class TokenAuthenticationService : ITokenAuthenticationService
     private static AuthenticationResult? TryValidateToken(string accessToken, AuthenticationInformation authenticationInformation)
     {
         var handler = new JwtSecurityTokenHandler();
-        var user = handler.ValidateToken(
-            accessToken,
-            authenticationInformation.TokenValidationParameters,
-            out var validatedToken);
+        try
+        {
+            var user = handler.ValidateToken(
+                accessToken,
+                authenticationInformation.TokenValidationParameters,
+                out var validatedToken);
 
-        if (validatedToken is JwtSecurityToken jwtSecurityToken)
-            return new AuthenticationResult(user, jwtSecurityToken);
+            if (validatedToken is JwtSecurityToken jwtSecurityToken)
+                return new AuthenticationResult(user, jwtSecurityToken);
+        }
+        catch (SecurityTokenUnableToValidateException)
+        {
+            // TODO: Log failing to validate the token.
+        }
 
         return null;
     }
