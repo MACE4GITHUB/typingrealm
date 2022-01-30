@@ -88,7 +88,7 @@ public static class RegistrationExtensions
     /// Used by Web API & SignalR hosts that use ASP.Net hosting framework.
     /// Is not used by custom tools / console apps / TCP servers.
     /// </summary>
-    public static IServiceCollection SetupCommonAspNetDependencies<TStartupFilter>(IServiceCollection services, Assembly? controllersAssembly = null)
+    public static IServiceCollection SetupCommonAspNetDependencies<TStartupFilter>(IServiceCollection services, params Assembly[] controllersAssemblies)
         where TStartupFilter : class, IStartupFilter
     {
         services.AddCors(options => options.AddPolicy(
@@ -106,17 +106,17 @@ public static class RegistrationExtensions
         var mvcBuilder = services.AddControllers();
         mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(DiagnosticsController).Assembly));
 
+        // If host has custom APIs.
+        foreach (var controllersAssembly in controllersAssemblies)
+        {
+            mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(controllersAssembly));
+        }
+
         mvcBuilder.AddJsonOptions(options =>
         {
                 // Accept enum values as strings to Web API endpoints.
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-
-        // If host has custom APIs.
-        if (controllersAssembly != null)
-        {
-            mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(controllersAssembly));
-        }
 
         // Swagger.
         services.AddSwaggerGen();

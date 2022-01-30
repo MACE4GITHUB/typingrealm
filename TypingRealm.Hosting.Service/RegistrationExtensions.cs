@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Authentication;
@@ -35,10 +36,10 @@ public static class RegistrationExtensions
         return builder;
     }
 
-    public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services, IConfiguration configuration, Assembly? controllersAssembly = null)
+    public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services, IConfiguration configuration, params Assembly[] controllersAssemblies)
     {
         Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
-        Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(services, controllersAssembly);
+        Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(services, controllersAssemblies.Append(typeof(AuthenticationController).Assembly).ToArray());
         var builder = SetupCommonMessagingServiceDependencies(services);
 
         // Authentication.

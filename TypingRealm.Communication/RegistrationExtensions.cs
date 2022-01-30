@@ -23,12 +23,14 @@ public static class RegistrationExtensions
     {
         services.AddMemoryCache();
 
-        if (!DebugHelpers.UseInfrastructure)
-        {
+        // We are using ITyrCache for SignalR Authentication tokens generation,
+        // so we need it registered even for the services that don't have Redis.
+        /*(if (!DebugHelpers.UseInfrastructure)
+        {*/
             services.AddSingleton<InMemoryTyrCache>();
             services.AddSingleton<ITyrCache>(provider => provider.GetRequiredService<InMemoryTyrCache>());
             services.AddTransient<IDistributedLockProvider>(provider => provider.GetRequiredService<InMemoryTyrCache>());
-        }
+        //}
 
         return services;
     }
