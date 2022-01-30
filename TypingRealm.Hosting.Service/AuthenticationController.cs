@@ -38,7 +38,7 @@ public sealed class AuthenticationController : TyrController
     {
         var token = tokenData.token;
 
-        var value = await _cache.GetValueAsync(token)
+        var value = await _cache.PopValueAsync(token)
             .ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(value))
