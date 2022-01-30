@@ -9,4 +9,7 @@ public interface ITyrCache
     ValueTask<T?> GetValueAsync<T>(string key);
     ValueTask SetValueAsync<T>(string key, T value, TimeSpan? expiration = null);
     ValueTask MergeCollectionAsync<T>(string key, IEnumerable<T> collection, bool isUnique = true);
+
+    ValueTask<T?> PopValueAsync<T>(string key);
+    ValueTask RemoveValueAsync(string key);
 }

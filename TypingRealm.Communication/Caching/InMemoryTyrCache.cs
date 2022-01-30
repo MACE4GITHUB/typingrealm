@@ -81,4 +81,21 @@ public sealed class InMemoryTyrCache : SyncManagedDisposable, ITyrCache, IDistri
             @lock.Value.Dispose();
         }
     }
+
+    public async ValueTask<T?> PopValueAsync<T>(string key)
+    {
+        var value = await GetValueAsync<T>(key)
+            .ConfigureAwait(false);
+
+        await RemoveValueAsync(key)
+            .ConfigureAwait(false);
+
+        return value;
+    }
+
+    public ValueTask RemoveValueAsync(string key)
+    {
+        _cache.Remove(GetCacheKey(key));
+        return default;
+    }
 }

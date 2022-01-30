@@ -60,6 +60,33 @@ public sealed class RedisTyrCache : ITyrCache, IDistributedLockProvider
             .ConfigureAwait(false);
     }
 
+    public async ValueTask<T?> PopValueAsync<T>(string key)
+    {
+        var value = await _database.StringGetDeleteAsync(GetRedisKey(key))
+            .ConfigureAwait(false);
+
+        // TODO: Refactor this code as it repeats in GetValueAsync method.
+        if (!value.HasValue)
+            return default; // TODO: Make sure customers of this method expect this behaviour (0 instead of null when T is INT).
+
+        var stringValue = value.ToString();
+
+        if (typeof(T).IsPrimitive || typeof(T) == typeof(string))
+            return (T)Convert.ChangeType(stringValue, typeof(T));
+
+        var deserialized = JsonSerializer.Deserialize<T>(stringValue);
+        if (deserialized == null)
+            throw new InvalidOperationException("Could not deserialize cached value.");
+
+        return deserialized;
+    }
+
+    public async ValueTask RemoveValueAsync(string key)
+    {
+        await _database.KeyDeleteAsync(GetRedisKey(key))
+            .ConfigureAwait(false);
+    }
+
     public async ValueTask SetValueAsync<T>(string key, T value, TimeSpan? expiration = null)
     {
         if (typeof(T) == typeof(string))
