@@ -13,6 +13,7 @@
     <ProjectReference Include="..\TypingRealm.Authentication.Core\TypingRealm.Authentication.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
+    <ProjectReference Include="..\TypingRealm.Configuration\TypingRealm.Configuration.csproj" />
     <ProjectReference Include="..\TypingRealm.Profiles.Core\TypingRealm.Profiles.Core.csproj" />
   </ItemGroup>
 

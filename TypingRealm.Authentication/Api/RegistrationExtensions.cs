@@ -5,11 +5,41 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TypingRealm.Authentication.OAuth;
+using TypingRealm.Communication;
+using TypingRealm.Configuration;
 
 namespace TypingRealm.Authentication.Api;
+
+public sealed class RealtimeAuthenticationClient
+{
+    private readonly string _serviceName;
+    private readonly IServiceClient _client;
+
+    public RealtimeAuthenticationClient(
+        IConfiguration configuration,
+        IServiceClient client)
+    {
+        _serviceName = configuration.GetServiceId();
+        _client = client;
+    }
+
+    public async ValueTask<string> GetRealtimeAuthValueAsync(string token)
+    {
+        var result = await _client.PostAsync<string, bool>(
+            _serviceName,
+            "api/realtime-auth/validate",
+            EndpointAuthentication.FromClientCredentials(
+                new ClientCredentials("realtime-auth", "secret", new { "realtime-auth", "service" })),
+            new { token = token }, default)
+            .ConfigureAwait(false);
+
+        return result;
+    }
+}
 
 public static class RegistrationExtensions
 {
@@ -36,6 +66,8 @@ public static class RegistrationExtensions
         this IServiceCollection services,
         IAuthenticationInformationProvider authenticationInformationProvider)
     {
+        services.AddTransient<RealtimeAuthenticationClient>();
+
         var profileAuthentication = authenticationInformationProvider.GetProfileAuthenticationInformation();
         var serviceAuthentication = authenticationInformationProvider.GetServiceAuthenticationInformation();
         var additionalProfileAuthentications = authenticationInformationProvider.GetAdditionalProfileAuthenticationInformations();
@@ -106,19 +138,23 @@ public static class RegistrationExtensions
         // Or configure it at least only when SignalR host is used.
         options.Events = new JwtBearerEvents
         {
-            OnMessageReceived = context =>
+            OnMessageReceived = async context =>
             {
                 var accessToken = context.Request.Query["access_token"];
 
-                    // If the request is for our hub...
-                    var path = context.HttpContext.Request.Path;
+                var realtimeAuthenticationClient = context.HttpContext.RequestServices.GetRequiredService<RealtimeAuthenticationClient>();
+
+                // If the request is for our hub...
+                var path = context.HttpContext.Request.Path;
                 if (!string.IsNullOrEmpty(accessToken) &&
                     path.StartsWithSegments("/hub"))
                 {
-                        // Read the token out of the query string
-                        context.Token = accessToken;
+                    var actualTokenValue = await realtimeAuthenticationClient.GetRealtimeAuthValueAsync(accessToken)
+                    .ConfigureAwait(false);
+
+                    // Read the token out of the query string
+                    context.Token = actualTokenValue;
                 }
-                return Task.CompletedTask;
             }
         };
     }

@@ -15,7 +15,8 @@ public static class Config
         new ApiScope[]
         {
                 new ApiScope("service", "TypingRealm internal service-to-service communication."),
-                new ApiScope("diagnostics", "TypingRealm internal diagnostics scope for diagnostics operations.")
+                new ApiScope("diagnostics", "TypingRealm internal diagnostics scope for diagnostics operations."),
+                new ApiScope("realtime-auth", "Used to authenticate realtime communication.")
         };
 
     public static IEnumerable<Client> Clients =>
@@ -49,6 +50,22 @@ public static class Config
                         "service"
                     },
                     AccessTokenLifetime = 60
+                },
+                new Client
+                {
+                    // TODO: Instead of pure CC flow use exchange, and send a valid USER token to this endpoint.
+                    // Or at least send user ID and save it in the claims.
+                    ClientId = "realtime-auth",
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    ClientSecrets =
+                    {
+                        new Secret("secret".Sha256())
+                    },
+                    AllowedScopes =
+                    {
+                        "realtime-auth"
+                    },
+                    AccessTokenLifetime = 20
                 }
         };
 }
