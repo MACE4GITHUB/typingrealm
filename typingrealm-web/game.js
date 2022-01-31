@@ -5,6 +5,11 @@ async function main() {
     // TODO: Make sure AbsoluteDelay is 0 before sending data to server.
     // Data shouldn't be reset/modified after typing has been completed and before data has been sent.
 
+    // Unique message id.
+    // It should probably be unique every time, as just incrementing it will lead to the same values
+    // in case user refreshes the page multiple times.
+    let uniqueMessageIdCounter = 0;
+
     const createAuth0Client = window.createAuth0Client;
     const signalR = window.signalR;
     let auth0 = undefined;
@@ -57,31 +62,93 @@ async function main() {
         }
     }
 
+    let ackResolves = {};
+    async function sendWithAck(msg) {
+        let messageId = (uniqueMessageIdCounter++).toString(); // should be unique every time;
+        if (uniqueMessageIdCounter > 10000) {
+            uniqueMessageIdCounter = 0;
+        }
+
+        let ackResolve;
+        msg.metadata = {
+            messageId: messageId,
+            acknowledgementType: 2 // TODO: Find out why 3 doesn't work from backend side.
+        };
+
+        let cancelReject;
+        const myPromise = new Promise((resolve, reject) => {
+            ackResolve = resolve;
+            cancelReject = setTimeout(() => {
+                reject();
+                console.log('rejected, did not succeed to ack in time.');
+            }, 3000);
+        });
+
+        ackResolves[messageId] = {
+            resolve: ackResolve,
+            cancelReject: () => clearTimeout(cancelReject)
+        };
+
+        await connection.invoke("Send", msg);
+        try {
+            await myPromise;
+            console.log('successfully accepted ack');
+        }
+        catch (error) {
+            console.log('failed to get ack');
+            console.log(error);
+        }
+    }
+
     async function connectToTypingDuels() {
-        const connection = new signalR.HubConnectionBuilder()
+        connection = new signalR.HubConnectionBuilder()
             .withUrl(`${TYPINGDUELS_URL}/hub`,  { accessTokenFactory: () => getRealtimeToken() })
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
+        // TODO: Subscribe earlier, as soon as connection is established.
+        connection.on("Send", (message) => {
+            console.log(message);
+
+            if (message.typeId == "TypingRealm.Messaging.AcknowledgeReceived") {
+                if (message.metadata && message.metadata.requestMessageId) {
+                    let resolveData = ackResolves[message.metadata.requestMessageId];
+                    if (resolveData) {
+                        resolveData.resolve();
+                        resolveData.cancelReject();
+                        console.log('accepted ack and canceled reject');
+                    }
+                }
+            }
+
+            handle(message);
+        });
+
         async function start() {
             try {
+                let user = await auth0.getUser();
+
                 await connection.start();
 
                 console.log("SignalR Connected.");
 
                 var accessToken = await getToken();
-                await connection.invoke("Send", {
-                    metadata: {
-                        messageId: "initial-authentication",
-                        acknowledgementType: 3
-                    },
+                await sendWithAck({
                     data: JSON.stringify({
                         accessToken: accessToken
                     }),
                     typeId: "TypingRealm.Authentication.Service.Messages.Authenticate"
                 });
+                console.log('finished waiting for sending for ack');
+                console.log("TypingDuels Authenticated.");
 
-                console.log("SignalR Authenticated.");
+                await sendWithAck({
+                    data: JSON.stringify({
+                        clientId: user.sub
+                    }),
+                    typeId: "TypingRealm.Messaging.Messages.Connect"
+                });
+                console.log("TypingDuels Connected.");
             } catch (err) {
                 console.log(err);
                 setTimeout(start, 5000);
@@ -94,8 +161,6 @@ async function main() {
 
         // Start the connection.
         await start();
-
-        return connection;
     }
 
     async function getRealtimeToken() {
@@ -226,24 +291,19 @@ async function main() {
     document.addEventListener('keyup', processKeyUp);
 
 
-    const connection = await connectToTypingDuels();
+    let connection;
+    await connectToTypingDuels();
+
     try {
-        connection.on("Send", (message) => {
-            console.log(message);
-
-            handle(message);
-        });
-
-        await connection.invoke("Send", {
+        /*await connection.invoke("Send", {
             metadata: {
-                messageId: "initial-status",
-                acknowledgementType: 2
+                messageId: "initial-status"
             },
             data: JSON.stringify({
                 typedCharactersCount: 0
             }),
             typeId: "TypingRealm.TypingDuels.Typed"
-        });
+        });*/
     } catch (error) {
         console.log(error);
     }

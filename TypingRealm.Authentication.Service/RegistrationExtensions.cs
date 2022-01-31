@@ -31,6 +31,21 @@ public static class RegistrationExtensions
     }
 
     /// <summary>
+    /// Use this method in domains that need to authenticate properly.
+    /// </summary>
+    // TODO: FORCE this method whenever we are not using character authentication.
+    // We can't allow people to use random ClientIds.
+    // Rethink the whole architecture here, possibly refactor.
+    public static IServiceCollection AddAuthorizeConnectHook(this IServiceCollection services)
+    {
+        // Authorize Character: first message after authentication should be
+        // Connect message with valid Character belonging to current Profile.
+        services.AddTransient<IConnectHook, AuthorizeConnectHook>();
+
+        return services;
+    }
+
+    /// <summary>
     /// Use this method in domains that need to check that Character belongs to the actual Profile.
     /// </summary>
     public static IServiceCollection AddCharacterAuthentication(this IServiceCollection services)

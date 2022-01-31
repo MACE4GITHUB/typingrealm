@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Authentication.Service.Messages;
 using TypingRealm.Messaging;
+using TypingRealm.Profiles;
 
 namespace TypingRealm.Authentication.Service;
 
@@ -17,6 +18,10 @@ public sealed class ConnectedClientContext : AsyncManagedDisposable, IConnectedC
     private Task? _notifyAboutExpiration;
 
     public string GetAccessToken() => _securityToken?.RawData ?? throw new InvalidOperationException("Access token is not set.");
+
+    public AuthenticatedProfile GetProfile() => _claimsPrincipal == null
+        ? throw new InvalidOperationException("Client is not authenticated yet.")
+        : AuthenticatedProfile.GetProfileForUser(_claimsPrincipal);
 
     public void SetAuthenticatedContext(ClaimsPrincipal claimsPrincipal, JwtSecurityToken securityToken)
     {

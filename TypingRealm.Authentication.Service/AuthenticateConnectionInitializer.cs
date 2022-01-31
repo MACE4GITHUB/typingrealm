@@ -18,9 +18,9 @@ public sealed class AuthenticateConnectionInitializer : IConnectionInitializer
     private readonly IUpdateDetector _updateDetector;
 
     // TODO: This is a major HACK. Refactor this so that it's configurable.
-    // For now EVERYTHING will skip the Connect's ConnectInitializer that also checks all IConnectHook-s.
-    // Everything is broken.
-    private const bool UseProfileClientId = true;
+    // It was done so we can skip the Connect's ConnectInitializer that also checks all IConnectHook-s.
+    // It is reverted now (with false value) but we still need to either make it configurable or remove it from here.
+    private const bool UseProfileClientId = false;
 
     public AuthenticateConnectionInitializer(
         IConnectionInitializer connectionInitializer,
