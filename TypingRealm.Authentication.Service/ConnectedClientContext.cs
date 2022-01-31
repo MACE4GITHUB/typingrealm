@@ -71,6 +71,8 @@ public sealed class ConnectedClientContext : AsyncManagedDisposable, IConnectedC
                 await _connectedClient.Connection.SendAsync(new TokenExpired(), cancellationToken)
                     .ConfigureAwait(false);
             }
+
+            // TODO: If token has expired completely - disconnect the client.
         }
     }
 }
