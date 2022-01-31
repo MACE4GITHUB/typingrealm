@@ -45,6 +45,7 @@ public sealed class WebApiStartupFilter : IStartupFilter
 
         app.UseRouting();
         app.UseCors(CorsPolicyName);
+
         app.UseAuthentication();
         app.UseAuthorization();
 
