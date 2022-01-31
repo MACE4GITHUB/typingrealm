@@ -17,6 +17,7 @@ public sealed class Typed
     public string? ClientId { get; set; }
 }
 
+// Consider debouncing per client, so that unrelated clients can get their updates and load is evened out.
 public sealed class TypedDebouncer
 {
     private readonly TimeSpan _debounceInterval = TimeSpan.FromMilliseconds(100);
