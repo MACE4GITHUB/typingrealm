@@ -33,6 +33,9 @@ public sealed class TypeMessageHandler : IMessageHandler<Typed>
 
         foreach (var client in _connectedClients.FindInGroups("Lobby"))
         {
+            if (client.ClientId == sender.ClientId)
+                continue;
+
             await client.Connection.SendAsync(new Typed
             {
                 TypedCharactersCount = message.TypedCharactersCount,

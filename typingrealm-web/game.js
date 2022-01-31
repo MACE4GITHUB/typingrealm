@@ -1,5 +1,8 @@
 async function main() {
 
+    // For quicker access for sending messages.
+    let authUserIdKey;
+
     /* INITIALIZATION */
 
     // TODO: Make sure AbsoluteDelay is 0 before sending data to server.
@@ -127,6 +130,7 @@ async function main() {
         async function start() {
             try {
                 let user = await auth0.getUser();
+                authUserIdKey = user.sub.replace('|', '_');
 
                 await connection.start();
 
@@ -325,28 +329,32 @@ async function main() {
 
         if (message.typeId == 'TypingRealm.TypingDuels.Typed') {
             let data = JSON.parse(message.data);
-            clientWidths[data.clientId.replace('|', '_')] = data.typedCharactersCount / 3;
 
-            for (var key in clientWidths) {
-                var value = clientWidths[key];
-
-                let element = duelsElement.querySelector(`#${key}`);
-                if (!element) {
-                    element = document.createElement('div');
-                    element.innerText = key;
-                    element.style.width = '0%';
-                    element.style.backgroundColor = 'red';
-                    element.id = key;
-                    duelsElement.appendChild(element);
-                } else {
-                    element.style.width = `${value}%`;
-                }
-            }
+            drawTypedStatus(data.clientId.replace('|', '_'), data.typedCharactersCount);
         }
     }
 
+    function drawTypedStatus(clientId, typedCharactersCount) {
+        clientWidths[clientId] = typedCharactersCount / 3;
 
+        for (var key in clientWidths) {
+            var value = clientWidths[key];
 
+            let element = duelsElement.querySelector(`#${key}`);
+            if (!element) {
+                element = document.createElement('div');
+                element.innerText = key;
+                element.style.width = '0%';
+                element.style.backgroundColor = 'red';
+                element.id = key;
+                duelsElement.appendChild(element);
+            } else {
+                element.style.width = `${value}%`;
+            }
+        }
+
+        console.log('updated status for client ' + clientId);
+    }
 
     function isKeySymbol(event) {
         return (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90)
@@ -584,6 +592,9 @@ async function main() {
             }),
             typeId: "TypingRealm.TypingDuels.Typed"
         });
+
+        // Draw self status.
+        drawTypedStatus(authUserIdKey, index);
     }
 
     function processKeyUp(event, simulation) {
