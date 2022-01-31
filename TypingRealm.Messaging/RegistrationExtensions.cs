@@ -41,8 +41,9 @@ public static class RegistrationExtensions
         services.RegisterHandler<Disconnect, DisconnectHandler>();
 
         // Updating.
-        // By default announce update (for testing purposes).
-        services.AddTransient<IUpdater, AnnouncingUpdater>();
+        // By default no updater.
+        // For testing purposes, use AnnouncingUpdater.
+        services.AddTransient<IUpdater, NoUpdater>();
 
         return services;
     }

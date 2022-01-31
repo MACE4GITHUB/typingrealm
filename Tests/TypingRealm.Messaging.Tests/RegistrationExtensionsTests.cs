@@ -72,7 +72,8 @@ public class RegistrationExtensionsTests : TestsBase
     [InlineData(typeof(IMessageHandlerFactory), typeof(MessageHandlerFactory))]
     [InlineData(typeof(IQueryDispatcher), typeof(QueryDispatcher))]
     [InlineData(typeof(IQueryHandlerFactory), typeof(QueryHandlerFactory))]
-    [InlineData(typeof(IUpdater), typeof(AnnouncingUpdater))]
+    //[InlineData(typeof(IUpdater), typeof(AnnouncingUpdater))]
+    [InlineData(typeof(IUpdater), typeof(NoUpdater))]
     [InlineData(typeof(IMessageHandler<Announce>), typeof(AnnounceHandler))]
     [InlineData(typeof(IMessageHandler<Disconnect>), typeof(DisconnectHandler))]
     public void ShouldRegisterTransientTypes(Type interfaceType, Type implementationType)
