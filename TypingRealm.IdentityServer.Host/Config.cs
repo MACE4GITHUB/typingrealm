@@ -63,7 +63,8 @@ public static class Config
                     },
                     AllowedScopes =
                     {
-                        "realtime-auth"
+                        "realtime-auth",
+                        "service"
                     },
                     AccessTokenLifetime = 20
                 }

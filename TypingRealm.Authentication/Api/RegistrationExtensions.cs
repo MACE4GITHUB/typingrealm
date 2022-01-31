@@ -27,13 +27,13 @@ public sealed class RealtimeAuthenticationClient
         _client = client;
     }
 
-    public async ValueTask<string> GetRealtimeAuthValueAsync(string token)
+    public async ValueTask<string?> GetRealtimeAuthValueAsync(string token)
     {
-        var result = await _client.PostAsync<string, bool>(
+        var result = await _client.PostAsync<object, string?>(
             _serviceName,
             "api/realtime-auth/validate",
             EndpointAuthentication.FromClientCredentials(
-                new ClientCredentials("realtime-auth", "secret", new { "realtime-auth", "service" })),
+                new ClientCredentials("realtime-auth", "secret", new[] { "realtime-auth", "service" })),
             new { token = token }, default)
             .ConfigureAwait(false);
 
@@ -133,24 +133,28 @@ public static class RegistrationExtensions
             options.Configuration.SigningKeys.Add(options.TokenValidationParameters.IssuerSigningKey);
         }
 
-        // For SignalR hubs.
-        // TODO: Consider not using this flow at all as this can lead to logging access token in Web console.
-        // Or configure it at least only when SignalR host is used.
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = async context =>
             {
-                var accessToken = context.Request.Query["access_token"];
-
-                var realtimeAuthenticationClient = context.HttpContext.RequestServices.GetRequiredService<RealtimeAuthenticationClient>();
+                var queryToken = context.Request.Query["access_token"].FirstOrDefault();
+                var headerToken = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(' ')[1];
 
                 // If the request is for our hub...
                 var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/hub"))
+                if (path.StartsWithSegments("/hub"))
                 {
-                    var actualTokenValue = await realtimeAuthenticationClient.GetRealtimeAuthValueAsync(accessToken)
-                    .ConfigureAwait(false);
+                    var token = queryToken ?? headerToken;
+                    if (token == null)
+                        return;
+
+                    var realtimeAuthenticationClient = context.HttpContext.RequestServices.GetRequiredService<RealtimeAuthenticationClient>();
+
+                    var actualTokenValue = await realtimeAuthenticationClient.GetRealtimeAuthValueAsync(token)
+                        .ConfigureAwait(false);
+
+                    if (string.IsNullOrEmpty(actualTokenValue))
+                        return;
 
                     // Read the token out of the query string
                     context.Token = actualTokenValue;

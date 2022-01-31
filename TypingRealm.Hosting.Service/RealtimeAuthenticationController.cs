@@ -32,9 +32,9 @@ public sealed class RealtimeAuthenticationController : TyrController
             new ClientCredentials("realtime-auth", "secret", new[] { "realtime-auth" }), default)
             .ConfigureAwait(false);
 
-        var value = $"{ProfileId.Value}_{accessToken}";
-        if (value.Count(x => x == '_') > 1)
-            throw new InvalidOperationException("Invalid ProfileId: should not contain _ signs.");
+        var value = $"{ProfileId.Value}${accessToken}";
+        if (value.Count(x => x == '$') > 1)
+            throw new InvalidOperationException("Invalid ProfileId: should not contain $ signs.");
 
         var token = $"{Guid.NewGuid()}_{Convert.ToBase64String(RandomNumberGenerator.GetBytes(20))}";
 
@@ -52,17 +52,19 @@ public sealed class RealtimeAuthenticationController : TyrController
     {
         var token = tokenData.token;
 
-        var value = await _cache.PopValueAsync(token)
+        // We cannot pop it as multiple requests are going on for the same token when negotiating SignalR connection.
+        var value = await _cache.GetValueAsync(token)
             .ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(value))
             return null;
 
-        if (ProfileId.Value != value.Trim('"').Split('_')[0])
-            return null;
+        // We cannot do this because this is scoped to Service tokens as of now.
+        /*if (ProfileId.Value != value.Trim('"').Split('$')[0])
+            return null;*/
 
         // TODO: Validate token.
 
-        return value.Trim('"').Split('_')[1];
+        return value.Trim('"').Split('$')[1];
     }
 }

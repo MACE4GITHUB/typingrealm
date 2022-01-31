@@ -59,7 +59,7 @@ async function main() {
 
     async function connectToTypingDuels() {
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`${TYPINGDUELS_URL}/hub`,  { accessTokenFactory: () => getToken() })
+            .withUrl(`${TYPINGDUELS_URL}/hub`,  { accessTokenFactory: () => getRealtimeToken() })
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
@@ -96,6 +96,19 @@ async function main() {
         await start();
 
         return connection;
+    }
+
+    async function getRealtimeToken() {
+        let token = await getToken();
+        let response = await fetch(`${TYPINGDUELS_URL}/api/realtime-auth/generate`, {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => response.text());
+
+        return response;
     }
 
     const TEXT_GENERATION_URL = `${DATA_URL}/api/texts/generate`;
