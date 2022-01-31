@@ -490,7 +490,9 @@ async function main() {
             }
 
             await typeSymbol(event.key, perf);
-            sendRealtime();
+            if (!simulation) {
+                sendRealtime();
+            }
             return;
         }
 
@@ -506,7 +508,9 @@ async function main() {
         if (textData.startTime) {
             if (isKeyBackspace(event)) {
                 pressBackspace(perf);
-                sendRealtime();
+                if (!simulation) {
+                    sendRealtime();
+                }
                 return;
             }
         }
