@@ -344,7 +344,7 @@ async function main() {
             if (!element) {
                 element = document.createElement('div');
                 element.innerText = key;
-                element.style.width = '0%';
+                element.style.width = `${value}%`;
                 element.style.backgroundColor = 'red';
                 element.id = key;
                 duelsElement.appendChild(element);
