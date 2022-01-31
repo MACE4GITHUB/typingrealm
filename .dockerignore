@@ -15,3 +15,5 @@ infrastructure-data/
 reverse-proxy/
 typingrealm-web/
 Utilities/
+
+**/logs/
