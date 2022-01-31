@@ -585,6 +585,7 @@ async function main() {
     }
 
     // Do not await when calling this, best performance.
+    // TODO: Implement some kind of debouncing logic so we don't send every update.
     async function sendRealtime() {
         await connection.invoke("Send", {
             data: JSON.stringify({
