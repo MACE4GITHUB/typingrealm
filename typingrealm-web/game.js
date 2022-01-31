@@ -559,7 +559,7 @@ async function main() {
 
             await typeSymbol(event.key, perf);
             if (!simulation) {
-                sendRealtime();
+                sendRealtimeThrottled();
             }
             return;
         }
@@ -577,7 +577,7 @@ async function main() {
             if (isKeyBackspace(event)) {
                 pressBackspace(perf);
                 if (!simulation) {
-                    sendRealtime();
+                    sendRealtimeThrottled();
                 }
                 return;
             }
@@ -585,8 +585,19 @@ async function main() {
     }
 
     // Do not await when calling this, best performance.
-    // TODO: Implement some kind of debouncing logic so we don't send every update.
+    let timerId = undefined;
+    async function sendRealtimeThrottled() {
+        if (timerId) return;
+
+        timerId = setTimeout(async () => {
+            timerId = undefined;
+            await sendRealtime();
+        }, 100);
+    }
+
+    // Do not await when calling this, best performance.
     async function sendRealtime() {
+
         await connection.invoke("Send", {
             data: JSON.stringify({
                 typedCharactersCount: index
