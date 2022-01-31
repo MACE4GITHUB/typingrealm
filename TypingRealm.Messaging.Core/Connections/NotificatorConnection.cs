@@ -13,6 +13,7 @@ public sealed class NotificatorConnection : IConnection
 {
     private readonly IMessageSender _messageSender;
     private readonly Notificator _notificator;
+    private readonly object _lock = new object();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NotificatorConnection"/> class.
@@ -35,7 +36,15 @@ public sealed class NotificatorConnection : IConnection
 
         var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        void Handle() => tcs.SetResult(true);
+        void Handle()
+        {
+            lock (_lock) // Unfortunately we need this lock, tcs cannot be set multiple times.
+            {
+                if (!tcs.Task.IsCompleted)
+                    tcs.SetResult(true);
+            }
+        }
+
         _notificator.Received += Handle;
 
         try
