@@ -161,6 +161,7 @@ async function main() {
 
     /* Global variables */
 
+    const duelsElement = document.getElementById('duels');
     const textElement = document.getElementById('text');
     const speedElement = document.getElementById('speed');
     const simulationSpeedMultiplierElement = document.getElementById('simulationSpeedMultiplier');
@@ -218,6 +219,7 @@ async function main() {
     let stopSimulation = false; // This is a flag to set when we want to interrupt simulation.
     let simulationSpeedMultiplier = 1;
 
+    const clientWidths = {};
 
 
     document.addEventListener('keydown', processKeyDown);
@@ -238,10 +240,10 @@ async function main() {
                 acknowledgementType: 2
             },
             data: JSON.stringify({
-                typedCharactersCount: 20
+                typedCharactersCount: 0
             }),
             typeId: "TypingRealm.TypingDuels.Typed"
-        })
+        });
     } catch (error) {
         console.log(error);
     }
@@ -259,6 +261,27 @@ async function main() {
                 }),
                 typeId: 'TypingRealm.Authentication.Service.Messages.Authenticate'
             })
+        }
+
+        if (message.typeId == 'TypingRealm.TypingDuels.Typed') {
+            let data = JSON.parse(message.data);
+            clientWidths[data.clientId.replace('|', '_')] = data.typedCharactersCount / 3;
+
+            for (var key in clientWidths) {
+                var value = clientWidths[key];
+
+                let element = duelsElement.querySelector(`#${key}`);
+                if (!element) {
+                    element = document.createElement('div');
+                    element.innerText = key;
+                    element.style.width = '0%';
+                    element.style.backgroundColor = 'red';
+                    element.id = key;
+                    duelsElement.appendChild(element);
+                } else {
+                    element.style.width = `${value}%`;
+                }
+            }
         }
     }
 
@@ -467,6 +490,7 @@ async function main() {
             }
 
             await typeSymbol(event.key, perf);
+            sendRealtime();
             return;
         }
 
@@ -482,9 +506,20 @@ async function main() {
         if (textData.startTime) {
             if (isKeyBackspace(event)) {
                 pressBackspace(perf);
+                sendRealtime();
                 return;
             }
         }
+    }
+
+    // Do not await when calling this, best performance.
+    async function sendRealtime() {
+        await connection.invoke("Send", {
+            data: JSON.stringify({
+                typedCharactersCount: index
+            }),
+            typeId: "TypingRealm.TypingDuels.Typed"
+        });
     }
 
     function processKeyUp(event, simulation) {
