@@ -5,6 +5,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["TypingRealm.Authentication.Core/TypingRealm.Authentication.Core.csproj", "TypingRealm.Authentication.Core/"]
+COPY ["TypingRealm.Common/TypingRealm.Common.csproj", "TypingRealm.Common/"]
 COPY ["TypingRealm.IdentityServer.Host/TypingRealm.IdentityServer.Host.csproj", "TypingRealm.IdentityServer.Host/"]
 RUN dotnet restore "TypingRealm.IdentityServer.Host/TypingRealm.IdentityServer.Host.csproj"
 COPY . .

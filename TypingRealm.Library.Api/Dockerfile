@@ -9,14 +9,17 @@ COPY ["TypingRealm.Authentication/TypingRealm.Authentication.csproj", "TypingRea
 COPY ["TypingRealm.Common/TypingRealm.Common.csproj", "TypingRealm.Common/"]
 COPY ["TypingRealm.Communication.Redis/TypingRealm.Communication.Redis.csproj", "TypingRealm.Communication.Redis/"]
 COPY ["TypingRealm.Communication/TypingRealm.Communication.csproj", "TypingRealm.Communication/"]
+COPY ["TypingRealm.Configuration/TypingRealm.Configuration.csproj", "TypingRealm.Configuration/"]
 COPY ["TypingRealm.DataAccess.Postgres/TypingRealm.DataAccess.Postgres.csproj", "TypingRealm.DataAccess.Postgres/"]
 COPY ["TypingRealm.Hosting/TypingRealm.Hosting.csproj", "TypingRealm.Hosting/"]
 COPY ["TypingRealm.Library.Api/TypingRealm.Library.Api.csproj", "TypingRealm.Library.Api/"]
 COPY ["TypingRealm.Library.Core/TypingRealm.Library.Core.csproj", "TypingRealm.Library.Core/"]
 COPY ["TypingRealm.Library.Infrastructure/TypingRealm.Library.Infrastructure.csproj", "TypingRealm.Library.Infrastructure/"]
 COPY ["TypingRealm.Library/TypingRealm.Library.csproj", "TypingRealm.Library/"]
+COPY ["TypingRealm.Logging/TypingRealm.Logging.csproj", "TypingRealm.Logging/"]
 COPY ["TypingRealm.Profiles.Core/TypingRealm.Profiles.Core.csproj", "TypingRealm.Profiles.Core/"]
-COPY ["TypingRealm.Texts.Core/TypingRealm.Texts.Core.csproj", "TypingRealm.Texts.Core/"]
+COPY ["TypingRealm.Serialization/TypingRealm.Serialization.csproj", "TypingRealm.Serialization/"]
+COPY ["TypingRealm.TextProcessing/TypingRealm.TextProcessing.csproj", "TypingRealm.TextProcessing/"]
 RUN dotnet restore "TypingRealm.Library.Api/TypingRealm.Library.Api.csproj"
 COPY . .
 WORKDIR "/src/TypingRealm.Library.Api"

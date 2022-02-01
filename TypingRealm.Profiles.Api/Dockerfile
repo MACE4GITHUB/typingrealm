@@ -9,14 +9,15 @@ COPY ["TypingRealm.Authentication/TypingRealm.Authentication.csproj", "TypingRea
 COPY ["TypingRealm.Common/TypingRealm.Common.csproj", "TypingRealm.Common/"]
 COPY ["TypingRealm.Communication.Redis/TypingRealm.Communication.Redis.csproj", "TypingRealm.Communication.Redis/"]
 COPY ["TypingRealm.Communication/TypingRealm.Communication.csproj", "TypingRealm.Communication/"]
+COPY ["TypingRealm.Configuration/TypingRealm.Configuration.csproj", "TypingRealm.Configuration/"]
 COPY ["TypingRealm.Hosting/TypingRealm.Hosting.csproj", "TypingRealm.Hosting/"]
-COPY ["TypingRealm.Messaging.Core/TypingRealm.Messaging.Core.csproj", "TypingRealm.Messaging.Core/"]
-COPY ["TypingRealm.Profiles.Api.Client/TypingRealm.Profiles.Api.Client.csproj", "TypingRealm.Profiles.Api.Client/"]
+COPY ["TypingRealm.Logging/TypingRealm.Logging.csproj", "TypingRealm.Logging/"]
 COPY ["TypingRealm.Profiles.Api.Resources/TypingRealm.Profiles.Api.Resources.csproj", "TypingRealm.Profiles.Api.Resources/"]
 COPY ["TypingRealm.Profiles.Api/TypingRealm.Profiles.Api.csproj", "TypingRealm.Profiles.Api/"]
 COPY ["TypingRealm.Profiles.Core/TypingRealm.Profiles.Core.csproj", "TypingRealm.Profiles.Core/"]
 COPY ["TypingRealm.Profiles.Infrastructure/TypingRealm.Profiles.Infrastructure.csproj", "TypingRealm.Profiles.Infrastructure/"]
 COPY ["TypingRealm.Profiles/TypingRealm.Profiles.csproj", "TypingRealm.Profiles/"]
+COPY ["TypingRealm.Serialization/TypingRealm.Serialization.csproj", "TypingRealm.Serialization/"]
 RUN dotnet restore "TypingRealm.Profiles.Api/TypingRealm.Profiles.Api.csproj"
 COPY . .
 WORKDIR "/src/TypingRealm.Profiles.Api"
