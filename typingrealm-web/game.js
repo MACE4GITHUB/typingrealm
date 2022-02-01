@@ -1,4 +1,4 @@
-async function main() {
+(async function main() {
 
     // For quicker access for sending messages.
     let authUserIdKey;
@@ -983,6 +983,4 @@ async function main() {
 
         return request;
     }
-}
-
-main();
+})();
