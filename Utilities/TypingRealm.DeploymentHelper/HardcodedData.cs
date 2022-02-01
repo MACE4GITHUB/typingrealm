@@ -10,6 +10,7 @@ public static class HardcodedData
 
         return new DeploymentData(new Service[]
         {
+            // IdentityServer.
             new Service(1, Constants.AuthorityServiceName, DatabaseType.None, CacheType.None, ".", 30000, false),
 
             new Service(10, "Texts", DatabaseType.None, CacheType.Redis, ".", 30401, false),
