@@ -10,7 +10,7 @@ public class ServerToClientMessageMetadataTests : TestsBase
     {
         var sut = ServerToClientMessageMetadata.CreateEmpty();
 
-        Assert.Null(sut.RequestMessageId);
+        Assert.Null(sut.MessageId);
     }
 
     [Fact]

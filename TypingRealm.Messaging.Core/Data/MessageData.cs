@@ -11,3 +11,8 @@ public abstract class MessageData
     public string Data { get; set; }
     public string TypeId { get; set; }
 }
+
+public abstract class MessageData<TMetadata> : MessageData
+{
+    public TMetadata? Metadata { get; set; }
+}

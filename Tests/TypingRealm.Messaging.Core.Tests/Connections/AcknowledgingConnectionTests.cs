@@ -80,7 +80,7 @@ public class AcknowledgingConnectionTests : TestsBase
             It.Is<ServerToClientMessageWithMetadata>(
                 y => (y.Message as AcknowledgeReceived) != null
                 && ((AcknowledgeReceived)y.Message).MessageId == message.Metadata.MessageId
-                && y.Metadata.RequestMessageId == message.Metadata.MessageId),
+                && y.Metadata.MessageId == message.Metadata.MessageId),
             Cts.Token));
     }
 }

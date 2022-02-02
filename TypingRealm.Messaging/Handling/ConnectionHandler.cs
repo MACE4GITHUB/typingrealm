@@ -109,7 +109,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                     // TODO: Do this also in background.
                     await connectedClient.Connection.SendAsync(response, new ServerToClientMessageMetadata
                     {
-                        RequestMessageId = messageWithMetadata.Metadata.MessageId
+                        MessageId = messageWithMetadata.Metadata.MessageId
                     }, cancellationToken)
                         .ConfigureAwait(false);
                 }
@@ -127,7 +127,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                 {
                     var serverToClientMetadata = new ServerToClientMessageMetadata
                     {
-                        RequestMessageId = messageWithMetadata.Metadata.MessageId
+                        MessageId = messageWithMetadata.Metadata.MessageId
                     };
 
                     await connectedClient.Connection.SendAsync(new AcknowledgeHandled(messageWithMetadata.Metadata.MessageId), serverToClientMetadata, cancellationToken)

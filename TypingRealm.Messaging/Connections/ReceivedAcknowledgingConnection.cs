@@ -22,7 +22,7 @@ public sealed class ReceivedAcknowledgingConnection : IConnection
         {
             var serverToClientMetadata = new ServerToClientMessageMetadata
             {
-                RequestMessageId = metadata.MessageId
+                MessageId = metadata.MessageId
             };
 
             await _connection.SendAsync(new AcknowledgeReceived(metadata.MessageId), serverToClientMetadata, cancellationToken)

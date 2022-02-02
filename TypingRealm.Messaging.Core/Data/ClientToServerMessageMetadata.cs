@@ -2,9 +2,8 @@
 
 namespace TypingRealm.Messaging;
 
-public sealed class ClientToServerMessageMetadata
+public sealed class ClientToServerMessageMetadata : MessageMetadata
 {
-    public string? MessageId { get; set; }
     public AcknowledgementType AcknowledgementType { get; set; } = AcknowledgementType.Handled;
 
     /// <summary>
@@ -12,6 +11,7 @@ public sealed class ClientToServerMessageMetadata
     /// </summary>
     public string? ResponseMessageTypeId { get; set; }
 
+    // This is a hack, preferably the server should decide which groups have been affected by the client.
     public List<string>? AffectedGroups { get; set; }
 
     public static ClientToServerMessageMetadata CreateEmpty() => new ClientToServerMessageMetadata();
