@@ -26,7 +26,7 @@ public class MessagesTests : TestsBase
     [Fact]
     public void ShouldHaveTestsForAllMessages()
     {
-        Assert.Equal(10, typeof(Announce).Assembly.GetTypes().Count(
+        Assert.Equal(11, typeof(Announce).Assembly.GetTypes().Count(
             t => t.GetCustomAttribute<MessageAttribute>() != null));
     }
 
