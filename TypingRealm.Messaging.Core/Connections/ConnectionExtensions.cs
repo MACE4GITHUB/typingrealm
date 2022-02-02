@@ -21,10 +21,4 @@ public static class ConnectionExtensions
     {
         return new NotificatorConnection(messageSender, notificator);
     }
-
-    public static ReceivedAcknowledgingConnection WithReceiveAcknowledgement(
-        this IConnection connection)
-    {
-        return new ReceivedAcknowledgingConnection(connection);
-    }
 }
