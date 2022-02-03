@@ -114,8 +114,8 @@
             console.log(message);
 
             if (message.typeId == "TypingRealm.Messaging.AcknowledgeReceived") {
-                if (message.metadata && message.metadata.requestMessageId) {
-                    let resolveData = ackResolves[message.metadata.requestMessageId];
+                if (message.metadata && message.metadata.messageId) {
+                    let resolveData = ackResolves[message.metadata.messageId];
                     if (resolveData) {
                         resolveData.resolve();
                         resolveData.cancelReject();
