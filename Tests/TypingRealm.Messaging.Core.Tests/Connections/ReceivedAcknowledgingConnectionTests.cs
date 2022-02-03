@@ -7,7 +7,7 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests.Connections;
 
-public class AcknowledgingConnectionTests : TestsBase
+public class ReceivedAcknowledgingConnectionTests : TestsBase
 {
     [Theory, AutoMoqData]
     public async Task ShouldSendAsUsual(
@@ -47,8 +47,11 @@ public class AcknowledgingConnectionTests : TestsBase
         connection.Verify(x => x.SendAsync(It.IsAny<object>(), Cts.Token), Times.Never);
     }
 
-    [Theory, AutoMoqData]
-    public async Task ShouldNotSendAcknowledgeReceived_WhenRequireAcknowledgementIsFalse(
+    [Theory]
+    [InlineAutoMoqData(AcknowledgementType.None)]
+    [InlineAutoMoqData(AcknowledgementType.Handled)]
+    public async Task ShouldNotSendAcknowledgeReceived_WhenAcknowledgementTypeIsNotReceived(
+        AcknowledgementType acknowledgementType,
         MessageWithMetadata message,
         [Frozen] Mock<IConnection> connection,
         ReceivedAcknowledgingConnection sut)
@@ -56,7 +59,7 @@ public class AcknowledgingConnectionTests : TestsBase
         connection.Setup(x => x.ReceiveAsync(Cts.Token))
             .ReturnsAsync(message);
 
-        message.Metadata!.AcknowledgementType = AcknowledgementType.None;
+        message.Metadata!.AcknowledgementType = acknowledgementType;
 
         await sut.ReceiveAsync(Cts.Token);
 
@@ -64,7 +67,7 @@ public class AcknowledgingConnectionTests : TestsBase
     }
 
     [Theory, AutoMoqData]
-    public async Task ShouldSendAcknowledgeReceived_WhenMessageHasId_AndRequireAcknowledgementIsTrue(
+    public async Task ShouldSendAcknowledgeReceived_WhenMessageHasId_AndAcknowledgementTypeIsReceived(
         MessageWithMetadata message,
         [Frozen] Mock<IConnection> connection,
         ReceivedAcknowledgingConnection sut)
@@ -78,9 +81,29 @@ public class AcknowledgingConnectionTests : TestsBase
 
         connection.Verify(x => x.SendAsync(
             It.Is<MessageWithMetadata>(
-                y => (y.Message as AcknowledgeReceived) != null
+                y => (y.Message is AcknowledgeReceived) != null
                 && ((AcknowledgeReceived)y.Message).MessageId == message.Metadata.MessageId
                 && y.Metadata!.MessageId == message.Metadata.MessageId),
             Cts.Token));
+    }
+
+    [Theory, AutoMoqData]
+    public async Task ShouldNotSendAcknowledgeReceived_WhenMessageHasId_AndAcknowledgementTypeIsReceived_ButMessageIsAcknowledgement(
+        MessageWithMetadata message,
+        [Frozen] Mock<IConnection> connection,
+        ReceivedAcknowledgingConnection sut)
+    {
+        connection.Setup(x => x.ReceiveAsync(Cts.Token))
+            .ReturnsAsync(message);
+
+        message.Metadata!.AcknowledgementType = AcknowledgementType.Received;
+
+        message.Message = new AcknowledgeReceived();
+        await sut.ReceiveAsync(Cts.Token);
+
+        message.Message = new AcknowledgeHandled();
+        await sut.ReceiveAsync(Cts.Token);
+
+        connection.Verify(x => x.SendAsync(It.IsAny<object>(), Cts.Token), Times.Never);
     }
 }
