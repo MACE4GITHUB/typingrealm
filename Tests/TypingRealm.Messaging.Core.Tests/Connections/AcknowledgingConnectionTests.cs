@@ -32,7 +32,7 @@ public class AcknowledgingConnectionTests : TestsBase
 
     [Theory, AutoMoqData]
     public async Task ShouldNotSendAcknowledgeReceived_WhenMessageIdIsNotSet(
-        ClientToServerMessageWithMetadata message,
+        MessageWithMetadata message,
         [Frozen] Mock<IConnection> connection,
         ReceivedAcknowledgingConnection sut)
     {
@@ -49,7 +49,7 @@ public class AcknowledgingConnectionTests : TestsBase
 
     [Theory, AutoMoqData]
     public async Task ShouldNotSendAcknowledgeReceived_WhenRequireAcknowledgementIsFalse(
-        ClientToServerMessageWithMetadata message,
+        MessageWithMetadata message,
         [Frozen] Mock<IConnection> connection,
         ReceivedAcknowledgingConnection sut)
     {
@@ -65,7 +65,7 @@ public class AcknowledgingConnectionTests : TestsBase
 
     [Theory, AutoMoqData]
     public async Task ShouldSendAcknowledgeReceived_WhenMessageHasId_AndRequireAcknowledgementIsTrue(
-        ClientToServerMessageWithMetadata message,
+        MessageWithMetadata message,
         [Frozen] Mock<IConnection> connection,
         ReceivedAcknowledgingConnection sut)
     {
@@ -77,7 +77,7 @@ public class AcknowledgingConnectionTests : TestsBase
         await sut.ReceiveAsync(Cts.Token);
 
         connection.Verify(x => x.SendAsync(
-            It.Is<ServerToClientMessageWithMetadata>(
+            It.Is<MessageWithMetadata>(
                 y => (y.Message as AcknowledgeReceived) != null
                 && ((AcknowledgeReceived)y.Message).MessageId == message.Metadata.MessageId
                 && y.Metadata.MessageId == message.Metadata.MessageId),

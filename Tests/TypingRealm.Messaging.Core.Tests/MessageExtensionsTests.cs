@@ -17,7 +17,7 @@ public class MessageExtensionsTests
 
     [Theory, AutoMoqData]
     public void GetMetadataOrEmpty_ShouldGetDefaultMetadata_WhenObjectDoesNotHaveMetadata(
-        ClientToServerMessageWithMetadata message)
+        MessageWithMetadata message)
     {
         message.Metadata = null!;
 
@@ -25,14 +25,5 @@ public class MessageExtensionsTests
 
         Assert.Equal(AcknowledgementType.Handled, metadata.AcknowledgementType);
         Assert.Null(metadata.MessageId);
-    }
-
-    [Theory, AutoMoqData]
-    public void GetMetadataOrEmpty_ShouldGetMetadataFromTheMessage(
-        ClientToServerMessageWithMetadata message)
-    {
-        var metadata = message.GetMetadataOrEmpty();
-
-        Assert.Equal(message.Metadata, metadata);
     }
 }

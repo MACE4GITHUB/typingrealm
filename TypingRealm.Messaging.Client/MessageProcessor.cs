@@ -344,8 +344,8 @@ public sealed class MessageProcessor : AsyncManagedDisposable, IMessageProcessor
                 var message = await resource!.Connection.ReceiveAsync(resource.CombinedCts.Token)
                     .ConfigureAwait(false);
 
-                if (message is not ServerToClientMessageWithMetadata messageWithMetadata)
-                    throw new InvalidOperationException($"Message is not of {typeof(ServerToClientMessageWithMetadata).Name} type.");
+                if (message is not MessageWithMetadata messageWithMetadata)
+                    throw new InvalidOperationException($"Message is not of {typeof(MessageWithMetadata).Name} type.");
 
                 message = messageWithMetadata.Message;
 

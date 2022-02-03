@@ -83,10 +83,10 @@ public sealed class ConnectionHandler : IConnectionHandler
             {
                 var message = await connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
 
-                if (message is not ClientToServerMessageWithMetadata messageWithMetadata)
-                    throw new InvalidOperationException($"Message is not of {typeof(ClientToServerMessageWithMetadata).Name} type.");
+                if (message is not MessageWithMetadata messageWithMetadata)
+                    throw new InvalidOperationException($"Message is not of {typeof(MessageWithMetadata).Name} type.");
 
-                metadata = messageWithMetadata.Metadata;
+                metadata = messageWithMetadata.Metadata as ClientToServerMessageMetadata;
 
                 if (messageWithMetadata.Metadata.MessageId != null && idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
                 {

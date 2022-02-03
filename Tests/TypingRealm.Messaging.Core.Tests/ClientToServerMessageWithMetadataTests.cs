@@ -10,9 +10,9 @@ public class ClientToServerMessageWithMetadataTests : TestsBase
         string message,
         ClientToServerMessageMetadata metadata)
     {
-        AssertSerializable<ClientToServerMessageWithMetadata>();
+        AssertSerializable<MessageWithMetadata>();
 
-        var sut = new ClientToServerMessageWithMetadata(message, metadata);
+        var sut = new MessageWithMetadata(message, metadata);
         Assert.Equal(message, sut.Message);
         Assert.Equal(metadata, sut.Metadata);
     }

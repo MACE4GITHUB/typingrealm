@@ -43,7 +43,7 @@ public sealed class ClientToServerSendingMessageSerializerConnection : IConnecti
         if (messageData.Metadata == null)
             messageData.Metadata = ServerToClientMessageMetadata.CreateEmpty();
 
-        return new ServerToClientMessageWithMetadata
+        return new MessageWithMetadata
         {
             Message = deserialized,
             Metadata = messageData.Metadata
@@ -53,10 +53,10 @@ public sealed class ClientToServerSendingMessageSerializerConnection : IConnecti
     public ValueTask SendAsync(object message, CancellationToken cancellationToken)
     {
         ClientToServerMessageMetadata? metadata = null;
-        if (message is ClientToServerMessageWithMetadata messageWithMetadata)
+        if (message is MessageWithMetadata messageWithMetadata)
         {
             message = messageWithMetadata.Message;
-            metadata = messageWithMetadata.Metadata;
+            metadata = messageWithMetadata.Metadata as ClientToServerMessageMetadata;
         }
 
         var serialized = _serializer.Serialize(message);

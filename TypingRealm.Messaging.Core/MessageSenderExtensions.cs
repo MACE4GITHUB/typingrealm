@@ -8,25 +8,10 @@ public static class MessageSenderExtensions
     public static ValueTask SendAsync(
         this IMessageSender messageSender,
         object message,
-        ClientToServerMessageMetadata metadata,
+        MessageMetadata metadata,
         CancellationToken cancellationToken)
     {
-        var messageWithMetadata = new ClientToServerMessageWithMetadata
-        {
-            Message = message,
-            Metadata = metadata
-        };
-
-        return messageSender.SendAsync(messageWithMetadata, cancellationToken);
-    }
-
-    public static ValueTask SendAsync(
-        this IMessageSender messageSender,
-        object message,
-        ServerToClientMessageMetadata metadata,
-        CancellationToken cancellationToken)
-    {
-        var messageWithMetadata = new ServerToClientMessageWithMetadata
+        var messageWithMetadata = new MessageWithMetadata
         {
             Message = message,
             Metadata = metadata

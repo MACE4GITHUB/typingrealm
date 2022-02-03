@@ -15,7 +15,7 @@ public class MessageSenderExtensionsTests : TestsBase
     {
         await sut.SendAsync(message, metadata, Cts.Token);
 
-        Mock.Get(sut).Verify(x => x.SendAsync(It.Is<ClientToServerMessageWithMetadata>(
+        Mock.Get(sut).Verify(x => x.SendAsync(It.Is<MessageWithMetadata>(
             y => y.Message == message && y.Metadata == metadata), Cts.Token));
     }
 
@@ -27,7 +27,7 @@ public class MessageSenderExtensionsTests : TestsBase
     {
         await sut.SendAsync(message, metadata, Cts.Token);
 
-        Mock.Get(sut).Verify(x => x.SendAsync(It.Is<ServerToClientMessageWithMetadata>(
+        Mock.Get(sut).Verify(x => x.SendAsync(It.Is<MessageWithMetadata>(
             y => y.Message == message && y.Metadata == metadata), Cts.Token));
     }
 }

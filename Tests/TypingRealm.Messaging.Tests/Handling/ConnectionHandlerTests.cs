@@ -45,9 +45,9 @@ public class TestConnection : IConnection
         }
     }
 
-    private static ClientToServerMessageWithMetadata ClientMessage(object message)
+    private static MessageWithMetadata ClientMessage(object message)
     {
-        return new ClientToServerMessageWithMetadata
+        return new MessageWithMetadata
         {
             Message = message,
             Metadata = ClientToServerMessageMetadata.CreateEmpty()
@@ -489,7 +489,7 @@ public class ConnectionHandlerTests : MessagingTestsBase
 
         var connection = Create<IConnection>();
         Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
-            .ReturnsAsync(Create<ClientToServerMessageWithMetadata>());
+            .ReturnsAsync(Create<MessageWithMetadata>());
 
         await AssertThrowsAsync(
             () => sut.HandleAsync(connection, Cts.Token),
@@ -511,7 +511,7 @@ public class ConnectionHandlerTests : MessagingTestsBase
 
         var connection = Create<IConnection>();
         Mock.Get(connection).Setup(x => x.ReceiveAsync(Cts.Token))
-            .ReturnsAsync(Create<ClientToServerMessageWithMetadata>());
+            .ReturnsAsync(Create<MessageWithMetadata>());
 
         await AssertThrowsAsync(
             () => sut.HandleAsync(connection, Cts.Token),
@@ -545,7 +545,7 @@ public class ConnectionHandlerTests : MessagingTestsBase
         [Frozen] Mock<IConnectionInitializer> initializer,
         [Frozen] Mock<IMessageDispatcher> dispatcher,
         IConnection connection,
-        ClientToServerMessageWithMetadata clientMessage,
+        MessageWithMetadata clientMessage,
         ConnectionHandler sut)
     {
         dispatcher.Setup(x => x.DispatchAsync(It.IsAny<ConnectedClient>(), It.IsAny<object>(), Cts.Token))

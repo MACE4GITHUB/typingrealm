@@ -6,9 +6,9 @@ public static class MessageExtensions
     /// Gets metadata from object if it is <see cref="ClientToServerMessageWithMetadata"/>,
     /// otherwise returns empty <see cref="ClientToServerMessageMetadata"/>.
     /// </summary>
-    public static ClientToServerMessageMetadata GetMetadataOrEmpty(this object message)
+    public static MessageMetadata GetMetadataOrEmpty(this object message)
     {
-        if (message is ClientToServerMessageWithMetadata messageWithMetadata
+        if (message is MessageWithMetadata messageWithMetadata
             && messageWithMetadata.Metadata != null)
             return messageWithMetadata.Metadata;
 

@@ -23,8 +23,8 @@ public sealed class ServerMessageUnwrapperConnection : IConnection
         var message = await _connection.ReceiveAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        if (message is not ClientToServerMessageWithMetadata messageWithMetadata)
-            throw new InvalidOperationException($"Received message is not of {typeof(ClientToServerMessageWithMetadata).Name} type.");
+        if (message is not MessageWithMetadata messageWithMetadata)
+            throw new InvalidOperationException($"Received message is not of {typeof(MessageWithMetadata).Name} type.");
 
         return messageWithMetadata.Message;
     }
