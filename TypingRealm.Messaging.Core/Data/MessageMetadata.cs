@@ -14,6 +14,7 @@ public class MessageMetadata
     /// response after successfully receiving or handling the message, so that
     /// the sending party can be aware that it can continue sending next message.
     /// </summary>
+    // Consider setting default acknowledgement to None.
     public AcknowledgementType AcknowledgementType { get; set; } = AcknowledgementType.Handled;
 
     /// <summary>

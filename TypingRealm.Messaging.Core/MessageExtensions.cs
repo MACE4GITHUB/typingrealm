@@ -3,8 +3,8 @@
 public static class MessageExtensions
 {
     /// <summary>
-    /// Gets metadata from object if it is <see cref="ClientToServerMessageWithMetadata"/>,
-    /// otherwise returns empty <see cref="ClientToServerMessageMetadata"/>.
+    /// Gets metadata from object if it is <see cref="MessageWithMetadata"/>,
+    /// otherwise returns empty <see cref="MessageMetadata"/>.
     /// </summary>
     public static MessageMetadata GetMetadataOrEmpty(this object message)
     {
@@ -12,6 +12,6 @@ public static class MessageExtensions
             && messageWithMetadata.Metadata != null)
             return messageWithMetadata.Metadata;
 
-        return ClientToServerMessageMetadata.CreateEmpty();
+        return MessageMetadata.CreateEmpty();
     }
 }

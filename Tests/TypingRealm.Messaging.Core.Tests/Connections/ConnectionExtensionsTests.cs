@@ -19,30 +19,13 @@ public class ConnectionExtensionsTests : TestsBase
     }
 
     [Theory, AutoMoqData]
-    public void WithNotificator_ShouldSetNotificator(
-        Notificator notificator,
-        IMessageSender sut)
+    public void WithNotificator_ShouldWrapConnectionInNotificatonConnection(
+        Notificator notificator, IMessageSender messageSender)
     {
-        var connection = sut.WithNotificator(notificator);
+        var sut = messageSender.WithNotificator(notificator);
 
-        Assert.Equal(notificator, GetPrivateField(connection, "_notificator"));
-    }
-
-    [Theory, AutoMoqData]
-    public void WithNotificator_ShouldSetMessageSender(IMessageSender sut)
-    {
-        var connection = sut.WithNotificator(Create<Notificator>());
-
-        Assert.Equal(sut, GetPrivateField(connection, "_messageSender"));
-    }
-
-    [Theory, AutoMoqData]
-    public void WithReceiveAcknowledgement_ShouldWrapConnection(
-        IConnection connection)
-    {
-        var sut = connection.WithReceiveAcknowledgement();
-
-        Assert.IsType<ReceivedAcknowledgingConnection>(sut);
-        Assert.Equal(connection, GetPrivateField(sut, "_connection"));
+        Assert.IsType<NotificatorConnection>(sut);
+        Assert.Equal(notificator, GetPrivateField(sut, "_notificator"));
+        Assert.Equal(messageSender, GetPrivateField(sut, "_messageSender"));
     }
 }
