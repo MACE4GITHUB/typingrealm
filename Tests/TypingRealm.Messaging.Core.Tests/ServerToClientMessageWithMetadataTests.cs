@@ -8,9 +8,9 @@ public class ServerToClientMessageWithMetadataTests : TestsBase
     [Theory, AutoMoqData]
     public void ShouldBeSerializable(
         string message,
-        ServerToClientMessageMetadata metadata)
+        MessageMetadata metadata)
     {
-        AssertSerializable<ServerToClientMessageMetadata>();
+        AssertSerializable<MessageMetadata>();
 
         var sut = new MessageWithMetadata(message, metadata);
         Assert.Equal(message, sut.Message);

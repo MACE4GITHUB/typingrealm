@@ -11,12 +11,12 @@ public sealed class SignalRConnectionFactory : ISignalRConnectionFactory
 {
     private readonly IMessageSerializer _messageSerializer;
     private readonly IMessageTypeCache _messageTypeCache;
-    private readonly IClientToServerMessageMetadataFactory _clientToServerMessageMetadataFactory;
+    private readonly IMessageMetadataFactory _clientToServerMessageMetadataFactory;
 
     public SignalRConnectionFactory(
         IMessageSerializer messageSerializer,
         IMessageTypeCache messageTypeCache,
-        IClientToServerMessageMetadataFactory clientToServerMessageMetadataFactory)
+        IMessageMetadataFactory clientToServerMessageMetadataFactory)
     {
         _messageSerializer = messageSerializer;
         _messageTypeCache = messageTypeCache;

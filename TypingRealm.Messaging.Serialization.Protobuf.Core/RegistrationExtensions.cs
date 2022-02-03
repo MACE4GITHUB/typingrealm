@@ -20,7 +20,7 @@ public static class RegistrationExtensions
                     typeof(ClientToServerMessageData),
                     typeof(ClientToServerMessageMetadata),
                     typeof(ServerToClientMessageData),
-                    typeof(ServerToClientMessageMetadata)
+                    typeof(MessageMetadata)
             });
         });
 

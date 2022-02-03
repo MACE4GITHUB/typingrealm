@@ -55,6 +55,6 @@ public class RegistrationExtensionsTests
         var services = new ServiceCollection();
         var provider = services.AddSerializationCore().Services.BuildServiceProvider();
 
-        provider.AssertRegisteredTransient<IClientToServerMessageMetadataFactory, ClientToServerMessageMetadataFactory>();
+        provider.AssertRegisteredTransient<IMessageMetadataFactory, MessageMetadataFactory>();
     }
 }

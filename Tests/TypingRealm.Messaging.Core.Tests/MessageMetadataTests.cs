@@ -3,12 +3,12 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests;
 
-public class ServerToClientMessageMetadataTests : TestsBase
+public class MessageMetadataTests : TestsBase
 {
     [Fact]
     public void ShouldCreateEmpty()
     {
-        var sut = ServerToClientMessageMetadata.CreateEmpty();
+        var sut = MessageMetadata.CreateEmpty();
 
         Assert.Null(sut.MessageId);
     }
@@ -16,6 +16,6 @@ public class ServerToClientMessageMetadataTests : TestsBase
     [Fact]
     public void ShouldBeSerializable()
     {
-        AssertSerializable<ClientToServerMessageMetadata>();
+        AssertSerializable<MessageMetadata>();
     }
 }

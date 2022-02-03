@@ -13,13 +13,13 @@ public sealed class ClientToServerSendingMessageSerializerConnection : IConnecti
     private readonly IConnection _connection;
     private readonly IMessageSerializer _serializer;
     private readonly IMessageTypeCache _messageTypeCache;
-    private readonly IClientToServerMessageMetadataFactory _metadataFactory;
+    private readonly IMessageMetadataFactory _metadataFactory;
 
     public ClientToServerSendingMessageSerializerConnection(
         IConnection connection,
         IMessageSerializer serializer,
         IMessageTypeCache messageTypeCache,
-        IClientToServerMessageMetadataFactory metadataFactory)
+        IMessageMetadataFactory metadataFactory)
     {
         _connection = connection;
         _serializer = serializer;
@@ -41,7 +41,7 @@ public sealed class ClientToServerSendingMessageSerializerConnection : IConnecti
         var deserialized = _serializer.Deserialize(data, messageType);
 
         if (messageData.Metadata == null)
-            messageData.Metadata = ServerToClientMessageMetadata.CreateEmpty();
+            messageData.Metadata = MessageMetadata.CreateEmpty();
 
         return new MessageWithMetadata
         {

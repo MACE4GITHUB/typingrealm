@@ -60,7 +60,7 @@ public sealed class MessageProcessor : AsyncManagedDisposable, IMessageProcessor
     private readonly IClientConnectionFactory _connectionFactory;
     private readonly IMessageDispatcher _dispatcher;
     private readonly IProfileTokenProvider _profileTokenProvider;
-    private readonly IClientToServerMessageMetadataFactory _metadataFactory;
+    private readonly IMessageMetadataFactory _metadataFactory;
     private readonly IMessageTypeCache _messageTypeCache;
     private readonly IAuthenticationService _authenticationService;
     private readonly SemaphoreSlimLock _reconnectLock = new SemaphoreSlimLock();
@@ -78,7 +78,7 @@ public sealed class MessageProcessor : AsyncManagedDisposable, IMessageProcessor
         IClientConnectionFactory connectionFactory,
         IMessageDispatcher dispatcher,
         IProfileTokenProvider profileTokenProvider,
-        IClientToServerMessageMetadataFactory metadataFactory,
+        IMessageMetadataFactory metadataFactory,
         IMessageTypeCache messageTypeCache,
         IAuthenticationService authenticationService)
     {
@@ -126,13 +126,13 @@ public sealed class MessageProcessor : AsyncManagedDisposable, IMessageProcessor
 
     public ValueTask SendWithoutAcknowledgementAsync(
         object message,
-        Action<ClientToServerMessageMetadata>? metadataSetter,
+        Action<MessageMetadata>? metadataSetter,
         CancellationToken cancellationToken)
         => SendAsync(message, metadataSetter, AcknowledgementType.None, cancellationToken);
 
     public async ValueTask SendAsync(
         object message,
-        Action<ClientToServerMessageMetadata>? metadataSetter,
+        Action<MessageMetadata>? metadataSetter,
         AcknowledgementType acknowledgementType,
         CancellationToken cancellationToken)
     {

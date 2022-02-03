@@ -18,7 +18,7 @@ public static class ConnectionExtensions
         this IConnection connection,
         IMessageSerializer messageSerializer,
         IMessageTypeCache messageTypeCache,
-        IClientToServerMessageMetadataFactory clientToServerMessageMetadataFactory)
+        IMessageMetadataFactory clientToServerMessageMetadataFactory)
     {
         return new ClientToServerSendingMessageSerializerConnection(
             connection,

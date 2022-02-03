@@ -46,11 +46,11 @@ public sealed class ServerToClientSendingMessageSerializerConnection : IConnecti
 
     public ValueTask SendAsync(object message, CancellationToken cancellationToken)
     {
-        ServerToClientMessageMetadata? metadata = null;
+        MessageMetadata? metadata = null;
         if (message is MessageWithMetadata messageWithMetadata)
         {
             message = messageWithMetadata.Message;
-            metadata = messageWithMetadata.Metadata as ServerToClientMessageMetadata;
+            metadata = messageWithMetadata.Metadata;
         }
 
         var serialized = _serializer.Serialize(message);

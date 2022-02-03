@@ -16,14 +16,14 @@ public sealed class ProtobufConnectionFactory : IProtobufConnectionFactory
 
     private readonly IMessageSerializer _messageSerializer;
     private readonly IMessageTypeCache _messageTypeCache;
-    private readonly IClientToServerMessageMetadataFactory _clientToServerMessageMetadataFactory;
+    private readonly IMessageMetadataFactory _clientToServerMessageMetadataFactory;
 
     public ProtobufConnectionFactory(
         IProtobufFieldNumberCache fieldNumberCache,
         IProtobufStreamSerializer protobuf,
         IMessageSerializer messageSerializer,
         IMessageTypeCache messageTypeCache,
-        IClientToServerMessageMetadataFactory clientToServerMessageMetadataFactory)
+        IMessageMetadataFactory clientToServerMessageMetadataFactory)
     {
         _fieldNumberCache = fieldNumberCache;
         _protobuf = protobuf;

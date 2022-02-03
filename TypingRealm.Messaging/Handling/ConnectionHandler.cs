@@ -107,7 +107,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                         .ConfigureAwait(false);
 
                     // TODO: Do this also in background.
-                    await connectedClient.Connection.SendAsync(response, new ServerToClientMessageMetadata
+                    await connectedClient.Connection.SendAsync(response, new MessageMetadata
                     {
                         MessageId = messageWithMetadata.Metadata.MessageId
                     }, cancellationToken)
@@ -125,7 +125,7 @@ public sealed class ConnectionHandler : IConnectionHandler
 
                 if (messageWithMetadata.Metadata.AcknowledgementType == AcknowledgementType.Handled && messageWithMetadata.Metadata.MessageId != null)
                 {
-                    var serverToClientMetadata = new ServerToClientMessageMetadata
+                    var serverToClientMetadata = new MessageMetadata
                     {
                         MessageId = messageWithMetadata.Metadata.MessageId
                     };

@@ -10,7 +10,7 @@ public sealed class MessageProcessorFactory : IMessageProcessorFactory
     private readonly IClientConnectionFactoryFactory _clientConnectionFactoryFactory;
     private readonly IMessageDispatcher _messageDispatcher;
     private readonly IProfileTokenProvider _profileTokenProvider;
-    private readonly IClientToServerMessageMetadataFactory _metadataFactory;
+    private readonly IMessageMetadataFactory _metadataFactory;
     private readonly IMessageTypeCache _messageTypeCache;
     private readonly IAuthenticationService _authenticationService;
 
@@ -19,7 +19,7 @@ public sealed class MessageProcessorFactory : IMessageProcessorFactory
         IClientConnectionFactoryFactory clientConnectionFactoryFactory,
         IMessageDispatcher messageDispatcher,
         IProfileTokenProvider profileTokenProvider,
-        IClientToServerMessageMetadataFactory metadataFactory,
+        IMessageMetadataFactory metadataFactory,
         IMessageTypeCache messageTypeCache,
         IAuthenticationService authenticationService)
     {

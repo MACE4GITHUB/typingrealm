@@ -54,7 +54,7 @@ public class RegistrationExtensionsTests : TestsBase
         Assert.Contains(typeof(ClientToServerMessageData), typeMembers);
         Assert.Contains(typeof(ClientToServerMessageMetadata), typeMembers);
         Assert.Contains(typeof(ServerToClientMessageData), typeMembers);
-        Assert.Contains(typeof(ServerToClientMessageMetadata), typeMembers);
+        Assert.Contains(typeof(MessageMetadata), typeMembers);
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class RegistrationExtensionsTests : TestsBase
         Assert.Contains(typeof(ClientToServerMessageData), registeredTypes);
         Assert.Contains(typeof(ClientToServerMessageMetadata), registeredTypes);
         Assert.Contains(typeof(ServerToClientMessageData), registeredTypes);
-        Assert.Contains(typeof(ServerToClientMessageMetadata), registeredTypes);
+        Assert.Contains(typeof(MessageMetadata), registeredTypes);
 
         var typeMembers = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
             .Single(x => x.Type == typeof(ClientToServerMessageData))

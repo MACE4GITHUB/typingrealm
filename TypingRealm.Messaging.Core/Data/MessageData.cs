@@ -36,6 +36,6 @@ public sealed class ClientToServerMessageData : MessageData<ClientToServerMessag
 {
 }
 
-public sealed class ServerToClientMessageData : MessageData<ServerToClientMessageMetadata>
+public sealed class ServerToClientMessageData : MessageData<MessageMetadata>
 {
 }

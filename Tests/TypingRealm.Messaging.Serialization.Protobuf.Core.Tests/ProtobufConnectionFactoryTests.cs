@@ -14,7 +14,7 @@ public class ProtobufConnectionFactoryTests : TestsBase
         [Frozen] IProtobufStreamSerializer protobuf,
         [Frozen] IMessageSerializer serializer,
         [Frozen] IMessageTypeCache messageTypeCache,
-        [Frozen] IClientToServerMessageMetadataFactory metadataFactory,
+        [Frozen] IMessageMetadataFactory metadataFactory,
         Stream stream,
         ProtobufConnectionFactory sut)
     {

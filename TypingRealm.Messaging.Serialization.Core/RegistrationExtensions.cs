@@ -15,7 +15,7 @@ public static class RegistrationExtensions
     {
         // TODO: Register these only on client side. Server doesn't need generators of metadata.
         // !!! but then we also need to split client and server versions of protobuf/signalr connection factories, so it's easier to just always register these types.
-        services.AddTransient<IClientToServerMessageMetadataFactory, ClientToServerMessageMetadataFactory>();
+        services.AddTransient<IMessageMetadataFactory, MessageMetadataFactory>();
 
         // This is used only from the client so no need to register it as Scoped.
         // And it won't work as scoped because it is injected into singletone TCP/SignalR Server classes.

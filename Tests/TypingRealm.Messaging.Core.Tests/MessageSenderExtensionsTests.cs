@@ -22,7 +22,7 @@ public class MessageSenderExtensionsTests : TestsBase
     [Theory, AutoMoqData]
     public async Task SendAsync_ShouldWrapServerMessageToMessageWithMetadata(
         object message,
-        ServerToClientMessageMetadata metadata,
+        MessageMetadata metadata,
         IMessageSender sut)
     {
         await sut.SendAsync(message, metadata, Cts.Token);

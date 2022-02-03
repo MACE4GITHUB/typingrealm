@@ -10,7 +10,7 @@ public class ClientToServerMessageMetadataFactoryTests
     [Theory, AutoMoqData]
     public void ShouldHaveHandledAcknowledgementByDefault(
         object message,
-        ClientToServerMessageMetadataFactory sut)
+        MessageMetadataFactory sut)
     {
         var result = sut.CreateFor(message);
         Assert.Equal(AcknowledgementType.Handled, result.AcknowledgementType);
@@ -21,7 +21,7 @@ public class ClientToServerMessageMetadataFactoryTests
         [Frozen] Mock<IMessageIdFactory> messageIdFactory,
         string messageId,
         object message,
-        ClientToServerMessageMetadataFactory sut)
+        MessageMetadataFactory sut)
     {
         messageIdFactory.Setup(x => x.CreateMessageId())
             .Returns(messageId);

@@ -20,7 +20,7 @@ public sealed class ReceivedAcknowledgingConnection : IConnection
         var metadata = message.GetMetadataOrEmpty();
         if (metadata.AcknowledgementType == AcknowledgementType.Received && metadata.MessageId != null)
         {
-            var serverToClientMetadata = new ServerToClientMessageMetadata
+            var serverToClientMetadata = new MessageMetadata
             {
                 MessageId = metadata.MessageId
             };
