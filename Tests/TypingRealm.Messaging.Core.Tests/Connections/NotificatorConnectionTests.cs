@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using Moq;
@@ -20,18 +22,6 @@ public class NotificatorConnectionTests : TestsBase
         await sut.SendAsync(message, Cts.Token);
 
         messageSender.Verify(x => x.SendAsync(message, Cts.Token));
-    }
-
-    [Theory, AutoMoqData]
-    public async Task ShouldNotUseUnderlyingConnectionToWaitForMessages(
-        [Frozen] Mock<IConnection> connection,
-        [Frozen] Notificator notificator,
-        NotificatorConnection sut)
-    {
-        notificator.NotifyReceived(Create<object>());
-        await sut.ReceiveAsync(Cts.Token);
-
-        connection.Verify(x => x.ReceiveAsync(Cts.Token), Times.Never);
     }
 
     [Theory, AutoMoqData]
@@ -124,5 +114,27 @@ public class NotificatorConnectionTests : TestsBase
         await SwallowAnyAsync(result.AsTask());
 
         Assert.Equal(0, GetSubscriptionCount());
+    }
+
+    [Theory, AutoMoqData]
+    public async Task ShouldWorkInHighConcurrencyScenario(
+        [Frozen] Notificator notificator,
+        NotificatorConnection sut)
+    {
+        var notifyTask = Task.WhenAll(Enumerable.Range(0, 1000).Select(_ => Task.Run(async () =>
+        {
+            await Wait(RandomNumberGenerator.GetInt32(100, 150));
+            notificator.NotifyReceived("message");
+        })));
+
+        var processingTask = Task.Run(async () =>
+        {
+            for (var i = 0; i < 1000; i++)
+            {
+                Assert.Equal("message", await sut.ReceiveAsync(Cts.Token));
+            }
+        });
+
+        await Task.WhenAll(notifyTask, processingTask);
     }
 }

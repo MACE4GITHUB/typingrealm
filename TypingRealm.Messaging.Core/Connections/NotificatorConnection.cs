@@ -13,7 +13,7 @@ public sealed class NotificatorConnection : IConnection
 {
     private readonly IMessageSender _messageSender;
     private readonly Notificator _notificator;
-    private readonly object _lock = new object();
+    private readonly object _lock = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NotificatorConnection"/> class.
