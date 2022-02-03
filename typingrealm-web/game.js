@@ -83,7 +83,7 @@
             ackResolve = resolve;
             cancelReject = setTimeout(() => {
                 reject();
-                console.log('rejected, did not succeed to ack in time.');
+                console.error('rejected, did not succeed to ack in time.');
             }, 3000);
         });
 
@@ -98,8 +98,8 @@
             console.log('successfully accepted ack');
         }
         catch (error) {
-            console.log('failed to get ack');
-            console.log(error);
+            console.error('failed to get ack');
+            console.error(error);
         }
     }
 
@@ -154,7 +154,7 @@
                 });
                 console.log("TypingDuels Connected.");
             } catch (err) {
-                console.log(err);
+                console.error(err);
                 setTimeout(start, 5000);
             }
         };
@@ -296,22 +296,7 @@
 
 
     let connection;
-    await connectToTypingDuels();
-
-    try {
-        /*await connection.invoke("Send", {
-            metadata: {
-                messageId: "initial-status"
-            },
-            data: JSON.stringify({
-                typedCharactersCount: 0
-            }),
-            typeId: "TypingRealm.TypingDuels.Typed"
-        });*/
-    } catch (error) {
-        console.log(error);
-    }
-
+    connectToTypingDuels();
     await renderNewText();
 
     async function handle(message) {
@@ -400,7 +385,6 @@
 
     async function getText() {
         let token = await getToken();
-        console.log(token);
 
         let response = await fetch(textRequestUrl, {
             headers: {
