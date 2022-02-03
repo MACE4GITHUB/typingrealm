@@ -17,10 +17,9 @@ public static class RegistrationExtensions
         {
             return new ProtobufStreamSerializer(new[]
             {
-                    typeof(ClientToServerMessageData),
-                    typeof(ClientToServerMessageMetadata),
-                    typeof(ServerToClientMessageData),
-                    typeof(MessageMetadata)
+                    typeof(MessageData),
+                    typeof(MessageMetadata),
+                    typeof(ClientToServerMessageMetadata)
             });
         });
 

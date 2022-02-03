@@ -367,7 +367,7 @@ public sealed class MessageProcessor : AsyncManagedDisposable, IMessageProcessor
                 await AsyncHelpers.WhenAll(_handlers.Values.Select(handler => handler(message)))
                     .ConfigureAwait(false);
 
-                await AsyncHelpers.WhenAll(_handlersWithId.Values.Select(handler => handler(message, messageWithMetadata.Metadata.MessageId)))
+                await AsyncHelpers.WhenAll(_handlersWithId.Values.Select(handler => handler(message, messageWithMetadata.Metadata?.MessageId)))
                     .ConfigureAwait(false);
             }
             catch (Exception exception)

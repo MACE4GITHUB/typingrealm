@@ -26,8 +26,8 @@ public sealed class ServerToClientSendingMessageSerializerConnection : IConnecti
         var message = await _connection.ReceiveAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        if (message is not ClientToServerMessageData messageData)
-            throw new InvalidOperationException($"Received invalid message: {message.GetType().Name} is not a {typeof(ClientToServerMessageData).Name} type.");
+        if (message is not MessageData messageData)
+            throw new InvalidOperationException($"Received invalid message: {message.GetType().Name} is not a {typeof(MessageData).Name} type.");
 
         var data = messageData.Data;
         var messageType = _messageTypeCache.GetTypeById(messageData.TypeId);
@@ -56,7 +56,7 @@ public sealed class ServerToClientSendingMessageSerializerConnection : IConnecti
         var serialized = _serializer.Serialize(message);
         var messageTypeId = _messageTypeCache.GetTypeId(message.GetType());
 
-        var result = new ServerToClientMessageData
+        var result = new MessageData
         {
             Data = serialized,
             TypeId = messageTypeId,

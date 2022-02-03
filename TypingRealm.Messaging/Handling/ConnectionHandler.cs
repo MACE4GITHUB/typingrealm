@@ -77,7 +77,7 @@ public sealed class ConnectionHandler : IConnectionHandler
         await TrySendPendingUpdates(connectedClient.Groups, cancellationToken).ConfigureAwait(false);
         while (_connectedClients.IsClientConnected(connectedClient.ClientId))
         {
-            ClientToServerMessageMetadata? metadata = null;
+            MessageMetadata? metadata = null;
 
             try
             {
@@ -86,9 +86,9 @@ public sealed class ConnectionHandler : IConnectionHandler
                 if (message is not MessageWithMetadata messageWithMetadata)
                     throw new InvalidOperationException($"Message is not of {typeof(MessageWithMetadata).Name} type.");
 
-                metadata = messageWithMetadata.Metadata as ClientToServerMessageMetadata;
+                metadata = messageWithMetadata.Metadata as MessageMetadata;
 
-                if (messageWithMetadata.Metadata.MessageId != null && idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
+                if (messageWithMetadata.Metadata?.MessageId != null && idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
                 {
                     _logger.LogDebug(
                         "Message with id {MessageId} has already been handled. Skipping duplicate (idempotency).",
@@ -99,7 +99,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                 await DispatchMessageAsync(connectedClient, messageWithMetadata.Message, cancellationToken).ConfigureAwait(false);
 
                 // TODO: Unit test this.
-                if (messageWithMetadata.Metadata.ResponseMessageTypeId != null)
+                if (messageWithMetadata.Metadata?.ResponseMessageTypeId != null)
                 {
                     // TODO: Send query response in background, do not block connection handling.
                     var responseType = _messageTypeCache.GetTypeById(messageWithMetadata.Metadata.ResponseMessageTypeId);
@@ -115,7 +115,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                 }
 
                 // If everything was dispatched successfully:
-                if (messageWithMetadata.Metadata.MessageId != null && !idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
+                if (messageWithMetadata.Metadata?.MessageId != null && !idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
                     idempotencyKeys.Add(messageWithMetadata.Metadata.MessageId, DateTime.UtcNow);
 
                 foreach (var item in idempotencyKeys.Where(x => x.Value < DateTime.UtcNow - TimeSpan.FromMinutes(1)))
@@ -123,7 +123,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                     idempotencyKeys.Remove(item.Key);
                 }
 
-                if (messageWithMetadata.Metadata.AcknowledgementType == AcknowledgementType.Handled && messageWithMetadata.Metadata.MessageId != null)
+                if (messageWithMetadata.Metadata?.AcknowledgementType == AcknowledgementType.Handled && messageWithMetadata.Metadata.MessageId != null)
                 {
                     var serverToClientMetadata = new MessageMetadata
                     {
@@ -144,8 +144,8 @@ public sealed class ConnectionHandler : IConnectionHandler
                 var groups = connectedClient.Groups;
 
                 // TODO: Unit test this (affected groups).
-                if (metadata?.AffectedGroups != null)
-                    groups = groups.Where(group => metadata.AffectedGroups.Contains(group));
+                if ((metadata as ClientToServerMessageMetadata)?.AffectedGroups != null)
+                    groups = groups.Where(group => (metadata as ClientToServerMessageMetadata)?.AffectedGroups?.Contains(group) ?? false);
 
                 await TrySendPendingUpdates(groups, cancellationToken).ConfigureAwait(false);
             }

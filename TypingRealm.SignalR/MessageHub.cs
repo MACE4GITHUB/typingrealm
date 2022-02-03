@@ -14,7 +14,7 @@ public sealed class MessageHub : Hub
         _server = server;
     }
 
-    public void Send(ClientToServerMessageData message)
+    public void Send(MessageData message)
     {
         _server.NotifyReceived(Context.ConnectionId, message);
     }

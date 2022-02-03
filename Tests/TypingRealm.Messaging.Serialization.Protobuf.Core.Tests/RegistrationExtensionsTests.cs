@@ -35,7 +35,7 @@ public class RegistrationExtensionsTests : TestsBase
     }
 
     [Fact]
-    public void AddProtobuf_ShouldRegisterProtobufStreamSerializerAsTransientWith4Messages()
+    public void AddProtobuf_ShouldRegisterProtobufStreamSerializerAsTransientWith3Messages()
     {
         var sut = new ServiceCollection();
         sut.AddTransient<IMessageTypeCache, MessageTypeCache>();
@@ -50,11 +50,10 @@ public class RegistrationExtensionsTests : TestsBase
             .Select(x => x.Type)
             .ToList();
 
-        Assert.Equal(4, typeMembers.Count);
-        Assert.Contains(typeof(ClientToServerMessageData), typeMembers);
-        Assert.Contains(typeof(ClientToServerMessageMetadata), typeMembers);
-        Assert.Contains(typeof(ServerToClientMessageData), typeMembers);
+        Assert.Equal(3, typeMembers.Count);
+        Assert.Contains(typeof(MessageData), typeMembers);
         Assert.Contains(typeof(MessageMetadata), typeMembers);
+        Assert.Contains(typeof(ClientToServerMessageMetadata), typeMembers);
     }
 
     [Fact]
@@ -137,7 +136,7 @@ public class RegistrationExtensionsTests : TestsBase
     public class BMessage { }
     // This test adds AMessage and BMessage to RuntimeTypeModel.
     [Theory, AutoMoqData]
-    public void AddProtobuf_ShouldCreateProtobufStreamSerializerWithFourRawTypes(Mock<IMessageTypeCache> cache)
+    public void AddProtobuf_ShouldCreateProtobufStreamSerializerWithThreeRawTypes(Mock<IMessageTypeCache> cache)
     {
         var sut = new ServiceCollection();
         sut.AddSingleton(cache.Object);
@@ -158,14 +157,13 @@ public class RegistrationExtensionsTests : TestsBase
         var registeredTypes = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
             .Select(t => t.Type)
             .ToList();
-        Assert.Equal(4, registeredTypes.Count);
-        Assert.Contains(typeof(ClientToServerMessageData), registeredTypes);
-        Assert.Contains(typeof(ClientToServerMessageMetadata), registeredTypes);
-        Assert.Contains(typeof(ServerToClientMessageData), registeredTypes);
+        Assert.Equal(3, registeredTypes.Count);
+        Assert.Contains(typeof(MessageData), registeredTypes);
         Assert.Contains(typeof(MessageMetadata), registeredTypes);
+        Assert.Contains(typeof(ClientToServerMessageMetadata), registeredTypes);
 
         var typeMembers = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
-            .Single(x => x.Type == typeof(ClientToServerMessageData))
+            .Single(x => x.Type == typeof(MessageData))
             .GetFields()
             .ToList();
 
@@ -174,10 +172,10 @@ public class RegistrationExtensionsTests : TestsBase
         var member3 = typeMembers.Single(t => t.FieldNumber == 3);
 
         Assert.Equal(typeof(string), member1.MemberType);
-        Assert.Equal(nameof(ClientToServerMessageData.Data), member1.Name);
-        Assert.Equal(typeof(ClientToServerMessageMetadata), member2.MemberType);
-        Assert.Equal(nameof(ClientToServerMessageData.Metadata), member2.Name);
+        Assert.Equal(nameof(MessageData.Data), member1.Name);
+        Assert.Equal(typeof(MessageMetadata), member2.MemberType); // TODO: Test that derived classes are properly serialized.
+        Assert.Equal(nameof(MessageData.Metadata), member2.Name);
         Assert.Equal(typeof(string), member3.MemberType);
-        Assert.Equal(nameof(ClientToServerMessageData.TypeId), member3.Name);
+        Assert.Equal(nameof(MessageData.TypeId), member3.Name);
     }
 }

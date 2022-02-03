@@ -8,6 +8,7 @@ namespace TypingRealm.Messaging.Serialization.Connections;
 /// Use this connection at client side (it should send messages to the server).
 /// </summary>
 // TODO: Unit test this class.
+// TODO: Unify with ServerToClient connection.
 public sealed class ClientToServerSendingMessageSerializerConnection : IConnection
 {
     private readonly IConnection _connection;
@@ -32,8 +33,8 @@ public sealed class ClientToServerSendingMessageSerializerConnection : IConnecti
         var message = await _connection.ReceiveAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        if (message is not ServerToClientMessageData messageData)
-            throw new InvalidOperationException($"Received invalid message: {message.GetType().Name} is not a {typeof(ServerToClientMessageData).Name} type.");
+        if (message is not MessageData messageData)
+            throw new InvalidOperationException($"Received invalid message: {message.GetType().Name} is not a {typeof(MessageData).Name} type.");
 
         var data = messageData.Data;
         var messageType = _messageTypeCache.GetTypeById(messageData.TypeId);
@@ -67,7 +68,7 @@ public sealed class ClientToServerSendingMessageSerializerConnection : IConnecti
         /*if (metadata == null)
             metadata = _metadataFactory.CreateFor(message);*/
 
-        var result = new ClientToServerMessageData
+        var result = new MessageData
         {
             Data = serialized,
             TypeId = messageTypeId,

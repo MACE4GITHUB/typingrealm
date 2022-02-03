@@ -39,7 +39,7 @@ public class AcknowledgingConnectionTests : TestsBase
         connection.Setup(x => x.ReceiveAsync(Cts.Token))
             .ReturnsAsync(message);
 
-        message.Metadata.MessageId = null;
+        message.Metadata!.MessageId = null;
         message.Metadata.AcknowledgementType = AcknowledgementType.Received;
 
         await sut.ReceiveAsync(Cts.Token);
@@ -56,7 +56,7 @@ public class AcknowledgingConnectionTests : TestsBase
         connection.Setup(x => x.ReceiveAsync(Cts.Token))
             .ReturnsAsync(message);
 
-        message.Metadata.AcknowledgementType = AcknowledgementType.None;
+        message.Metadata!.AcknowledgementType = AcknowledgementType.None;
 
         await sut.ReceiveAsync(Cts.Token);
 
@@ -72,7 +72,7 @@ public class AcknowledgingConnectionTests : TestsBase
         connection.Setup(x => x.ReceiveAsync(Cts.Token))
             .ReturnsAsync(message);
 
-        message.Metadata.AcknowledgementType = AcknowledgementType.Received;
+        message.Metadata!.AcknowledgementType = AcknowledgementType.Received;
 
         await sut.ReceiveAsync(Cts.Token);
 
@@ -80,7 +80,7 @@ public class AcknowledgingConnectionTests : TestsBase
             It.Is<MessageWithMetadata>(
                 y => (y.Message as AcknowledgeReceived) != null
                 && ((AcknowledgeReceived)y.Message).MessageId == message.Metadata.MessageId
-                && y.Metadata.MessageId == message.Metadata.MessageId),
+                && y.Metadata!.MessageId == message.Metadata.MessageId),
             Cts.Token));
     }
 }

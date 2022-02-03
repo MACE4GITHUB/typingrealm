@@ -13,7 +13,7 @@ public sealed class ClientToServerSignalRMessageSender : IMessageSender
     private ClientToServerSignalRMessageSender(HubConnection hub, Notificator notificator)
     {
         _hub = hub;
-        _hub.On<ServerToClientMessageData>(SignalRConstants.Send, message => notificator.NotifyReceived(message));
+        _hub.On<MessageData>(SignalRConstants.Send, message => notificator.NotifyReceived(message));
     }
 
     public static IConnection Create(HubConnection hub)
