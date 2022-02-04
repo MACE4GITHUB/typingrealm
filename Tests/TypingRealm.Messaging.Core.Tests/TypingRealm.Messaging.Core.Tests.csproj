@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\TypingRealm.Common\TypingRealm.Common.csproj" />
     <ProjectReference Include="..\..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
     <ProjectReference Include="..\..\TypingRealm.Testing\TypingRealm.Testing.csproj" />
+    <ProjectReference Include="..\TypingRealm.Common.Tests\TypingRealm.Common.Tests.csproj" />
   </ItemGroup>
 
 </Project>

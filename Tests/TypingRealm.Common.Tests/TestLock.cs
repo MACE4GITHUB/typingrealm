@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TypingRealm.Messaging.Tests.Connections;
+namespace TypingRealm.Common.Tests;
 
 public sealed class TestLock : ILock
 {

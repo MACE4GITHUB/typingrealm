@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Moq;
+using TypingRealm.Common.Tests;
 using TypingRealm.Messaging.Connections;
 using TypingRealm.Testing;
 using Xunit;

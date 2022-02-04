@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using TypingRealm.Testing;
 using Xunit;
 
-namespace TypingRealm.Messaging.Tests.Connections;
+namespace TypingRealm.Common.Tests;
 
 public class SemaphoreSlimLockTests : TestsBase
 {
