@@ -177,7 +177,8 @@ public sealed class ServiceGenerator
             sb.AppendLine(@$"      ""commandName"": ""Project"",");
             sb.AppendLine(@$"      ""environmentVariables"": {{");
             sb.AppendLine(@$"        ""ASPNETCORE_ENVIRONMENT"": ""Debug"",");
-            sb.AppendLine(@$"        ""DISABLE_INFRASTRUCTURE"": ""True""");
+            sb.AppendLine(@$"        ""DISABLE_INFRASTRUCTURE"": ""True"",");
+            sb.AppendLine(@$"        ""SERVICE_AUTHORITY"": ""http://127.0.0.1:30000/""");
             sb.AppendLine(@$"      }},");
             sb.AppendLine($@"      ""applicationUrl"": ""http://0.0.0.0:{service.Port}""");
             sb.AppendLine($@"    }},");
