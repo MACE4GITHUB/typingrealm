@@ -38,6 +38,7 @@ public sealed class NotificatorConnection : IConnection
 
         void Handle()
         {
+            // TODO: Consider improving this logic so that we don't lock for every operation, use something faster.
             lock (_lock) // Unfortunately we need this lock, tcs cannot be set multiple times.
             {
                 if (!tcs.Task.IsCompleted)
