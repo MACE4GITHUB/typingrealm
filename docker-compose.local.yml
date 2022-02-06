@@ -17,6 +17,8 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-data-net
+    volumes:
+      - ./infrastructure-data/local/data/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile
@@ -64,6 +66,8 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-identityserver-net
+    volumes:
+      - ./infrastructure-data/local/identityserver/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
@@ -81,6 +85,8 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-library-net
+    volumes:
+      - ./infrastructure-data/local/library/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Library.Api/Dockerfile
@@ -113,6 +119,8 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-profiles-net
+    volumes:
+      - ./infrastructure-data/local/profiles/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
@@ -130,6 +138,8 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-texts-net
+    volumes:
+      - ./infrastructure-data/local/texts/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Texts.Api/Dockerfile
@@ -162,6 +172,8 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-typing-net
+    volumes:
+      - ./infrastructure-data/local/typing/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Typing.Api/Dockerfile
@@ -211,6 +223,8 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-typingduels-net
+    volumes:
+      - ./infrastructure-data/local/typingduels/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.TypingDuels.Api/Dockerfile

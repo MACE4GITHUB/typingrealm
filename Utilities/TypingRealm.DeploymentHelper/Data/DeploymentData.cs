@@ -122,10 +122,7 @@ public sealed record DeploymentData(
 
     private static IEnumerable<string> GetServiceVolumes(Service service, Environment environment)
     {
-        _ = service;
-        _ = environment;
-
-        return Enumerable.Empty<string>();
+        yield return $"{Constants.InfrastructureDataFolder}/{environment.VolumeFolderName}/{service.ServiceName}/logs:/app/logs";
     }
 
     private static IEnumerable<string> GetServicePorts(Service service, Environment environment)

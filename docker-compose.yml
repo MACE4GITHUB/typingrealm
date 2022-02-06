@@ -11,6 +11,8 @@ services:
       - debug-typingrealm-net
     ports:
       - 30400:80
+    volumes:
+      - ./infrastructure-data/debug/data/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile
@@ -28,6 +30,8 @@ services:
       - debug-typingrealm-net
     ports:
       - 30000:80
+    volumes:
+      - ./infrastructure-data/debug/identityserver/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
@@ -45,6 +49,8 @@ services:
       - debug-typingrealm-net
     ports:
       - 30402:80
+    volumes:
+      - ./infrastructure-data/debug/library/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Library.Api/Dockerfile
@@ -62,6 +68,8 @@ services:
       - debug-typingrealm-net
     ports:
       - 30103:80
+    volumes:
+      - ./infrastructure-data/debug/profiles/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
@@ -79,6 +87,8 @@ services:
       - debug-typingrealm-net
     ports:
       - 30401:80
+    volumes:
+      - ./infrastructure-data/debug/texts/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Texts.Api/Dockerfile
@@ -96,6 +106,8 @@ services:
       - debug-typingrealm-net
     ports:
       - 30403:80
+    volumes:
+      - ./infrastructure-data/debug/typing/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Typing.Api/Dockerfile
@@ -113,6 +125,8 @@ services:
       - debug-typingrealm-net
     ports:
       - 30404:80
+    volumes:
+      - ./infrastructure-data/debug/typingduels/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.TypingDuels.Api/Dockerfile

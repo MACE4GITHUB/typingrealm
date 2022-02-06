@@ -21,6 +21,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-data-net
+    volumes:
+      - ./infrastructure-data/dev/data/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Data.Api/Dockerfile
@@ -73,6 +75,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-identityserver-net
+    volumes:
+      - ./infrastructure-data/dev/identityserver/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.IdentityServer.Host/Dockerfile
@@ -91,6 +95,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-library-net
+    volumes:
+      - ./infrastructure-data/dev/library/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Library.Api/Dockerfile
@@ -126,6 +132,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-profiles-net
+    volumes:
+      - ./infrastructure-data/dev/profiles/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Profiles.Api/Dockerfile
@@ -144,6 +152,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-texts-net
+    volumes:
+      - ./infrastructure-data/dev/texts/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Texts.Api/Dockerfile
@@ -179,6 +189,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-typing-net
+    volumes:
+      - ./infrastructure-data/dev/typing/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.Typing.Api/Dockerfile
@@ -235,6 +247,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-typingduels-net
+    volumes:
+      - ./infrastructure-data/dev/typingduels/logs:/app/logs
     build:
       context: .
       dockerfile: TypingRealm.TypingDuels.Api/Dockerfile
@@ -287,6 +301,8 @@ services:
       - dev-typingrealm-net
       - infra-tyr_typingrealm-infra-net
       - dev-typingrealm-web-ui-net
+    volumes:
+      - ./infrastructure-data/dev/web-ui/logs:/app/logs
     build:
       context: ./typingrealm-web
       dockerfile: Dockerfile
