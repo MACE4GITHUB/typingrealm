@@ -10,6 +10,7 @@ using AutoFixture;
 using AutoFixture.Kernel;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using TypingRealm.Messaging;
 using Xunit;
 
 namespace TypingRealm.Testing;
@@ -125,6 +126,17 @@ public abstract class TestsBase : IDisposable
             JsonSerializer.Serialize(instance));
 
         AssertDeepEqual(instance!, result!);
+    }
+
+    protected void AssertMessage<T>()
+    {
+        Assert.NotNull(typeof(T).GetCustomAttribute<MessageAttribute>());
+    }
+
+    protected void AssertSerializableMessage<T>()
+    {
+        AssertSerializable<T>();
+        AssertMessage<T>();
     }
 
     protected void AssertDeepEqual(object leftInstance, object rightInstance)
