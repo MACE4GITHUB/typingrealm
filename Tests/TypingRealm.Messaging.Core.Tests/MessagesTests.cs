@@ -120,24 +120,18 @@ public class MessagesTests : TestsBase
     }
 
     [Theory, AutoMoqData]
-    public void ClientToServerMessageData(MessageData sut)
+    public void MessageData(MessageData sut)
     {
         AssertSerializable<MessageData>();
-        Assert.IsAssignableFrom<MessageData>(sut);
+        AssertMessage<MessageData>();
 
         // Metadata can be null.
         sut.Metadata = null;
         Assert.Null(sut.Metadata);
     }
 
-    [Theory, AutoMoqData]
-    public void ServerToClientMessageData(MessageData sut)
+    private void AssertMessage<T>()
     {
-        AssertSerializable<MessageData>();
-        Assert.IsAssignableFrom<MessageData>(sut);
-
-        // Metadata can be null.
-        sut.Metadata = null;
-        Assert.Null(sut.Metadata);
+        Assert.NotNull(typeof(T).GetCustomAttribute<MessageAttribute>());
     }
 }
