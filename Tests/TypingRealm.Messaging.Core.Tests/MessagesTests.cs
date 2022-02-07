@@ -110,7 +110,6 @@ public class MessagesTests : TestsBase
         string typeId)
     {
         AssertSerializable<MessageData>();
-        AssertMessage<MessageData>();
 
         var sut = new MessageData();
         Assert.Null(sut.Data);
@@ -131,7 +130,6 @@ public class MessagesTests : TestsBase
     public void MessageData(MessageData sut)
     {
         AssertSerializable<MessageData>();
-        AssertMessage<MessageData>();
 
         // Metadata can be null.
         sut.Metadata = null;

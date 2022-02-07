@@ -4,7 +4,6 @@
 /// Instance of this class is transfered over the network.
 /// The actual message serialized payload is stored in the Data field.
 /// </summary>
-[Message]
 public sealed class MessageData
 {
 #pragma warning disable CS8618
