@@ -30,6 +30,7 @@ public class MessagesTests : TestsBase
     public void AnnounceMessage(string message)
     {
         AssertSerializable<Announce>();
+        AssertMessage<Announce>();
 
         var sut = new Announce(message);
         Assert.Equal(message, sut.Message);
@@ -39,6 +40,7 @@ public class MessagesTests : TestsBase
     public void DisconnectedMessage(string reason)
     {
         AssertSerializable<Disconnected>();
+        AssertMessage<Disconnected>();
 
         var sut = new Disconnected(reason);
         Assert.Equal(reason, sut.Reason);
@@ -48,6 +50,7 @@ public class MessagesTests : TestsBase
     public void DisconnectMessage()
     {
         AssertSerializable<Disconnect>();
+        AssertMessage<Disconnect>();
     }
 
     [Theory, AutoMoqData]
@@ -57,6 +60,7 @@ public class MessagesTests : TestsBase
     {
         Assert.NotNull(Connect.DefaultGroup);
         AssertSerializable<Connect>();
+        AssertMessage<Connect>();
 
         var sut = new Connect(clientId);
         Assert.Equal(clientId, sut.ClientId);
@@ -74,6 +78,7 @@ public class MessagesTests : TestsBase
     public void BroadcastMessage(string senderId)
     {
         AssertSerializable<TestBroadcastMessage>();
+        AssertMessage<TestBroadcastMessage>();
 
         var sut = new TestBroadcastMessage(senderId);
         Assert.Equal(senderId, sut.SenderId);
@@ -83,6 +88,7 @@ public class MessagesTests : TestsBase
     public void AcknowledgeReceived(string messageId)
     {
         AssertSerializable<AcknowledgeReceived>();
+        AssertMessage<AcknowledgeReceived>();
 
         var sut = new AcknowledgeReceived(messageId);
         Assert.Equal(messageId, sut.MessageId);
@@ -92,6 +98,7 @@ public class MessagesTests : TestsBase
     public void AcknowledgeHandled(string messageId)
     {
         AssertSerializable<AcknowledgeHandled>();
+        AssertMessage<AcknowledgeHandled>();
 
         var sut = new AcknowledgeHandled(messageId);
         Assert.Equal(messageId, sut.MessageId);
@@ -103,6 +110,7 @@ public class MessagesTests : TestsBase
         string typeId)
     {
         AssertSerializable<MessageData>();
+        AssertMessage<MessageData>();
 
         var sut = new MessageData();
         Assert.Null(sut.Data);
@@ -130,7 +138,7 @@ public class MessagesTests : TestsBase
         Assert.Null(sut.Metadata);
     }
 
-    private void AssertMessage<T>()
+    private static void AssertMessage<T>()
     {
         Assert.NotNull(typeof(T).GetCustomAttribute<MessageAttribute>());
     }
