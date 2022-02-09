@@ -3,7 +3,7 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests;
 
-public class ClientToServerMessageWithMetadataTests : TestsBase
+public class MessageWithMetadataTests : TestsBase
 {
     [Theory, AutoMoqData]
     public void ShouldBeSerializable(
