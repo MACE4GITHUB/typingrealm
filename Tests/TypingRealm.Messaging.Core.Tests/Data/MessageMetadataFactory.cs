@@ -5,12 +5,12 @@ using Xunit;
 
 namespace TypingRealm.Messaging.Tests;
 
-public class ClientToServerMessageMetadataFactoryTests
+public class MessageMetadataFactory
 {
     [Theory, AutoMoqData]
     public void ShouldHaveHandledAcknowledgementByDefault(
         object message,
-        MessageMetadataFactory sut)
+        Messaging.MessageMetadataFactory sut)
     {
         var result = sut.CreateFor(message);
         Assert.Equal(AcknowledgementType.Handled, result.AcknowledgementType);
@@ -21,7 +21,7 @@ public class ClientToServerMessageMetadataFactoryTests
         [Frozen] Mock<IMessageIdFactory> messageIdFactory,
         string messageId,
         object message,
-        MessageMetadataFactory sut)
+        Messaging.MessageMetadataFactory sut)
     {
         messageIdFactory.Setup(x => x.CreateMessageId())
             .Returns(messageId);
