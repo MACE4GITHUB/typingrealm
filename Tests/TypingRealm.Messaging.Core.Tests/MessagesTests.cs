@@ -19,38 +19,29 @@ public class MessagesTests : TestsBase
         }
     }
 
-    //[Fact]
+    [Fact]
     public void ShouldHaveTestsForAllMessages()
     {
-        Assert.Equal(11, typeof(Announce).Assembly.GetTypes().Count(
+        Assert.Equal(7, typeof(Announce).Assembly.GetTypes().Count(
             t => t.GetCustomAttribute<MessageAttribute>() != null));
     }
 
     [Theory, AutoMoqData]
     public void AnnounceMessage(string message)
     {
-        AssertSerializable<Announce>();
-        AssertMessage<Announce>();
+        AssertSerializableMessage<Announce>();
 
         var sut = new Announce(message);
         Assert.Equal(message, sut.Message);
     }
 
     [Theory, AutoMoqData]
-    public void DisconnectedMessage(string reason)
+    public void BroadcastMessage(string senderId)
     {
-        AssertSerializable<Disconnected>();
-        AssertMessage<Disconnected>();
+        AssertSerializableMessage<TestBroadcastMessage>();
 
-        var sut = new Disconnected(reason);
-        Assert.Equal(reason, sut.Reason);
-    }
-
-    [Fact]
-    public void DisconnectMessage()
-    {
-        AssertSerializable<Disconnect>();
-        AssertMessage<Disconnect>();
+        var sut = new TestBroadcastMessage(senderId);
+        Assert.Equal(senderId, sut.SenderId);
     }
 
     [Theory, AutoMoqData]
@@ -59,8 +50,7 @@ public class MessagesTests : TestsBase
         string group)
     {
         Assert.NotNull(Connect.DefaultGroup);
-        AssertSerializable<Connect>();
-        AssertMessage<Connect>();
+        AssertSerializableMessage<Connect>();
 
         var sut = new Connect(clientId);
         Assert.Equal(clientId, sut.ClientId);
@@ -74,21 +64,25 @@ public class MessagesTests : TestsBase
         Assert.Equal(Connect.DefaultGroup, sut.Group);
     }
 
-    [Theory, AutoMoqData]
-    public void BroadcastMessage(string senderId)
+    [Fact]
+    public void DisconnectMessage()
     {
-        AssertSerializable<TestBroadcastMessage>();
-        AssertMessage<TestBroadcastMessage>();
+        AssertSerializableMessage<Disconnect>();
+    }
 
-        var sut = new TestBroadcastMessage(senderId);
-        Assert.Equal(senderId, sut.SenderId);
+    [Theory, AutoMoqData]
+    public void DisconnectedMessage(string reason)
+    {
+        AssertSerializableMessage<Disconnected>();
+
+        var sut = new Disconnected(reason);
+        Assert.Equal(reason, sut.Reason);
     }
 
     [Theory, AutoMoqData]
     public void AcknowledgeReceived(string messageId)
     {
-        AssertSerializable<AcknowledgeReceived>();
-        AssertMessage<AcknowledgeReceived>();
+        AssertSerializableMessage<AcknowledgeReceived>();
 
         var sut = new AcknowledgeReceived(messageId);
         Assert.Equal(messageId, sut.MessageId);
@@ -97,47 +91,9 @@ public class MessagesTests : TestsBase
     [Theory, AutoMoqData]
     public void AcknowledgeHandled(string messageId)
     {
-        AssertSerializable<AcknowledgeHandled>();
-        AssertMessage<AcknowledgeHandled>();
+        AssertSerializableMessage<AcknowledgeHandled>();
 
         var sut = new AcknowledgeHandled(messageId);
         Assert.Equal(messageId, sut.MessageId);
-    }
-
-    [Theory, AutoMoqData]
-    public void ConcreteMessageData(
-        string data,
-        string typeId)
-    {
-        AssertSerializable<MessageData>();
-
-        var sut = new MessageData();
-        Assert.Null(sut.Data);
-        Assert.Null(sut.TypeId);
-
-        sut.Data = data;
-        sut.TypeId = typeId;
-        Assert.Equal(data, sut.Data);
-        Assert.Equal(typeId, sut.TypeId);
-
-        sut.Data = null!;
-        sut.TypeId = null!;
-        Assert.Null(sut.Data);
-        Assert.Null(sut.TypeId);
-    }
-
-    [Theory, AutoMoqData]
-    public void MessageData(MessageData sut)
-    {
-        AssertSerializable<MessageData>();
-
-        // Metadata can be null.
-        sut.Metadata = null;
-        Assert.Null(sut.Metadata);
-    }
-
-    private static void AssertMessage<T>()
-    {
-        Assert.NotNull(typeof(T).GetCustomAttribute<MessageAttribute>());
     }
 }

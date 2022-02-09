@@ -1,4 +1,4 @@
-﻿namespace TypingRealm.Messaging;
+﻿namespace TypingRealm.Messaging.Messages;
 
 [Message]
 public sealed class AcknowledgeReceived

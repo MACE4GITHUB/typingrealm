@@ -2,6 +2,7 @@
 using AutoFixture.Xunit2;
 using Moq;
 using TypingRealm.Messaging.Connections;
+using TypingRealm.Messaging.Messages;
 using TypingRealm.Testing;
 using Xunit;
 
