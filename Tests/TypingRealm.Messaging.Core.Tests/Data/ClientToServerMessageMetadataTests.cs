@@ -1,4 +1,5 @@
-﻿using TypingRealm.Testing;
+﻿using System.Collections.Generic;
+using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Messaging.Tests;
@@ -19,5 +20,16 @@ public class ClientToServerMessageMetadataTests : TestsBase
     public void ShouldBeSerializable()
     {
         AssertSerializable<ClientToServerMessageMetadata>();
+    }
+
+    [Fact]
+    public void ShouldHaveNullableListOfAffectedGroups()
+    {
+        var sut = ClientToServerMessageMetadata.CreateEmpty();
+        Assert.Null(sut.AffectedGroups);
+
+        var list = new List<string>();
+        sut.AffectedGroups = list;
+        Assert.Equal(list, sut.AffectedGroups);
     }
 }
