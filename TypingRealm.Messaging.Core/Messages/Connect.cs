@@ -7,6 +7,7 @@
 [Message]
 public sealed class Connect
 {
+    // TODO: Make sure we can connect to multiple groups at once, total multigroup support.
     // TODO: !!! Validate this message's ClientId when handling Connect message.
     // Currently if Character authentication is disabled - any user with a valid token can send ANY client id.
     // Take TOKEN SUB claim by default instead of this message's property.
