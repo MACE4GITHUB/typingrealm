@@ -113,7 +113,7 @@
         connection.on("Send", (message) => {
             console.log(message);
 
-            if (message.typeId == "TypingRealm.Messaging.AcknowledgeReceived") {
+            if (message.typeId == "TypingRealm.Messaging.Messages.AcknowledgeReceived") {
                 if (message.metadata && message.metadata.messageId) {
                     let resolveData = ackResolves[message.metadata.messageId];
                     if (resolveData) {
