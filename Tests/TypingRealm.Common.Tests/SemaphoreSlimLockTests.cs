@@ -14,6 +14,7 @@ public class SemaphoreSlimLockTests : TestsBase
         Assert.IsAssignableFrom<SyncManagedDisposable>(sut);
     }
 
+#pragma warning disable CA1849 // Call async methods when in an async method
     [Theory, AutoMoqData]
     public async Task WaitAsync_ShouldThrowIfDisposed(SemaphoreSlimLock sut)
     {
@@ -35,6 +36,16 @@ public class SemaphoreSlimLockTests : TestsBase
 
         Assert.Equal(typeof(SemaphoreSlimLock).FullName, exception.ObjectName);
     }
+
+    [Theory, AutoMoqData]
+    public async Task ShouldDisposeOfSemaphoreSlim(SemaphoreSlimLock sut)
+    {
+        sut.Dispose();
+
+        await Assert.ThrowsAsync<ObjectDisposedException>(
+            () => GetSemaphore(sut).WaitAsync());
+    }
+#pragma warning restore CA1849 // Call async methods when in an async method
 
     [Theory, AutoMoqData]
     public async Task ShouldWaitAndRelease(SemaphoreSlimLock sut)
@@ -80,16 +91,7 @@ public class SemaphoreSlimLockTests : TestsBase
         Assert.Equal(0, mutex.CurrentCount);
     }
 
-    [Theory, AutoMoqData]
-    public async Task ShouldDisposeOfSemaphoreSlim(SemaphoreSlimLock sut)
-    {
-        sut.Dispose();
-
-        await Assert.ThrowsAsync<ObjectDisposedException>(
-            () => GetSemaphore(sut).WaitAsync());
-    }
-
-    private SemaphoreSlim GetSemaphore(SemaphoreSlimLock sut)
+    private static SemaphoreSlim GetSemaphore(SemaphoreSlimLock sut)
     {
         return (SemaphoreSlim)GetPrivateField(sut, "_mutex")!;
     }

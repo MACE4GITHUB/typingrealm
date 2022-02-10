@@ -6,7 +6,7 @@ namespace TypingRealm.Tests;
 
 public class TestAsyncManagedDisposable : AsyncManagedDisposable
 {
-    public bool IsDisposed { get; set; }
+    public bool TestIsDisposed { get; set; }
     public int WaitBeforeDisposingMs { get; set; }
 
     protected override async ValueTask DisposeManagedResourcesAsync()
@@ -14,7 +14,7 @@ public class TestAsyncManagedDisposable : AsyncManagedDisposable
         if (WaitBeforeDisposingMs > 0)
             await Task.Delay(WaitBeforeDisposingMs);
 
-        IsDisposed = true;
+        TestIsDisposed = true;
     }
 }
 
@@ -42,14 +42,14 @@ public class AsyncManagedDisposableTests : IDisposable
     public void ShouldDisposeSync()
     {
         _sut.Dispose();
-        Assert.True(_sut.IsDisposed);
+        Assert.True(_sut.TestIsDisposed);
     }
 
     [Fact]
     public async Task ShouldDisposeAsync()
     {
         await _sut.DisposeAsync();
-        Assert.True(_sut.IsDisposed);
+        Assert.True(_sut.TestIsDisposed);
     }
 
     [Fact]
@@ -57,6 +57,6 @@ public class AsyncManagedDisposableTests : IDisposable
     {
         _sut.WaitBeforeDisposingMs = 100;
         _sut.Dispose();
-        Assert.True(_sut.IsDisposed);
+        Assert.True(_sut.TestIsDisposed);
     }
 }

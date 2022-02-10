@@ -133,7 +133,7 @@ public class ManagedDisposableTests : IDisposable
     }
 
     [Fact]
-    public async Task ShouldHaveIsDisposedFalse_WhenNotDisposed()
+    public void ShouldHaveIsDisposedFalse_WhenNotDisposed()
     {
         Assert.False(_sut.IsDisposedTest);
     }

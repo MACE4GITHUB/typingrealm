@@ -6,11 +6,11 @@ namespace TypingRealm.Tests;
 
 public class TestSyncManagedDisposable : SyncManagedDisposable
 {
-    public bool IsDisposed { get; set; }
+    public bool TestIsDisposed { get; set; }
 
     protected override void DisposeManagedResources()
     {
-        IsDisposed = true;
+        TestIsDisposed = true;
     }
 }
 
@@ -38,13 +38,13 @@ public class SyncManagedDisposableTests : IDisposable
     public void ShouldDisposeSync()
     {
         _sut.Dispose();
-        Assert.True(_sut.IsDisposed);
+        Assert.True(_sut.TestIsDisposed);
     }
 
     [Fact]
     public async Task ShouldDisposeAsync()
     {
         await _sut.DisposeAsync();
-        Assert.True(_sut.IsDisposed);
+        Assert.True(_sut.TestIsDisposed);
     }
 }
