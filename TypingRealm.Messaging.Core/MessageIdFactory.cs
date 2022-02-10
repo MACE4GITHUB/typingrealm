@@ -13,11 +13,27 @@ public interface IMessageIdFactory
 
 public sealed class MessageIdFactory : IMessageIdFactory
 {
+    private int _resetting;
     private uint _messageId;
 
     public string CreateMessageId()
     {
-        // TODO: Come up with a way to constrain this value to like 10_000 instead of 4 billions.
+        if (_messageId >= 10000)
+        {
+            var previousValue = Interlocked.CompareExchange(ref _resetting, 1, 0);
+            if (previousValue == 0)
+            {
+                Interlocked.Exchange(ref _messageId, 0);
+            }
+        }
+        else
+        {
+            if (_messageId >= 5000 && _resetting == 1)
+            {
+                _resetting = 0;
+            }
+        }
+
         return Interlocked.Increment(ref _messageId).ToString();
     }
 }
