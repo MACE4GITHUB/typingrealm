@@ -4,11 +4,6 @@ using System.Threading.Tasks;
 
 namespace TypingRealm.Messaging.Serialization.Connections;
 
-/// <summary>
-/// Use this connection at client side (it should send messages to the server).
-/// </summary>
-// TODO: Unit test this class.
-// TODO: Unify with ServerToClient connection.
 public sealed class MessageSerializerConnection : IConnection
 {
     private readonly IConnection _connection;
@@ -41,6 +36,8 @@ public sealed class MessageSerializerConnection : IConnection
 
         var deserialized = _serializer.Deserialize(data, messageType);
 
+        // TODO: Consider using MetadataFactory here (but set messageId to null, because it wasn't passed).
+        // Probably best to implement CreateEmpty() method on MetadataFactory.
         if (messageData.Metadata == null)
             messageData.Metadata = MessageMetadata.CreateEmpty();
 
