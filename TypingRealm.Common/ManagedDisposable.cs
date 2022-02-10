@@ -14,7 +14,6 @@ namespace TypingRealm;
 /// </summary>
 public abstract class ManagedDisposable : IDisposable, IAsyncDisposable
 {
-    // TODO: Unit test this property.
     public bool IsDisposed { get; private set; }
 
     public async ValueTask DisposeAsync()
