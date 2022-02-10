@@ -30,7 +30,7 @@ public sealed class TcpProtobufClientConnectionFactory : IClientConnectionFactor
         var stream = client.GetStream();
         var sendLock = new SemaphoreSlimLock();
         var receiveLock = new SemaphoreSlimLock();
-        var connection = _factory.CreateProtobufConnectionForClient(stream)
+        var connection = _factory.CreateProtobufConnection(stream)
             .WithLocking(sendLock, receiveLock);
 
         return new ConnectionWithDisconnect(connection, async () =>

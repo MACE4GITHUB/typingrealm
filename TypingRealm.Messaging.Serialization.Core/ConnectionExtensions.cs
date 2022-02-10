@@ -14,30 +14,16 @@ public static class ConnectionExtensions
     /// and converts actual messages to <see cref="MessageData"/> before sending.
     /// Attaches required metadata to objects before sending.
     /// </summary>
-    public static IConnection ForClient(
+    public static IConnection AddCoreMessageSerialization(
         this IConnection connection,
         IMessageSerializer messageSerializer,
         IMessageTypeCache messageTypeCache,
-        IMessageMetadataFactory clientToServerMessageMetadataFactory)
+        IMessageMetadataFactory messageMetadataFactory)
     {
-        return new ClientToServerSendingMessageSerializerConnection(
+        return new MessageSerializerConnection(
             connection,
             messageSerializer,
             messageTypeCache,
-            clientToServerMessageMetadataFactory);
-    }
-
-    /// <summary>
-    /// Converts <see cref="MessageData"/> objects to <see cref="ClientToServerMessageWithMetadata"/>
-    /// objects, and converts actual messages to <see cref="MessageData"/> before sending.
-    public static IConnection ForServer(
-        this IConnection connection,
-        IMessageSerializer messageSerializer,
-        IMessageTypeCache messageTypeCache)
-    {
-        return new ServerToClientSendingMessageSerializerConnection(
-            connection,
-            messageSerializer,
-            messageTypeCache);
+            messageMetadataFactory);
     }
 }

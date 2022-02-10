@@ -11,7 +11,7 @@ public sealed class SignalRConnectionFactory : ISignalRConnectionFactory
 {
     private readonly IMessageSerializer _messageSerializer;
     private readonly IMessageTypeCache _messageTypeCache;
-    private readonly IMessageMetadataFactory _clientToServerMessageMetadataFactory;
+    private readonly IMessageMetadataFactory _messageMetadataFactory;
 
     public SignalRConnectionFactory(
         IMessageSerializer messageSerializer,
@@ -20,19 +20,19 @@ public sealed class SignalRConnectionFactory : ISignalRConnectionFactory
     {
         _messageSerializer = messageSerializer;
         _messageTypeCache = messageTypeCache;
-        _clientToServerMessageMetadataFactory = clientToServerMessageMetadataFactory;
+        _messageMetadataFactory = clientToServerMessageMetadataFactory;
     }
 
     public IConnection CreateProtobufConnectionForClient(HubConnection hub)
     {
         return ClientToServerSignalRMessageSender.Create(hub)
-            .ForClient(_messageSerializer, _messageTypeCache, _clientToServerMessageMetadataFactory);
+            .AddCoreMessageSerialization(_messageSerializer, _messageTypeCache, _messageMetadataFactory);
     }
 
     public IConnection CreateProtobufConnectionForServer(IClientProxy clientProxy, Notificator notificator)
     {
         return new ServerToClientSignalRMessageSender(clientProxy)
             .WithNotificator(notificator)
-            .ForServer(_messageSerializer, _messageTypeCache);
+            .AddCoreMessageSerialization(_messageSerializer, _messageTypeCache, _messageMetadataFactory);
     }
 }

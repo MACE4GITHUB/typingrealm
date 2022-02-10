@@ -34,15 +34,9 @@ public sealed class ProtobufConnectionFactory : IProtobufConnectionFactory
     }
 
     // TODO: Unit test this (possibly after we move ForClient / ForServer from here somehow).
-    public IConnection CreateProtobufConnectionForClient(Stream stream)
+    public IConnection CreateProtobufConnection(Stream stream)
     {
         return new ProtobufConnection(stream, _fieldNumberCache, _protobuf)
-            .ForClient(_messageSerializer, _messageTypeCache, _clientToServerMessageMetadataFactory);
-    }
-
-    public IConnection CreateProtobufConnectionForServer(Stream stream)
-    {
-        return new ProtobufConnection(stream, _fieldNumberCache, _protobuf)
-            .ForServer(_messageSerializer, _messageTypeCache);
+            .AddCoreMessageSerialization(_messageSerializer, _messageTypeCache, _clientToServerMessageMetadataFactory);
     }
 }

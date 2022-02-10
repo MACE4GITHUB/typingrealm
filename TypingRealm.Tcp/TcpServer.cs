@@ -126,7 +126,7 @@ public sealed class TcpServer : AsyncManagedDisposable
             using var stream = tcpClient.GetStream();
             using var sendLock = new SemaphoreSlimLock();
             using var receiveLock = new SemaphoreSlimLock();
-            var connection = _protobufConnectionFactory.CreateProtobufConnectionForServer(stream)
+            var connection = _protobufConnectionFactory.CreateProtobufConnection(stream)
                 .WithLocking(sendLock, receiveLock);
 
             var task = _connectionHandler

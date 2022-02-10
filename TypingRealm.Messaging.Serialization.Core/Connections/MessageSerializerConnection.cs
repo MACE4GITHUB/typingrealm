@@ -9,14 +9,14 @@ namespace TypingRealm.Messaging.Serialization.Connections;
 /// </summary>
 // TODO: Unit test this class.
 // TODO: Unify with ServerToClient connection.
-public sealed class ClientToServerSendingMessageSerializerConnection : IConnection
+public sealed class MessageSerializerConnection : IConnection
 {
     private readonly IConnection _connection;
     private readonly IMessageSerializer _serializer;
     private readonly IMessageTypeCache _messageTypeCache;
     private readonly IMessageMetadataFactory _metadataFactory;
 
-    public ClientToServerSendingMessageSerializerConnection(
+    public MessageSerializerConnection(
         IConnection connection,
         IMessageSerializer serializer,
         IMessageTypeCache messageTypeCache,
@@ -53,16 +53,17 @@ public sealed class ClientToServerSendingMessageSerializerConnection : IConnecti
 
     public ValueTask SendAsync(object message, CancellationToken cancellationToken)
     {
-        ClientToServerMessageMetadata? metadata = null;
+        MessageMetadata? metadata = null;
         if (message is MessageWithMetadata messageWithMetadata)
         {
             message = messageWithMetadata.Message;
-            metadata = messageWithMetadata.Metadata as ClientToServerMessageMetadata;
+            metadata = messageWithMetadata.Metadata;
         }
 
         var serialized = _serializer.Serialize(message);
         var messageTypeId = _messageTypeCache.GetTypeId(message.GetType());
 
+        // TODO: Analyze this commented out piece of code, consider uncommenting or removing it.
         // TODO: Remove this code and generate metadata above - where we need to save messageId for idempotency (retries).
         // If metadata was sent from user side - use user's metadata, otherwise create for this message.
         /*if (metadata == null)
