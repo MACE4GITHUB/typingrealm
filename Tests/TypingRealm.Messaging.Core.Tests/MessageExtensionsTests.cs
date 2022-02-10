@@ -26,4 +26,16 @@ public class MessageExtensionsTests
         Assert.Equal(AcknowledgementType.Handled, metadata.AcknowledgementType);
         Assert.Null(metadata.MessageId);
     }
+
+    [Theory, AutoMoqData]
+    public void GetMetadataOrEmpty_ShouldGetMetadata_WhenObjectHasMetadata(
+        MessageMetadata metadata,
+        MessageWithMetadata message)
+    {
+        message.Metadata = metadata;
+
+        var result = message.GetMetadataOrEmpty();
+
+        Assert.Equal(metadata, result);
+    }
 }
