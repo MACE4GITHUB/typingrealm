@@ -24,8 +24,10 @@ public class NotificatorConnectionTests : TestsBase
         messageSender.Verify(x => x.SendAsync(message, Cts.Token));
     }
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
+#pragma warning disable S5034 // "ValueTask" should be consumed correctly
     [Theory, AutoMoqData]
-    public async Task ShouldReturnMessageSynchronouslyIfAlreadyReceived(
+    public void ShouldReturnMessageSynchronouslyIfAlreadyReceived(
         [Frozen] Notificator notificator,
         NotificatorConnection sut)
     {
@@ -36,6 +38,8 @@ public class NotificatorConnectionTests : TestsBase
         notificator.NotifyReceived(message);
         Assert.Equal(message, sut.ReceiveAsync(Cts.Token).Result);
     }
+#pragma warning restore CA2012
+#pragma warning restore S5034
 
     [Theory, AutoMoqData]
     public async Task ShouldReturnMessageWhenNotified(

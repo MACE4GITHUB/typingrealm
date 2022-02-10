@@ -80,12 +80,14 @@ public class ReceivedAcknowledgingConnectionTests : TestsBase
 
         await sut.ReceiveAsync(Cts.Token);
 
+#pragma warning disable S2219 // Runtime type checking should be simplified
         connection.Verify(x => x.SendAsync(
             It.Is<MessageWithMetadata>(
-                y => (y.Message is AcknowledgeReceived) != null
+                y => y.Message.GetType() == typeof(AcknowledgeReceived)
                 && ((AcknowledgeReceived)y.Message).MessageId == message.Metadata.MessageId
                 && y.Metadata!.MessageId == message.Metadata.MessageId),
             Cts.Token));
+#pragma warning restore S2219
     }
 
     [Theory, AutoMoqData]
