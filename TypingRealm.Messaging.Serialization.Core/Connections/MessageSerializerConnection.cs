@@ -63,11 +63,9 @@ public sealed class MessageSerializerConnection : IConnection
         var serialized = _serializer.Serialize(message);
         var messageTypeId = _messageTypeCache.GetTypeId(message.GetType());
 
-        // TODO: Analyze this commented out piece of code, consider uncommenting or removing it.
-        // TODO: Remove this code and generate metadata above - where we need to save messageId for idempotency (retries).
         // If metadata was sent from user side - use user's metadata, otherwise create for this message.
-        /*if (metadata == null)
-            metadata = _metadataFactory.CreateFor(message);*/
+        if (metadata == null)
+            metadata = _metadataFactory.CreateFor(message);
 
         var result = new MessageData
         {
