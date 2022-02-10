@@ -4,6 +4,7 @@ using TypingRealm.Messaging.Messages;
 
 namespace TypingRealm.Messaging.Connections;
 
+// Used by server-side ConnectionHandler.
 public sealed class ReceivedAcknowledgingConnection : IConnection
 {
     private readonly IConnection _connection;
@@ -15,8 +16,6 @@ public sealed class ReceivedAcknowledgingConnection : IConnection
 
     public async ValueTask<object> ReceiveAsync(CancellationToken cancellationToken)
     {
-        // TODO: Move this logic to ConnectionHandler so it's always executing on the server.
-        // Or make sure server always uses this connection (probably as well as client, this is universal now).
         var message = await _connection.ReceiveAsync(cancellationToken).ConfigureAwait(false);
         if (message is MessageWithMetadata mwm &&
             (mwm.Message is AcknowledgeReceived || mwm.Message is AcknowledgeHandled))

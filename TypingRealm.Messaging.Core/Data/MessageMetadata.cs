@@ -25,5 +25,5 @@ public class MessageMetadata
     /// </summary>
     public string? ResponseMessageTypeId { get; set; }
 
-    public static MessageMetadata CreateEmpty() => new MessageMetadata();
+    public static MessageMetadata CreateEmpty() => new();
 }
