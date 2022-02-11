@@ -67,7 +67,7 @@ public static class Program
             .AddRopeWarMessages()
             .Services
             .AddProtobuf() // Also adds Protobuf ConnectionFactory.
-            .AddJson() // Serialize messages with JSON instead of Protobuf.
+            .UseJsonMessageSerializer() // Serialize messages with JSON instead of Protobuf.
             .UseTcpProtobufClientConnectionFactory("127.0.0.1", 30112)
             .RegisterClientMessaging();
 
@@ -108,7 +108,7 @@ public static class Program
             .AddTyrAuthenticationMessages()
             .AddRopeWarMessages()
             .Services
-            .AddJson()
+            .UseJsonMessageSerializer()
             .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
             .AddSignalRConnectionFactory()
             .UseSignalRClientConnectionFactory("http://127.0.0.1:30102/hub")
@@ -151,7 +151,7 @@ public static class Program
             .AddTyrAuthenticationMessages()
             .AddTypingDuelsMessages()
             .Services
-            .AddJson()
+            .UseJsonMessageSerializer()
             .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
             .AddSignalRConnectionFactory()
             .UseSignalRClientConnectionFactory("http://127.0.0.1:30404/hub")
@@ -194,7 +194,7 @@ public static class Program
             .AddTyrAuthenticationMessages()
             .AddWorldMessages()
             .Services
-            .AddJson()
+            .UseJsonMessageSerializer()
             .AddProtobufMessageSerializer() // Serialize messages with Protobuf instead of JSON.
             .AddSignalRConnectionFactory()
             .UseSignalRClientConnectionFactory("http://127.0.0.1:30111/hub")

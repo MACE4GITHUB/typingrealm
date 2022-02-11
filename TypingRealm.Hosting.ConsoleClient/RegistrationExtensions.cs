@@ -34,7 +34,7 @@ public static class RegistrationExtensions
 
         services
             .AddCommunication()
-            .AddJson()
+            .UseJsonMessageSerializer()
             .AddProtobufMessageSerializer()
             .RegisterClientMessaging() // Client-specific. TODO: use RegisterClientMessagingBase instead.
             .AddSignalRConnectionFactory()

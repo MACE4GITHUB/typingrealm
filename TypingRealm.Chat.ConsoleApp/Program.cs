@@ -41,7 +41,7 @@ public static class Program
             .AddChatMessages()
             .Services
             .AddProtobuf() // Also adds Protobuf ConnectionFactory.
-            .AddJson() // Serialize messages with JSON instead of Protobuf.
+            .UseJsonMessageSerializer() // Serialize messages with JSON instead of Protobuf.
                        //.UseTcpProtobufClientConnectionFactory("typingrealm.com", 40010)
             .UseTcpProtobufClientConnectionFactory("127.0.0.1", 40010)
             .RegisterClientMessaging()

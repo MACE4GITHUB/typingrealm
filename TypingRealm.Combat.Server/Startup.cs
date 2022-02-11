@@ -21,7 +21,7 @@ public sealed class Startup
         services.AddSerializationCore()
             .AddMessageTypesFromAssembly(typeof(Attacked).Assembly)
             .Services
-            .AddJson()
+            .UseJsonMessageSerializer()
             .RegisterMessaging()
             .RegisterMessageHub();
 

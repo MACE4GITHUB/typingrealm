@@ -31,7 +31,7 @@ public static class RegistrationExtensions
 
         // Use this to serialize/deserialize messages in JSON instead of protobuf base64 string.
         // This can be removed for total Protobuf serialization mode.
-        services.AddJson();
+        services.UseJsonMessageSerializer();
 
         return builder;
     }
@@ -50,7 +50,7 @@ public static class RegistrationExtensions
         services.RegisterMessageHub();
 
         // Message serialization.
-        services.AddJson();
+        services.UseJsonMessageSerializer();
 
         // Use this to enable protobuf base64 string message serializer instead of json.
         // This can be removed for total JSON serialization mode.
