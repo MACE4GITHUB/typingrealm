@@ -6,7 +6,6 @@ namespace TypingRealm.Messaging.Serialization;
 /// These methods SHOULD be called on the lowest-level <see cref="IConnection"/>
 /// instance that is getting raw <see cref="MessageData"/> objects.
 /// </summary>
-// TODO: Unit test this class.
 public static class ConnectionExtensions
 {
     /// <summary>

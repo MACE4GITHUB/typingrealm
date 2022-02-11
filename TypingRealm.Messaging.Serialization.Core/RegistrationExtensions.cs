@@ -17,6 +17,7 @@ public static class RegistrationExtensions
         // !!! but then we also need to split client and server versions of protobuf/signalr connection factories, so it's easier to just always register these types.
         services.AddTransient<IMessageMetadataFactory, MessageMetadataFactory>();
 
+        // TODO: Make sure it works from the server side as well (scoped preferred?).
         // This is used only from the client so no need to register it as Scoped.
         // And it won't work as scoped because it is injected into singletone TCP/SignalR Server classes.
         services.AddSingleton<IMessageIdFactory, MessageIdFactory>();
