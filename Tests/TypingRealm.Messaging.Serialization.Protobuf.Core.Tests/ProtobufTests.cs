@@ -14,7 +14,7 @@ public class ProtobufTests : TestsBase
     [Fact]
     public void ShouldAddAllTypesToRuntimeTypeModel_WhenCreated()
     {
-        var sut = new ProtobufStreamSerializer(new[] { typeof(AMessage), typeof(BMessage) });
+        var sut = new ProtobufStreamSerializer(new[] { typeof(AMessage), typeof(BMessage) }, null!);
         var typeMembers = ((RuntimeTypeModel)GetPrivateProperty(sut, "Model")!).GetTypes().Cast<MetaType>()
             .Select(x => x.Type);
 
@@ -27,7 +27,7 @@ public class ProtobufTests : TestsBase
     public void ShouldSerializeAndDeserialize()
     {
         var message = Create<CMessage>();
-        var protobuf = new ProtobufStreamSerializer(new[] { typeof(CMessage) });
+        var protobuf = new ProtobufStreamSerializer(new[] { typeof(CMessage) }, null!);
 
         using var stream = new MemoryStream();
         protobuf.Serialize(stream, message, 3);

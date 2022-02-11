@@ -14,10 +14,9 @@ public interface IProtobufStreamSerializer
     void Serialize(Stream destination, object instance, int fieldNumber);
 }
 
-// TODO: Unit test this class. Possibly together with ProtobufMessageSerializer.
 public sealed class ProtobufStreamSerializer : ProtobufRuntimeModelSerializer, IProtobufStreamSerializer
 {
-    public ProtobufStreamSerializer(IEnumerable<Type> types) : base(types) { }
+    public ProtobufStreamSerializer(IEnumerable<Type> types, IDictionary<Type, IEnumerable<Type>> subTypes) : base(types, subTypes) { }
 
     public object Deserialize(Stream source, Func<int, Type> typeResolver)
     {
@@ -42,9 +41,9 @@ public sealed class ProtobufStreamSerializer : ProtobufRuntimeModelSerializer, I
             destination, instance, instance.GetType(), PrefixStyle.Base128, fieldNumber);
     }
 
-    private bool TryDeserializeWithLengthPrefix(Stream source, PrefixStyle style, ProtoBuf.TypeResolver resolver, out object value)
+    private bool TryDeserializeWithLengthPrefix(Stream source, PrefixStyle style, TypeResolver resolver, out object value)
     {
         value = Model.DeserializeWithLengthPrefix(source, null, null, style, 0, resolver);
-        return value is object;
+        return value is not null;
     }
 }

@@ -19,7 +19,7 @@ public class ProtobufIntegrationTests : TestsBase
         TestMessage message,
         List<string> list)
     {
-        var protobuf = new ProtobufStreamSerializer(Array.Empty<Type>());
+        var protobuf = new ProtobufStreamSerializer(Array.Empty<Type>(), null!);
 
         var sut = new ProtobufConnection(stream, cache.Object, protobuf);
 

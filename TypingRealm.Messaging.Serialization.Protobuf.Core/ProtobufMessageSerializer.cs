@@ -4,7 +4,8 @@ using System.IO;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf;
 
-// TODO: Unit test this class. Possibly together with ProtobufStreamSerializer.
+// TODO: Implement nested types serialization even when they are not marked by Message attribute.
+// Unit test this new feature (uncomment related test code and unit test nested types).
 public sealed class ProtobufMessageSerializer : ProtobufRuntimeModelSerializer, IMessageSerializer
 {
     public ProtobufMessageSerializer(IEnumerable<Type> types) : base(types) { }
