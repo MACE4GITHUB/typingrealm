@@ -1,34 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ProtoBuf;
-using ProtoBuf.Meta;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf;
 
-// TODO: Unit test this class. Possibly together with ProtobufMessageSerializer.
-public sealed class ProtobufStreamSerializer : IProtobufStreamSerializer
+/// <summary>
+/// Wrapper around Protobuf implementation.
+/// </summary>
+public interface IProtobufStreamSerializer
 {
-    private readonly RuntimeTypeModel _model;
+    object Deserialize(Stream source, Func<int, Type> typeResolver);
+    void Serialize(Stream destination, object instance, int fieldNumber);
+}
 
-    public ProtobufStreamSerializer(IEnumerable<Type> types)
-    {
-        _model = RuntimeTypeModel.Create();
-
-        foreach (var type in types)
-        {
-            _model.Add(type, false)
-                .Add(type
-                    .GetProperties()
-                    .Select(property => property.Name)
-                    .OrderBy(name => name)
-                    .ToArray());
-        }
-
-        // TODO: uncomment this for better performance.
-        //_model.Compile();
-    }
+public sealed class ProtobufStreamSerializer : ProtobufRuntimeModelSerializer, IProtobufStreamSerializer
+{
+    public ProtobufStreamSerializer(IEnumerable<Type> types, IDictionary<Type, IEnumerable<Type>> subTypes) : base(types, subTypes) { }
 
     public object Deserialize(Stream source, Func<int, Type> typeResolver)
     {
@@ -49,13 +37,13 @@ public sealed class ProtobufStreamSerializer : IProtobufStreamSerializer
         if (instance is null)
             throw new ArgumentNullException(nameof(instance));
 
-        _model.SerializeWithLengthPrefix(
+        Model.SerializeWithLengthPrefix(
             destination, instance, instance.GetType(), PrefixStyle.Base128, fieldNumber);
     }
 
-    private bool TryDeserializeWithLengthPrefix(Stream source, PrefixStyle style, ProtoBuf.TypeResolver resolver, out object value)
+    private bool TryDeserializeWithLengthPrefix(Stream source, PrefixStyle style, TypeResolver resolver, out object value)
     {
-        value = _model.DeserializeWithLengthPrefix(source, null, null, style, 0, resolver);
-        return value is object;
+        value = Model.DeserializeWithLengthPrefix(source, null, null, style, 0, resolver);
+        return value is not null;
     }
 }

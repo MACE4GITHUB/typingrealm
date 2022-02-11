@@ -93,6 +93,11 @@ public abstract class TestsBase : IDisposable
         .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)?
         .GetValue(instance);
 
+    protected static object? GetPrivateProperty(object instance, string propertyName) => instance
+        .GetType()
+        .GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic)?
+        .GetValue(instance);
+
     /// <summary>
     /// Gets new ServiceCollection with enabled Logging and Serialization.
     /// Can be overridden to register additional dependencies by default.

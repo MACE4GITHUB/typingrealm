@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf;
@@ -19,7 +21,10 @@ public static class RegistrationExtensions
             {
                     typeof(MessageData),
                     typeof(MessageMetadata),
-                    typeof(ClientToServerMessageMetadata)
+                    typeof(ClientToServerMessageMetadata) // This is needed so that properties of this class are serialized.
+            }, new Dictionary<Type, IEnumerable<Type>>
+            {
+                [typeof(MessageMetadata)] = new[] { typeof(ClientToServerMessageMetadata) } // This is needed so that Protobuf knows about derived types.
             });
         });
 
