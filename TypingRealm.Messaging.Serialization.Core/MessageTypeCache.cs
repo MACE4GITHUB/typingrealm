@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TypingRealm.Messaging.Serialization.Json;
 
 namespace TypingRealm.Messaging.Serialization;
 
@@ -46,14 +45,18 @@ public sealed class MessageTypeCache : IMessageTypeCache
             .OrderBy(type => type.FullName)
             .ToList();
 
+        // TODO: Make sure protobuf works over multiple servers with new implementation.
         // This is a temporary hack so that protobuf works with multiple servers
-        // when Json is enabled. JsonSerializedMessage will always be the first message,
+        // when Json is enabled. MessageData will always be the first message,
         // hence protobuf field number for it will always be "1" for any servers.
-        var jsonSerializedMessage = types.SingleOrDefault(type => type == typeof(JsonSerializedMessage));
-        if (jsonSerializedMessage != null)
+        // TODO: Make sure we really need this and protobuf will be used to basically serialize a single message over network.
+        var messageData = types.SingleOrDefault(type => type == typeof(MessageData));
+        if (messageData != null)
         {
-            types.Remove(jsonSerializedMessage);
-            types = new[] { jsonSerializedMessage }.Concat(types).ToList();
+            types.Remove(messageData);
+
+            // TODO: Consider adding MessageData always, even if it wasn't passed here.
+            types = new[] { typeof(MessageData) }.Concat(types).ToList();
         }
 
         return types

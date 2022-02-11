@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using TypingRealm.Messaging.Serialization.Json;
 using Xunit;
 
 namespace TypingRealm.Messaging.Serialization.A
@@ -90,14 +89,14 @@ namespace TypingRealm.Messaging.Serialization.Tests
             var sut = new MessageTypeCache(new[]
             {
                 typeof(A.DTestMessage),
-                typeof(JsonSerializedMessage),
+                typeof(MessageData),
                 typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage)
             });
 
             var list = sut.GetAllTypes().ToDictionary(x => x.Key, x => x.Value)
                 .ToList();
 
-            Assert.Equal(typeof(JsonSerializedMessage), list[0].Value);
+            Assert.Equal(typeof(MessageData), list[0].Value);
             Assert.Equal(typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage), list[1].Value);
             Assert.Equal(typeof(A.DTestMessage), list[2].Value);
         }
