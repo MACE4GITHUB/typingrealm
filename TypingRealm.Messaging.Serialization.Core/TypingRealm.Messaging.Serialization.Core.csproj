@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Messaging.Core\TypingRealm.Messaging.Core.csproj" />
+    <ProjectReference Include="..\TypingRealm.Serialization\TypingRealm.Serialization.csproj" />
   </ItemGroup>
 
 </Project>

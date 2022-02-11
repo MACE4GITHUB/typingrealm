@@ -7,6 +7,7 @@ namespace TypingRealm.Serialization;
 public interface ISerializer
 {
     T? Deserialize<T>(string json);
+    object? Deserialize(string json, Type type);
     string Serialize<T>(T value);
 }
 
@@ -30,6 +31,14 @@ public sealed class Serializer : ISerializer
             return (T)Convert.ChangeType(json, typeof(T));
 
         return JsonSerializer.Deserialize<T>(json, _options);
+    }
+
+    public object? Deserialize(string json, Type type)
+    {
+        if (type.IsPrimitive || type == typeof(string))
+            return Convert.ChangeType(json, type);
+
+        return JsonSerializer.Deserialize(json, type, _options);
     }
 
     public string Serialize<T>(T value)

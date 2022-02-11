@@ -1,26 +1,25 @@
 ﻿using System;
-using System.Text.Json;
+using TypingRealm.Serialization;
 
 namespace TypingRealm.Messaging.Serialization.Json;
 
-// TODO: Unit test this class.
 public sealed class JsonMessageSerializer : IMessageSerializer
 {
-    private readonly JsonSerializerOptions _options;
+    private readonly ISerializer _serializer;
 
-    public JsonMessageSerializer(JsonSerializerOptions options)
+    public JsonMessageSerializer(ISerializer serializer)
     {
-        _options = options;
+        _serializer = serializer;
     }
 
     public object Deserialize(string data, Type messageType)
     {
-        return JsonSerializer.Deserialize(data, messageType, _options)
+        return _serializer.Deserialize(data, messageType)
             ?? throw new InvalidOperationException($"Could not deserialize message of type {messageType.Name}.");
     }
 
     public string Serialize(object instance)
     {
-        return JsonSerializer.Serialize(instance, _options);
+        return _serializer.Serialize(instance);
     }
 }
