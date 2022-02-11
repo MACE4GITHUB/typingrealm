@@ -16,6 +16,7 @@ public class RegistrationExtensionsTests : TestsBase
     {
         var sut = new ServiceCollection();
         sut.AddSerializationCore();
+
         sut.AddProtobuf();
 
         var provider = sut.BuildServiceProvider();
@@ -46,7 +47,7 @@ public class RegistrationExtensionsTests : TestsBase
         provider.AssertRegisteredTransient<IProtobufStreamSerializer, ProtobufStreamSerializer>();
 
         var serializer = provider.GetRequiredService<IProtobufStreamSerializer>();
-        var typeMembers = ((RuntimeTypeModel)GetPrivateField(serializer, "_model")!).GetTypes().Cast<MetaType>()
+        var typeMembers = ((RuntimeTypeModel)GetPrivateProperty(serializer, "Model")!).GetTypes().Cast<MetaType>()
             .Select(x => x.Type)
             .ToList();
 
@@ -87,7 +88,7 @@ public class RegistrationExtensionsTests : TestsBase
 
         var serializer = provider.GetRequiredService<IMessageSerializer>();
 
-        var registeredTypes = ((RuntimeTypeModel)GetPrivateField(serializer, "_model")!).GetTypes().Cast<MetaType>()
+        var registeredTypes = ((RuntimeTypeModel)GetPrivateProperty(serializer, "Model")!).GetTypes().Cast<MetaType>()
             .Select(t => t.Type)
             .ToList();
 
@@ -117,7 +118,7 @@ public class RegistrationExtensionsTests : TestsBase
 
         var serializer = provider.GetRequiredService<IMessageSerializer>();
 
-        var registeredTypes = ((RuntimeTypeModel)GetPrivateField(serializer, "_model")!).GetTypes().Cast<MetaType>()
+        var registeredTypes = ((RuntimeTypeModel)GetPrivateProperty(serializer, "Model")!).GetTypes().Cast<MetaType>()
             .Select(t => t.Type)
             .ToList();
 
@@ -154,7 +155,7 @@ public class RegistrationExtensionsTests : TestsBase
             .Returns(types);
 
         var protobuf = provider.GetRequiredService<IProtobufStreamSerializer>();
-        var registeredTypes = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
+        var registeredTypes = ((RuntimeTypeModel)GetPrivateProperty(protobuf, "Model")!).GetTypes().Cast<MetaType>()
             .Select(t => t.Type)
             .ToList();
         Assert.Equal(3, registeredTypes.Count);
@@ -162,7 +163,7 @@ public class RegistrationExtensionsTests : TestsBase
         Assert.Contains(typeof(MessageMetadata), registeredTypes);
         Assert.Contains(typeof(ClientToServerMessageMetadata), registeredTypes);
 
-        var typeMembers = ((RuntimeTypeModel)GetPrivateField(protobuf, "_model")!).GetTypes().Cast<MetaType>()
+        var typeMembers = ((RuntimeTypeModel)GetPrivateProperty(protobuf, "Model")!).GetTypes().Cast<MetaType>()
             .Single(x => x.Type == typeof(MessageData))
             .GetFields()
             .ToList();

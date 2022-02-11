@@ -15,7 +15,7 @@ public class ProtobufTests : TestsBase
     public void ShouldAddAllTypesToRuntimeTypeModel_WhenCreated()
     {
         var sut = new ProtobufStreamSerializer(new[] { typeof(AMessage), typeof(BMessage) });
-        var typeMembers = ((RuntimeTypeModel)GetPrivateField(sut, "_model")!).GetTypes().Cast<MetaType>()
+        var typeMembers = ((RuntimeTypeModel)GetPrivateProperty(sut, "Model")!).GetTypes().Cast<MetaType>()
             .Select(x => x.Type);
 
         Assert.Contains(typeof(AMessage), typeMembers);

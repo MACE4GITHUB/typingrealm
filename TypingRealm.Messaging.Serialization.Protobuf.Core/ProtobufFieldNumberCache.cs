@@ -4,6 +4,15 @@ using System.Linq;
 
 namespace TypingRealm.Messaging.Serialization.Protobuf;
 
+/// <summary>
+/// Additional layer between <see cref="IMessageTypeCache"/> and Protobuf FieldNumber.
+/// </summary>
+public interface IProtobufFieldNumberCache
+{
+    Type GetTypeByFieldNumber(int fieldNumber);
+    int GetFieldNumber(Type type);
+}
+
 public sealed class ProtobufFieldNumberCache : IProtobufFieldNumberCache
 {
     private readonly Dictionary<int, Type> _fieldNumberToType;
