@@ -269,6 +269,9 @@ dotnet_diagnostic.S3881.severity = silent
 # Review this from time to time (enable, review, disable).
 dotnet_diagnostic.IDE0046.severity = silent
 
+# Temporarily hide TODO comments for cleaner picture.
+# Review this from time to time (enable, review, disable).
+dotnet_diagnostic.S1135.severity = silent
 
 
 # === Tests ===
