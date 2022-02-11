@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoFixture.Xunit2;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Messaging.Serialization.Json;
 using TypingRealm.Serialization;
@@ -47,5 +48,15 @@ public class JsonMessageSerializerTests : TestsBase
 
         var result = sut.Serialize(data);
         Assert.Equal(serialized, result);
+    }
+
+    [Fact]
+    public void ShouldBeRegistered()
+    {
+        var provider = GetServiceCollection()
+            .UseJsonMessageSerializer()
+            .BuildServiceProvider();
+
+        provider.AssertRegisteredTransient<IMessageSerializer, JsonMessageSerializer>();
     }
 }

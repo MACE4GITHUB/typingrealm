@@ -11,6 +11,7 @@ using AutoFixture.Kernel;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Messaging;
+using TypingRealm.Serialization;
 using Xunit;
 
 namespace TypingRealm.Testing;
@@ -93,13 +94,14 @@ public abstract class TestsBase : IDisposable
         .GetValue(instance);
 
     /// <summary>
-    /// Gets new ServiceCollection with enabled Logging. Can be overridden to
-    /// register additional dependencies by default.
+    /// Gets new ServiceCollection with enabled Logging and Serialization.
+    /// Can be overridden to register additional dependencies by default.
     /// </summary>
     protected virtual IServiceCollection GetServiceCollection()
     {
         return new ServiceCollection()
-            .AddLogging();
+            .AddLogging()
+            .AddSerialization();
     }
 
     /// <summary>
