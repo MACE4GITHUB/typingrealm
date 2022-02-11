@@ -30,21 +30,7 @@ public static class RegistrationExtensions
         return builder.AddMessageTypesFromAssembly(typeof(Authenticate).Assembly);
     }
 
-    /// <summary>
-    /// Use this method in domains that need to authenticate properly.
-    /// </summary>
-    // TODO: FORCE this method whenever we are not using character authentication.
-    // We can't allow people to use random ClientIds.
-    // Rethink the whole architecture here, possibly refactor.
-    public static IServiceCollection AddAuthorizeConnectHook(this IServiceCollection services)
-    {
-        // Authorize Character: first message after authentication should be
-        // Connect message with valid Character belonging to current Profile.
-        services.AddTransient<IConnectHook, AuthorizeConnectHook>();
-
-        return services;
-    }
-
+    // TODO: Refactor this method, it won't work anymore with current Authentication approach.
     /// <summary>
     /// Use this method in domains that need to check that Character belongs to the actual Profile.
     /// </summary>
@@ -70,7 +56,9 @@ public static class RegistrationExtensions
         services.AddScoped<IConnectedClientContext, ConnectedClientContext>();
         services.AddTransient<IProfileTokenService, ConnectedClientProfileTokenService>();
 
+        // TODO: Make a possibility to switch to CharacterAuthentication (Connect message) here before AuthenticateConnectionInitializer decorator.
         // Wait for Authenticate message with valid token as the first message.
+        services.AddTransient<IConnectionInitializer, UserProfileConnectionInitializer>();
         services.Decorate<IConnectionInitializer, AuthenticateConnectionInitializer>();
 
         // To query Characters API.
