@@ -27,6 +27,8 @@ public class ProtobufTests : TestsBase
     public void ShouldSerializeAndDeserialize()
     {
         var message = Create<CMessage>();
+        message.Value = Create<string>();
+
         var protobuf = new ProtobufStreamSerializer(new[] { typeof(CMessage) }, null!);
 
         using var stream = new MemoryStream();
@@ -41,6 +43,7 @@ public class ProtobufTests : TestsBase
             throw new InvalidOperationException();
         });
 
+        Assert.NotNull(message.Value);
         Assert.Equal(message.Value, result.Value);
     }
 }

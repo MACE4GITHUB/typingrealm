@@ -36,7 +36,7 @@ public static class RegistrationExtensions
 
     public static IServiceCollection AddProtobufMessageSerializer(this IServiceCollection services)
     {
-        // TODO: It SHOULD be transient so other types can be registered as well (json after protobuf).
+        // TODO: MAJOR It SHOULD be transient so other types can be registered as well (json after protobuf).
         // But we can register a list of all types as singletone not to calculate it every time.
         // Or change implementation so that it takes the list from cache.
         services.AddTransient<IMessageSerializer>(provider =>

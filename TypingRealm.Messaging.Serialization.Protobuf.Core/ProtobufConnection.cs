@@ -24,6 +24,7 @@ public sealed class ProtobufConnection : IConnection
         _protobuf = protobuf;
     }
 
+#pragma warning disable CA1835 // Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'
     public async ValueTask<object> ReceiveAsync(CancellationToken cancellationToken)
     {
         // Use trick to wait asynchronously until there is something in the stream.
@@ -49,4 +50,5 @@ public sealed class ProtobufConnection : IConnection
         await _stream.WriteAsync(memoryStream.GetBuffer(), 0, (int)memoryStream.Position, cancellationToken)
             .ConfigureAwait(false);
     }
+#pragma warning restore CA1835
 }

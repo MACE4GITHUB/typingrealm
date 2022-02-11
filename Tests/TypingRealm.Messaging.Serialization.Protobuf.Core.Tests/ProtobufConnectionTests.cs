@@ -63,7 +63,7 @@ public class ProtobufConnectionTests : TestsBase
         Assert.NotEmpty(writtenBytes);
         var resultBytes = new byte[writtenBytes.Length];
         stream.Seek(0, SeekOrigin.Begin);
-        stream.Read(resultBytes, 0, writtenBytes.Length);
+        await stream.ReadAsync(resultBytes.AsMemory(0, writtenBytes.Length));
         Assert.Equal(writtenBytes, resultBytes);
     }
 
@@ -71,16 +71,16 @@ public class ProtobufConnectionTests : TestsBase
     {
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            await Task.Delay(100);
+            await Task.Delay(100, cancellationToken);
 
-            return await base.ReadAsync(buffer, offset, count, cancellationToken);
+            return await base.ReadAsync(buffer.AsMemory(offset, count), cancellationToken);
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            await Task.Delay(100);
+            await Task.Delay(100, cancellationToken);
 
-            await base.WriteAsync(buffer, offset, count, cancellationToken);
+            await base.WriteAsync(buffer.AsMemory(offset, count), cancellationToken);
         }
     }
     [Theory, AutoMoqData]
@@ -89,7 +89,7 @@ public class ProtobufConnectionTests : TestsBase
         Mock<IProtobufFieldNumberCache> cache,
         TestMessage message)
     {
-        var stream = new TestStream();
+        using var stream = new TestStream();
         Fixture.Register<Stream>(() => stream);
         Fixture.Register<IProtobufStreamSerializer>(() => protobuf.Object);
         Fixture.Register<IProtobufFieldNumberCache>(() => cache.Object);
@@ -113,7 +113,7 @@ public class ProtobufConnectionTests : TestsBase
         byte[] writtenBytes,
         TestMessage message)
     {
-        var stream = new TestStream();
+        using var stream = new TestStream();
         Fixture.Register<Stream>(() => stream);
         Fixture.Register<IProtobufStreamSerializer>(() => protobuf.Object);
         Fixture.Register<IProtobufFieldNumberCache>(() => cache.Object);
@@ -142,7 +142,7 @@ public class ProtobufConnectionTests : TestsBase
         Assert.NotEmpty(writtenBytes);
         var resultBytes = new byte[writtenBytes.Length];
         stream.Seek(0, SeekOrigin.Begin);
-        stream.Read(resultBytes, 0, writtenBytes.Length);
+        await stream.ReadAsync(resultBytes.AsMemory(0, writtenBytes.Length));
         Assert.Equal(writtenBytes, resultBytes);
     }
 }

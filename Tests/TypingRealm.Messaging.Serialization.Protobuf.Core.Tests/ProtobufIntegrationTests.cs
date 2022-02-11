@@ -17,7 +17,7 @@ public class ProtobufIntegrationTests : TestsBase
         [Frozen] Stream stream,
         [Frozen] Mock<IProtobufFieldNumberCache> cache,
         TestMessage message,
-        List<string> list)
+        ICollection<string> list)
     {
         var protobuf = new ProtobufStreamSerializer(Array.Empty<Type>(), null!);
 

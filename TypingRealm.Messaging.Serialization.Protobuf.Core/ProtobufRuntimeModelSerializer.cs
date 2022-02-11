@@ -34,6 +34,6 @@ public abstract class ProtobufRuntimeModelSerializer
         }
 
         // TODO: uncomment this for better performance.
-        //Model.Compile();
+        ////Model.Compile();
     }
 }

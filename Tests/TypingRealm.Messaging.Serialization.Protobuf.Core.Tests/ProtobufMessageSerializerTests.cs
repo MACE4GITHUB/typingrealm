@@ -18,17 +18,17 @@ public class ProtobufMessageSerializerTests
         public int Age { get; set; }
         public IEnumerable<string> Values { get; set; }
 
-        // Uncomment this after it's implemented:
+        // TODO: Uncomment this after it's implemented:
         // Implement nested types serialization even when they are not marked by Message attribute.
-        //public SecondMessage Message { get; set; }
-        //public IEnumerable<SecondMessage> SecondValues { get; set; }
+        ////public SecondMessage Message { get; set; }
+        ////public IEnumerable<SecondMessage> SecondValues { get; set; }
     }
 
-    /*public class SecondMessage
-    {
-        public int Age { get; set; }
-        public List<string> Values { get; set; }
-    }*/
+    ////public class SecondMessage
+    ////{
+        ////public int Age { get; set; }
+        ////public List<string> Values { get; set; }
+    ////}
 #pragma warning restore CS8618
 
     [Fact]
