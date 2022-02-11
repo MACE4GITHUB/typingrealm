@@ -16,7 +16,7 @@ public class ProtobufConnectionTests : TestsBase
         [Frozen] Mock<IProtobufStreamSerializer> protobuf,
         [Frozen] Mock<IProtobufFieldNumberCache> cache,
         TestMessage message,
-        ProtobufConnectionDeprecated sut)
+        ProtobufConnection sut)
     {
         cache.Setup(x => x.GetTypeByFieldNumber(5)).Returns(typeof(TestMessage));
 
@@ -36,7 +36,7 @@ public class ProtobufConnectionTests : TestsBase
         [Frozen] Mock<IProtobufFieldNumberCache> cache,
         byte[] writtenBytes,
         TestMessage message,
-        ProtobufConnectionDeprecated sut)
+        ProtobufConnection sut)
     {
         cache.Setup(x => x.GetFieldNumber(typeof(TestMessage)))
             .Returns(5);

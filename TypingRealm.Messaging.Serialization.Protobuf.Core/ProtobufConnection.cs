@@ -42,8 +42,7 @@ public sealed class ProtobufConnection : IConnection
     {
         using var memoryStream = new MemoryStream();
 
-        var fieldNumber = Convert.ToInt32(
-            _fieldNumberCache.GetFieldNumber(message.GetType()));
+        var fieldNumber = _fieldNumberCache.GetFieldNumber(message.GetType());
 
         _protobuf.Serialize(memoryStream, message, fieldNumber);
 
