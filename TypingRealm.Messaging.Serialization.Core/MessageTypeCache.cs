@@ -5,6 +5,16 @@ using System.Linq;
 namespace TypingRealm.Messaging.Serialization;
 
 /// <summary>
+/// The cache stores mapping between message type and its string identity.
+/// </summary>
+public interface IMessageTypeCache
+{
+    Type GetTypeById(string typeId);
+    string GetTypeId(Type type);
+    IEnumerable<KeyValuePair<string, Type>> GetAllTypes();
+}
+
+/// <summary>
 /// The cache stores mapping between message type and its identity.
 /// </summary>
 public sealed class MessageTypeCache : IMessageTypeCache
@@ -62,7 +72,6 @@ public sealed class MessageTypeCache : IMessageTypeCache
         return types
             .Select((type, index) => new
             {
-                    // TODO: Unit test this exception or change implementation.
                     TypeId = type.FullName ?? throw new InvalidOperationException("Type doesn't have name."),
                 Type = type
             })

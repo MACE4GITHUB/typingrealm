@@ -1,6 +1,17 @@
 ﻿using System;
 using System.Linq;
+using Moq;
+using TypingRealm.Messaging;
+using TypingRealm.Testing;
 using Xunit;
+
+namespace Abc
+{
+    [Message]
+    public class Test
+    {
+    }
+}
 
 namespace TypingRealm.Messaging.Serialization.A
 {
@@ -84,21 +95,23 @@ namespace TypingRealm.Messaging.Serialization.Tests
         }
 
         [Fact]
-        public void ShouldPutJsonSerializedMessageAtFirstPlace()
+        public void ShouldPutMessageDataMessageAtFirstPlace()
         {
             var sut = new MessageTypeCache(new[]
             {
                 typeof(A.DTestMessage),
                 typeof(MessageData),
-                typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage)
+                typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage),
+                typeof(Abc.Test)
             });
 
             var list = sut.GetAllTypes().ToDictionary(x => x.Key, x => x.Value)
                 .ToList();
 
             Assert.Equal(typeof(MessageData), list[0].Value);
-            Assert.Equal(typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage), list[1].Value);
-            Assert.Equal(typeof(A.DTestMessage), list[2].Value);
+            Assert.Equal(typeof(Abc.Test), list[1].Value);
+            Assert.Equal(typeof(Serialization.A.ATestMessageBeforeJsonSerializedMessage), list[2].Value);
+            Assert.Equal(typeof(A.DTestMessage), list[3].Value);
         }
 
         [Fact]
@@ -129,6 +142,15 @@ namespace TypingRealm.Messaging.Serialization.Tests
             var sut = new MessageTypeCache(new[] { typeof(A.BTestMessage) });
             Assert.Throws<InvalidOperationException>(
                 () => sut.GetTypeId(typeof(B.CTestMessage)));
+        }
+
+        [Theory, AutoMoqData]
+        public void ShouldThrow_WhenTypeDoesNotHaveFullName(Mock<Type> type)
+        {
+            type.Setup(x => x.FullName).Returns((string?)null);
+
+            Assert.Throws<InvalidOperationException>(
+                () => new MessageTypeCache(new[] { typeof(A.BTestMessage), type.Object }));
         }
     }
 }
