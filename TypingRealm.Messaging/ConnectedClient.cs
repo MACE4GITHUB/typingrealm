@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging.Updating;
 
@@ -15,7 +14,6 @@ namespace TypingRealm.Messaging;
 public sealed class ConnectedClient
 {
     private readonly IUpdateDetector _updateDetector;
-    private string? _singleGroup;
     private readonly HashSet<string> _groups
         = new HashSet<string>();
 
@@ -37,7 +35,7 @@ public sealed class ConnectedClient
         string group)
         : this(clientId, connection, updateDetector)
     {
-        _singleGroup = group;
+        _groups = new(new[] { group });
     }
 
     public ConnectedClient(
@@ -47,10 +45,10 @@ public sealed class ConnectedClient
         IEnumerable<string> groups)
         : this(clientId, connection, updateDetector)
     {
-        _groups = new HashSet<string>(groups);
+        _groups = new(groups);
     }
 
-    public ConnectedClient(
+    private ConnectedClient(
         string clientId,
         IConnection connection,
         IUpdateDetector updateDetector)
@@ -77,23 +75,23 @@ public sealed class ConnectedClient
     /// </summary>
     public string Group
     {
-        get => _singleGroup ?? throw new InvalidOperationException("Single group has not been set.");
+        get => _groups.Single();
         set
         {
-            if (_singleGroup == value)
+            // TODO: Lock or make sure this operation is atomical.
+            var currentGroup = _groups.Single();
+            if (currentGroup == value)
                 return;
 
-            if (_singleGroup != null)
-                _updateDetector.MarkForUpdate(_singleGroup);
+            _groups.Remove(currentGroup);
+            _groups.Add(value);
 
-            _singleGroup = value;
-            _updateDetector.MarkForUpdate(_singleGroup);
+            _updateDetector.MarkForUpdate(currentGroup);
+            _updateDetector.MarkForUpdate(value);
         }
     }
 
-    public IEnumerable<string> Groups => _singleGroup == null
-        ? _groups
-        : _groups.Append(_singleGroup);
+    public IEnumerable<string> Groups => _groups;
 
     public void AddToGroup(string group)
     {
