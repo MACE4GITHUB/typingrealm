@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TypingRealm.Messaging.Updating;
 
@@ -73,6 +74,7 @@ public sealed class ConnectedClient
     /// update detector for changes so that both previous and new groups are
     /// updated on the next update cycle.
     /// </summary>
+    [Obsolete($"Use {nameof(Groups)} property instead, or extension method GetSingleGroupOrDefault or GetSingleGroupOrThrow.")]
     public string Group
     {
         get => _groups.Single();
