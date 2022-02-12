@@ -74,23 +74,11 @@ public sealed class ConnectedClient
     /// update detector for changes so that both previous and new groups are
     /// updated on the next update cycle.
     /// </summary>
-    [Obsolete($"Use {nameof(Groups)} property instead, or extension method GetSingleGroupOrDefault or GetSingleGroupOrThrow.")]
+    [Obsolete($"Use {nameof(Groups)} property instead, or extension method GetSingleGroupOrDefault or GetSingleGroupOrThrow. For setting the single group use SetGroup method.")]
     public string Group
     {
         get => _groups.Single();
-        set
-        {
-            // TODO: Lock or make sure this operation is atomical.
-            var currentGroup = _groups.Single();
-            if (currentGroup == value)
-                return;
-
-            _groups.Remove(currentGroup);
-            _groups.Add(value);
-
-            _updateDetector.MarkForUpdate(currentGroup);
-            _updateDetector.MarkForUpdate(value);
-        }
+        set => this.SetGroup(value);
     }
 
     public IEnumerable<string> Groups => _groups;
