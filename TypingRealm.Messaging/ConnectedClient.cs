@@ -15,7 +15,6 @@ namespace TypingRealm.Messaging;
 public sealed class ConnectedClient
 {
     private readonly IUpdateDetector _updateDetector;
-    private string? _singleGroup;
     private readonly HashSet<string> _groups
         = new HashSet<string>();
 
@@ -37,7 +36,7 @@ public sealed class ConnectedClient
         string group)
         : this(clientId, connection, updateDetector)
     {
-        _singleGroup = group;
+        _groups = new(new[] { group });
     }
 
     public ConnectedClient(
@@ -47,10 +46,10 @@ public sealed class ConnectedClient
         IEnumerable<string> groups)
         : this(clientId, connection, updateDetector)
     {
-        _groups = new HashSet<string>(groups);
+        _groups = new(groups);
     }
 
-    public ConnectedClient(
+    private ConnectedClient(
         string clientId,
         IConnection connection,
         IUpdateDetector updateDetector)
@@ -75,25 +74,14 @@ public sealed class ConnectedClient
     /// update detector for changes so that both previous and new groups are
     /// updated on the next update cycle.
     /// </summary>
+    [Obsolete($"Use {nameof(Groups)} property instead, or extension method GetSingleGroupOrDefault or GetSingleGroupOrThrow. For setting the single group use SetGroup method.")]
     public string Group
     {
-        get => _singleGroup ?? throw new InvalidOperationException("Single group has not been set.");
-        set
-        {
-            if (_singleGroup == value)
-                return;
-
-            if (_singleGroup != null)
-                _updateDetector.MarkForUpdate(_singleGroup);
-
-            _singleGroup = value;
-            _updateDetector.MarkForUpdate(_singleGroup);
-        }
+        get => _groups.Single();
+        set => this.SetGroup(value);
     }
 
-    public IEnumerable<string> Groups => _singleGroup == null
-        ? _groups
-        : _groups.Append(_singleGroup);
+    public IEnumerable<string> Groups => _groups;
 
     public void AddToGroup(string group)
     {

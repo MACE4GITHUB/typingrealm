@@ -64,14 +64,14 @@ public class ConnectedClientStoreTests : MessagingTestsBase
     }
 
     [Theory, MultiGroupData]
-    public void Add_ShouldMarkForUpdateMultipleGroupsAndSingleGroup_WhenAdded(
+    public void Add_ShouldMarkForUpdateMultipleGroups_WhenAddedOneMoreGroup(
         [Frozen] Mock<IUpdateDetector> updateDetector,
         ConnectedClient client,
         string group,
         ConnectedClientStore sut)
     {
         // Possibly improve this unit test.
-        client.Group = group;
+        client.AddToGroup(group);
 
         sut.Add(client);
         updateDetector.Verify(x => x.MarkForUpdate(It.Is<IEnumerable<string>>(
@@ -125,7 +125,9 @@ public class ConnectedClientStoreTests : MessagingTestsBase
 
         var clientInGroups1And2 = CreateMultiGroupClient(new[] { group1, group2 });
         var clientInGroups123 = CreateMultiGroupClient(new[] { group1, group2 });
-        clientInGroups123.Group = group3;
+
+        Assert.Throws<InvalidOperationException>(() => clientInGroups123.Group = group3);
+        clientInGroups123.AddToGroup(group3);
 
         foreach (var client in clientsInGroup1
             .Concat(clientsInGroup2)
