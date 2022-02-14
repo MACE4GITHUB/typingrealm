@@ -145,14 +145,6 @@
                 });
                 console.log('finished waiting for sending for ack');
                 console.log("TypingDuels Authenticated.");
-
-                await sendWithAck({
-                    data: JSON.stringify({
-                        clientId: user.sub
-                    }),
-                    typeId: "TypingRealm.Messaging.Messages.Connect"
-                });
-                console.log("TypingDuels Connected.");
             } catch (err) {
                 console.error(err);
                 setTimeout(start, 5000);
