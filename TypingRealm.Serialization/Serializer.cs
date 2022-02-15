@@ -11,6 +11,7 @@ public interface ISerializer
     string Serialize<T>(T value);
 }
 
+// TODO: Consider not serializing properties that have default values (0, null, etc).
 public sealed class Serializer : ISerializer
 {
     private readonly JsonSerializerOptions _options;
