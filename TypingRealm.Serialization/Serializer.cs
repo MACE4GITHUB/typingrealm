@@ -28,7 +28,8 @@ public sealed class Serializer : ISerializer
 
     public T? Deserialize<T>(string json)
     {
-        if (typeof(T).IsPrimitive || typeof(T) == typeof(string))
+        if (typeof(T).IsPrimitive
+            || (typeof(T) == typeof(string) && !json.StartsWith("\"", StringComparison.Ordinal)))
             return (T)Convert.ChangeType(json, typeof(T));
 
         return JsonSerializer.Deserialize<T>(json, _options);
@@ -36,7 +37,8 @@ public sealed class Serializer : ISerializer
 
     public object? Deserialize(string json, Type type)
     {
-        if (type.IsPrimitive || type == typeof(string))
+        if (type.IsPrimitive
+            || (type == typeof(string) && !json.StartsWith("\"", StringComparison.Ordinal)))
             return Convert.ChangeType(json, type);
 
         return JsonSerializer.Deserialize(json, type, _options);

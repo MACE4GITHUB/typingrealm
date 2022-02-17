@@ -68,4 +68,77 @@ public class SerializerTests
         Assert.Equal((TestEnum)0, result2.NestedClass.Enum);
         Assert.Equal(TestEnum.SecondValue, result2.Enum);
     }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldSerializeAndDeserializeStrings(
+        Serializer sut, string value)
+    {
+        var data = sut.Serialize<string>(value);
+        Assert.Equal($"\"{value}\"", data);
+
+        var deserialized = sut.Deserialize<string>($"\"{value}\"");
+        Assert.Equal(value, deserialized);
+    }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldDeserializeStrings_NonGeneric(
+        Serializer sut, string value)
+    {
+        var deserialized = sut.Deserialize($"\"{value}\"", typeof(string));
+        Assert.Equal(value, deserialized);
+    }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldDeserializeRawString(
+        Serializer sut, string value)
+    {
+        var deserialized = sut.Deserialize<string>($"{value}");
+        Assert.Equal(value, deserialized);
+    }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldDeserializeRawString_NonGeneric(
+        Serializer sut, string value)
+    {
+        var deserialized = sut.Deserialize($"{value}", typeof(string));
+        Assert.Equal(value, deserialized);
+    }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldSerializeAndDeserializePrimitives(
+        Serializer sut, int value)
+    {
+        var data = sut.Serialize<int>(value);
+        Assert.Equal($"{value}", data);
+
+        var deserialized = sut.Deserialize<int>($"{value}");
+        Assert.Equal(value, deserialized);
+    }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldDeserializePrimitives_NonGeneric(
+        Serializer sut, int value)
+    {
+        var deserialized = sut.Deserialize($"{value}", typeof(int));
+        Assert.Equal(value, deserialized);
+    }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldSerializeAndDeserializeEnums(
+        Serializer sut, TestEnum value)
+    {
+        var data = sut.Serialize<TestEnum>(value);
+        Assert.Equal($"\"{value}\"", data);
+
+        var deserialized = sut.Deserialize<TestEnum>($"\"{value}\"");
+        Assert.Equal(value, deserialized);
+    }
+
+    [Theory, AutoMoqData]
+    public void Serializer_ShouldSerializeAndDeserializeEnums_NonGeneric(
+        Serializer sut, TestEnum value)
+    {
+        var deserialized = sut.Deserialize($"\"{value}\"", typeof(TestEnum));
+        Assert.Equal(value, deserialized);
+    }
 }
