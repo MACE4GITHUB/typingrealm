@@ -1,9 +1,10 @@
-﻿using TypingRealm.Testing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TypingRealm.Testing;
 using Xunit;
 
 namespace TypingRealm.Serialization.Tests;
 
-public class SerializerTests
+public class SerializerTests : TestsBase
 {
 #pragma warning disable CS8618
     public class TestClass
@@ -140,5 +141,12 @@ public class SerializerTests
     {
         var deserialized = sut.Deserialize($"\"{value}\"", typeof(TestEnum));
         Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void AddSerialization_ShouldRegisterTransientSerializer()
+    {
+        var provider = GetServiceCollection().AddSerialization().BuildServiceProvider();
+        provider.AssertRegisteredTransient<ISerializer, Serializer>();
     }
 }
