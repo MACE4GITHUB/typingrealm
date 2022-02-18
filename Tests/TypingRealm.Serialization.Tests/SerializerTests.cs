@@ -15,11 +15,17 @@ public class SerializerTests : TestsBase
         public TestEnum Enum { get; set; }
     }
 
+#pragma warning disable CA1008 // Enums should have zero value
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
+#pragma warning disable S2344 // Enumeration type names should not have "Flags" or "Enum" suffixes
     public enum TestEnum
     {
         FirstValue = 1,
         SecondValue = 2
     }
+#pragma warning restore S2344
+#pragma warning restore CA1711
+#pragma warning restore CA1008
 #pragma warning restore CS8618
 
     [Theory, AutoMoqData]
