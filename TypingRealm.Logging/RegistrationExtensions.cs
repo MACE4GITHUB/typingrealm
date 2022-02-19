@@ -26,7 +26,7 @@ public static class RegistrationExtensions
         var isDevelopment = DebugHelpers.IsDevelopment();
         var environment = DebugHelpers.GetEnvironment().ToLowerInvariant();
         var serviceId = configuration.GetServiceId();
-        var indexFormat = $"typingrealm-logs-{environment}-{serviceId}-{{0:yyyy.MM.dd}}";
+        var indexFormat = $"typingrealm-logs-{environment}-{serviceId}-{{0:yyyy.MM}}";
 
         var connectionString = configuration.GetConnectionString("Logging");
 
