@@ -10,6 +10,7 @@ using TypingRealm.Configuration;
 
 namespace TypingRealm.Logging;
 
+// TODO: This is not unit tested, hard to unit test.
 public static class RegistrationExtensions
 {
     public static ILoggingBuilder AddTyrLogging(
