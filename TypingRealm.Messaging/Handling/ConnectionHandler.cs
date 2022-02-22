@@ -147,7 +147,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                 if ((metadata as ClientToServerMessageMetadata)?.AffectedGroups != null)
                     groups = groups.Where(group => (metadata as ClientToServerMessageMetadata)?.AffectedGroups?.Contains(group) ?? false);
 
-                if (metadata != null && metadata.SendUpdate)
+                if (metadata == null || !metadata.SendUpdate)
                     groups = Enumerable.Empty<string>();
 
                 await TrySendPendingUpdates(groups, cancellationToken).ConfigureAwait(false);
