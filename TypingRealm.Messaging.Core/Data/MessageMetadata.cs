@@ -25,5 +25,11 @@ public class MessageMetadata
     /// </summary>
     public string? ResponseMessageTypeId { get; set; }
 
+    /// <summary>
+    /// Force server to send update to all clients in the same group as sending
+    /// client, after the message has been processed.
+    /// </summary>
+    public bool SendUpdate { get; set; }
+
     public static MessageMetadata CreateEmpty() => new();
 }

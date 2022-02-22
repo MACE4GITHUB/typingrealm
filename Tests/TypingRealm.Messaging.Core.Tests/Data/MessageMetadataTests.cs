@@ -33,4 +33,14 @@ public class MessageMetadataTests : TestsBase
         sut = new MessageMetadata();
         Assert.Equal(AcknowledgementType.Handled, sut.AcknowledgementType);
     }
+
+    [Fact]
+    public void ShouldHaveFalseSendUpdateByDefault()
+    {
+        var sut = MessageMetadata.CreateEmpty();
+        Assert.False(sut.SendUpdate);
+
+        sut = new MessageMetadata();
+        Assert.False(sut.SendUpdate);
+    }
 }

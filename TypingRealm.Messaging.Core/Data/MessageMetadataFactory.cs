@@ -1,4 +1,6 @@
-﻿namespace TypingRealm.Messaging;
+﻿using System.Reflection;
+
+namespace TypingRealm.Messaging;
 
 public interface IMessageMetadataFactory
 {
@@ -20,6 +22,12 @@ public sealed class MessageMetadataFactory : IMessageMetadataFactory
         metadata.MessageId = _messageIdFactory.CreateMessageId();
 
         // Load any metadata from attributes here.
+        // TODO: Cache types & attributes.
+        var messageAttribute = message.GetType().GetCustomAttribute<MessageAttribute>();
+        if (messageAttribute != null)
+        {
+            metadata.SendUpdate = messageAttribute.SendUpdate;
+        }
 
         return metadata;
     }

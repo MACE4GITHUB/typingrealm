@@ -9,4 +9,10 @@ namespace TypingRealm.Messaging;
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class MessageAttribute : Attribute
 {
+    public MessageAttribute(bool sendUpdate = false)
+    {
+        SendUpdate = sendUpdate;
+    }
+
+    public bool SendUpdate { get; }
 }

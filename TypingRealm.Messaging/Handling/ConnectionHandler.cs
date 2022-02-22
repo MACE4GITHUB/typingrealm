@@ -86,7 +86,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                 if (message is not MessageWithMetadata messageWithMetadata)
                     throw new InvalidOperationException($"Message is not of {typeof(MessageWithMetadata).Name} type.");
 
-                metadata = messageWithMetadata.Metadata as MessageMetadata;
+                metadata = messageWithMetadata.Metadata;
 
                 if (messageWithMetadata.Metadata?.MessageId != null && idempotencyKeys.ContainsKey(messageWithMetadata.Metadata.MessageId))
                 {
@@ -146,6 +146,9 @@ public sealed class ConnectionHandler : IConnectionHandler
                 // TODO: Unit test this (affected groups).
                 if ((metadata as ClientToServerMessageMetadata)?.AffectedGroups != null)
                     groups = groups.Where(group => (metadata as ClientToServerMessageMetadata)?.AffectedGroups?.Contains(group) ?? false);
+
+                if (metadata != null && metadata.SendUpdate)
+                    groups = Enumerable.Empty<string>();
 
                 await TrySendPendingUpdates(groups, cancellationToken).ConfigureAwait(false);
             }
