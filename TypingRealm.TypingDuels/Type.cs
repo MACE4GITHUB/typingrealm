@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Serialization;
+using TypingRealm.Messaging.Updating;
 
 namespace TypingRealm.TypingDuels;
 
@@ -127,6 +128,22 @@ public static class RegistrationExtensions
         builder.AddTypingDuelsMessages();
         builder.Services.RegisterHandler<Typed, TypeMessageHandler>();
         builder.Services.AddSingleton<TypedDebouncer>();
+        builder.Services.UseUpdateFactory<UpdateFactory>();
         return builder;
+    }
+}
+
+#pragma warning disable CS8618
+[Message]
+public sealed class Update
+{
+}
+#pragma warning restore CS8618
+
+public sealed class UpdateFactory : IUpdateFactory
+{
+    public object GetUpdateFor(string clientId)
+    {
+        return new Update();
     }
 }
