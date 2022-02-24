@@ -19,6 +19,7 @@
 
     const url_string = window.location.href;
     const url = new URL(url_string);
+
     let profile = url.searchParams.get('profile');
 
     let PROFILES_URL = 'https://api.typingrealm.com/profiles';
@@ -234,6 +235,9 @@
     const dataSubmitUrl = `${DATA_URL}/api/usersessions/result`;
     const getOverallReportUrl = `${DATA_URL}/api/usersessions/statistics/readable?language=${language}`;
 
+    const typingSessionsApi = `${DATA_URL}/api/typingsessions`;
+    const userSessionsApi = `${DATA_URL}/api/usersessions`;
+
     function getTextUrl(textId) {
         return `${DATA_URL}/api/texts/${textId}`;
     }
@@ -281,6 +285,76 @@
     let simulationSpeedMultiplier = 1;
 
     const clientWidths = {};
+
+
+
+
+    let userSessionId = url.searchParams.get('userSessionId');
+    if (!userSessionId) {
+        let typingSessionId = url.searchParams.get('typingSessionId');
+        if (!typingSessionId) {
+            // Generate typing session.
+
+            let token = await getToken();
+            const response = await fetch(typingSessionsApi, {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                })
+            }).then(r => r.json());
+
+            typingSessionId = response.typingSessionId;
+
+            console.log('Successfully submitted typing result.');
+            console.log(response);
+
+
+
+            if (window.location.search === '') {
+                window.location = window.location.origin + `?typingSessionId=${typingSessionId}`
+            } else {
+                window.location = window.location.origin + window.location.search + `&typingSessionId=${typingSessionId}`
+            }
+
+            return;
+        }
+
+        // Generate user session.
+
+        let token = await getToken();
+        const response = await fetch(userSessionsApi, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                typingSessionId: typingSessionId,
+                userTimeZoneOffsetMinutes: 0 // TODO: Supply proper value.
+            })
+        }).then(r => r.json());
+
+        userSessionId = response.userSessionId;
+
+
+
+        if (window.location.search === '') {
+            window.location = window.location.origin + `?userSessionId=${userSessionId}`
+        } else {
+            window.location = window.location.origin + window.location.search + `&userSessionId=${userSessionId}`
+        }
+
+        return;
+    }
+
+
+
+
 
 
     document.addEventListener('keydown', processKeyDown);
