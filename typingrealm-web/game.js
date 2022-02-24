@@ -449,7 +449,7 @@
         return 50;
     }
 
-    async function getText() {
+    async function generateText() {
         let token = await getToken();
 
         let response = await fetch(textRequestUrl, {
@@ -459,6 +459,11 @@
         });
 
         let textId = await response.text();
+        return textId;
+    }
+
+    async function getText(textId) {
+        let token = await getToken();
 
         let textResponse = await fetch(getTextUrl(textId), {
             headers: {
@@ -470,7 +475,6 @@
 
         return text;
     }
-
 
     async function renderNewText() {
         if (allowInput) {
@@ -490,7 +494,8 @@
         simulationSpeedMultiplierElement.innerHTML = '';
         hintElement.classList.add('hidden');
 
-        textData.text = await getText();
+        let textId = await generateText();
+        textData.text = await getText(textId);
 
         textElement.innerHTML = '';
         textData.text.value.split('').forEach((character, index) => {
