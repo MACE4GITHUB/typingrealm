@@ -290,8 +290,8 @@
 
 
     let userSessionId = url.searchParams.get('userSessionId');
+    let typingSessionId = url.searchParams.get('typingSessionId');
     if (!userSessionId) {
-        let typingSessionId = url.searchParams.get('typingSessionId');
         if (!typingSessionId) {
             // Generate typing session.
 
@@ -308,6 +308,34 @@
             }).then(r => r.json());
 
             typingSessionId = response.typingSessionId;
+
+            const textId = await generateText();
+
+            const nextResponse = await fetch(`${typingSessionsApi}/${typingSessionId}/texts`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    textId: textId
+                })
+            }).then(r => r.json());
+            const textIndex = nextResponse.textIndex;
+            console.log(`Added text to session with id ${textIndex}`);
+
+            const typingSessionText = await fetch(`${typingSessionsApi}/${typingSessionId}/texts/${textIndex}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(r => r.json());
+            const textValue = typingSessionText.Value;
+            console.log('Actual text value: ' + typingSessionText.value);
+
 
             if (window.location.search === '') {
                 window.location = window.location.origin + `?typingSessionId=${typingSessionId}`
@@ -489,8 +517,29 @@
         simulationSpeedMultiplierElement.innerHTML = '';
         hintElement.classList.add('hidden');
 
-        let textId = await generateText();
+
+        var token = await getToken();
+        // TODO: Remove hardcoded text index.
+        const textIndex = 1;
+        const typingSessionText = await fetch(`${typingSessionsApi}/${typingSessionId}/texts/${textIndex}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(r => r.json());
+        const textValue = typingSessionText.value;
+        console.log('Actual text value: ' + typingSessionText.value);
+
+
+
+
+
+        let textId = typingSessionText.textId;
         textData.text = await getText(textId);
+        //let textId = await generateText();
+        //textData.text = await getText(textId);
 
         textElement.innerHTML = '';
         textData.text.value.split('').forEach((character, index) => {
