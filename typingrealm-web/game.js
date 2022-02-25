@@ -309,11 +309,6 @@
 
             typingSessionId = response.typingSessionId;
 
-            console.log('Successfully submitted typing result.');
-            console.log(response);
-
-
-
             if (window.location.search === '') {
                 window.location = window.location.origin + `?typingSessionId=${typingSessionId}`
             } else {
