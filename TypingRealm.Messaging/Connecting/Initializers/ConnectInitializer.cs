@@ -11,6 +11,7 @@ namespace TypingRealm.Messaging.Connecting.Initializers;
 /// Connection initializer that accepts only those connections whose first
 /// message is a valid Connect message with supplied ClientId and/or Group.
 /// </summary>
+// TODO: Rewrite this initializer so that group is set by GroupProvider, do not create instances of ConnectedClient outside of ConnectedClientFactory.
 public sealed class ConnectInitializer : IConnectionInitializer
 {
     private readonly IUpdateDetector _updateDetector;

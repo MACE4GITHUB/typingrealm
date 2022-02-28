@@ -3,31 +3,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
 using TypingRealm.Messaging.Connecting;
-using TypingRealm.Messaging.Messages;
-using TypingRealm.Messaging.Updating;
 
 namespace TypingRealm.Authentication.Service;
 
 public sealed class UserProfileConnectionInitializer : IConnectionInitializer
 {
     private readonly IConnectedClientContext _connectedClientContext;
-    private readonly IUpdateDetector _updateDetector;
+    private readonly IConnectedClientFactory _connectedClientFactory;
 
     public UserProfileConnectionInitializer(
         IConnectedClientContext connectedClientContext,
-        IUpdateDetector updateDetector)
+        IConnectedClientFactory connectedClientFactory)
     {
         _connectedClientContext = connectedClientContext;
-        _updateDetector = updateDetector;
+        _connectedClientFactory = connectedClientFactory;
     }
 
-    public ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
+    public async ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
     {
         var profileId = _connectedClientContext.GetProfile()?.ProfileId;
         if (profileId == null)
             throw new InvalidOperationException("User token does not have a name.");
 
-        var connectedClient = new ConnectedClient(profileId, connection, _updateDetector, Connect.DefaultGroup);
-        return new(connectedClient);
+        var connectedClient = await _connectedClientFactory.CreateConnectedClientAsync(profileId, connection, cancellationToken)
+            .ConfigureAwait(false);
+
+        return connectedClient;
     }
 }

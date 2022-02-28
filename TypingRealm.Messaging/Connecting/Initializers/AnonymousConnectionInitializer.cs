@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TypingRealm.Messaging.Updating;
 
 namespace TypingRealm.Messaging.Connecting.Initializers;
 
@@ -11,17 +10,16 @@ namespace TypingRealm.Messaging.Connecting.Initializers;
 /// </summary>
 public sealed class AnonymousConnectionInitializer : IConnectionInitializer
 {
-    private const string DefaultGroup = "Lobby";
-    private readonly IUpdateDetector _updateDetector;
+    private readonly IConnectedClientFactory _connectedClientFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AnonymousConnectionInitializer"/> class.
     /// </summary>
     /// <param name="updateDetector">Update detector used when creating new
     /// instances of <see cref="ConnectedClient"/>.</param>
-    public AnonymousConnectionInitializer(IUpdateDetector updateDetector)
+    public AnonymousConnectionInitializer(IConnectedClientFactory connectedClientFactory)
     {
-        _updateDetector = updateDetector;
+        _connectedClientFactory = connectedClientFactory;
     }
 
     /// <summary>
@@ -30,11 +28,12 @@ public sealed class AnonymousConnectionInitializer : IConnectionInitializer
     /// </summary>
     /// <param name="connection">Client's connection.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
+    public async ValueTask<ConnectedClient> ConnectAsync(IConnection connection, CancellationToken cancellationToken)
     {
         var clientId = Guid.NewGuid().ToString();
-        var connectedClient = new ConnectedClient(clientId, connection, _updateDetector, DefaultGroup);
+        var connectedClient = await _connectedClientFactory.CreateConnectedClientAsync(clientId, connection, cancellationToken)
+            .ConfigureAwait(false);
 
-        return new ValueTask<ConnectedClient>(connectedClient);
+        return connectedClient;
     }
 }

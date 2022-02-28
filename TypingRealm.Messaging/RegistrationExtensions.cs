@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging.Connecting;
-using TypingRealm.Messaging.Connecting.Initializers;
 using TypingRealm.Messaging.Handlers;
 using TypingRealm.Messaging.Handling;
 using TypingRealm.Messaging.Messages;
@@ -26,7 +25,12 @@ public static class RegistrationExtensions
 
         // Connecting.
         services.AddTransient<IConnectHook, EmptyConnectHook>();
-        services.AddTransient<IConnectionInitializer, ConnectInitializer>();
+
+        // Temporarily disabled because we are rewriting this logic by introducing GroupProvider & ConnectedClientFactory.
+        //services.AddTransient<IConnectionInitializer, ConnectInitializer>();
+
+        services.AddTransient<IConnectionGroupProvider, DefaultConnectionGroupProvider>();
+        services.AddTransient<IConnectedClientFactory, DefaultConnectedClientFactory>();
 
         // Message dispatching and handling.
         services.AddTransient<IMessageDispatcher, MessageDispatcher>();
