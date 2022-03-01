@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Messaging;
+using TypingRealm.Messaging.Connecting;
 using TypingRealm.Messaging.Serialization;
 
 namespace TypingRealm.TypingDuels;
@@ -18,6 +19,7 @@ public static class RegistrationExtensions
         builder.Services.RegisterHandler<Typed, TypeMessageHandler>();
         builder.Services.AddSingleton<TypedDebouncer>();
         builder.Services.UseUpdateFactory<UpdateFactory>();
+        builder.Services.AddTransient<IConnectionGroupProvider, ConnectionGroupProvider>();
         return builder;
     }
 }
