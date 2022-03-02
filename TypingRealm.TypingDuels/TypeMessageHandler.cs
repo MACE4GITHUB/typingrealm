@@ -27,7 +27,7 @@ public sealed class TypeMessageHandler : IMessageHandler<Typed>
             message.TypedCharactersCount,
             (_, _) => message.TypedCharactersCount);
 
-        foreach (var client in _connectedClients.FindInGroups("Lobby"))
+        foreach (var client in _connectedClients.FindInGroups(sender.Groups))
         {
             if (client.ClientId == sender.ClientId)
                 continue;

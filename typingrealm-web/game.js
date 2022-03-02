@@ -146,6 +146,14 @@
                 });
                 console.log('finished waiting for sending for ack');
                 console.log("TypingDuels Authenticated.");
+
+                await sendWithAck({
+                    data: JSON.stringify({
+                        typingSessionId: typingSessionId
+                    }),
+                    typeId: "TypingRealm.TypingDuels.ConnectToSession"
+                });
+                console.log(`Connected to typing session ${typingSessionId}.`);
             } catch (err) {
                 console.error(err);
                 setTimeout(start, 5000);
