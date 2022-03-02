@@ -16,7 +16,11 @@ public static class RegistrationExtensions
     public static MessageTypeCacheBuilder AddTypingDuelsDomain(this MessageTypeCacheBuilder builder)
     {
         builder.AddTypingDuelsMessages();
+
         builder.Services.RegisterHandler<Typed, TypeMessageHandler>();
+        builder.Services.AddSingleton<TypeMessageHandler>();
+        builder.Services.AddSingleton<IMessageHandler<Typed>>(p => p.GetRequiredService<TypeMessageHandler>());
+
         builder.Services.AddSingleton<TypedDebouncer>();
         builder.Services.UseUpdateFactory<UpdateFactory>();
         builder.Services.AddTransient<IConnectionGroupProvider, ConnectionGroupProvider>();

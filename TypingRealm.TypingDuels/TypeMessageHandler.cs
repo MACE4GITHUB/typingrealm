@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TypingRealm.Messaging;
@@ -9,7 +11,7 @@ namespace TypingRealm.TypingDuels;
 public sealed class TypeMessageHandler : IMessageHandler<Typed>
 {
     private readonly IConnectedClientStore _connectedClients;
-    private readonly ConcurrentDictionary<string, int> _clientProgresses = new();
+    private readonly Dictionary<string, ConcurrentDictionary<string, int>> _clientProgresses = new();
     private readonly TypedDebouncer _debouncer;
 
     public TypeMessageHandler(
@@ -20,9 +22,19 @@ public sealed class TypeMessageHandler : IMessageHandler<Typed>
         _debouncer = debouncer;
     }
 
+    // HACK: Temporary hack.
+    public IEnumerable<Typed> GetClientProgresses(string typingSessionId) => _clientProgresses[typingSessionId].Select(x => new Typed
+    {
+        ClientId = x.Key,
+        TypedCharactersCount = x.Value
+    });
+
     public async ValueTask HandleAsync(ConnectedClient sender, Typed message, CancellationToken cancellationToken)
     {
-        _clientProgresses.AddOrUpdate(
+        if (!_clientProgresses.ContainsKey(sender.Group))
+            _clientProgresses.Add(sender.Group, new ConcurrentDictionary<string, int>());
+
+        _clientProgresses[sender.Group].AddOrUpdate(
             sender.ClientId,
             message.TypedCharactersCount,
             (_, _) => message.TypedCharactersCount);
