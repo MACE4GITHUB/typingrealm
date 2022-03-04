@@ -17,9 +17,8 @@ public static class RegistrationExtensions
     {
         builder.AddTypingDuelsMessages();
 
+        builder.Services.AddSingleton<TypingDuelsState>();
         builder.Services.RegisterHandler<Typed, TypeMessageHandler>();
-        builder.Services.AddSingleton<TypeMessageHandler>();
-        builder.Services.AddSingleton<IMessageHandler<Typed>>(p => p.GetRequiredService<TypeMessageHandler>());
 
         builder.Services.AddSingleton<TypedDebouncer>();
         builder.Services.UseUpdateFactory<UpdateFactory>();
