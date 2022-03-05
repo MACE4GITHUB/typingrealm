@@ -9,6 +9,12 @@ public sealed class TypingDuelsState
     private readonly object _lock = new object();
     private readonly Dictionary<string, ConcurrentDictionary<string, int>> _clientProgresses = new();
 
+    public void InitializeProgress(string typingSessionId, string clientId)
+    {
+        var progresses = GetProgressesForTypingSession(typingSessionId);
+        progresses.TryAdd(clientId, 0);
+    }
+
     public void UpdateProgress(string typingSessionId, string clientId, int progress)
     {
         var progresses = GetProgressesForTypingSession(typingSessionId);
