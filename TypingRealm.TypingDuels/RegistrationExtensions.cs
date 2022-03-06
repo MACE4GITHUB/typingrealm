@@ -23,6 +23,9 @@ public static class RegistrationExtensions
         builder.Services.AddSingleton<TypedDebouncer>();
         builder.Services.UseUpdateFactory<UpdateFactory>();
         builder.Services.AddTransient<IConnectionGroupProvider, ConnectionGroupProvider>();
+
+        builder.Services.AddTransient<IConnectedClientInitializer, ConnectedClientInitializer>();
+
         return builder;
     }
 }

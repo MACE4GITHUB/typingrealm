@@ -21,6 +21,7 @@ public sealed class ConnectionHandler : IConnectionHandler
     private readonly IQueryDispatcher _queryDispatcher;
     private readonly IUpdateDetector _updateDetector;
     private readonly IMessageTypeCache _messageTypeCache;
+    private readonly IEnumerable<IConnectedClientInitializer> _connectedClientInitializers;
     private readonly IUpdater _updater;
 
     public ConnectionHandler(
@@ -31,6 +32,7 @@ public sealed class ConnectionHandler : IConnectionHandler
         IQueryDispatcher queryDispatcher,
         IUpdateDetector updateDetector,
         IMessageTypeCache messageTypeCache,
+        IEnumerable<IConnectedClientInitializer> connectedClientInitializers,
         IUpdater updater)
     {
         _logger = logger;
@@ -40,6 +42,7 @@ public sealed class ConnectionHandler : IConnectionHandler
         _queryDispatcher = queryDispatcher;
         _updateDetector = updateDetector;
         _messageTypeCache = messageTypeCache;
+        _connectedClientInitializers = connectedClientInitializers;
         _updater = updater;
     }
 
@@ -69,6 +72,12 @@ public sealed class ConnectionHandler : IConnectionHandler
         _connectedClients.Add(connectedClient);
         if (!_connectedClients.IsClientConnected(connectedClient.ClientId))
             throw new InvalidOperationException("Client was not added correctly.");
+
+        foreach (var initializer in _connectedClientInitializers)
+        {
+            await initializer.InitializeAsync(connectedClient)
+                .ConfigureAwait(false);
+        }
 
         // TODO: Unit test all the logic about idempotency.
         var idempotencyKeys = new Dictionary<string, DateTime>();
