@@ -156,6 +156,7 @@ public sealed class ConnectionHandler : IConnectionHandler
                 if ((metadata as ClientToServerMessageMetadata)?.AffectedGroups != null)
                     groups = groups.Where(group => (metadata as ClientToServerMessageMetadata)?.AffectedGroups?.Contains(group) ?? false);
 
+                // TODO: Do not empty groups if we came here from catch - when client is disconnected we need to notify everyone.
                 if (metadata == null || !metadata.SendUpdate)
                     groups = Enumerable.Empty<string>();
 
