@@ -3,7 +3,7 @@ using Xunit;
 
 namespace TypingRealm.TextProcessing.Tests;
 
-public class LanguageTests
+public class LanguageTests : TextProcessingTestsBase
 {
     [Fact]
     public void ShouldSupportAllSupportedLanguages()
@@ -29,5 +29,11 @@ public class LanguageTests
     public void ShouldThrow_WhenNullIsPassed()
     {
         Assert.Throws<ArgumentNullException>(() => new Language(null!));
+    }
+
+    [Fact]
+    public void ShouldBeIdentity()
+    {
+        Assert.IsAssignableFrom<Identity>(Create<Language>());
     }
 }
