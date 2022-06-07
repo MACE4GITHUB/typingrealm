@@ -8,7 +8,7 @@ namespace TypingRealm.TextProcessing.Tests;
 
 public class LanguageProviderTests : TextProcessingTestsBase
 {
-    private readonly LanguageProvider _sut = new LanguageProvider();
+    private readonly LanguageProvider _sut = new();
 
     [Theory, AutoDomainData]
     public async Task ShouldThrow_WhenLanguageIsInvalid(Language language)

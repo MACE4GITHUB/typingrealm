@@ -15,8 +15,8 @@ public interface ITextProcessor
 
 public sealed class TextProcessor : ITextProcessor
 {
-    private static readonly Regex _sentenceRegex = new Regex(@$"(?<=[\.!\?][{TextConstants.PunctuationCharactersForRegex}]*)\s+", RegexOptions.Compiled);
-    private static readonly Regex _multipleSpacesRegex = new Regex(" {2,}", RegexOptions.Compiled);
+    private static readonly Regex _sentenceRegex = new(@$"(?<=[\.!\?][{TextConstants.PunctuationCharactersForRegex}]*)\s+", RegexOptions.Compiled);
+    private static readonly Regex _multipleSpacesRegex = new(" {2,}", RegexOptions.Compiled);
     private static readonly char[] _wordTrimCharacters = $"{TextConstants.PunctuationCharacters} ".ToCharArray();
 
     public IEnumerable<string> GetSentencesEnumerable(string text)
@@ -80,10 +80,10 @@ public sealed class TextProcessor : ITextProcessor
         if (normalizedText.EndsWith(" !", StringComparison.Ordinal))
             normalizedText = $"{normalizedText[0..^2]}!";
 
-        if (!normalizedText.EndsWith(".")
-            && !normalizedText.EndsWith("!")
-            && !normalizedText.EndsWith("?")
-            && !normalizedText.EndsWith("\""))
+        if (!normalizedText.EndsWith(".", StringComparison.Ordinal)
+            && !normalizedText.EndsWith("!", StringComparison.Ordinal)
+            && !normalizedText.EndsWith("?", StringComparison.Ordinal)
+            && !normalizedText.EndsWith("\"", StringComparison.Ordinal))
             normalizedText = $"{normalizedText}.";
 
         return normalizedText;
