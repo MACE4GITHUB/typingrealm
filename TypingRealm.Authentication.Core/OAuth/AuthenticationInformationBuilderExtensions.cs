@@ -18,6 +18,7 @@ public static class AuthenticationInformationBuilderExtensions
         builder.AuthenticationInformation.TokenEndpoint = configuration.TokenEndpoint;
 
         builder.AuthenticationInformation.RequireHttpsMetadata = configuration.RequireHttpsMetadata;
+        builder.AuthenticationInformation.SuppressErrorOnDiscovery = configuration.SuppressErrorOnDiscovery;
 
         builder.AuthenticationInformation.ServiceClientId = configuration.ServiceClientId;
         builder.AuthenticationInformation.ServiceClientSecret = configuration.ServiceClientSecret;

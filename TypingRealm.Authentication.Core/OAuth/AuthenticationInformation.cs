@@ -23,6 +23,9 @@ public sealed class AuthenticationInformation
     // This can be set for false for local IdentityServer that will not be exposed outside the Docker/Cluster network.
     public bool RequireHttpsMetadata { get; set; } = true;
 
+    // This can be set to suppress error on Discovery, like when Auth0 doesn't work.
+    public bool SuppressErrorOnDiscovery { get; set; }
+
     public TokenValidationParameters TokenValidationParameters { get; }
         = new TokenValidationParameters
         {

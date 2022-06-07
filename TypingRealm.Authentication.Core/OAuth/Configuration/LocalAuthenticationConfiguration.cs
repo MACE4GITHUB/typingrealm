@@ -9,6 +9,7 @@ public sealed record LocalAuthenticationConfiguration : AuthenticationProviderCo
         AuthorizationEndpoint: "http://localhost:30103/api/local-auth/authorize", // TODO: Implement local auth code flow on this endpoint.
         PkceClientId: "local-webapp",
         ServiceClientId: "local-service",
-        ServiceClientSecret: "local-secret")
+        ServiceClientSecret: "local-secret",
+        SuppressErrorOnDiscovery: false)
     { }
 }

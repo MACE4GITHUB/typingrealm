@@ -159,6 +159,13 @@ public static class RegistrationExtensions
                     // Read the token out of the query string
                     context.Token = actualTokenValue;
                 }
+            },
+            OnAuthenticationFailed = context =>
+            {
+                if (authenticationInformation.SuppressErrorOnDiscovery)
+                    context.NoResult();
+
+                return Task.CompletedTask;
             }
         };
     }

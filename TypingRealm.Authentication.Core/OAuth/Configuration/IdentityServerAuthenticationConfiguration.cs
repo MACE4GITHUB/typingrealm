@@ -17,7 +17,8 @@ public sealed record IdentityServerAuthenticationConfiguration : AuthenticationP
         AuthorizationEndpoint: $"{issuer}connect/authorize",
         PkceClientId: "webapp",
         ServiceClientId: "service",
-        ServiceClientSecret: "secret")
+        ServiceClientSecret: "secret",
+        SuppressErrorOnDiscovery: false)
     {
         // If at any point of time we are going to expose IdentityServer outside
         // (and use it for user tokens), this should be set to true.

@@ -10,6 +10,7 @@ public record Auth0AuthenticationConfiguration: AuthenticationProviderConfigurat
         AuthorizationEndpoint: $"{issuer}authorize",
         PkceClientId: pkceClientId,
         ServiceClientId: null,
-        ServiceClientSecret: null)
+        ServiceClientSecret: null,
+        SuppressErrorOnDiscovery: true)
     { }
 }
