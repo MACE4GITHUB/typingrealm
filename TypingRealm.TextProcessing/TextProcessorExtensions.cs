@@ -39,7 +39,7 @@ public static class TextProcessorExtensions
         return textProcessor.GetWordsEnumerable(text)
             .Select(word => textProcessor.NormalizeWord(word))
             .Where(word => word.Length > 0)
-            .Distinct(); // TODO: Consider not making them distinct, so we can get words following in order within the sentence even when they repeat.
+            .Distinct(); // Normalized words are distinct, just GetWordsEnumerable are consecutive all.
     }
 
     public static IEnumerable<string> GetNormalizedWordsEnumerable(
