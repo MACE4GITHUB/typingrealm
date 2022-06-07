@@ -59,4 +59,18 @@ public class LanguageInformationTests : TextProcessingTestsBase
         Assert.Throws<ArgumentNullException>(
             () => new LanguageInformation(null!, allowedCharacters));
     }
+
+    [Theory, AutoDomainData]
+    public void ShouldSetLanguageProperty(Language language)
+    {
+        var sut = new LanguageInformation(language, Create<string>());
+        Assert.Equal(language, sut.Language);
+    }
+
+    [Theory, AutoDomainData]
+    public void ShouldSetAllowedCharactersProperty(string allowedCharacters)
+    {
+        var sut = new LanguageInformation(Create<Language>(), allowedCharacters);
+        Assert.Equal(allowedCharacters, sut.AllowedCharacters);
+    }
 }
