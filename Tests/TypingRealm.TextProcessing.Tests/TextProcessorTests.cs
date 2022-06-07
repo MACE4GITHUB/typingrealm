@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AutoFixture;
+using AutoFixture.Xunit2;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Testing;
 using Xunit;
@@ -35,7 +36,7 @@ public class TextProcessorTests : TextProcessingTestsBase
     [Fact]
     public void GetSentences_ShouldTrimBeginningAndTheEnd()
     {
-        var text = "Sentences.   Another; sentence...    One!  More# sentences !   Some.  ";
+        var text = "   Sentences.   Another; sentence...    One!  More# sentences !   Some.  ";
 
         var sentences = _sut.GetSentencesEnumerable(text)
             .ToList();
@@ -74,6 +75,20 @@ public class TextProcessorTests : TextProcessingTestsBase
         Assert.Equal(2, sentences.Count); // Not three! Where third is just one dot.
     }
 
+    [Fact]
+    public void GetSentences_ShouldNotAddEmptySentence_WhenSpacesBetweenDots()
+    {
+        var text = "Sentence one. Sentence two.    .    something    .    .";
+
+        var sentences = _sut.GetSentencesEnumerable(text)
+            .ToList();
+
+        Assert.Equal("Sentence one.", sentences[0]);
+        Assert.Equal("Sentence two.", sentences[1]);
+        Assert.Equal("Something.", sentences[2]);
+        Assert.Equal(3, sentences.Count);
+    }
+
     [Theory]
     [InlineData("“", "\"")]
     [InlineData("”", "\"")]
@@ -82,7 +97,7 @@ public class TextProcessorTests : TextProcessingTestsBase
     [InlineData("’", "'")]
     [InlineData("‘", "'")]
     [InlineData("‚", ",")]
-    public void GetSentences_ShouldReplaceUtf8CharactersWithPrintable(
+    public void GetSentences_ShouldReplaceUtf8CharactersWithTypeable(
         string symbol, string replacement)
     {
         var text = $"Some {symbol} sentence";
@@ -95,7 +110,7 @@ public class TextProcessorTests : TextProcessingTestsBase
     }
 
     [Fact]
-    public void GetSentences_ShouldReplaceUtf8DashBetweenWordsWithPrintable()
+    public void GetSentences_ShouldReplaceUtf8DashBetweenWordsWithTypeable()
     {
         var text = "Some wordy–word and –  with spaces.";
 
@@ -106,9 +121,8 @@ public class TextProcessorTests : TextProcessingTestsBase
         Assert.Single(sentences);
     }
 
-    // TODO: Consider enhancing sentence generation so that the first letter is a Capital one, even if it goes after - sign.
     [Fact]
-    public void GetSentences_ShouldReplaceUtf8LongDashWithPrintable()
+    public void GetSentences_ShouldReplaceUtf8LongDashWithTypeable()
     {
         var text = "Some —dash—words sentence — with words.";
 
@@ -119,10 +133,40 @@ public class TextProcessorTests : TextProcessingTestsBase
         Assert.Single(sentences);
     }
 
+    [Theory]
+    [InlineAutoData("- sentence", "- Sentence.")]
+    [InlineAutoData(" -Some sentence.", "- Some sentence.")]
+    [InlineAutoData("-sentence", "- Sentence.")]
+    [InlineAutoData("\"sentence", "\"Sentence.")]
+    [InlineAutoData("-\"sentence", "- \"Sentence.")]
+    [InlineAutoData("- \"sentence", "- \"Sentence.")]
+    [InlineAutoData("\"-sentence", "\"-Sentence.")]
+    [InlineAutoData("#sentence", "#Sentence.")]
+    public void ShouldCapitalizeFirstLetter_WhenSentenceStartsWithPunctuation(
+        string text, string firstSentence)
+    {
+        var sentences = _sut.GetSentencesEnumerable(text)
+            .ToList();
+
+        Assert.Equal(firstSentence, sentences[0]);
+    }
+
     [Fact]
     public void GetSentences_ShouldNotHaveSpaceBeforeFirstLongDash()
     {
         var text = " —Some sentence.";
+
+        var sentences = _sut.GetSentencesEnumerable(text)
+            .ToList();
+
+        Assert.Equal("- Some sentence.", sentences[0]);
+        Assert.Single(sentences);
+    }
+
+    [Fact]
+    public void GetSentences_ShouldNotHaveSpaceBeforeFirstDash()
+    {
+        var text = " -Some sentence.";
 
         var sentences = _sut.GetSentencesEnumerable(text)
             .ToList();
@@ -321,13 +365,14 @@ public class TextProcessorTests : TextProcessingTestsBase
         var words = _sut.GetWordsEnumerable(text)
             .ToList();
 
-        Assert.Equal("-Some", words[0]);
-        Assert.Equal("#~", words[1]);
-        Assert.Equal("#.", words[2]);
-        Assert.Equal("Symbols", words[3]);
-        Assert.Equal("-#", words[4]);
-        Assert.Equal("aha?", words[5]);
-        Assert.Equal(6, words.Count);
+        Assert.Equal("-", words[0]);
+        Assert.Equal("Some", words[1]);
+        Assert.Equal("#~", words[2]);
+        Assert.Equal("#.", words[3]);
+        Assert.Equal("Symbols", words[4]);
+        Assert.Equal("-#", words[5]);
+        Assert.Equal("aha?", words[6]);
+        Assert.Equal(7, words.Count);
     }
 
     [Fact]

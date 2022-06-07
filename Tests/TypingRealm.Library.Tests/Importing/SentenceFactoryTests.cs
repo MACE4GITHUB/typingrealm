@@ -127,10 +127,11 @@ public class SentenceFactoryTests : LibraryTestsBase
         var text = "  -$ Simple sentence ... . soME other sentence. # , . ! ? another; sentence-  ";
         var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
 
-        Assert.Equal("-$ Simple sentence ... SoME other sentence. # ,. Another; sentence-.", sentence.Value);
-        Assert.Equal("-$", sentence.Words.First().Value);
-        Assert.Equal("...", sentence.Words.ToList()[3].Value);
-        Assert.Equal(" .| ..|..|...|..|.. |. ", string.Join("|", sentence.Words.ToList()[3].KeyPairs.Select(kp => kp.Value)));
+        Assert.Equal("- $ Simple sentence ... SoME other sentence. # ,. Another; sentence-.", sentence.Value);
+        Assert.Equal("-", sentence.Words.First().Value);
+        Assert.Equal("$", sentence.Words.ToList()[1].Value);
+        Assert.Equal("...", sentence.Words.ToList()[4].Value);
+        Assert.Equal(" .| ..|..|...|..|.. |. ", string.Join("|", sentence.Words.ToList()[4].KeyPairs.Select(kp => kp.Value)));
 
         Assert.Equal(SentenceType.Other, sentence.Type);
     }

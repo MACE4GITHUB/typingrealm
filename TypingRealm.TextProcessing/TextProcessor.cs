@@ -64,10 +64,14 @@ public sealed class TextProcessor : ITextProcessor
             .Replace("…", "...")
             .ToString().Trim();
 
-        // Remove multiple spaces in a row.
-        normalizedText = _multipleSpacesRegex.Replace(normalizedText, " ");
+        if (normalizedText.StartsWith("-"))
+            normalizedText = $"- {normalizedText[1..]}";
 
-        if (normalizedText.Trim().Length == 0)
+        // Remove multiple spaces in a row.
+        normalizedText = _multipleSpacesRegex.Replace(normalizedText, " ")
+            .Trim();
+
+        if (normalizedText.Length == 0)
             return normalizedText;
 
         // TODO: Add a dot at the end here if last character is not punctuation.
