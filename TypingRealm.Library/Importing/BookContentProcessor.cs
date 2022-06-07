@@ -14,7 +14,7 @@ public interface IBookContentProcessor
 
 public sealed class BookContentProcessor : IBookContentProcessor
 {
-    private const int MinSentenceLengthCharacters = 8;
+    private readonly SentenceValidator _sentenceValidator = new SentenceValidator();
     private readonly ITextProcessor _textProcessor;
     private readonly ISentenceFactory _sentenceFactory;
 
@@ -29,7 +29,7 @@ public sealed class BookContentProcessor : IBookContentProcessor
     public IEnumerable<Sentence> ProcessBookContent(BookId bookId, string content, LanguageInformation languageInformation)
     {
         return _textProcessor.GetSentencesEnumerable(content, languageInformation)
-            .Where(sentence => sentence.Length >= MinSentenceLengthCharacters)
+            .Where(sentence => _sentenceValidator.IsValidSentence(sentence))
             .Select((sentence, sentenceIndex) => _sentenceFactory.CreateSentence(bookId, sentence, sentenceIndex));
     }
 }

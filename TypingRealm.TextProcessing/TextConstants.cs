@@ -27,4 +27,6 @@ public static class TextConstants
     public static readonly char SpaceCharacter = ' ';
     public static Language EnglishLanguage => new(EnglishLanguageValue);
     public static Language RussianLanguage => new(RussianLanguageValue);
+
+    public static readonly string AllNonLetterCharacters = $"{PunctuationCharacters}{SpaceCharacter}{NumberCharacters}";
 }
