@@ -39,7 +39,7 @@ public static class TextProcessorExtensions
         return textProcessor.GetWordsEnumerable(text)
             .Select(word => textProcessor.NormalizeWord(word))
             .Where(word => word.Length > 0)
-            .Distinct();
+            .Distinct(); // TODO: Consider not making them distinct, so we can get words following in order within the sentence even when they repeat.
     }
 
     public static IEnumerable<string> GetNormalizedWordsEnumerable(
@@ -47,10 +47,7 @@ public static class TextProcessorExtensions
         string text,
         LanguageInformation languageInformation)
     {
-        return textProcessor.GetWordsEnumerable(text)
-            .Select(word => textProcessor.NormalizeWord(word))
-            .Where(word => languageInformation.IsAllLettersAllowed(word))
-            .Where(word => word.Length > 0)
-            .Distinct();
+        return textProcessor.GetNormalizedWordsEnumerable(text)
+            .Where(word => languageInformation.IsAllLettersAllowed(word));
     }
 }

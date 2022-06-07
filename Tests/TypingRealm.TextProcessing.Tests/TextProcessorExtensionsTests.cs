@@ -14,7 +14,7 @@ public class TextProcessorExtensionsTests : TextProcessingTestsBase
     }
 
     [Fact]
-    public void GetSentences_ShouldGetOnlySentencesWithAllowedCharacters()
+    public void GetSentencesEnumerable_ShouldGetOnlySentencesWithAllowedCharacters()
     {
         var text = "abcd bc. ba   cd? abcd? bcde";
 
@@ -30,7 +30,7 @@ public class TextProcessorExtensionsTests : TextProcessingTestsBase
     }
 
     [Fact]
-    public void GetNotAllowedSentences_ShouldGetOnlySentencesWithNotAllowedCharacters()
+    public void GetNotAllowedSentencesEnumerable_ShouldGetOnlySentencesWithNotAllowedCharacters()
     {
         var text = "abcd bc. ba   cd? abcd? bcde";
 
@@ -46,7 +46,7 @@ public class TextProcessorExtensionsTests : TextProcessingTestsBase
     }
 
     [Fact]
-    public void GetWords_ShouldGetOnlyWordsWithAllowedCharacters_NonUnique()
+    public void GetWordsEnumerable_ShouldGetOnlyWordsWithAllowedCharacters_NonUnique()
     {
         var text = " abc. ab abc abcd! abc end. abc end.";
 
@@ -64,7 +64,7 @@ public class TextProcessorExtensionsTests : TextProcessingTestsBase
     }
 
     [Fact]
-    public void GetNormalizedWords_ShohuldGetNormalizedWords_Unique()
+    public void GetNormalizedWordsEnumerable_ShohuldGetNormalizedWords_Unique()
     {
         var text = " abC. Ab aBc ABCD! abc end. abc end. #,.";
 
