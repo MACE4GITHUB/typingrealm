@@ -13,7 +13,7 @@ public static class TextConstants
     {
             EnglishLanguageValue,
             RussianLanguageValue
-        };
+    };
 
     public static readonly string PunctuationCharacters = "'\",<.>/?=+\\|_;:!@#$%^&*()[{]}`~-";
     public static string PunctuationCharactersForRegex => PunctuationCharacters
