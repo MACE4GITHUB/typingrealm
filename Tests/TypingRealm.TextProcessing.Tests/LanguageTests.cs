@@ -6,7 +6,7 @@ namespace TypingRealm.TextProcessing.Tests;
 public class LanguageTests : TextProcessingTestsBase
 {
     [Fact]
-    public void ShouldSupportAllSupportedLanguages()
+    public void ShouldSupportAllSupportedLanguages_AndSetValueProperty()
     {
         foreach (var languageValue in TextConstants.SupportedLanguageValues)
         {
