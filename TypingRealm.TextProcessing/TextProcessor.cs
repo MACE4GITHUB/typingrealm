@@ -67,7 +67,7 @@ public sealed class TextProcessor : ITextProcessor
         // Remove multiple spaces in a row.
         normalizedText = _multipleSpacesRegex.Replace(normalizedText, " ");
 
-        if (normalizedText.Trim() == string.Empty)
+        if (normalizedText.Trim().Length == 0)
             return normalizedText;
 
         // TODO: Add a dot at the end here if last character is not punctuation.
