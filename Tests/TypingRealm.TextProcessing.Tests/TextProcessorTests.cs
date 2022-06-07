@@ -34,6 +34,56 @@ public class TextProcessorTests : TextProcessingTestsBase
     }
 
     [Fact]
+    public void GetSentences_ShouldSplitSentencesByDot_AndLeaveOtherPunctuation_AndNotAppendDotAtTheEnd()
+    {
+        var text = "Sentence.#~ ! Another!; sentence.. One?--";
+
+        var sentences = _sut.GetSentencesEnumerable(text)
+            .ToList();
+
+        Assert.Equal("Sentence.#~", sentences[0]);
+        Assert.Equal("Another!;", sentences[1]);
+        Assert.Equal("Sentence..", sentences[2]);
+        Assert.Equal("One?--", sentences[3]);
+    }
+
+    [Fact]
+    public void GetSentences_ShouldReturnEmptyCollection_WhenOnlyCarriageReturns()
+    {
+        var text = " \r \r\r\r \r";
+
+        var sentences = _sut.GetSentencesEnumerable(text)
+            .ToList();
+
+        Assert.Empty(sentences);
+    }
+
+    [Fact]
+    public void GetSentences_ShouldReturnEmptyCollection_WhenOnlySpaceDotsOrQuestionsOrExclamation()
+    {
+        var text = " .  . .. ? !! ! ???";
+
+        var sentences = _sut.GetSentencesEnumerable(text)
+            .ToList();
+
+        Assert.Empty(sentences);
+    }
+
+    [Fact]
+    public void GetSentences_ShouldAppendDotOnlyWhenEndsWithoutPunctuation()
+    {
+        var sentences = _sut.GetSentencesEnumerable("Without punctuation")
+            .ToList();
+
+        Assert.Equal("Without punctuation.", sentences[0]);
+
+        sentences = _sut.GetSentencesEnumerable("With punctuation:")
+            .ToList();
+
+        Assert.Equal("With punctuation:", sentences[0]);
+    }
+
+    [Fact]
     public void GetSentences_ShouldTrimBeginningAndTheEnd()
     {
         var text = "   Sentences.   Another; sentence...    One!  More# sentences !   Some.  ";
@@ -142,6 +192,11 @@ public class TextProcessorTests : TextProcessingTestsBase
     [InlineAutoData("- \"sentence", "- \"Sentence.")]
     [InlineAutoData("\"-sentence", "\"-Sentence.")]
     [InlineAutoData("#sentence", "#Sentence.")]
+    [InlineAutoData("#a", "#A.")]
+    [InlineAutoData("b", "B.")]
+    [InlineAutoData("  b  ", "B.")]
+    [InlineAutoData("-", "- .")]
+    [InlineAutoData("#", "#")]
     public void ShouldCapitalizeFirstLetter_WhenSentenceStartsWithPunctuation(
         string text, string firstSentence)
     {
@@ -376,7 +431,7 @@ public class TextProcessorTests : TextProcessingTestsBase
     }
 
     [Fact]
-    public void AddTextProcessing_ShouldRegisterAsSingleton()
+    public void AddTextProcessing_ShouldRegisterTextProcessorAsSingleton()
     {
         var serviceProvider = new ServiceCollection()
             .AddTextProcessing()

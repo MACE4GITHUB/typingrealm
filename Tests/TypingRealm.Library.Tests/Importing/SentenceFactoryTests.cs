@@ -127,7 +127,7 @@ public class SentenceFactoryTests : LibraryTestsBase
         var text = "  -$ Simple sentence ... . soME other sentence. # , . ! ? another; sentence-  ";
         var sentence = e2eSut.CreateSentence(bookId, text, indexInBook);
 
-        Assert.Equal("- $ Simple sentence ... SoME other sentence. # ,. Another; sentence-.", sentence.Value);
+        Assert.Equal("- $ Simple sentence ... SoME other sentence. # ,. Another; sentence-", sentence.Value);
         Assert.Equal("-", sentence.Words.First().Value);
         Assert.Equal("$", sentence.Words.ToList()[1].Value);
         Assert.Equal("...", sentence.Words.ToList()[4].Value);

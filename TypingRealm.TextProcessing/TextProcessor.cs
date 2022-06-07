@@ -72,7 +72,7 @@ public sealed class TextProcessor : ITextProcessor
             sb.Length--;
 
         if (sb.Length == 0)
-            return string.Empty; // This will happen only if text contains only \r symbols. TODO: Unit test this.
+            return string.Empty; // This will happen only if text contains only \r symbols.
 
         if (sb[0] == '-')
             sb.Insert(1, ' ');
@@ -106,10 +106,10 @@ public sealed class TextProcessor : ITextProcessor
             sb.Remove(sb.Length - 2, 1);
 
         if (sb.Length == 0)
-            return string.Empty;
+            return string.Empty; // Impossible to happen, hence not unit tested. Consider removing this logic.
 
         var lastCharacter = sb[^1];
-        if (lastCharacter != '.' && lastCharacter != '!' && lastCharacter != '?' && lastCharacter != '\"')
+        if (!TextConstants.PunctuationCharacters.Contains(lastCharacter))
             sb.Append('.');
 
         return sb.ToString();
