@@ -10,7 +10,7 @@ public sealed class LanguageInformation
         ArgumentNullException.ThrowIfNull(language);
         ArgumentNullException.ThrowIfNull(allowedCharacters);
 
-        if (allowedCharacters == string.Empty)
+        if (allowedCharacters.Length == 0)
             throw new ArgumentException("Allowed characters should have at least one character.");
 
         Language = language;
