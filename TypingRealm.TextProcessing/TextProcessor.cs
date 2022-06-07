@@ -16,7 +16,6 @@ public interface ITextProcessor
 public sealed class TextProcessor : ITextProcessor
 {
     private static readonly Regex _sentenceRegex = new(@$"(?<=[\.!\?][{TextConstants.PunctuationCharactersForRegex}]*)\s+", RegexOptions.Compiled);
-    private static readonly Regex _multipleSpacesRegex = new(" {2,}", RegexOptions.Compiled);
     private static readonly char[] _wordTrimCharacters = $"{TextConstants.PunctuationCharacters} ".ToCharArray();
 
     public IEnumerable<string> GetSentencesEnumerable(string text)
@@ -45,8 +44,10 @@ public sealed class TextProcessor : ITextProcessor
 
     private static string NormalizeCharacters(string text)
     {
-        var sb = new StringBuilder(text);
-        var normalizedText = sb
+        if (text.Length == 0)
+            return string.Empty;
+
+        var sb = new StringBuilder(text)
             .Replace("\r", string.Empty)
             .Replace("\n", " ")
             .Replace("“", "\"")
@@ -61,36 +62,57 @@ public sealed class TextProcessor : ITextProcessor
             .Replace("†", " ")
             .Replace("–", "-")
             .Replace("—", " - ")
-            .Replace("…", "...")
-            .ToString().Trim();
+            .Replace("…", "...");
 
-        if (normalizedText.StartsWith("-"))
-            normalizedText = $"- {normalizedText[1..]}";
+        // Trim string builder.
+        while (sb.Length > 0 && sb[0] == ' ')
+            sb.Remove(0, 1);
 
-        // Remove multiple spaces in a row.
-        normalizedText = _multipleSpacesRegex.Replace(normalizedText, " ")
-            .Trim();
+        while (sb.Length > 0 && sb[^1] == ' ')
+            sb.Length--;
 
-        if (normalizedText.Length == 0)
-            return normalizedText;
+        if (sb.Length == 0)
+            return string.Empty; // This will happen only if text contains only \r symbols. TODO: Unit test this.
 
-        // TODO: Add a dot at the end here if last character is not punctuation.
+        if (sb[0] == '-')
+            sb.Insert(1, ' ');
 
-        // TODO: Optimize this to not copy strings.
-        if (normalizedText.EndsWith(" .", StringComparison.Ordinal))
-            normalizedText = $"{normalizedText[0..^2]}.";
-        if (normalizedText.EndsWith(" ?", StringComparison.Ordinal))
-            normalizedText = $"{normalizedText[0..^2]}?";
-        if (normalizedText.EndsWith(" !", StringComparison.Ordinal))
-            normalizedText = $"{normalizedText[0..^2]}!";
+        // Need to remove multiple spaces here, before checking endings.
+        var index = 0;
+        var previousSpace = false;
+        while (true)
+        {
+            if (sb[index] == ' ')
+            {
+                if (previousSpace)
+                {
+                    sb.Remove(index, 1);
+                    continue;
+                }
 
-        if (!normalizedText.EndsWith(".", StringComparison.Ordinal)
-            && !normalizedText.EndsWith("!", StringComparison.Ordinal)
-            && !normalizedText.EndsWith("?", StringComparison.Ordinal)
-            && !normalizedText.EndsWith("\"", StringComparison.Ordinal))
-            normalizedText = $"{normalizedText}.";
+                previousSpace = true;
+            }
+            else
+            {
+                previousSpace = false;
+            }
 
-        return normalizedText;
+            index++;
+            if (index >= sb.Length)
+                break;
+        }
+
+        if (sb.Length >= 2 && sb[^2] == ' ' && (sb[^1] == '.' || sb[^1] == '?' || sb[^1] == '!'))
+            sb.Remove(sb.Length - 2, 1);
+
+        if (sb.Length == 0)
+            return string.Empty;
+
+        var lastCharacter = sb[^1];
+        if (lastCharacter != '.' && lastCharacter != '!' && lastCharacter != '?' && lastCharacter != '\"')
+            sb.Append('.');
+
+        return sb.ToString();
     }
 
     private static string CapitalizeFirstLetter(string text)
