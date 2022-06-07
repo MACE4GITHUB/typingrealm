@@ -23,7 +23,6 @@ public static class TextConstants
         .Replace("]", @"\]")
         .Replace(@"^", @"\^");
 
-    public static readonly char[] PunctuationCharactersArray = PunctuationCharacters.ToCharArray();
     public static readonly string NumberCharacters = "0123456789";
     public static readonly char SpaceCharacter = ' ';
     public static Language EnglishLanguage => new(EnglishLanguageValue);
