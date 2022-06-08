@@ -46,7 +46,7 @@ public sealed class TextGenerator : ITextGenerator
         {
             var sentencesRequest = configuration.ShouldContain.Any()
                 ? SentencesRequest.ContainingKeyPairs(configuration.ShouldContain, count)
-                : SentencesRequest.Random(count);
+                : SentencesRequest.Random(count, count);
 
             data = (await _libraryClient.GetSentencesAsync(sentencesRequest, configuration.Language)
                 .ConfigureAwait(false))
