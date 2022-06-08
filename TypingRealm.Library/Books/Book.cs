@@ -108,7 +108,7 @@ public sealed class Book
     public void Archive()
     {
         if (_state.IsArchived)
-            throw new InvalidOperationException("Book has already been archived.");
+            throw new DomainException("Book has already been archived.");
 
         _state = _state with
         {

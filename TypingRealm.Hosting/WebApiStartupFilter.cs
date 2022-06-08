@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace TypingRealm.Hosting;
@@ -57,6 +56,15 @@ public sealed class WebApiStartupFilter : IStartupFilter
                     || contextFeature?.Error is NotSupportedException)
                 {
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                    {
+                        error = contextFeature.Error.Message
+                    })).ConfigureAwait(false);
+                }
+
+                if (contextFeature?.Error is DomainException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
                     await context.Response.WriteAsync(JsonSerializer.Serialize(new
                     {
                         error = contextFeature.Error.Message
