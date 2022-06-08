@@ -19,3 +19,5 @@ public sealed class BadRequestApiException : ApiException
 {
     public BadRequestApiException(string message) : base(message, 400) { }
 }
+
+public sealed record DomainErrorDetails(string Error);

@@ -65,10 +65,12 @@ public sealed class WebApiStartupFilter : IStartupFilter
                 if (contextFeature?.Error is DomainException)
                 {
                     context.Response.StatusCode = StatusCodes.Status409Conflict;
-                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
-                    {
-                        error = contextFeature.Error.Message
-                    })).ConfigureAwait(false);
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(
+                        new DomainErrorDetails(contextFeature.Error.Message),
+                        new JsonSerializerOptions
+                        {
+                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                        })).ConfigureAwait(false);
                 }
             });
         });

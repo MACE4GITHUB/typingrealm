@@ -114,8 +114,8 @@ public sealed class BooksController : TyrController
     [HttpGet]
     [Route("{bookId}")]
     [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
+    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
     public async ValueTask<ActionResult<BookDto>> GetBookById(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
@@ -129,8 +129,8 @@ public sealed class BooksController : TyrController
     [HttpPut]
     [Route("{bookId}")]
     [ProducesResponseType(203)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
+    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
     public async ValueTask<IActionResult> UpdateBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter,
         UpdateBookDto dto)
@@ -148,9 +148,9 @@ public sealed class BooksController : TyrController
     [HttpDelete]
     [Route("{bookId}")]
     [ProducesResponseType(203)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
-    [ProducesResponseType(409)]
+    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
+    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+    [ProducesResponseType(409, Type = typeof(DomainErrorDetails))]
     public async ValueTask<IActionResult> ArchiveBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
@@ -167,9 +167,9 @@ public sealed class BooksController : TyrController
     private sealed record UploadBookResponse(string bookId);
     [HttpPost]
     [ProducesResponseType(201, Type = typeof(UploadBookResponse))]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
-    [ProducesResponseType(409)]
+    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
+    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+    [ProducesResponseType(409, Type = typeof(DomainErrorDetails))]
     public async ValueTask<IActionResult> UploadBook(
         [FromQuery] UploadBookDto dto, IFormFile content)
     {
@@ -188,9 +188,9 @@ public sealed class BooksController : TyrController
     [HttpPost]
     [Route("{bookId}/import")]
     [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
-    [ProducesResponseType(409)]
+    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
+    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+    [ProducesResponseType(409, Type = typeof(DomainErrorDetails))]
     public async ValueTask<ActionResult<BookImportResult>> ImportBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
