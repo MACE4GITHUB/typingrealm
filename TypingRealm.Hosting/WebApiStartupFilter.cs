@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace TypingRealm.Hosting;
@@ -45,6 +46,20 @@ public sealed class WebApiStartupFilter : IStartupFilter
                     await context.Response.WriteAsync(JsonSerializer.Serialize(new
                     {
                         error = apiException.Message
+                    })).ConfigureAwait(false);
+                }
+
+                // TODO: Consider using everywhere my own exceptions instead of relying on these types.
+                // Or consider not exposing messages of these exceptions (potentially PII).
+                if (contextFeature?.Error is ArgumentNullException
+                    || contextFeature?.Error is ArgumentException
+                    || contextFeature?.Error is InvalidOperationException
+                    || contextFeature?.Error is NotSupportedException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                    {
+                        error = contextFeature.Error.Message
                     })).ConfigureAwait(false);
                 }
             });
