@@ -46,7 +46,8 @@ public sealed class BooksController : TyrController
     {
         var book = await _bookQuery.FindBookAsync(bookId);
         if (book == null)
-            return NotFound();
+            throw new NotFoundApiException("message");
+            //return NotFound();
 
         return Ok(book);
     }

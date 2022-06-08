@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text.Json;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
 namespace TypingRealm.Hosting;
@@ -30,16 +31,22 @@ public sealed class WebApiStartupFilter : IStartupFilter
         // Forward HTTP errors throughout services call chain.
         app.UseExceptionHandler(exceptionHandlerApp =>
         {
-            exceptionHandlerApp.Run(context =>
+            exceptionHandlerApp.Run(async context =>
             {
                 var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                 if (contextFeature?.Error is HttpRequestException exception)
                 {
-                        // TODO: Consider forwarding only 403, 400 or 404 forwarding might be undesired.
-                        context.Response.StatusCode = (int)(exception.StatusCode ?? HttpStatusCode.InternalServerError);
+                    // TODO: Consider forwarding only 403, 400 or 404 forwarding might be undesired.
+                    context.Response.StatusCode = (int)(exception.StatusCode ?? HttpStatusCode.InternalServerError);
                 }
-
-                return Task.CompletedTask;
+                if (contextFeature?.Error is ApiException apiException)
+                {
+                    context.Response.StatusCode = apiException.StatusCode;
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                    {
+                        error = apiException.Message
+                    })).ConfigureAwait(false);
+                }
             });
         });
 
