@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
@@ -117,6 +118,9 @@ public static class RegistrationExtensions
                 // Accept enum values as strings to Web API endpoints.
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
+
+        // Fluent validation.
+        mvcBuilder.AddFluentValidation();
 
         // Swagger.
         services.AddSwaggerGen();

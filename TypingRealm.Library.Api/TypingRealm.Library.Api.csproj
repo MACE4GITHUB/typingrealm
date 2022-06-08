@@ -21,4 +21,8 @@
     <ProjectReference Include="..\TypingRealm.Library.Infrastructure\TypingRealm.Library.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>

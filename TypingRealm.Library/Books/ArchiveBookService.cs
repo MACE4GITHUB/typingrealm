@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.Books;
@@ -15,20 +14,14 @@ public sealed class ArchiveBookService
         _sentenceRepository = sentenceRepository;
     }
 
-    public async ValueTask ArchiveBookAsync(BookId bookId)
+    public async ValueTask ArchiveBookAsync(Book book)
     {
-        var book = await _bookRepository.FindBookAsync(bookId)
-            .ConfigureAwait(false);
-
-        if (book == null)
-            throw new InvalidOperationException("Book doesn't exist.");
-
         book.Archive();
 
         await _bookRepository.UpdateBookAsync(book)
             .ConfigureAwait(false);
 
-        await _sentenceRepository.RemoveAllForBook(bookId)
+        await _sentenceRepository.RemoveAllForBook(book.BookId)
             .ConfigureAwait(false);
     }
 }

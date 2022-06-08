@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Hosting;
 using TypingRealm.Library.Api.Controllers;
 using TypingRealm.Library.Infrastructure;
@@ -17,5 +19,8 @@ var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(SentencesControl
 // This Library.Infrastructure extension method should register everything
 // needed by the whole Library service.
 builder.Services.AddLibraryApi(builder.Configuration);
+builder.Services.AddTransient<IValidator<BookIdRouteParameter>, BookIdRouteParameterValidator>();
+builder.Services.AddTransient<IValidator<UpdateBookDto>, UpdateBookDtoValidator>();
+builder.Services.AddTransient<IValidator<UploadBookDto>, UploadBookDtoValidator>();
 
 await builder.Build().RunAsync();

@@ -11,7 +11,7 @@ namespace TypingRealm.Library.Importing;
 
 public interface IBookImporter
 {
-    ValueTask<BookImportResult> ImportBookAsync(BookId bookId);
+    ValueTask<BookImportResult> ImportBookAsync(Book book);
 }
 
 public sealed class BookImporter : IBookImporter
@@ -40,13 +40,9 @@ public sealed class BookImporter : IBookImporter
         _logger = logger;
     }
 
-    public async ValueTask<BookImportResult> ImportBookAsync(BookId bookId)
+    public async ValueTask<BookImportResult> ImportBookAsync(Book book)
     {
-        var book = await _bookStore.FindBookAsync(bookId)
-            .ConfigureAwait(false);
-
-        if (book == null)
-            throw new InvalidOperationException($"Book {bookId} is not found.");
+        var bookId = book.BookId;
 
         var bookContent = await _bookStore.FindBookContentAsync(bookId)
             .ConfigureAwait(false);

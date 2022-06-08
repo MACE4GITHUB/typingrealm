@@ -9,7 +9,7 @@ public static class TextConstants
     public const string DefaultLanguageValue = EnglishLanguageValue;
     private const string EnglishLanguageValue = "en";
     private const string RussianLanguageValue = "ru";
-    internal static IEnumerable<string> SupportedLanguageValues => new[]
+    public static IEnumerable<string> SupportedLanguageValues => new[]
     {
             EnglishLanguageValue,
             RussianLanguageValue
