@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +55,9 @@ public sealed class BooksController : TyrController
 
     [HttpPut]
     [Route("{bookId}")]
-    public async ValueTask<ActionResult> UpdateBook(string bookId, UpdateBookDto dto)
+    public async ValueTask<ActionResult> UpdateBook(
+        [StringLength(BookId.MaxLength, MinimumLength = BookId.MinLength)] string bookId,
+        UpdateBookDto dto)
     {
         var book = await _bookRepository.FindBookAsync(new(bookId));
         if (book == null)
