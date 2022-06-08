@@ -150,6 +150,7 @@ public sealed class BooksController : TyrController
     [ProducesResponseType(203)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
     public async ValueTask<IActionResult> ArchiveBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
@@ -168,6 +169,7 @@ public sealed class BooksController : TyrController
     [ProducesResponseType(201, Type = typeof(UploadBookResponse))]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
     public async ValueTask<IActionResult> UploadBook(
         [FromQuery] UploadBookDto dto, IFormFile content)
     {
@@ -188,6 +190,7 @@ public sealed class BooksController : TyrController
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
     public async ValueTask<ActionResult<BookImportResult>> ImportBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
