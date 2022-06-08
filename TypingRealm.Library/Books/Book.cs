@@ -69,7 +69,7 @@ public sealed class Book
     public void StartProcessing()
     {
         if (_state.IsArchived)
-            throw new InvalidOperationException("Book has already been archived.");
+            throw new DomainException("Book has already been archived.");
 
         _state = _state with
         {
@@ -80,10 +80,10 @@ public sealed class Book
     public void FinishProcessing()
     {
         if (_state.IsArchived)
-            throw new InvalidOperationException("Book has already been archived.");
+            throw new DomainException("Book has already been archived.");
 
         if (_state.ProcessingStatus != ProcessingStatus.Processing)
-            throw new InvalidOperationException("This book is not started processing yet.");
+            throw new DomainException("This book is not started processing yet.");
 
         _state = _state with
         {
@@ -94,10 +94,10 @@ public sealed class Book
     public void ErrorProcessing()
     {
         if (_state.IsArchived)
-            throw new InvalidOperationException("Book has already been archived.");
+            throw new DomainException("Book has already been archived.");
 
         if (_state.ProcessingStatus != ProcessingStatus.Processing)
-            throw new InvalidOperationException("This book is not started processing yet.");
+            throw new DomainException("This book is not started processing yet.");
 
         _state = _state with
         {
