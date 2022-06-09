@@ -23,8 +23,8 @@ public static class RegistrationExtensions
             {
                 configuration.AddInMemoryCollection(new[]
                 {
-                        new KeyValuePair<string, string>("ServiceId", parts[1].ToLowerInvariant())
-                    });
+                    new KeyValuePair<string, string>("ServiceId", parts[1].ToLowerInvariant())
+                });
             }
         }
 
