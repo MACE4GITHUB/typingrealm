@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
 using TypingRealm.Communication.Redis;
@@ -132,6 +133,8 @@ public static class RegistrationExtensions
         // Swagger.
         services.AddSwaggerGen(options =>
         {
+            options.OrderActionsBy(x => x.RelativePath);
+
             // Load description from MD file.
             var description = string.Empty;
             var apiFilePath = Path.Combine(AppContext.BaseDirectory, "Api.md");
