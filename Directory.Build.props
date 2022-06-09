@@ -4,6 +4,9 @@
 
     <!-- Enables ALL analyzers instead of deprecated FxCop. -->
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+
+    <!-- TODO: Consider enabling it only for *.Api projects. -->
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <!--<PackageReference>

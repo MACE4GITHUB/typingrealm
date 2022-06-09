@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -123,7 +125,14 @@ public static class RegistrationExtensions
         mvcBuilder.AddFluentValidation();
 
         // Swagger.
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+            foreach (var xmlFile in xmlFiles)
+            {
+                options.IncludeXmlComments(xmlFile);
+            }
+        });
 
         // Web API or SingnalR or another custom Startup filter.
         services.AddTransient<IStartupFilter, TStartupFilter>();

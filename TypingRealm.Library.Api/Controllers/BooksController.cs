@@ -145,6 +145,19 @@ public sealed class BooksController : TyrController
         return NoContent();
     }
 
+    /// <summary>
+    /// Archives the Book.
+    /// </summary>
+    /// <remarks>
+    /// This is soft delete. This marks the Book as deleted and removes all
+    /// sentences data. There is no functionality to restore the Book for now.
+    /// If we have it in future - you would need to re-import the Book after
+    /// restoring it.
+    ///
+    /// Sample request:
+    ///
+    ///     DELETE /api/books/{bookId}
+    /// </remarks>
     [HttpDelete]
     [Route("{bookId}")]
     [ProducesResponseType(203)]
@@ -165,6 +178,21 @@ public sealed class BooksController : TyrController
     }
 
     private sealed record UploadBookResponse(string bookId);
+    /// <summary>
+    /// Uploads a new Book, but does not import it.
+    /// </summary>
+    /// <remarks>
+    /// Uploading the Book does NOT import it, it just adds its content and
+    /// description to the Library. No new sentences data will appear in the
+    /// application until you Import this Book with `/api/books/{bookId}/import`
+    /// endpoint.
+    ///
+    /// Sample request:
+    ///
+    ///     POST /books?description=SomeDescription&amp;language=en
+    ///
+    /// `content` should be form-data file.
+    /// </remarks>
     [HttpPost]
     [ProducesResponseType(201, Type = typeof(UploadBookResponse))]
     [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
