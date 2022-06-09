@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
 using TypingRealm.Communication.Redis;
