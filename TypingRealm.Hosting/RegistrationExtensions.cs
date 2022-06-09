@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -111,7 +112,12 @@ public static class RegistrationExtensions
         services.AddTyrHealthChecks();
 
         // Web API controllers.
-        var mvcBuilder = services.AddControllers();
+        var mvcBuilder = services.AddControllers(options =>
+        {
+            // This is so Swagger shows up this response type.
+            options.Filters.Add(new ProducesAttribute("application/json"));
+        });
+
         mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(DiagnosticsController).Assembly));
 
         // If host has custom APIs.
