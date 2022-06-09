@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using TypingRealm.Authentication.Api;
 using TypingRealm.Communication;
 using TypingRealm.Communication.Redis;
+using TypingRealm.Configuration;
 using TypingRealm.Hosting.Deployment;
 using TypingRealm.Hosting.HealthChecks;
 using TypingRealm.Serialization;
@@ -55,7 +57,7 @@ public static class RegistrationExtensions
         this IServiceCollection services, IConfiguration configuration, Assembly controllersAssembly)
     {
         SetupCommonDependencies(services, configuration);
-        SetupCommonAspNetDependencies<WebApiStartupFilter>(services, controllersAssembly);
+        SetupCommonAspNetDependencies<WebApiStartupFilter>(services, configuration, controllersAssembly);
 
         // Authentication.
         services.AddTyrApiAuthentication();
@@ -91,7 +93,10 @@ public static class RegistrationExtensions
     /// Used by Web API & SignalR hosts that use ASP.Net hosting framework.
     /// Is not used by custom tools / console apps / TCP servers.
     /// </summary>
-    public static IServiceCollection SetupCommonAspNetDependencies<TStartupFilter>(IServiceCollection services, params Assembly[] controllersAssemblies)
+    public static IServiceCollection SetupCommonAspNetDependencies<TStartupFilter>(
+        IServiceCollection services,
+        IConfiguration configuration,
+        params Assembly[] controllersAssemblies)
         where TStartupFilter : class, IStartupFilter
     {
         services.AddCors(options => options.AddPolicy(
@@ -127,6 +132,28 @@ public static class RegistrationExtensions
         // Swagger.
         services.AddSwaggerGen(options =>
         {
+            // Load description from MD file.
+            var description = string.Empty;
+            var apiFilePath = Path.Combine(AppContext.BaseDirectory, "Api.md");
+            if (File.Exists(apiFilePath))
+                description = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Api.md"));
+
+            var serviceId = configuration.GetServiceId();
+            var title = $"[ {serviceId} ] API";
+            if (description.StartsWith("# "))
+            {
+                title = $"{description.Split('\n')[0].Replace("# ", "").Replace("\r", "").Trim()} [ {serviceId} ]";
+                description = description[(description.IndexOf('\n') + 1)..];
+            }
+
+            // v1 is used as a key to swagger json.
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = title,
+                Version = "v1", // Shown on swagger page.
+                Description = description
+            });
+
             var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
             foreach (var xmlFile in xmlFiles)
             {

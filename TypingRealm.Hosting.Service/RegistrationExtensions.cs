@@ -39,7 +39,11 @@ public static class RegistrationExtensions
     public static MessageTypeCacheBuilder UseSignalRHost(this IServiceCollection services, IConfiguration configuration, params Assembly[] controllersAssemblies)
     {
         Hosting.RegistrationExtensions.SetupCommonDependencies(services, configuration);
-        Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(services, controllersAssemblies.Append(typeof(RealtimeAuthenticationController).Assembly).ToArray());
+        Hosting.RegistrationExtensions.SetupCommonAspNetDependencies<SignalRStartupFilter>(
+            services,
+            configuration,
+            controllersAssemblies.Append(typeof(RealtimeAuthenticationController).Assembly).ToArray());
+
         var builder = SetupCommonMessagingServiceDependencies(services);
 
         // Authentication.
