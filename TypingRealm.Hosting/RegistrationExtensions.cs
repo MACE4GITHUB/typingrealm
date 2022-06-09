@@ -122,8 +122,8 @@ public static class RegistrationExtensions
 
         mvcBuilder.AddJsonOptions(options =>
         {
-                // Accept enum values as strings to Web API endpoints.
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            // Accept enum values as strings to Web API endpoints.
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
         // Fluent validation.
