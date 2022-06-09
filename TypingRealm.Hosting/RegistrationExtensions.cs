@@ -135,6 +135,15 @@ public static class RegistrationExtensions
         {
             options.OrderActionsBy(x => x.RelativePath);
 
+            // Exclude diagnostics /api/diagnostics/* endpoints.
+            options.DocInclusionPredicate((_, x) =>
+            {
+                if (x.RelativePath == null)
+                    return true;
+
+                return !x.RelativePath.StartsWith("api/diagnostics", StringComparison.Ordinal);
+            });
+
             // Load description from MD file.
             var description = string.Empty;
             var apiFilePath = Path.Combine(AppContext.BaseDirectory, "Api.md");
