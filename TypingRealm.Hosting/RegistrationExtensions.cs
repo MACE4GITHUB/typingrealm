@@ -91,7 +91,7 @@ public static class RegistrationExtensions
     }
 
     /// <summary>
-    /// Used by Web API & SignalR hosts that use ASP.Net hosting framework.
+    /// Used by Web API and SignalR hosts that use ASP.Net hosting framework.
     /// Is not used by custom tools / console apps / TCP servers.
     /// </summary>
     public static IServiceCollection SetupCommonAspNetDependencies<TStartupFilter>(
