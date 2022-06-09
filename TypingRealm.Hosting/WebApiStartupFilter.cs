@@ -108,6 +108,9 @@ public sealed class WebApiStartupFilter : IStartupFilter
 
         // TODO: Check whether it's Development environment and only then enable swagger.
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+        {
+            options.DefaultModelsExpandDepth(0);
+        });
     }
 }
