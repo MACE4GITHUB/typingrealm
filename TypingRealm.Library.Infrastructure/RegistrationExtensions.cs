@@ -23,6 +23,7 @@ public static class RegistrationExtensions
         }
         else
         {
+            // TODO: Fix local implementation: it doesn't work because some deps like IBookQuery are not registered.
             services.AddInMemoryInfrastructure();
         }
 
