@@ -11,6 +11,7 @@ namespace TypingRealm.Library.Books;
 /// </summary>
 public sealed record BookContent(BookId BookId, Stream Content);
 
+/// <include file='../ApiDocs.xml' path='Api/Library/Book/ProcessingStatus/*'/>
 public enum ProcessingStatus
 {
     NotProcessed = 1,

@@ -2,9 +2,23 @@
 
 namespace TypingRealm.Library.Books.Queries;
 
-public sealed record BookDto(
-    string BookId,
-    string Language,
-    string Description,
-    ProcessingStatus ProcessingStatus,
-    DateTime AddedAtUtc);
+/// <summary>
+/// Book information without context that can be Queried through the API.
+/// </summary>
+public sealed class BookDto
+{
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/BookId/*'/>
+    public string BookId { get; init; } = null!;
+
+    /// <include file='../ApiDocs.xml' path='Api/Global/Language/*'/>
+    public string Language { get; init; } = null!;
+
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/Description/*'/>
+    public string Description { get; init; } = null!;
+
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/ProcessingStatus/*'/>
+    public ProcessingStatus ProcessingStatus { get; init; }
+
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/AddedAtUtc/*'/>
+    public DateTime AddedAtUtc { get; init; }
+}

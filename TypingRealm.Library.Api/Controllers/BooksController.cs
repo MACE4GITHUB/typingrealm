@@ -38,6 +38,20 @@ public sealed class UploadBookDto
 
     /// <include file='../ApiDocs.xml' path='Api/Global/Language/*'/>
     public string Language { get; init; } = null!;
+
+    /// <summary>
+    /// Content of the file. It should be a text file with text (UTF-8) content.
+    /// </summary>
+    public IFormFile Content { get; init; } = null!;
+}
+
+/// <summary>
+/// Response after uploading the Book.
+/// </summary>
+public sealed class UploadBookResponse
+{
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/BookId/*'/>
+    public string BookId { get; init; } = null!;
 }
 
 public sealed class BookIdValidator : AbstractValidator<string>
@@ -128,6 +142,15 @@ public sealed class BooksController : TyrController
     /// <summary>
     /// Gets all books without their content.
     /// </summary>
+    /// <remarks>
+    /// Gets a collection of all Books added to the system, returns just the
+    /// information about them, without the content. Archived books won't show up.
+    /// When no books are present in the library - returns an empty list [].
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/books
+    /// </remarks>
     [HttpGet]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetAll))]
     public async ValueTask<ActionResult<IEnumerable<BookDto>>> GetAllBooks()
@@ -140,6 +163,14 @@ public sealed class BooksController : TyrController
     /// <summary>
     /// Finds a single book and returns the information without the content.
     /// </summary>
+    /// <remarks>
+    /// Searches and returns a single book that has the specified identifier.
+    /// If no book is found with such id, 404 (NotFound) result is returned.
+    ///
+    /// Sample request:
+    ///
+    ///     GET /api/books/123myBookId
+    /// </remarks>
     [HttpGet("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetSingle))]
     public async ValueTask<ActionResult<BookDto>> GetBookById(
@@ -156,6 +187,17 @@ public sealed class BooksController : TyrController
     /// Updates book information.
     /// </summary>
     /// <param name="dto">Book information for update, these fields will be updated in the existing book.</param>
+    /// <remarks>
+    /// Updates the book, overwriting specified parameters on the existing Book.
+    /// If no book is found - returns 404 (NotFound) result.
+    ///
+    /// Sample request:
+    ///
+    ///     PUT /api/books/123myBookId
+    ///     {
+    ///         "description": "My new book description"
+    ///     }
+    /// </remarks>
     [HttpPut("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionNoContent))]
     public async ValueTask<IActionResult> UpdateBook(
@@ -200,7 +242,6 @@ public sealed class BooksController : TyrController
         return NoContent();
     }
 
-    public sealed record UploadBookResponse(string bookId);
     /// <summary>
     /// Uploads a new Book, but does not import it.
     /// </summary>
@@ -219,9 +260,9 @@ public sealed class BooksController : TyrController
     [HttpPost]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionWithContent))]
     public async ValueTask<ActionResult<UploadBookResponse>> UploadBook(
-        [FromQuery] UploadBookDto dto, IFormFile content)
+        [FromQuery] UploadBookDto dto)
     {
-        using var stream = content.OpenReadStream();
+        using var stream = dto.Content.OpenReadStream();
 
         var bookId = await _bookRepository.NextBookIdAsync();
         var book = new Book(bookId, new Language(dto.Language), new BookDescription(dto.Description));
@@ -229,10 +270,26 @@ public sealed class BooksController : TyrController
 
         await _bookRepository.AddBookWithContentAsync(book, bookContent);
 
-        var result = new UploadBookResponse(bookId.Value);
+        var result = new UploadBookResponse
+        {
+            BookId = bookId
+        };
+
         return CreatedAtAction(nameof(GetBookById), result, result);
     }
 
+    /// <summary>
+    /// Imports a book that exists in the Library.
+    /// </summary>
+    /// <remarks>
+    /// Parses the content of the book, splits it into sentences, words and
+    /// keypairs and adds it to the sentences data. The book cannot be imported
+    /// twice.
+    ///
+    /// Sample request:
+    ///
+    ///     POST /books/123myBookId/import
+    /// </remarks>
     [HttpPost("{bookId}/import")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionWithContent))]
     public async ValueTask<ActionResult<BookImportResult>> ImportBook(

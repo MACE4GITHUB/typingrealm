@@ -20,6 +20,16 @@
                     to distinguish it from the other books.
                 </summary>
             </Description>
+            <ProcessingStatus>
+                <summary>
+                    Status of the Import of the book, whether it's imported to the system or not.
+                </summary>
+            </ProcessingStatus>
+            <AddedAtUtc>
+                <summary>
+                    UTC time when the book has been added to the Library.
+                </summary>
+            </AddedAtUtc>
         </Book>
     </Library>
 </Api>

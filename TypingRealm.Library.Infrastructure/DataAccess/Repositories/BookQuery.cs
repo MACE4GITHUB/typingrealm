@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TypingRealm.Library.Books.Queries;
+using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 
@@ -23,7 +24,7 @@ public sealed class BookQuery : IBookQuery
             .ConfigureAwait(false);
 
         return daos
-            .Select(x => new BookDto(x.Id, x.Language, x.Description, x.ProcessingStatus, x.AddedAtUtc))
+            .Select(x => DtoFromDao(x))
             .ToList();
     }
 
@@ -36,6 +37,18 @@ public sealed class BookQuery : IBookQuery
         if (dao == null)
             return null;
 
-        return new BookDto(dao.Id, dao.Language, dao.Description, dao.ProcessingStatus, dao.AddedAtUtc);
+        return DtoFromDao(dao);
+    }
+
+    private static BookDto DtoFromDao(BookDao dao)
+    {
+        return new BookDto
+        {
+            BookId = dao.Id,
+            Description = dao.Description,
+            Language = dao.Language,
+            ProcessingStatus = dao.ProcessingStatus,
+            AddedAtUtc = dao.AddedAtUtc
+        };
     }
 }
