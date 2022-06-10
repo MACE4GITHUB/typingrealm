@@ -4,10 +4,16 @@
 
     <!-- Enables ALL analyzers instead of deprecated FxCop. -->
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-
-    <!-- TODO: Consider enabling it only for *.Api projects. -->
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <Choose>
+    <When Condition="$(MSBuildProjectName.EndsWith('.Api'))">
+      <PropertyGroup>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
   <ItemDefinitionGroup>
     <!--<PackageReference>
       <PrivateAssets>all</PrivateAssets>
