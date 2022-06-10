@@ -115,6 +115,13 @@ public sealed class UploadBookDtoValidator : AbstractValidator<UploadBookDto>
 
         RuleFor(x => x.Language)
             .SetValidator(new LanguageValidator());
+
+        RuleFor(x => x.Content)
+            .NotNull()
+            .NotEmpty();
+
+        RuleFor(x => x.Content.Length)
+            .ExclusiveBetween(10, 20_000_000);
     }
 }
 
