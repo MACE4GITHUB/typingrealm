@@ -138,6 +138,9 @@ public static class RegistrationExtensions
         // Swagger.
         services.AddSwaggerGen(options =>
         {
+            // We need this to solve the issue with PascalCase [FromRoute] parameters when using objects.
+            options.DescribeAllParametersInCamelCase();
+
             options.OrderActionsBy(x => x.RelativePath);
 
             // Exclude diagnostics /api/diagnostics/* endpoints.
