@@ -170,7 +170,7 @@ public sealed class BooksController : TyrController
         return NoContent();
     }
 
-    private sealed record UploadBookResponse(string bookId);
+    public sealed record UploadBookResponse(string bookId);
     /// <summary>
     /// Uploads a new Book, but does not import it.
     /// </summary>
@@ -188,7 +188,7 @@ public sealed class BooksController : TyrController
     /// </remarks>
     [HttpPost]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionWithContent))]
-    public async ValueTask<IActionResult> UploadBook(
+    public async ValueTask<ActionResult<UploadBookResponse>> UploadBook(
         [FromQuery] UploadBookDto dto, IFormFile content)
     {
         using var stream = content.OpenReadStream();
