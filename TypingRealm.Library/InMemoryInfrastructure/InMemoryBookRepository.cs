@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TypingRealm.Library.Books;
+using TypingRealm.Library.Books.Queries;
 
 namespace TypingRealm.Library.InMemoryInfrastructure;
 
-public sealed class InMemoryBookRepository : IBookRepository
+public sealed class InMemoryBookRepository : IBookRepository, IBookQuery
 {
     private readonly Dictionary<BookId, Book> _books = new Dictionary<BookId, Book>();
     private readonly Dictionary<BookId, BookContent> _bookContents
@@ -23,12 +25,30 @@ public sealed class InMemoryBookRepository : IBookRepository
         return default;
     }
 
+    public async ValueTask<IEnumerable<BookDto>> FindAllBooksAsync()
+    {
+        return _books.Values.Select(b => b.GetState()).Select(b => new BookDto
+        {
+            BookId = b.BookId,
+            Language = b.Language,
+            ProcessingStatus = b.ProcessingStatus,
+            Description = b.Description,
+            AddedAtUtc = default
+        });
+    }
+
     public ValueTask<Book?> FindBookAsync(BookId bookId)
     {
         if (_books.TryGetValue(bookId, out var book))
             return new(book);
 
         return new((Book?)null);
+    }
+
+    public async ValueTask<BookDto?> FindBookAsync(string bookId)
+    {
+        return (await FindAllBooksAsync().ConfigureAwait(false))
+            .FirstOrDefault(x => x.BookId == bookId);
     }
 
     public ValueTask<BookContent?> FindBookContentAsync(BookId bookId)

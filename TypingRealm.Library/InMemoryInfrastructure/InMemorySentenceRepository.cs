@@ -6,10 +6,25 @@ using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.InMemoryInfrastructure;
 
-public sealed class InMemorySentenceRepository : ISentenceRepository
+public sealed class InMemorySentenceRepository : ISentenceRepository, ISentenceQuery
 {
     private readonly Dictionary<SentenceId, Sentence> _sentences
         = new Dictionary<SentenceId, Sentence>();
+
+    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesAsync(SentencesRequest request)
+    {
+        return _sentences.Values.Select(x => new SentenceDto(x.SentenceId, x.Value));
+        /*{
+            SentenceId = x.SentenceId,
+            Value = x.Value
+        });*/
+    }
+
+    public async ValueTask<IEnumerable<string>> FindWordsAsync(WordsRequest request)
+    {
+        return (await FindSentencesAsync(null!).ConfigureAwait(false)).SelectMany(x => x.Value)!.ToString()!
+            .Split(' ');
+    }
 
     public ValueTask<SentenceId> NextIdAsync()
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Library.Books;
+using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Importing;
 using TypingRealm.Library.InMemoryInfrastructure;
 using TypingRealm.Library.Sentences;
@@ -24,7 +25,11 @@ public static class RegistrationExtensions
     {
         // TODO: Implement and add here in memory IBookQuery, ISentenceQuery.
 
-        return services.AddSingleton<IBookRepository, InMemoryBookRepository>()
-            .AddSingleton<ISentenceRepository, InMemorySentenceRepository>();
+        return services.AddSingleton<InMemoryBookRepository>()
+            .AddSingleton<InMemorySentenceRepository>()
+            .AddTransient<IBookRepository>(p => p.GetRequiredService<InMemoryBookRepository>())
+            .AddTransient<ISentenceRepository>(p => p.GetRequiredService<InMemorySentenceRepository>())
+            .AddTransient<IBookQuery>(p => p.GetRequiredService<InMemoryBookRepository>())
+            .AddTransient<SentenceQueryResolver>(p => _ => p.GetRequiredService<InMemorySentenceRepository>());
     }
 }
