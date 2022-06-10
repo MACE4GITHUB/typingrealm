@@ -103,7 +103,7 @@ public sealed class BooksController : TyrController
     }
 
     [HttpGet]
-    [ProducesResponseType(200)]
+    [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetAll))]
     public async ValueTask<ActionResult<IEnumerable<BookDto>>> GetAllBooks()
     {
         var books = await _bookQuery.FindAllBooksAsync();
@@ -113,9 +113,7 @@ public sealed class BooksController : TyrController
 
     [HttpGet]
     [Route("{bookId}")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
-    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+    [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetSingle))]
     public async ValueTask<ActionResult<BookDto>> GetBookById(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
@@ -128,9 +126,7 @@ public sealed class BooksController : TyrController
 
     [HttpPut]
     [Route("{bookId}")]
-    [ProducesResponseType(203)]
-    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
-    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
+    [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionNoContent))]
     public async ValueTask<IActionResult> UpdateBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter,
         UpdateBookDto dto)
@@ -160,10 +156,7 @@ public sealed class BooksController : TyrController
     /// </remarks>
     [HttpDelete]
     [Route("{bookId}")]
-    [ProducesResponseType(203)]
-    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
-    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-    [ProducesResponseType(409, Type = typeof(DomainErrorDetails))]
+    [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionNoContent))]
     public async ValueTask<IActionResult> ArchiveBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
@@ -194,10 +187,7 @@ public sealed class BooksController : TyrController
     /// `content` should be form-data file.
     /// </remarks>
     [HttpPost]
-    [ProducesResponseType(201, Type = typeof(UploadBookResponse))]
-    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
-    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-    [ProducesResponseType(409, Type = typeof(DomainErrorDetails))]
+    [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionWithContent))]
     public async ValueTask<IActionResult> UploadBook(
         [FromQuery] UploadBookDto dto, IFormFile content)
     {
@@ -215,10 +205,7 @@ public sealed class BooksController : TyrController
 
     [HttpPost]
     [Route("{bookId}/import")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(400, Type = typeof(ValidationProblemDetails))]
-    [ProducesResponseType(404, Type = typeof(NotFoundResult))]
-    [ProducesResponseType(409, Type = typeof(DomainErrorDetails))]
+    [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionWithContent))]
     public async ValueTask<ActionResult<BookImportResult>> ImportBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
