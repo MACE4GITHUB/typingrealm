@@ -1,0 +1,25 @@
+﻿<Api>
+    <Global>
+        <Language>
+            <summary>
+                Language is an identity of one of the languages that are supported by the application.
+            </summary>
+        </Language>
+    </Global>
+    <Library>
+        <Book>
+            <BookId>
+                <summary>
+                    Identifier of a book. It should be returned when uploading a new book or
+                    it can be viewed when querying books.
+                </summary>
+            </BookId>
+            <Description>
+                <summary>
+                    The human-readable description of the book (like title or author)
+                    to distinguish it from the other books.
+                </summary>
+            </Description>
+        </Book>
+    </Library>
+</Api>

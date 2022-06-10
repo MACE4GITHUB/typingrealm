@@ -13,9 +13,32 @@ using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Api.Controllers;
 
-public sealed record BookIdRouteParameter(string BookId);
-public sealed record UpdateBookDto(string Description);
-public sealed record UploadBookDto(string Description, string Language);
+public sealed class BookIdRouteParameter
+{
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/BookId/*'/>
+    public string BookId { get; init; } = null!;
+}
+
+/// <summary>
+/// Information to update in the existing book.
+/// </summary>
+public sealed class UpdateBookDto
+{
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/Description/*'/>
+    public string Description { get; init; } = null!;
+}
+
+/// <summary>
+/// Information to upload to the Library as the new book.
+/// </summary>
+public sealed class UploadBookDto
+{
+    /// <include file='../ApiDocs.xml' path='Api/Library/Book/Description/*'/>
+    public string Description { get; init; } = null!;
+
+    /// <include file='../ApiDocs.xml' path='Api/Global/Language/*'/>
+    public string Language { get; init; } = null!;
+}
 
 public sealed class BookIdValidator : AbstractValidator<string>
 {
@@ -102,6 +125,9 @@ public sealed class BooksController : TyrController
         _archiveBookService = archiveBookService;
     }
 
+    /// <summary>
+    /// Gets all books without their content.
+    /// </summary>
     [HttpGet]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetAll))]
     public async ValueTask<ActionResult<IEnumerable<BookDto>>> GetAllBooks()
@@ -111,10 +137,13 @@ public sealed class BooksController : TyrController
         return Ok(books);
     }
 
+    /// <summary>
+    /// Finds a single book and returns the information without the content.
+    /// </summary>
     [HttpGet("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetSingle))]
     public async ValueTask<ActionResult<BookDto>> GetBookById(
-        [FromRoute] BookIdRouteParameter bookIdRouteParameter)
+        [FromQuery] BookIdRouteParameter bookIdRouteParameter)
     {
         var book = await _bookQuery.FindBookAsync(bookIdRouteParameter.BookId);
         if (book == null)
@@ -123,6 +152,10 @@ public sealed class BooksController : TyrController
         return Ok(book);
     }
 
+    /// <summary>
+    /// Updates book information.
+    /// </summary>
+    /// <param name="dto">Book information for update, these fields will be updated in the existing book.</param>
     [HttpPut("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionNoContent))]
     public async ValueTask<IActionResult> UpdateBook(

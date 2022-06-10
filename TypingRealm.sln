@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8668EAB-6602-4560-8C38-86C84FA9124C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		ApiDocs.xml = ApiDocs.xml
 		Directory.Build.props = Directory.Build.props
 		LICENSE.md = LICENSE.md
 		README.md = README.md
