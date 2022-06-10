@@ -111,8 +111,7 @@ public sealed class BooksController : TyrController
         return Ok(books);
     }
 
-    [HttpGet]
-    [Route("{bookId}")]
+    [HttpGet("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetSingle))]
     public async ValueTask<ActionResult<BookDto>> GetBookById(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
@@ -124,8 +123,7 @@ public sealed class BooksController : TyrController
         return Ok(book);
     }
 
-    [HttpPut]
-    [Route("{bookId}")]
+    [HttpPut("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionNoContent))]
     public async ValueTask<IActionResult> UpdateBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter,
@@ -154,8 +152,7 @@ public sealed class BooksController : TyrController
     ///
     ///     DELETE /api/books/{bookId}
     /// </remarks>
-    [HttpDelete]
-    [Route("{bookId}")]
+    [HttpDelete("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionNoContent))]
     public async ValueTask<IActionResult> ArchiveBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
@@ -203,8 +200,7 @@ public sealed class BooksController : TyrController
         return CreatedAtAction(nameof(GetBookById), result, result);
     }
 
-    [HttpPost]
-    [Route("{bookId}/import")]
+    [HttpPost("{bookId}/import")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.BusinessActionWithContent))]
     public async ValueTask<ActionResult<BookImportResult>> ImportBook(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
