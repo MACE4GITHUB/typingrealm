@@ -122,6 +122,10 @@ public sealed class UploadBookDtoValidator : AbstractValidator<UploadBookDto>
 
         RuleFor(x => x.Content.Length)
             .ExclusiveBetween(10, 20_000_000);
+
+        /*// Need to dispose of stream & make sure this works to use this validation.
+        RuleFor(x => x.Content)
+            .MustCreate(x => new BookContent(BookId.New(), x.OpenReadStream()));*/
     }
 }
 
