@@ -185,7 +185,7 @@ public sealed class BooksController : TyrController
     [HttpGet("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetSingle))]
     public async ValueTask<ActionResult<BookDto>> GetBookById(
-        [FromQuery] BookIdRouteParameter bookIdRouteParameter)
+        [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
         var book = await _bookQuery.FindBookAsync(bookIdRouteParameter.BookId);
         if (book == null)
