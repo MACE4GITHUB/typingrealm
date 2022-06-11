@@ -13,7 +13,11 @@ public sealed class InMemorySentenceRepository : ISentenceRepository, ISentenceQ
 
     public async ValueTask<IEnumerable<SentenceDto>> FindSentencesAsync(SentencesRequest request)
     {
-        return _sentences.Values.Select(x => new SentenceDto(x.SentenceId, x.Value));
+        return _sentences.Values.Select(x => new SentenceDto
+        {
+            SentenceId = x.SentenceId,
+            Value = x.Value
+        });
         /*{
             SentenceId = x.SentenceId,
             Value = x.Value
