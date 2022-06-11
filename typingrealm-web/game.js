@@ -315,9 +315,9 @@
                 })
             }).then(r => r.json());
 
-            typingSessionId = response.typingSessionId;
+            typingSessionId = response.typingSessionId.replace(/['"]+/g, '');
 
-            const textId = await generateText();
+            const textId = (await generateText()).replace(/['"]+/g, '');
 
             const nextResponse = await fetch(`${typingSessionsApi}/${typingSessionId}/texts`, {
                 method: 'POST',
