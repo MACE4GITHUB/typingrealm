@@ -1,49 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading.Tasks;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
+using TypingRealm.Library.Api.Sentences.Data;
 using TypingRealm.Library.Sentences;
-using TypingRealm.TextProcessing;
 
-namespace TypingRealm.Library.Api.Controllers;
-
-public sealed class LanguageQueryParameter
-{
-    /// <include file='../ApiDocs.xml' path='Api/Global/Language/*'/>
-    [DefaultValue(TextConstants.DefaultLanguageValue)]
-    public string Language { get; init; } = TextConstants.DefaultLanguageValue;
-}
-
-public sealed class LanguageQueryParameterValidator : AbstractValidator<LanguageQueryParameter>
-{
-    public LanguageQueryParameterValidator()
-    {
-        RuleFor(x => x.Language)
-            .SetValidator(new LanguageValidator());
-    }
-}
-
-public sealed class SentencesRequestValidator : AbstractValidator<SentencesRequest>
-{
-    public SentencesRequestValidator()
-    {
-        RuleFor(x => x)
-            .Must(x => x.IsValid())
-            .WithMessage(x => string.Join("; ", x.GetErrorsIfInvalid()));
-    }
-}
-
-public sealed class WordsRequestValidator : AbstractValidator<WordsRequest>
-{
-    public WordsRequestValidator()
-    {
-        RuleFor(x => x)
-            .Must(x => x.IsValid())
-            .WithMessage(x => string.Join("; ", x.GetErrorsIfInvalid()));
-    }
-}
+namespace TypingRealm.Library.Api.Sentences;
 
 [Route(ServiceConfiguration.SentencesApiPrefix)]
 public sealed class SentencesController : TyrController

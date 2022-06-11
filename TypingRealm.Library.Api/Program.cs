@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
-using TypingRealm.Library.Api.Controllers;
+using TypingRealm.Library.Api.Books;
 using TypingRealm.Library.Infrastructure;
 
 // The Library service serves as the reference WebAPI service of the whole
@@ -12,7 +12,7 @@ using TypingRealm.Library.Infrastructure;
 
 // This creates a host that needs only API endpoints, registering all common
 // implementations shared between all project's Web API services.
-var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(SentencesController).Assembly);
+var builder = HostFactory.CreateWebApiApplicationBuilder(typeof(BooksController).Assembly);
 
 // This Library.Infrastructure extension method should register everything
 // needed by the whole Library service.
