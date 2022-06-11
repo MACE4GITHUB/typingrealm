@@ -133,7 +133,7 @@ public static class RegistrationExtensions
         });
 
         // Fluent validation.
-        mvcBuilder.AddFluentValidation();
+        mvcBuilder.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(controllersAssemblies));
 
         // Swagger.
         services.AddSwaggerGen(options =>
