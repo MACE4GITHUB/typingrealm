@@ -46,7 +46,7 @@ public sealed class BooksController : TyrController
     /// </remarks>
     [HttpGet]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetAll))]
-    public async ValueTask<ActionResult<IEnumerable<BookDto>>> GetAllBooks()
+    public async ValueTask<ActionResult<IEnumerable<BookView>>> GetAllBooks()
     {
         var books = await _bookQuery.FindAllBooksAsync();
 
@@ -66,7 +66,7 @@ public sealed class BooksController : TyrController
     /// </remarks>
     [HttpGet("{bookId}")]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetSingle))]
-    public async ValueTask<ActionResult<BookDto>> GetBookById(
+    public async ValueTask<ActionResult<BookView>> GetBookById(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
         var book = await _bookQuery.FindBookAsync(bookIdRouteParameter.BookId);

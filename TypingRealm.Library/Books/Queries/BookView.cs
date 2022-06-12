@@ -5,7 +5,7 @@ namespace TypingRealm.Library.Books.Queries;
 /// <summary>
 /// Book information without context that can be Queried through the API.
 /// </summary>
-public sealed class BookDto
+public sealed class BookView
 {
     /// <include file='../ApiDocs.xml' path='Api/Library/Book/BookId/*'/>
     public string BookId { get; init; } = null!;

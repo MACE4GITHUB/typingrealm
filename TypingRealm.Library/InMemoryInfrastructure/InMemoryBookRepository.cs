@@ -25,9 +25,9 @@ public sealed class InMemoryBookRepository : IBookRepository, IBookQuery
         return default;
     }
 
-    public async ValueTask<IEnumerable<BookDto>> FindAllBooksAsync()
+    public async ValueTask<IEnumerable<BookView>> FindAllBooksAsync()
     {
-        return _books.Values.Select(b => b.GetState()).Select(b => new BookDto
+        return _books.Values.Select(b => b.GetState()).Select(b => new BookView
         {
             BookId = b.BookId,
             Language = b.Language,
@@ -45,7 +45,7 @@ public sealed class InMemoryBookRepository : IBookRepository, IBookQuery
         return new((Book?)null);
     }
 
-    public async ValueTask<BookDto?> FindBookAsync(string bookId)
+    public async ValueTask<BookView?> FindBookAsync(string bookId)
     {
         return (await FindAllBooksAsync().ConfigureAwait(false))
             .FirstOrDefault(x => x.BookId == bookId);

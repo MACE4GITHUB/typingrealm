@@ -16,7 +16,7 @@ public sealed class BookQuery : IBookQuery
         _dbContext = dbContext;
     }
 
-    public async ValueTask<IEnumerable<BookDto>> FindAllBooksAsync()
+    public async ValueTask<IEnumerable<BookView>> FindAllBooksAsync()
     {
         var daos = await _dbContext.Book.AsNoTracking()
             .Where(x => !x.IsArchived)
@@ -28,7 +28,7 @@ public sealed class BookQuery : IBookQuery
             .ToList();
     }
 
-    public async ValueTask<BookDto?> FindBookAsync(string bookId)
+    public async ValueTask<BookView?> FindBookAsync(string bookId)
     {
         var dao = await _dbContext.Book.AsNoTracking()
             .SingleOrDefaultAsync(x => !x.IsArchived && x.Id == bookId)
@@ -40,9 +40,9 @@ public sealed class BookQuery : IBookQuery
         return DtoFromDao(dao);
     }
 
-    private static BookDto DtoFromDao(BookDao dao)
+    private static BookView DtoFromDao(BookDao dao)
     {
-        return new BookDto
+        return new BookView
         {
             BookId = dao.Id,
             Description = dao.Description,
