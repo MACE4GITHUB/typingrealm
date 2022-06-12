@@ -108,7 +108,7 @@ public class BookTests : LibraryTestsBase
         var sut = Fixture.CreateBook(config => config
             .With(x => x.IsArchived, true));
 
-        Assert.Throws<InvalidOperationException>(() => sut.StartProcessing());
+        Assert.Throws<DomainException>(() => sut.StartProcessing());
     }
 
     [Theory]
@@ -134,7 +134,7 @@ public class BookTests : LibraryTestsBase
             .With(x => x.IsArchived, true)
             .With(x => x.ProcessingStatus, ProcessingStatus.Processing));
 
-        Assert.Throws<InvalidOperationException>(() => sut.FinishProcessing());
+        Assert.Throws<DomainException>(() => sut.FinishProcessing());
     }
 
     [Theory]
@@ -147,7 +147,7 @@ public class BookTests : LibraryTestsBase
             .With(x => x.IsArchived, false)
             .With(x => x.ProcessingStatus, status));
 
-        Assert.Throws<InvalidOperationException>(() => sut.FinishProcessing());
+        Assert.Throws<DomainException>(() => sut.FinishProcessing());
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class BookTests : LibraryTestsBase
             .With(x => x.IsArchived, true)
             .With(x => x.ProcessingStatus, ProcessingStatus.Processing));
 
-        Assert.Throws<InvalidOperationException>(() => sut.ErrorProcessing());
+        Assert.Throws<DomainException>(() => sut.ErrorProcessing());
     }
 
     [Theory]
@@ -182,7 +182,7 @@ public class BookTests : LibraryTestsBase
             .With(x => x.IsArchived, false)
             .With(x => x.ProcessingStatus, status));
 
-        Assert.Throws<InvalidOperationException>(() => sut.ErrorProcessing());
+        Assert.Throws<DomainException>(() => sut.ErrorProcessing());
     }
 
     [Fact]
@@ -203,7 +203,7 @@ public class BookTests : LibraryTestsBase
         var sut = Fixture.CreateBook(config => config
             .With(x => x.IsArchived, true));
 
-        Assert.Throws<InvalidOperationException>(() => sut.Archive());
+        Assert.Throws<DomainException>(() => sut.Archive());
     }
 
     [Fact]

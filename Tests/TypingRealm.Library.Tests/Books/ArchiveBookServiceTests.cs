@@ -24,31 +24,23 @@ public class ArchiveBookServiceTests : LibraryTestsBase
     }
 
     [Theory, AutoDomainData]
-    public async Task ShouldArchiveBook_ThenUpdateAllSentences_WhenBookExists_AndNotArchived(
-        BookId bookId)
+    public async Task ShouldArchiveBook_ThenRemoveAllSentences_WhenNotArchived()
     {
         var book = Fixture.CreateBook(config => config
             .With(x => x.IsArchived, false));
 
-        _bookRepository.Setup(x => x.FindBookAsync(bookId))
-            .ReturnsAsync(book);
-
-        await _sut.ArchiveBookAsync(bookId);
+        await _sut.ArchiveBookAsync(book);
 
         _bookRepository.Verify(x => x.UpdateBookAsync(book));
         _bookRepository.Verify(x => x.UpdateBookAsync(It.Is<Book>(book => book.GetState().IsArchived)));
-        _sentenceRepository.Verify(x => x.RemoveAllForBook(bookId));
+        _sentenceRepository.Verify(x => x.RemoveAllForBook(book.BookId));
     }
 
     [Theory, AutoDomainData]
-    public async Task ShouldThrow_AndNotUpdateAnything_WhenBookDoesNotExist(
-        BookId bookId)
+    public async Task ShouldThrow_AndNotUpdateAnything_WhenBookIsNull()
     {
-        _bookRepository.Setup(x => x.FindBookAsync(bookId))
-            .ReturnsAsync((Book?)null);
-
-        await AssertThrowsAsync<InvalidOperationException>(
-            () => _sut.ArchiveBookAsync(bookId));
+        await AssertThrowsAsync<ArgumentNullException>(
+            () => _sut.ArchiveBookAsync(null!));
 
         _sentenceRepository.Verify(x => x.RemoveAllForBook(It.IsAny<BookId>()), Times.Never);
         _bookRepository.Verify(x => x.UpdateBookAsync(It.IsAny<Book>()), Times.Never);
@@ -56,28 +48,24 @@ public class ArchiveBookServiceTests : LibraryTestsBase
 
     [Theory, AutoDomainData]
     public async Task ShouldNotRemoveSentences_WhenArchivingFails(
-        BookId bookId)
+        Book book)
     {
-        _bookRepository.Setup(x => x.FindBookAsync(bookId))
+        _bookRepository.Setup(x => x.UpdateBookAsync(book))
             .ThrowsAsync(NewTestException());
 
         await AssertThrowsAsync<TestException>(
-            () => _sut.ArchiveBookAsync(bookId));
+            () => _sut.ArchiveBookAsync(book));
 
-        _sentenceRepository.Verify(x => x.RemoveAllForBook(bookId), Times.Never);
+        _sentenceRepository.Verify(x => x.RemoveAllForBook(book.BookId), Times.Never);
     }
 
     [Theory, AutoDomainData]
-    public async Task ShouldNotUpdateAnything_WhenBookIsAlreadyArchived(
-        BookId bookId)
+    public async Task ShouldNotUpdateAnything_WhenBookIsAlreadyArchived()
     {
         var book = Fixture.CreateBook(config => config.With(x => x.IsArchived, true));
 
-        _bookRepository.Setup(x => x.FindBookAsync(bookId))
-            .ReturnsAsync(book);
-
-        await AssertThrowsAsync<InvalidOperationException>(
-            () => _sut.ArchiveBookAsync(bookId));
+        await AssertThrowsAsync<DomainException>(
+            () => _sut.ArchiveBookAsync(book));
 
         _sentenceRepository.Verify(x => x.RemoveAllForBook(It.IsAny<BookId>()), Times.Never);
         _bookRepository.Verify(x => x.UpdateBookAsync(It.IsAny<Book>()), Times.Never);

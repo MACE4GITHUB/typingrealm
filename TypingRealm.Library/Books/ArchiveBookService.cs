@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using TypingRealm.Library.Sentences;
 
 namespace TypingRealm.Library.Books;
@@ -16,6 +17,8 @@ public sealed class ArchiveBookService
 
     public async ValueTask ArchiveBookAsync(Book book)
     {
+        ArgumentNullException.ThrowIfNull(book);
+
         book.Archive();
 
         await _bookRepository.UpdateBookAsync(book)

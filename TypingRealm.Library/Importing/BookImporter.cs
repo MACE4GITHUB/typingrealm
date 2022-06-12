@@ -42,6 +42,8 @@ public sealed class BookImporter : IBookImporter
 
     public async ValueTask<BookImportResult> ImportBookAsync(Book book)
     {
+        ArgumentNullException.ThrowIfNull(book);
+
         var bookId = book.BookId;
 
         var bookContent = await _bookStore.FindBookContentAsync(bookId)
