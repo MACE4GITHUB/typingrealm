@@ -5,6 +5,6 @@ namespace TypingRealm.Library.Books.Queries;
 
 public interface IBookQuery
 {
-    ValueTask<BookView?> FindBookAsync(string bookId);
+    ValueTask<BookView?> FindBookAsync(BookId bookId);
     ValueTask<IEnumerable<BookView>> FindAllBooksAsync();
 }

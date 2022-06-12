@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TypingRealm.Library.Books;
 using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 
@@ -28,10 +29,10 @@ public sealed class BookQuery : IBookQuery
             .ToList();
     }
 
-    public async ValueTask<BookView?> FindBookAsync(string bookId)
+    public async ValueTask<BookView?> FindBookAsync(BookId bookId)
     {
         var dao = await _dbContext.Book.AsNoTracking()
-            .SingleOrDefaultAsync(x => !x.IsArchived && x.Id == bookId)
+            .SingleOrDefaultAsync(x => !x.IsArchived && x.Id == bookId.Value)
             .ConfigureAwait(false);
 
         if (dao == null)

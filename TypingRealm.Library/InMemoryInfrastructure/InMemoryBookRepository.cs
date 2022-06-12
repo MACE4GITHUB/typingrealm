@@ -25,30 +25,10 @@ public sealed class InMemoryBookRepository : IBookRepository, IBookQuery
         return default;
     }
 
-    public async ValueTask<IEnumerable<BookView>> FindAllBooksAsync()
-    {
-        return _books.Values.Select(b => b.GetState()).Select(b => new BookView
-        {
-            BookId = b.BookId,
-            Language = b.Language,
-            ProcessingStatus = b.ProcessingStatus,
-            Description = b.Description,
-            AddedAtUtc = default
-        });
-    }
-
     public ValueTask<Book?> FindBookAsync(BookId bookId)
     {
-        if (_books.TryGetValue(bookId, out var book))
-            return new(book);
-
-        return new((Book?)null);
-    }
-
-    public async ValueTask<BookView?> FindBookAsync(string bookId)
-    {
-        return (await FindAllBooksAsync().ConfigureAwait(false))
-            .FirstOrDefault(x => x.BookId == bookId);
+        _books.TryGetValue(bookId, out var book);
+        return new(book);
     }
 
     public ValueTask<BookContent?> FindBookContentAsync(BookId bookId)
@@ -73,5 +53,23 @@ public sealed class InMemoryBookRepository : IBookRepository, IBookQuery
         _books[state.BookId] = book;
 
         return default;
+    }
+
+    async ValueTask<IEnumerable<BookView>> IBookQuery.FindAllBooksAsync()
+    {
+        return _books.Values.Select(b => b.GetState()).Select(b => new BookView
+        {
+            BookId = b.BookId,
+            Language = b.Language,
+            ProcessingStatus = b.ProcessingStatus,
+            Description = b.Description,
+            AddedAtUtc = default
+        });
+    }
+
+    async ValueTask<BookView?> IBookQuery.FindBookAsync(BookId bookId)
+    {
+        return (await ((IBookQuery)this).FindAllBooksAsync().ConfigureAwait(false))
+            .FirstOrDefault(x => x.BookId == bookId);
     }
 }

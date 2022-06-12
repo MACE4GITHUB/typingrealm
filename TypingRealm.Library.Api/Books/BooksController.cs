@@ -69,7 +69,7 @@ public sealed class BooksController : TyrController
     public async ValueTask<ActionResult<BookView>> GetBookById(
         [FromRoute] BookIdRouteParameter bookIdRouteParameter)
     {
-        var book = await _bookQuery.FindBookAsync(bookIdRouteParameter.BookId);
+        var book = await _bookQuery.FindBookAsync(new(bookIdRouteParameter.BookId));
         if (book == null)
             return NotFound();
 
