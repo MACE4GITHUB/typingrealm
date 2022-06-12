@@ -136,7 +136,7 @@ public sealed class SentenceQuery : ISentenceQuery
         var result = joinResult
             .OrderBy(x => x.Index)
             .Take(maxSentencesCount)
-            .Select(x => new SentenceDto { SentenceId = x.SentenceId, Value = x.Value })
+            .Select(x => new SentenceDto(x.SentenceId, x.Value))
             .ToList();
 
         return result;
@@ -180,7 +180,7 @@ public sealed class SentenceQuery : ISentenceQuery
         var result = sentences
             .DistinctBy(x => x.SentenceId)
             .OrderByDescending(x => x.CountInSentence)
-            .Select(x => new SentenceDto { SentenceId = x.SentenceId, Value = x.SentenceValue })
+            .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
             .Take(maxSentencesCount)
             .ToList();
 
@@ -210,7 +210,7 @@ public sealed class SentenceQuery : ISentenceQuery
         var result = sentences
             .DistinctBy(x => x.SentenceId)
             .OrderByDescending(x => x.RawCountInSentence)
-            .Select(x => new SentenceDto { SentenceId = x.SentenceId, Value = x.SentenceValue })
+            .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
             .Take(maxSentencesCount)
             .ToList();
 

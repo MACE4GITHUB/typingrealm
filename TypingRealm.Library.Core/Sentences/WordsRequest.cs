@@ -27,20 +27,20 @@ public sealed class WordsRequest
     /// it's more than 1, then some of the words will follow each other just
     /// like in a regular sentence.
     /// </summary>
-    public int ConsecutiveCount { get; set; } = 1;
+    public int ConsecutiveCount { get; init; } = 1;
 
     /// <summary>
     /// Specifies text parts that you need your words to contain. This works
     /// only with <see cref="WordsRequestType.ContainingKeyPairs" />.
     /// </summary>
-    public IEnumerable<string> Contains { get; set; } = Enumerable.Empty<string>();
+    public IEnumerable<string> Contains { get; init; } = Enumerable.Empty<string>();
 
     /// <summary>
     /// Indicates whether words should be stripped from any punctuation and made
     /// lowercase, to get raw alphabet symbols. Can be useful for letter
     /// practice or for parts of menus and other in-game interactions.
     /// </summary>
-    public bool RawWords { get; set; }
+    public bool RawWords { get; init; }
 
     public static WordsRequest Random(int count) => Random(count, 1);
     public static WordsRequest Random(int count, int consecutiveCount) => new WordsRequest

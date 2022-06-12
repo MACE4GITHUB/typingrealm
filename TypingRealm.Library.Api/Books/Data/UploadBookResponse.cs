@@ -3,8 +3,8 @@
 /// <summary>
 /// Response after uploading the Book.
 /// </summary>
-public sealed class UploadBookResponse
+public sealed record UploadBookResponse(string BookId)
 {
     /// <include file='../ApiDocs.xml' path='Api/Library/Book/BookId/*'/>
-    public string BookId { get; init; } = null!;
+    public string BookId { get; init; } = BookId;
 }

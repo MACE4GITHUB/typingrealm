@@ -163,10 +163,7 @@ public sealed class BooksController : TyrController
 
         await _bookRepository.AddBookWithContentAsync(book, bookContent);
 
-        var result = new UploadBookResponse
-        {
-            BookId = bookId
-        };
+        var result = new UploadBookResponse(bookId);
 
         return CreatedAtAction(nameof(GetBookById), result, result);
     }

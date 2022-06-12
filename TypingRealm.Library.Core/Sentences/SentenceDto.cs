@@ -8,7 +8,7 @@
 /// remove / disable some sentences for users if they want to avoid typing them
 /// again.
 /// </remarks>
-public sealed class SentenceDto
+public sealed record SentenceDto(string SentenceId, string Value)
 {
     /// <summary>
     /// Sentence unique identifier.
@@ -16,10 +16,10 @@ public sealed class SentenceDto
     /// <remarks>
     /// Later we might be able to disable select sentences.
     /// </remarks>
-    public string SentenceId { get; init; } = null!;
+    public string SentenceId { get; init; } = SentenceId;
 
     /// <summary>
     /// Text value of the sentence.
     /// </summary>
-    public string Value { get; init; } = null!;
+    public string Value { get; init; } = Value;
 }

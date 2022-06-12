@@ -6,7 +6,7 @@ namespace TypingRealm.Library.Sentences;
 /// <summary>
 /// Request to get Sentences from the Library.
 /// </summary>
-public sealed class SentencesRequest
+public sealed record SentencesRequest
 {
     private const int MaxCountLimit = 10000;
 
