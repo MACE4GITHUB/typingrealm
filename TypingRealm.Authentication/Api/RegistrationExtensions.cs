@@ -111,6 +111,7 @@ public static class RegistrationExtensions
 
         services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
         services.AddTransient<IProfileTokenService, HttpContextProfileTokenService>();
+        services.AddTransient<IProfileService, HttpContextProfileService>();
 
         return services;
 

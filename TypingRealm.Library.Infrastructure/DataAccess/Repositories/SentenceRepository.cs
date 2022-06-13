@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using NpgsqlTypes;
+using TypingRealm.Authentication.Api;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Infrastructure.DataAccess.Entities;
 using TypingRealm.Library.Sentences;
@@ -22,13 +23,16 @@ public sealed class SentenceRepository : ISentenceRepository
 {
     private readonly LibraryDbContext _dbContext;
     private readonly ILogger<SentenceRepository> _logger;
+    private readonly IProfileService _profileService;
 
     public SentenceRepository(
         LibraryDbContext dbContext,
-        ILogger<SentenceRepository> logger)
+        ILogger<SentenceRepository> logger,
+        IProfileService profileService)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _profileService = profileService;
     }
 
     public ValueTask<SentenceId> NextIdAsync() => new(new SentenceId(Guid.NewGuid().ToString()));
@@ -114,7 +118,8 @@ public sealed class SentenceRepository : ISentenceRepository
             .UseSnakeCaseNamingConvention()
             .Options;
 
-        using var context = new LibraryDbContext(options);
+        // TODO: Use some kind of DbContext factory for this.
+        using var context = new LibraryDbContext(options, _profileService);
         context.ChangeTracker.AutoDetectChangesEnabled = false;
         await context.Database.UseTransactionAsync(transaction)
             .ConfigureAwait(false);

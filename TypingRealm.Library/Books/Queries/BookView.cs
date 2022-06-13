@@ -21,4 +21,7 @@ public sealed class BookView
 
     /// <include file='../ApiDocs.xml' path='Api/Global/CreatedAtUtc/*'/>
     public DateTime CreatedAtUtc { get; init; }
+    public DateTime UpdatedAtUtc { get; init; }
+    public string? CreatedBy { get; init; }
+    public string? UpdatedBy { get; init; }
 }

@@ -49,7 +49,10 @@ public sealed class BookQuery : IBookQuery
             Description = dao.Description,
             Language = dao.Language,
             ProcessingStatus = dao.ProcessingStatus,
-            CreatedAtUtc = dao.CreatedAtUtc
+            CreatedAtUtc = dao.CreatedAtUtc,
+            UpdatedAtUtc = dao.UpdatedAtUtc,
+            CreatedBy = dao.CreatedBy,
+            UpdatedBy = dao.UpdatedBy
         };
     }
 }
