@@ -13,7 +13,7 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 [Index(nameof(AddedAtUtc))]
 [Index(nameof(ContentId))]
 [Index(nameof(Language))]
-public class BookDao : IDao<BookDao>
+public class BookDao : TrackableDao, IDao<BookDao>
 {
     [Key]
     [MaxLength(BookId.MaxLength)]
