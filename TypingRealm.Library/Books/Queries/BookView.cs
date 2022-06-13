@@ -19,6 +19,6 @@ public sealed class BookView
     /// <include file='../ApiDocs.xml' path='Api/Library/Book/ProcessingStatus/*'/>
     public ProcessingStatus ProcessingStatus { get; init; }
 
-    /// <include file='../ApiDocs.xml' path='Api/Library/Book/AddedAtUtc/*'/>
-    public DateTime AddedAtUtc { get; init; }
+    /// <include file='../ApiDocs.xml' path='Api/Global/CreatedAtUtc/*'/>
+    public DateTime CreatedAtUtc { get; init; }
 }

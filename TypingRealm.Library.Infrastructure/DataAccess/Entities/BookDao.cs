@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using TypingRealm.Library.Books;
@@ -10,7 +9,6 @@ namespace TypingRealm.Library.Infrastructure.DataAccess.Entities;
 [Index(nameof(Description))]
 [Index(nameof(ProcessingStatus))]
 [Index(nameof(IsArchived))]
-[Index(nameof(AddedAtUtc))]
 [Index(nameof(ContentId))]
 [Index(nameof(Language))]
 public class BookDao : TrackableDao, IDao<BookDao>
@@ -33,8 +31,6 @@ public class BookDao : TrackableDao, IDao<BookDao>
 
     public bool IsArchived { get; set; }
 
-    public DateTime AddedAtUtc { get; set; }
-
     public virtual ICollection<SentenceDao> Sentences { get; set; }
 
     public static BookDao ToDao(Book book)
@@ -48,8 +44,7 @@ public class BookDao : TrackableDao, IDao<BookDao>
             Language = state.Language,
             ContentId = state.BookId,
             ProcessingStatus = state.ProcessingStatus,
-            IsArchived = state.IsArchived,
-            AddedAtUtc = DateTime.UtcNow
+            IsArchived = state.IsArchived
         };
     }
 
@@ -76,9 +71,6 @@ public class BookDao : TrackableDao, IDao<BookDao>
 
         if (IsArchived != from.IsArchived)
             IsArchived = from.IsArchived;
-
-        if (AddedAtUtc == default && AddedAtUtc != from.AddedAtUtc)
-            AddedAtUtc = from.AddedAtUtc;
     }
 }
 #pragma warning restore CS8618

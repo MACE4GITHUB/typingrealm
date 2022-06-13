@@ -5,6 +5,11 @@
                 Language is an identity of one of the languages that are supported by the application.
             </summary>
         </Language>
+        <CreatedAtUtc>
+            <summary>
+                Shows the date when the entity has been created.
+            </summary>
+        </CreatedAtUtc>
     </Global>
     <Library>
         <Book>
@@ -25,11 +30,6 @@
                     Status of the Import of the book, whether it's imported to the system or not.
                 </summary>
             </ProcessingStatus>
-            <AddedAtUtc>
-                <summary>
-                    UTC time when the book has been added to the Library.
-                </summary>
-            </AddedAtUtc>
         </Book>
     </Library>
 </Api>

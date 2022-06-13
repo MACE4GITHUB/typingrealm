@@ -63,7 +63,7 @@ public sealed class InMemoryBookRepository : IBookRepository, IBookQuery
             Language = b.Language,
             ProcessingStatus = b.ProcessingStatus,
             Description = b.Description,
-            AddedAtUtc = default
+            CreatedAtUtc = default
         });
     }
 
