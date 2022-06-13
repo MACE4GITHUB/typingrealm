@@ -10,7 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypingRealm.Common\TypingRealm.Common.csproj" />
-    <ProjectReference Include="..\TypingRealm.Library.Api.Client\TypingRealm.Library.Api.Client.csproj" />
+    <ProjectReference Include="..\TypingRealm.Communication\TypingRealm.Communication.csproj" />
+    <ProjectReference Include="..\TypingRealm.Library.Core\TypingRealm.Library.Core.csproj" />
     <ProjectReference Include="..\TypingRealm.TextProcessing\TypingRealm.TextProcessing.csproj" />
     <ProjectReference Include="..\TypingRealm.Texts.Core\TypingRealm.Texts.Core.csproj" />
   </ItemGroup>

@@ -228,7 +228,8 @@ public sealed class ServiceGenerator
         }
 
         // API Client project.
-        {
+        // Do not create API Client project, use proper DI from now on.
+        /*{
             var file = PrepareFolder(rootFolder, service.ServiceProjects.ApiClientPath);
 
             var projects = new[]
@@ -245,7 +246,7 @@ public sealed class ServiceGenerator
             {
                 UpdateProjectFile(service, file, includeProjects: projects);
             }
-        }
+        }*/
 
         // Infrastructure project.
         {
