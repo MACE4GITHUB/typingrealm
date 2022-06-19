@@ -27,9 +27,15 @@ public class AutoDomainDataAttribute : AutoDataAttribute
 
     public static IFixture CreateFixture()
     {
-        return AutoMoqDataAttribute.CreateFixture()
+        var fixture = AutoMoqDataAttribute.CreateFixture()
             .Customize(new TextProcessing.Tests.DomainCustomization())
             .Customize(new DomainCustomization());
+
+        fixture.Register(() => fixture.Build<Book.State>()
+            .With(x => x.ProcessingStatus, ProcessingStatus.Processed)
+            .Create());
+
+        return fixture;
     }
 }
 
@@ -49,9 +55,10 @@ public class DomainCustomization : ICustomization
 
 public static class DomainExtensions
 {
-    public static Book CreateBook(this IFixture fixture, Func<ICustomizationComposer<Book.State>, IPostprocessComposer<Book.State>> config)
+    public static Book CreateBook(this IFixture fixture, Func<IPostprocessComposer<Book.State>, IPostprocessComposer<Book.State>> config)
     {
-        var composer = fixture.Build<Book.State>();
+        var composer = fixture.Build<Book.State>()
+            .With(x => x.ProcessingStatus, ProcessingStatus.Processed);
 
         var postProcess = config(composer);
 

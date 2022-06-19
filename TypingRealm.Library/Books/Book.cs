@@ -137,6 +137,7 @@ public sealed class CanBeArchivedSpecification : Specification<Book.State>
 {
     public override Expression<Func<Book.State, bool>> ToExpression()
     {
-        return state => !state.IsArchived;
+        return state => !state.IsArchived
+            && state.ProcessingStatus != ProcessingStatus.Processing;
     }
 }
