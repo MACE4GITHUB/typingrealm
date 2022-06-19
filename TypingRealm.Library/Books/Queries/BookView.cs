@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace TypingRealm.Library.Books.Queries;
+﻿namespace TypingRealm.Library.Books.Queries;
 
 /// <summary>
 /// Book information without context that can be Queried through the API.
 /// </summary>
-public sealed class BookView
+public sealed class BookView : TrackableView
 {
     /// <include file='../ApiDocs.xml' path='Api/Library/Book/BookId/*'/>
     public string BookId { get; init; } = null!;
@@ -18,10 +16,4 @@ public sealed class BookView
 
     /// <include file='../ApiDocs.xml' path='Api/Library/Book/ProcessingStatus/*'/>
     public ProcessingStatus ProcessingStatus { get; init; }
-
-    /// <include file='../ApiDocs.xml' path='Api/Global/CreatedAtUtc/*'/>
-    public DateTime CreatedAtUtc { get; init; }
-    public DateTime UpdatedAtUtc { get; init; }
-    public string? CreatedBy { get; init; }
-    public string? UpdatedBy { get; init; }
 }
