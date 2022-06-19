@@ -131,6 +131,10 @@ public sealed class BooksController : TyrController
         if (book == null)
             return NotFound();
 
+        // An example of using Domain Specification for Application layer validation.
+        if (!new CanBeArchivedSpecification().IsSatisfiedBy(book.GetState()))
+            return Conflict("Book cannot be archived in current state.");
+
         await _archiveBookService.ArchiveBookAsync(book);
         return NoContent();
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq.Expressions;
 using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Books;
@@ -108,13 +109,34 @@ public sealed class Book
 
     public void Archive()
     {
-        if (_state.IsArchived)
-            throw new DomainException("Book has already been archived.");
+        var canBeArchived = new CanBeArchivedSpecification();
+        if (!canBeArchived.IsSatisfiedBy(_state))
+            throw new DomainException("Book cannot be archived in current state. It has probably already been archived.");
 
         _state = _state with
         {
             IsArchived = true,
             ProcessingStatus = ProcessingStatus.NotProcessed
         };
+    }
+}
+
+public abstract class Specification<T>
+{
+    public abstract Expression<Func<T, bool>> ToExpression();
+
+    public bool IsSatisfiedBy(T entity)
+    {
+        var predicate = ToExpression().Compile();
+
+        return predicate(entity);
+    }
+}
+
+public sealed class CanBeArchivedSpecification : Specification<Book.State>
+{
+    public override Expression<Func<Book.State, bool>> ToExpression()
+    {
+        return state => !state.IsArchived;
     }
 }
