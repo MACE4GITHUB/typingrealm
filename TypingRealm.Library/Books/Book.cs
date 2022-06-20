@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq.Expressions;
+using TypingRealm.Library.Books.Specifications;
 using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Books;
@@ -118,14 +118,5 @@ public sealed class Book
             IsArchived = true,
             ProcessingStatus = ProcessingStatus.NotProcessed
         };
-    }
-}
-
-public sealed class CanBeArchivedSpecification : Specification<Book.State>
-{
-    public override Expression<Func<Book.State, bool>> ToExpression()
-    {
-        return state => !state.IsArchived
-            && state.ProcessingStatus != ProcessingStatus.Processing;
     }
 }
