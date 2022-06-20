@@ -4,6 +4,7 @@ using AutoFixture;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TypingRealm.Library.Books;
+using TypingRealm.Library.Infrastructure;
 using TypingRealm.Library.Sentences;
 using TypingRealm.Testing;
 using Xunit;

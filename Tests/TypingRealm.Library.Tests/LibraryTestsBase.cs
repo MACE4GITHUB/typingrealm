@@ -4,6 +4,7 @@ using AutoFixture.Dsl;
 using AutoFixture.Xunit2;
 using Microsoft.Extensions.DependencyInjection;
 using TypingRealm.Library.Books;
+using TypingRealm.Library.Infrastructure;
 using TypingRealm.Testing;
 
 namespace TypingRealm.Library.Tests;

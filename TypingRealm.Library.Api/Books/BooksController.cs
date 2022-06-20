@@ -6,6 +6,7 @@ using TypingRealm.Hosting;
 using TypingRealm.Library.Api.Books.Data;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Books.Queries;
+using TypingRealm.Library.Books.Specifications;
 using TypingRealm.Library.Importing;
 using TypingRealm.TextProcessing;
 
