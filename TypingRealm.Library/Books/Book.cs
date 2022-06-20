@@ -121,18 +121,6 @@ public sealed class Book
     }
 }
 
-public abstract class Specification<T>
-{
-    public abstract Expression<Func<T, bool>> ToExpression();
-
-    public bool IsSatisfiedBy(T entity)
-    {
-        var predicate = ToExpression().Compile();
-
-        return predicate(entity);
-    }
-}
-
 public sealed class CanBeArchivedSpecification : Specification<Book.State>
 {
     public override Expression<Func<Book.State, bool>> ToExpression()
