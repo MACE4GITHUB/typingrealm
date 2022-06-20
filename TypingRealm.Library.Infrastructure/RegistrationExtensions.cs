@@ -5,6 +5,7 @@ using TypingRealm.Library.Books;
 using TypingRealm.Library.Books.Queries;
 using TypingRealm.Library.Infrastructure.DataAccess;
 using TypingRealm.Library.Infrastructure.DataAccess.Repositories;
+using TypingRealm.Library.InMemoryInfrastructure;
 using TypingRealm.Library.Sentences;
 using TypingRealm.TextProcessing;
 
@@ -44,5 +45,17 @@ public static class RegistrationExtensions
             language));
 
         return services;
+    }
+
+    public static IServiceCollection AddInMemoryInfrastructure(this IServiceCollection services)
+    {
+        // TODO: Implement and add here in memory IBookQuery, ISentenceQuery.
+
+        return services.AddSingleton<InMemoryBookRepository>()
+            .AddSingleton<InMemorySentenceRepository>()
+            .AddTransient<IBookRepository>(p => p.GetRequiredService<InMemoryBookRepository>())
+            .AddTransient<ISentenceRepository>(p => p.GetRequiredService<InMemorySentenceRepository>())
+            .AddTransient<IBookQuery>(p => p.GetRequiredService<InMemoryBookRepository>())
+            .AddTransient<SentenceQueryResolver>(p => _ => p.GetRequiredService<InMemorySentenceRepository>());
     }
 }
