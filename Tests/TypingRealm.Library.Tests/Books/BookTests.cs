@@ -242,9 +242,13 @@ public class BookTests : LibraryTestsBase
     }
 
     [Fact]
-    public void BookId_New_ShouldCreateNewGuid()
+    public void BookId_New_ShouldCreateNewGuid_PrefixedByBookId()
     {
-        Assert.True(Guid.TryParse(BookId.New(), out var id));
+        var bookId = BookId.New();
+        Assert.StartsWith("bookId-", bookId);
+
+        var value = bookId.Value.Replace("bookId-", string.Empty);
+        Assert.True(Guid.TryParse(value, out var id));
         Assert.NotEqual(Guid.Empty, id);
     }
 

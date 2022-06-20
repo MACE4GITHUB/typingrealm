@@ -12,5 +12,5 @@ public sealed class BookId : Identity
         Validation.ValidateLength(value, MinLength, MaxLength);
     }
 
-    public static BookId New() => new(Guid.NewGuid().ToString());
+    public static BookId New() => new($"bookId-{Guid.NewGuid()}");
 }
