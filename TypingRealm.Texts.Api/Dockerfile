@@ -12,7 +12,6 @@ COPY ["TypingRealm.Communication/TypingRealm.Communication.csproj", "TypingRealm
 COPY ["TypingRealm.Configuration/TypingRealm.Configuration.csproj", "TypingRealm.Configuration/"]
 COPY ["TypingRealm.Hosting/TypingRealm.Hosting.csproj", "TypingRealm.Hosting/"]
 COPY ["TypingRealm.Library.Api.Client/TypingRealm.Library.Api.Client.csproj", "TypingRealm.Library.Api.Client/"]
-COPY ["TypingRealm.Library.Core/TypingRealm.Library.Core.csproj", "TypingRealm.Library.Core/"]
 COPY ["TypingRealm.Logging/TypingRealm.Logging.csproj", "TypingRealm.Logging/"]
 COPY ["TypingRealm.Profiles.Core/TypingRealm.Profiles.Core.csproj", "TypingRealm.Profiles.Core/"]
 COPY ["TypingRealm.Serialization/TypingRealm.Serialization.csproj", "TypingRealm.Serialization/"]

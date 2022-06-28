@@ -102,8 +102,8 @@ public sealed class RedisTyrCache : ITyrCache, IDistributedLockProvider
             .ConfigureAwait(false);
     }
 
-    private RedisKey GetRedisKey(string key)
+    private string GetRedisKey(string key)
     {
-        return new RedisKey($"service_cache_{key}");
+        return $"service_cache_{key}";
     }
 }

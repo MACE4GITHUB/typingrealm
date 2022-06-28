@@ -13,7 +13,6 @@ COPY ["TypingRealm.Configuration/TypingRealm.Configuration.csproj", "TypingRealm
 COPY ["TypingRealm.DataAccess.Postgres/TypingRealm.DataAccess.Postgres.csproj", "TypingRealm.DataAccess.Postgres/"]
 COPY ["TypingRealm.Hosting/TypingRealm.Hosting.csproj", "TypingRealm.Hosting/"]
 COPY ["TypingRealm.Library.Api/TypingRealm.Library.Api.csproj", "TypingRealm.Library.Api/"]
-COPY ["TypingRealm.Library.Core/TypingRealm.Library.Core.csproj", "TypingRealm.Library.Core/"]
 COPY ["TypingRealm.Library.Infrastructure/TypingRealm.Library.Infrastructure.csproj", "TypingRealm.Library.Infrastructure/"]
 COPY ["TypingRealm.Library/TypingRealm.Library.csproj", "TypingRealm.Library/"]
 COPY ["TypingRealm.Logging/TypingRealm.Logging.csproj", "TypingRealm.Logging/"]
