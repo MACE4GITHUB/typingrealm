@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TypingRealm.Library.Books.Queries;
+namespace TypingRealm;
 
 // This is a temporary class for showcase purposes. Domain shouldn't have
 // tracking concern embedded into it.
