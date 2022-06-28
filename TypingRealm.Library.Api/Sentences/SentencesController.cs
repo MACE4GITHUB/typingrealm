@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypingRealm.Hosting;
 using TypingRealm.Library.Api.Sentences.Data;
-using TypingRealm.Library.Sentences;
+using TypingRealm.Library.Sentences.Queries;
 
 namespace TypingRealm.Library.Api.Sentences;
 
@@ -25,7 +25,7 @@ public sealed class SentencesController : TyrController
     /// </remarks>
     [HttpPost]
     [ApiConventionMethod(typeof(ApiConventions), nameof(ApiConventions.GetCollectionByQuery))]
-    public async ValueTask<ActionResult<IEnumerable<SentenceDto>>> GetSentences(
+    public async ValueTask<ActionResult<IEnumerable<SentenceView>>> GetSentences(
         SentencesRequest request,
         [FromQuery] LanguageQueryParameter queryParameters)
     {

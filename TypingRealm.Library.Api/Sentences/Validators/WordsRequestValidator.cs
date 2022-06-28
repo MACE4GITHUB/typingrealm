@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using TypingRealm.Library.Sentences;
+using TypingRealm.Library.Sentences.Queries;
 
 namespace TypingRealm.Library.Api.Sentences.Validators;
 

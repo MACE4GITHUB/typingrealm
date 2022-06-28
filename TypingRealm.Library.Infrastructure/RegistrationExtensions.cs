@@ -7,6 +7,7 @@ using TypingRealm.Library.Infrastructure.DataAccess;
 using TypingRealm.Library.Infrastructure.DataAccess.Repositories;
 using TypingRealm.Library.InMemoryInfrastructure;
 using TypingRealm.Library.Sentences;
+using TypingRealm.Library.Sentences.Queries;
 using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Infrastructure;

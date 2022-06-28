@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TypingRealm.Library.Books;
 using TypingRealm.Library.Sentences;
+using TypingRealm.Library.Sentences.Queries;
 
 namespace TypingRealm.Library.InMemoryInfrastructure;
 
@@ -11,9 +12,9 @@ public sealed class InMemorySentenceRepository : ISentenceRepository, ISentenceQ
     private readonly Dictionary<SentenceId, Sentence> _sentences
         = new Dictionary<SentenceId, Sentence>();
 
-    public async ValueTask<IEnumerable<SentenceDto>> FindSentencesAsync(SentencesRequest request)
+    public async ValueTask<IEnumerable<SentenceView>> FindSentencesAsync(SentencesRequest request)
     {
-        return _sentences.Values.Select(x => new SentenceDto(x.SentenceId, x.Value));
+        return _sentences.Values.Select(x => new SentenceView(x.SentenceId, x.Value));
     }
 
     public async ValueTask<IEnumerable<string>> FindWordsAsync(WordsRequest request)

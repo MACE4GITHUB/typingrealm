@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TypingRealm.Library.Books;
-using TypingRealm.Library.Sentences;
+using TypingRealm.Library.Sentences.Queries;
 using TypingRealm.TextProcessing;
 
 namespace TypingRealm.Library.Infrastructure.DataAccess.Repositories;
@@ -26,7 +26,7 @@ public sealed class SentenceQuery : ISentenceQuery
         _language = language;
     }
 
-    public ValueTask<IEnumerable<SentenceDto>> FindSentencesAsync(SentencesRequest request)
+    public ValueTask<IEnumerable<SentenceView>> FindSentencesAsync(SentencesRequest request)
     {
         if (!request.IsValid())
             throw new InvalidOperationException("Invalid request.");
@@ -75,7 +75,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .ToList();
     }
 
-    private async ValueTask<IEnumerable<SentenceDto>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
+    private async ValueTask<IEnumerable<SentenceView>> FindRandomSentencesAsync(int maxSentencesCount, int consecutiveSentencesCount)
     {
         var allBooks = await _dbContext.Book.AsNoTracking()
             .Where(x => !x.IsArchived && x.ProcessingStatus == ProcessingStatus.Processed && x.Language == _language && x.Sentences.Any())
@@ -136,7 +136,7 @@ public sealed class SentenceQuery : ISentenceQuery
         var result = joinResult
             .OrderBy(x => x.Index)
             .Take(maxSentencesCount)
-            .Select(x => new SentenceDto(x.SentenceId, x.Value))
+            .Select(x => new SentenceView(x.SentenceId, x.Value))
             .ToList();
 
         return result;
@@ -156,7 +156,7 @@ public sealed class SentenceQuery : ISentenceQuery
             .Select(indexInBook => new BookAndSentencePair(bookId, indexInBook));
     }
 
-    private async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int maxSentencesCount)
+    private async ValueTask<IEnumerable<SentenceView>> FindSentencesContainingKeyPairsAsync(IEnumerable<string> keyPairs, int maxSentencesCount)
     {
         var sentences = await _dbContext.KeyPair.AsNoTracking()
             .Where(keyPair => keyPairs.Contains(keyPair.Value))
@@ -180,14 +180,14 @@ public sealed class SentenceQuery : ISentenceQuery
         var result = sentences
             .DistinctBy(x => x.SentenceId)
             .OrderByDescending(x => x.CountInSentence)
-            .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
+            .Select(x => new SentenceView(x.SentenceId, x.SentenceValue))
             .Take(maxSentencesCount)
             .ToList();
 
         return result;
     }
 
-    private async ValueTask<IEnumerable<SentenceDto>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int maxSentencesCount)
+    private async ValueTask<IEnumerable<SentenceView>> FindSentencesContainingWordsAsync(IEnumerable<string> words, int maxSentencesCount)
     {
         var searchWords = words.Select(word => word.ToLowerInvariant()).ToList();
 
@@ -210,7 +210,7 @@ public sealed class SentenceQuery : ISentenceQuery
         var result = sentences
             .DistinctBy(x => x.SentenceId)
             .OrderByDescending(x => x.RawCountInSentence)
-            .Select(x => new SentenceDto(x.SentenceId, x.SentenceValue))
+            .Select(x => new SentenceView(x.SentenceId, x.SentenceValue))
             .Take(maxSentencesCount)
             .ToList();
 
