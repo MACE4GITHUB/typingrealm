@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -29,12 +28,5 @@ public class BookContentDao : IDao<BookContentDao>
 
     public BookContent FromDao() => new BookContent(
         new(BookId), new MemoryStream(Encoding.UTF8.GetBytes(Content))); // HACK.
-
-    public void MergeFrom(BookContentDao from)
-    {
-        _ = from;
-
-        throw new NotSupportedException("Cannot change book's content once created.");
-    }
 }
 #pragma warning restore CS8618

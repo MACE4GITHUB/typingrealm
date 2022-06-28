@@ -6,7 +6,6 @@ namespace TypingRealm.Library.Infrastructure.DataAccess;
 public interface IDao<in T>
 {
     string Id { get; }
-    void MergeFrom(T from);
 }
 
 public abstract class TrackableDao
