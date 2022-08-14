@@ -84,7 +84,8 @@ export default class Typer {
         return {
             createdPerf: this.#createdPerf,
             createdAt: this.#createdAt,
-            events: this.#events
+            events: this.#events,
+            text: this.#text
         };
     }
 
