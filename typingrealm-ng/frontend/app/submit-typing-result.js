@@ -1,17 +1,18 @@
 import { tokenProvider } from './auth.js';
+import config from './config/index.js';
 
 async function submitTypingResultMock(typer) {
     console.log('MOCK submitted typing results', typer.result);
 }
 
 export default async function submitTypingResult(typer) {
-    const url = 'http://localhost:30101/api/typing';
+    const uri = config.typingApi.typingSubmitEndpoint;
 
     const body = typer.result;
     body.createdAtOffset = body.createdAt.getTimezoneOffset();
 
     const token = await tokenProvider();
-    const result = await fetch(url, {
+    const result = await fetch(uri, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

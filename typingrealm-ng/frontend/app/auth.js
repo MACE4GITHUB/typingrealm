@@ -1,3 +1,5 @@
+import config from './config/index.js';
+
 const authAreaElement = document.getElementById('auth');
 
 let authInstance;
@@ -28,7 +30,7 @@ class Auth {
         if (this.#token) return this.#token;
 
         const idToken = await this.#auth.getToken();
-        const accessTokenResponse = await fetch('http://localhost:30101/api/auth/token', {
+        const accessTokenResponse = await fetch(config.authApi.tokenEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
