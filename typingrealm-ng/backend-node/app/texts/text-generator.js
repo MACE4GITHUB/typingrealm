@@ -1,5 +1,9 @@
+import fetch from 'node-fetch';
+
 export default class TextGenerator {
-    generateText() {
-        return 'It is a long established fact.';
+    async generateText() {
+        const response = await fetch('https://api.quotable.io/random');
+        const json = await response.json();
+        return json.content;
     }
 }
