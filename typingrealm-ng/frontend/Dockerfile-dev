@@ -1,0 +1,3 @@
+FROM nginx
+COPY . /usr/share/nginx/html
+COPY ./app/config/config.dev.js /usr/share/nginx/html/app/config/config.js

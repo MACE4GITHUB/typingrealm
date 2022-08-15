@@ -1,1 +1,1 @@
-export { default } from './config-debug.js';
+export { default } from './config.js';
