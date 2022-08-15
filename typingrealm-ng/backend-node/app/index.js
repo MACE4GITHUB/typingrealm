@@ -9,6 +9,7 @@ import registerAuthApp from './auth/index.js';
 const app = express();
 const port = config.typingApiPort;
 
+console.log('Applying CORS policy', config.cors);
 app.use(cors({
     origin: config.cors
 }));

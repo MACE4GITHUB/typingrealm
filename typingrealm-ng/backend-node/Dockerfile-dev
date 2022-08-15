@@ -8,6 +8,6 @@ RUN npm install
 #RUN npm ci --only=production
 
 COPY ./app .
-COPY ./app/config/config-dev.js ./app/config/config.js
+COPY ./app/config/config-dev.js ./config/config.js
 
 CMD [ "node", "index.js" ]
