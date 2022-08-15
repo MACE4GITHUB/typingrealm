@@ -1,3 +1,5 @@
+import { tokenProvider } from './auth.js';
+
 async function submitTypingResultMock(typer) {
     console.log('MOCK submitted typing results', typer.result);
 }
@@ -8,10 +10,12 @@ export default async function submitTypingResult(typer) {
     const body = typer.result;
     body.createdAtOffset = body.createdAt.getTimezoneOffset();
 
+    const token = await tokenProvider();
     const result = await fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(body)
     });

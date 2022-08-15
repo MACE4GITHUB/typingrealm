@@ -1,9 +1,18 @@
 const authAreaElement = document.getElementById('auth');
 
+let authInstance;
 export default function(google, clientId) {
-    return new Auth(
-        new GoogleAuth(google, clientId));
+    if (!authInstance) {
+        authInstance = new Auth(
+            new GoogleAuth(google, clientId));
+    }
+
+    return authInstance;
 }
+
+export function tokenProvider() {
+    return authInstance.getToken();
+};
 
 /** Decorator around GoogleAuth. */
 class Auth {
