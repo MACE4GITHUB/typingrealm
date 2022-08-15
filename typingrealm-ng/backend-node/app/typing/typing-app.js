@@ -10,6 +10,7 @@ export default function(app) {
 
     app.post('/api/typing', (req, res) => {
         typingResultRepository.save(req.body);
+        console.log('received', req.body);
         res.status(201).end();
     });
 }
