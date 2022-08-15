@@ -9,8 +9,8 @@ export default function(app) {
     });
 
     app.post('/api/typing', (req, res) => {
-        typingResultRepository.save(req.body);
-        console.log('received', req.body);
+        const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
+        typingResultRepository.save(req.body, profile); // TODO: Make the profile information available in the context of repository?
         res.status(201).end();
     });
 }
