@@ -17,11 +17,12 @@ async function processKeyDown(event) {
     }
 
     if (event.key === 'Enter') {
+        // Show loader.
+        textElement.innerHTML = '<div class="loader"></div>';
+
         // Retrieve next text from the API.
         const text = await retrieveText();
 
-        // Show loader.
-        textElement.innerHTML = '<div class="loader"></div>';
         await new Promise(r => setTimeout(r, 2000)); // Mock loading for viewing loader animation.
 
         // Create new Typer from this text, set up callback to log the Typer results when we finish typing.
