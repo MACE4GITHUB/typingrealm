@@ -1,0 +1,15 @@
+{
+    email typingrealm@gmail.com
+}
+
+typingrealm.com {
+    reverse_proxy typingrealm-ui:80
+}
+
+api.typingrealm.com {
+    handle_path /typing/* {
+        reverse_proxy typingrealm-typing:80
+    }
+
+    respond 404
+}

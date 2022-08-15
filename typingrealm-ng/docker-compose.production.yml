@@ -1,0 +1,33 @@
+version: '3.4'
+
+networks:
+  typingrealm-net:
+  typingrealm-typing-net:
+  typingrealm-ui-net:
+
+services:
+  typingrealm-typing:
+    image: ${DOCKER_REGISTRY-}typingrealm-typing
+    container_name: typingrealm-typing
+    networks:
+      - typingrealm-net
+      - typingrealm-typing-net
+    build:
+      context: ./backend-node
+      dockerfile: Dockerfile-production
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  typingrealm-ui:
+    image: ${DOCKER_REGISTRY-}typingrealm-ui
+    container_name: typingrealm-ui
+    networks:
+      - typingrealm-net
+      - typingrealm-ui-net
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-production
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m

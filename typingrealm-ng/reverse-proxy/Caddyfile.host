@@ -1,0 +1,39 @@
+{
+    email typingrealm@gmail.com
+}
+
+typingrealm.com {
+    reverse_proxy typingrealm-ui:80
+}
+
+api.typingrealm.com {
+    handle_path /typing/* {
+        reverse_proxy typingrealm-typing:80
+    }
+
+    respond 404
+}
+
+dev.typingrealm.com {
+    reverse_proxy dev-typingrealm-ui:80
+}
+
+dev.api.typingrealm.com {
+    handle_path /typing/* {
+        reverse_proxy dev-typingrealm-typing:80
+    }
+
+    respond 404
+}
+
+localhost {
+    reverse_proxy host.docker.internal:30080
+}
+
+api.localhost {
+    handle_path /typing/* {
+        reverse_proxy local-typingrealm-typing:80
+    }
+
+    respond 404
+}

@@ -1,0 +1,27 @@
+version: '3.4'
+
+networks:
+  tyr_typingrealm-net:
+    external: true
+  local-tyr_local-typingrealm-net:
+    external: true
+  dev-tyr_dev-typingrealm-net:
+    external: true
+
+services:
+  typingrealm-caddy:
+    image: caddy
+    container_name: typingrealm-caddy
+    networks:
+      - tyr_typingrealm-net
+      - local-tyr_local-typingrealm-net
+      - dev-tyr_dev-typingrealm-net
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./reverse-proxy/Caddyfile.host:/etc/caddy/Caddyfile
+      - ./infrastructure-data/prod/caddy_data:/data
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
