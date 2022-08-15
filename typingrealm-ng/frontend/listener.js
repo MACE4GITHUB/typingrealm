@@ -1,4 +1,5 @@
 import retrieveText from './text.js';
+import submitTypingResult from './submit-typing-result.js';
 import Typer from './typer.js';
 
 const textElement = document.getElementById('text');
@@ -27,7 +28,7 @@ async function processKeyDown(event) {
 
         // Create new Typer from this text, set up callback to log the Typer results when we finish typing.
         // Assign it to an intermediatory variable so that we don't start handling keyboard input yet.
-        let localTyper = new Typer(text, typer => console.log('finished', typer.result));
+        let localTyper = new Typer(text, submitTypingResult);
 
         // Remove loader and add Typer characters to the text element.
         textElement.innerHTML = '';
