@@ -24,7 +24,8 @@ async function processKeyDown(event) {
         // Retrieve next text from the API.
         const text = await retrieveText();
 
-        await new Promise(r => setTimeout(r, 2000)); // Mock loading for viewing loader animation.
+        // Mock loading for viewing loader animation.
+        //await new Promise(r => setTimeout(r, 2000));
 
         // Create new Typer from this text, set up callback to log the Typer results when we finish typing.
         // Assign it to an intermediatory variable so that we don't start handling keyboard input yet.
