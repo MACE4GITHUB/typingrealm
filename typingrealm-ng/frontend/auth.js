@@ -1,6 +1,41 @@
 const authAreaElement = document.getElementById('auth');
 
-export default class Auth {
+export default function(google, clientId) {
+    return new Auth(
+        new GoogleAuth(google, clientId));
+}
+
+/** Decorator around GoogleAuth. */
+class Auth {
+    #auth;
+    #token;
+
+    constructor(auth) {
+        this.#auth = auth;
+    }
+
+    async getToken() {
+        // TODO: Implement expiration.
+        if (this.#token) return this.#token;
+
+        const idToken = await this.#auth.getToken();
+        const accessTokenResponse = await fetch('http://localhost:30101/api/auth/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: idToken
+            })
+        });
+
+        this.#token = (await accessTokenResponse.json()).access_token;
+        console.log('Acquired token', this.#token);
+        return this.#token;
+    }
+}
+
+class GoogleAuth {
     #google;
     #idToken = null;
     #promiseResolves = [];
