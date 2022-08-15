@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import config from './config/config-debug.js';
 import registerTypingApp from './typing/index.js';
 import registerTextsApp from './texts/index.js';
+import registerAuthApp from './auth/index.js';
 
 const app = express();
 const port = config.typingApiPort;
@@ -20,6 +21,9 @@ registerTypingApp(app);
 
 // Register /api/texts service.
 registerTextsApp(app);
+
+// Register mock Auth service.
+registerAuthApp(app);
 
 // In future, separate services might be refactored into multiple separate
 // backend servers. For now though, they'll be hosted in one single server, but

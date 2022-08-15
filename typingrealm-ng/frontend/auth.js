@@ -45,6 +45,8 @@ export default class Auth {
         for (let resolve; resolve = this.#promiseResolves.pop(); ) {
             resolve(this.#idToken);
         }
+
+        console.log('handled auth', this.#idToken);
     }
 
     #isExpiring() {
