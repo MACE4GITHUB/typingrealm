@@ -42,6 +42,18 @@ body {
   margin: 0 auto;
 }
 
+#auth {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#authButton {
+    width: 208px;
+    margin: 0 auto;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
