@@ -5,5 +5,5 @@ export default {
         'https://typingrealm.com',
         'https://dev.typingrealm.com'
     ],
-    typingApiPort: 30101
+    typingApiPort: 80
 }

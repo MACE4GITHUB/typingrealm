@@ -1,4 +1,5 @@
-const typingApiUri = 'https://api.typingrealm.com';
+const baseUri = 'https://api.typingrealm.com';
+const typingApiUri = `${baseUri}/typing`;
 const typingApi = {
     uri: typingApiUri,
     typingSubmitEndpoint: `${typingApiUri}/api/typing`

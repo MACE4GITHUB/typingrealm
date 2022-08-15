@@ -1,4 +1,5 @@
-const typingApiUri = 'http://host.docker.internal:30101';
+const baseUri = 'http://host.docker.internal:30101';
+const typingApiUri = baseUri;
 const typingApi = {
     uri: typingApiUri,
     typingSubmitEndpoint: `${typingApiUri}/api/typing`

@@ -2,5 +2,5 @@ export default {
     cors: [
         'https://typingrealm.com'
     ],
-    typingApiPort: 30101
+    typingApiPort: 80
 }

@@ -1,4 +1,5 @@
-const typingApiUri = 'http://localhost:30101';
+const baseUri = 'http://localhost:30101';
+const typingApiUri = baseUri;
 const typingApi = {
     uri: typingApiUri,
     typingSubmitEndpoint: `${typingApiUri}/api/typing`
