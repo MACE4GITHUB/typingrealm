@@ -1,14 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import config from './config/config-debug.js';
 import registerTypingApp from './typing/index.js';
 import registerTextsApp from './texts/index.js';
 
 const app = express();
-const port = 30101; // TODO: Get this value from the configuration.
+const port = config.typingApiPort;
 
 app.use(cors({
-    origin: 'http://localhost:8080'
+    origin: config.cors
 }));
 
 // Parse request body as JSON.
