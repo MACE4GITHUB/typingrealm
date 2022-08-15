@@ -5,5 +5,6 @@ export default {
         'https://typingrealm.com',
         'https://dev.typingrealm.com'
     ],
-    typingApiPort: 80
+    typingApiPort: 80,
+    typingDbConnectionString: process.env.TypingDbConnectionString
 }

@@ -18,6 +18,24 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    env_file:
+      - envs/.env.dev.typing
+
+  dev-typingrealm-typing-postgres:
+    image: postgres
+    container_name: dev-typingrealm-typing-postgres
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-typing-net
+    ports:
+      - 5432:5432
+    volumes:
+      - ./infrastructure-data/dev/typing/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    env_file:
+      - envs/.env.dev.typing
 
   dev-typingrealm-ui:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-ui
@@ -31,3 +49,5 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    env_file:
+      - envs/.env.dev.typing

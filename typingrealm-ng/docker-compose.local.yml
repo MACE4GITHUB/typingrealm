@@ -4,6 +4,8 @@ networks:
   local-typingrealm-net:
   local-typingrealm-typing-net:
   local-typingrealm-ui-net:
+  dev-tyr_dev-typingrealm-net: # For accessing DEV databases & resources, local should work with DEV infrastructure.
+    external: true
 
 services:
   local-typingrealm-typing:
@@ -12,6 +14,7 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-typing-net
+      - dev-tyr_dev-typingrealm-net
     ports:
       - 30101:30101
     build:
@@ -20,6 +23,8 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    env_file:
+      - envs/.env.local.typing
 
   local-typingrealm-ui:
     image: ${DOCKER_REGISTRY-}local-typingrealm-ui
@@ -35,3 +40,5 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    env_file:
+      - envs/.env.local.typing
