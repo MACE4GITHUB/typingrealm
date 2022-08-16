@@ -23,8 +23,6 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
-    env_file:
-      - envs/.env.local.typing
 
   local-typingrealm-ui:
     image: ${DOCKER_REGISTRY-}local-typingrealm-ui
@@ -40,5 +38,3 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
-    env_file:
-      - envs/.env.local.typing
