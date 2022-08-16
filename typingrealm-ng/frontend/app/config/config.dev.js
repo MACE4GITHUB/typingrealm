@@ -5,13 +5,13 @@ const typingApi = {
     typingSubmitEndpoint: `${typingApiUri}/api/typing`
 };
 
-const authApiUri = `${baseUri}/typing`;
+const authApiUri = typingApiUri;
 const authApi = {
     uri: authApiUri,
     tokenEndpoint: `${authApiUri}/api/auth/token`
 };
 
-const textsApiUri = `${baseUri}/typing`;
+const textsApiUri = typingApiUri;
 const textsApi = {
     uri: textsApiUri,
     generateTextEndpoint: `${textsApiUri}/api/texts`

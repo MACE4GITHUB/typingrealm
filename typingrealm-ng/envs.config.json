@@ -6,7 +6,8 @@
         {
             "name": "local",
             "useInfrastructureFrom": "dev",
-            "exposeLocalPorts": "true"
+            "exposeLocalPorts": "true",
+            "localVolume": "true"
         },
         {
             "name": "dev",
@@ -27,12 +28,14 @@
                     "ports": "5432:5432"
                 }
             ],
-            "localPort": 30101
+            "localPort": 30101,
+            "localVolume": "/usr/src/app"
         },
         {
             "name": "ui",
             "dockerContext": "./frontend",
-            "localPort": 30080
+            "localPort": 30080,
+            "localVolume": "/usr/share/nginx/html"
         }
     ]
 }

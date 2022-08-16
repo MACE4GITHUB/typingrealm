@@ -88,6 +88,12 @@ module.exports = function(config, fs) {
         content.push(`    build:`);
         content.push(`      context: ${service.dockerContext}`);
         content.push(`      dockerfile: Dockerfile-${env.name}`);
+
+        if (env.localVolume && service.localVolume) {
+            content.push(`    volumes:`);
+            content.push(`      - ${service.dockerContext}:${service.localVolume}`);
+        }
+
         content.push(`    restart: unless-stopped`);
         content.push(`    mem_limit: 1g`);
         content.push('    mem_reservation: 750m');

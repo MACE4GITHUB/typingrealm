@@ -20,6 +20,8 @@ services:
     build:
       context: ./backend-node
       dockerfile: Dockerfile-local
+    volumes:
+      - ./backend-node:/usr/src/app
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -35,6 +37,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile-local
+    volumes:
+      - ./frontend:/usr/share/nginx/html
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
