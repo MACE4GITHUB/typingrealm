@@ -1,11 +1,11 @@
 version: '3.4'
 
 networks:
-  tyr_typingrealm-net:
-    external: true
   local-tyr_local-typingrealm-net:
     external: true
   dev-tyr_dev-typingrealm-net:
+    external: true
+  tyr_typingrealm-net:
     external: true
 
 services:
@@ -13,9 +13,9 @@ services:
     image: caddy
     container_name: typingrealm-caddy
     networks:
-      - tyr_typingrealm-net
       - local-tyr_local-typingrealm-net
       - dev-tyr_dev-typingrealm-net
+      - tyr_typingrealm-net
     ports:
       - 80:80
       - 443:443

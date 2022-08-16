@@ -1,6 +1,7 @@
 {
     "projectName": "typingrealm",
     "infrastructureDataFolder": "./infrastructure-data",
+    "caddyfile": "./reverse-proxy/Caddyfile.host",
     "envs": [
         {
             "name": "local",
