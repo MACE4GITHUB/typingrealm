@@ -18,6 +18,9 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    environment:
+      - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
+
   dev-typingrealm-typing-postgres:
     image: postgres
     container_name: dev-typingrealm-typing-postgres
@@ -31,8 +34,6 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
-    environment:
-      - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
 
   dev-typingrealm-ui:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-ui

@@ -98,7 +98,7 @@ module.exports = function(config, fs) {
             for (let infra of service.infra) {
                 if (infra.type === 'postgres') {
                     infraContent.push('');
-                    addPostgres(service, content, infra, env);
+                    addPostgres(service, infraContent, infra, env);
 
                     if (!hasEnvVars) {
                         hasEnvVars = true;
@@ -114,6 +114,7 @@ module.exports = function(config, fs) {
                 throw new Error('Unknown infrastructure type.');
             }
         }
+        content.push(...infraContent);
 
         return content;
     }
