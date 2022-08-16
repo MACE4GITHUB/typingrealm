@@ -1,0 +1,37 @@
+{
+    "projectName": "typingrealm",
+    "infrastructureDataFolder": "./infrastructure-data",
+    "envs": [
+        {
+            "name": "local",
+            "useInfrastructureFrom": "dev",
+            "exposeLocalPorts": "true"
+        },
+        {
+            "name": "dev",
+            "exposeInfraPorts": "true"
+        },
+        {
+            "name": "production",
+            "noPrefix": "true"
+        }
+    ],
+    "services": [
+        {
+            "name": "typing",
+            "dockerContext": "./backend-node",
+            "infra": [
+                {
+                    "type": "postgres",
+                    "ports": "5432:5432"
+                }
+            ],
+            "localPort": 30101
+        },
+        {
+            "name": "ui",
+            "dockerContext": "./frontend",
+            "localPort": 30080
+        }
+    ]
+}
