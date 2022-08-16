@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node app/index.js",
     "start:prod": "dbmate --url $DATABASE_URL wait && dbmate --url $DATABASE_URL up && node index.js",
-    "test": "echo 'Error: no test specified' && exit 1"
+    "test": "echo 'Error: no test specified' && exit 1",
+    "restart": "docker restart -t 1 local-typingrealm-typing"
   },
   "author": "Ivan Zyranau",
   "license": "MIT",
