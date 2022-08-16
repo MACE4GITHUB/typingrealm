@@ -32,6 +32,8 @@ services:
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
+    environment:
+      - POSTGRES_PASSWORD=admin
 
   typingrealm-ui:
     image: ${DOCKER_REGISTRY-}typingrealm-ui

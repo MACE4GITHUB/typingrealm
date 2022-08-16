@@ -140,6 +140,8 @@ module.exports = function(config, fs) {
         content.push(`    restart: unless-stopped`);
         content.push(`    mem_limit: 1g`);
         content.push('    mem_reservation: 750m');
+        content.push('    environment:');
+        content.push('      - POSTGRES_PASSWORD=admin');
     }
 
     function getExternalNetwork(envWithInfrastructure) {

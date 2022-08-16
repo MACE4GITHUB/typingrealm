@@ -1,5 +1,8 @@
 FROM node:18
 
+RUN curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+RUN chmod +x /usr/local/bin/dbmate
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
@@ -8,6 +11,7 @@ RUN npm install
 #RUN npm ci --only=production
 
 COPY ./app .
+COPY ./db ./db
 COPY ./app/config/config-local.js ./config/config.js
 
-CMD [ "node", "index.js" ]
+CMD [ "npm", "run", "start:prod" ]
