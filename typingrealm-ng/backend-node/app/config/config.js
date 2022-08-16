@@ -6,5 +6,5 @@ export default {
         'https://dev.typingrealm.com'
     ],
     typingApiPort: 30101,
-    typingDbConnectionString: 'postgres://postgres:admin@dev-typingrealm-data-postgres:5432/typing?sslmode=disable'
+    typingDbConnectionString: 'postgres://postgres:admin@host.docker.internal:5432/typing?sslmode=disable'
 }

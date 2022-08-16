@@ -92,11 +92,22 @@ module.exports = function(config, fs) {
         content.push(`    mem_limit: 1g`);
         content.push('    mem_reservation: 750m');
 
+        let hasEnvVars = false;
+        const infraContent = [];
         if (service.infra?.length > 0 && !env.useInfrastructureFrom) {
             for (let infra of service.infra) {
                 if (infra.type === 'postgres') {
-                    content.push('');
+                    infraContent.push('');
                     addPostgres(service, content, infra, env);
+
+                    if (!hasEnvVars) {
+                        hasEnvVars = true;
+                        content.push(`    environment:`);
+                    }
+
+                    const databaseName = infra.database ?? service.name;
+                    content.push(`      - DATABASE_URL=postgres://postgres:admin@${getPrefix(env)}${projectName}-${service.name}-postgres:5432/${databaseName}?sslmode=disable`);
+
                     continue;
                 }
 

@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node app/index.js",
-    "start:prod": "dbmate --url 'postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable' wait &&  dbmate --url 'postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable' up && node index.js",
+    "start:prod": "dbmate --url $DATABASE_URL wait && dbmate --url $DATABASE_URL up && node index.js",
     "test": "echo 'Error: no test specified' && exit 1"
   },
   "author": "Ivan Zyranau",
