@@ -4,7 +4,7 @@ networks:
   local-typingrealm-net:
   local-typingrealm-typing-net:
   local-typingrealm-ui-net:
-  dev-tyr_dev-typingrealm-net: # For accessing DEV databases & resources, local should work with DEV infrastructure.
+  dev-tyr_dev-typingrealm-net:
     external: true
 
 services:
@@ -16,7 +16,7 @@ services:
       - local-typingrealm-typing-net
       - dev-tyr_dev-typingrealm-net
     ports:
-      - 30101:30101
+      - 30101:80
     build:
       context: ./backend-node
       dockerfile: Dockerfile-local
