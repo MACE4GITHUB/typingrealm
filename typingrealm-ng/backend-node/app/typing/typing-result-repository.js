@@ -28,9 +28,10 @@ export default class TypingResultRepository {
         try {
             await client.query('begin');
 
+            const bundleArguments = [new Date().toISOString(), typingResult.text, profile, typingResult.clientCreatedAt, typingResult.clientFinishedAt, typingResult.clientTimezone, typingResult.clientTimezoneOffset];
             const response = await client.query(
-                'insert into typing_bundle(created_at, text, profile_id) values($1, $2, $3) returning id;',
-                [typingResult.createdAt, typingResult.text, profile]);
+                'insert into typing_bundle(submitted_at, text, profile_id, client_created_at, client_finished_at, client_timezone, client_timezone_offset) values($1, $2, $3, $4, $5, $6, $7) returning id;',
+                bundleArguments);
             const bundleId = response.rows[0].id;
 
             const eventValuesArray = typingResult.events.map((e, index) => {
@@ -43,6 +44,8 @@ export default class TypingResultRepository {
                     Math.round((e.perf - createdPerf) * 1000)
                 ];
             });
+
+            console.log(bundleArguments, eventValuesArray);
 
             const valuesString = generateValuesString(eventValuesArray.length, eventValuesArray[0].length);
             function generateValuesString(length, size) {

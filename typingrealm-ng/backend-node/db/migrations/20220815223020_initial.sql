@@ -1,9 +1,13 @@
 -- migrate:up
 create table "typing_bundle" (
     "id" bigserial primary key not null,
-    "created_at" timestamptz not null,
+    "submitted_at" timestamp not null,
     "text" varchar(5000) not null,
-    "profile_id" varchar(500) not null
+    "profile_id" varchar(500) not null,
+    "client_created_at" timestamp not null,
+    "client_finished_at" timestamp not null,
+    "client_timezone" varchar(100) not null,
+    "client_timezone_offset" smallint not null
 );
 
 create table "event" (

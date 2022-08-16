@@ -37,6 +37,9 @@ export default class Typer {
     /** The timestamp at which the Typer instance was created (text is loaded by user). */
     #createdAt;
 
+    /** The timestamp at which the Typer has been finished completely. */
+    #finishedAt;
+
     /**
      * Creates a new instance of Typer.
      * @param {String} text Whole text that needs to be typed.
@@ -84,6 +87,7 @@ export default class Typer {
         return {
             createdPerf: this.#createdPerf,
             createdAt: this.#createdAt,
+            finishedAt: this.#finishedAt,
             events: this.#events,
             text: this.#text
         };
@@ -179,6 +183,7 @@ export default class Typer {
 
             // todo: callback on finalize.
             if (this.#characters.every(x => !x.isTypedWithError)) {
+                this.#finishedAt = new Date();
                 this.#isFinished = true;
                 this.#finishedCallback && this.#finishedCallback(this);
             }

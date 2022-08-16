@@ -41,7 +41,6 @@ class Auth {
         });
 
         this.#token = (await accessTokenResponse.json()).access_token;
-        console.log('Acquired token', this.#token);
         return this.#token;
     }
 }
@@ -91,8 +90,6 @@ class GoogleAuth {
         for (let resolve; resolve = this.#promiseResolves.pop(); ) {
             resolve(this.#idToken);
         }
-
-        console.log('handled auth', this.#idToken);
     }
 
     #isExpiring() {

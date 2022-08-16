@@ -7,9 +7,17 @@ async function submitTypingResultMock(typer) {
 
 export default async function submitTypingResult(typer) {
     const uri = config.typingApi.typingSubmitEndpoint;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const body = typer.result;
-    body.createdAtOffset = body.createdAt.getTimezoneOffset();
+    const body = {
+        createdPerf: typer.result.createdPerf,
+        text: typer.result.text,
+        events: typer.result.events,
+        clientCreatedAt: typer.result.createdAt,
+        clientFinishedAt: typer.result.finishedAt,
+        clientTimezone: timezone,
+        clientTimezoneOffset: typer.result.createdAt.getTimezoneOffset()
+    };
 
     const token = await tokenProvider();
     const result = await fetch(uri, {
