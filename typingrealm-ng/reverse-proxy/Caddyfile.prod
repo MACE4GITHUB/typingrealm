@@ -8,7 +8,7 @@ typingrealm.com {
 
 api.typingrealm.com {
     handle_path /typing/* {
-        reverse_proxy typingrealm-typing:80
+        reverse_proxy typingrealm-typing-node:80
     }
 
     respond 404
