@@ -6,6 +6,18 @@ networks:
   typingrealm-ui-net:
 
 services:
+  typingrealm-typing-api:
+    image: caddy
+    container_name: typingrealm-typing-api
+    networks:
+      - typingrealm-net
+      - typingrealm-typing-net
+    volumes:
+      - ./backend/typing/Caddyfile-production:/etc/caddy/Caddyfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
   typingrealm-typing-node:
     image: ${DOCKER_REGISTRY-}typingrealm-typing-node
     container_name: typingrealm-typing-node

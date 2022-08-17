@@ -105,6 +105,22 @@ module.exports = function(config, fs) {
 
             if (env.localVolume || env.exposeLocalPorts) replicas = 1;
 
+            if (service.isLoadBalanced && env.isLoadBalanced) {
+                content.push(`  ${getPrefix(env)}${projectName}-${service.name}-api:`);
+                content.push(`    image: caddy`);
+                content.push(`    container_name: ${getPrefix(env)}${projectName}-${service.name}-api`);
+                content.push(`    networks:`);
+                content.push(`      - ${getPrefix(env)}${projectName}-net`);
+                content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
+                // TODO: Expose local ports here (after balancing) intead of from direct containers.
+                content.push(`    volumes:`);
+                content.push(`      - ${service.dockerContext}/Caddyfile-${env.name}:/etc/caddy/Caddyfile`);
+                content.push(`    restart: unless-stopped`);
+                content.push(`    mem_limit: 1g`);
+                content.push('    mem_reservation: 750m');
+                content.push("");
+            }
+
             for (let replica = 0; replica < replicas ?? 1; replica++) {
                 content.push(`  ${getPrefix(env)}${projectName}-${backend.serviceId}${getReplicaPostfix(replica)}:`);
                 content.push(`    image: \${DOCKER_REGISTRY-}${getPrefix(env)}${projectName}-${backend.serviceId}`);

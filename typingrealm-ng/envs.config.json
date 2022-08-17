@@ -11,16 +11,19 @@
         },
         {
             "name": "dev",
+            "isLoadBalanced": "true",
             "exposeInfraPorts": "true"
         },
         {
             "name": "production",
+            "isLoadBalanced": "true",
             "noPrefix": "true"
         }
     ],
     "services": [
         {
             "name": "typing",
+            "isLoadBalanced": true,
             "dockerContext": "./backend/typing",
             "infra": [
                 {
