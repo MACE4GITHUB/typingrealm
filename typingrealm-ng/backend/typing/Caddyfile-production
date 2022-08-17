@@ -1,0 +1,7 @@
+:80 {
+    reverse_proxy typingrealm-typing-node:80 typingrealm-typing-node-2:80 typingrealm-typing-node-3:80 {
+        lb_policy round_robin
+        health_path /health
+        health_interval 10s
+    }
+}
