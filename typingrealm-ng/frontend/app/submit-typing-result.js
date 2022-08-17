@@ -28,6 +28,7 @@ export default async function submitTypingResult(typer) {
         },
         body: JSON.stringify(body)
     });
+    const json = await result.json();
 
-    console.log('Submitted typing result', typer.result, result);
+    console.log('Submitted typing result', typer.result, json);
 }
