@@ -26,6 +26,14 @@ registerTextsApp(app);
 // Register mock Auth service.
 registerAuthApp(app);
 
+// Health check endpoint with a counter.
+let healthCheckCount = 0;
+app.get('/health', (req, res) => {
+    res.send({ count: healthCheckCount++ });
+    console.log('Triggered healthcheck', healthCheckCount);
+    res.status(200).end();
+});
+
 // In future, separate services might be refactored into multiple separate
 // backend servers. For now though, they'll be hosted in one single server, but
 // they should be decoupled from each other as much as possible.
