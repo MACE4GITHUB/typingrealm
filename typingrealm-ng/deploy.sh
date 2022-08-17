@@ -8,6 +8,7 @@ elif [ "$1" == "dev" ]; then
 elif [ "$1" == "local" ]; then
     if [ "$2" == "stop" ]; then
         docker-compose -p local-tyr -f ./docker-compose.local.yml stop
+        docker-compose -p local-tyr -f ./docker-compose.local.yml down --volumes
     else
         docker-compose -p local-tyr -f ./docker-compose.local.yml up -d --build
     fi
