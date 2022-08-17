@@ -6,9 +6,9 @@ networks:
   dev-typingrealm-ui-net:
 
 services:
-  dev-typingrealm-typing:
-    image: ${DOCKER_REGISTRY-}dev-typingrealm-typing
-    container_name: dev-typingrealm-typing
+  dev-typingrealm-typing-node:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-typing-node
+    container_name: dev-typingrealm-typing-node
     networks:
       - dev-typingrealm-net
       - dev-typingrealm-typing-net

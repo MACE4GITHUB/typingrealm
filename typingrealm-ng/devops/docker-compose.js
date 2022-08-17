@@ -89,11 +89,16 @@ module.exports = function(config, fs) {
             }
         }
 
-        if (!service.backends) { service.backends = [ {} ] };
+        if (!service.backends) { service.backends = [ {
+            serviceId: service.name
+        } ] };
+
         for (let backend of service.backends) {
-            content.push(`  ${getPrefix(env)}${projectName}-${service.name}:`);
-            content.push(`    image: \${DOCKER_REGISTRY-}${getPrefix(env)}${projectName}-${service.name}`);
-            content.push(`    container_name: ${getPrefix(env)}${projectName}-${service.name}`);
+            backend.serviceId = backend.servicePath ?? service.name;
+
+            content.push(`  ${getPrefix(env)}${projectName}-${backend.serviceId}:`);
+            content.push(`    image: \${DOCKER_REGISTRY-}${getPrefix(env)}${projectName}-${backend.serviceId}`);
+            content.push(`    container_name: ${getPrefix(env)}${projectName}-${backend.serviceId}`);
             content.push(`    networks:`);
             content.push(`      - ${getPrefix(env)}${projectName}-net`);
             content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);

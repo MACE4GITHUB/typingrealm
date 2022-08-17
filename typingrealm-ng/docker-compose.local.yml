@@ -8,9 +8,9 @@ networks:
     external: true
 
 services:
-  local-typingrealm-typing:
-    image: ${DOCKER_REGISTRY-}local-typingrealm-typing
-    container_name: local-typingrealm-typing
+  local-typingrealm-typing-node:
+    image: ${DOCKER_REGISTRY-}local-typingrealm-typing-node
+    container_name: local-typingrealm-typing-node
     networks:
       - local-typingrealm-net
       - local-typingrealm-typing-net
