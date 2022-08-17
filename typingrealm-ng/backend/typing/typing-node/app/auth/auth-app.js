@@ -1,13 +1,24 @@
-import jwtDecode from 'jwt-decode';
+import { OAuth2Client } from 'google-auth-library';
+
+const clientId = '400839590162-k6q520pk6lqs3vee6u18cdfhvtd07hf7';
+const client = new OAuth2Client(clientId);
+async function verify(token) {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        requiredAudience: clientId
+    });
+    const payload = ticket.getPayload();
+    console.log('verified', payload);
+    return payload['sub'];
+}
 
 /** This is a MOCK Auth app, it will be replaced by IdentityServer. */
 export default function(app) {
     const map = new Map();
 
-    app.post('/api/auth/token', (req, res) => {
+    app.post('/api/auth/token', async (req, res) => {
         const token = req.body.token;
-        const decoded = jwtDecode(token);
-        const sub = decoded.sub;
+        const sub = await verify(token);
 
         let accessToken;
         if (map.has(token.sub)) {
