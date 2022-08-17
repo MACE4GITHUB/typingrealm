@@ -66,53 +66,21 @@ module.exports = function(config, fs) {
     }
 
     function getServiceEntries(service, env) {
-        const content = [];
+        let content = [];
 
-        content.push(`  ${getPrefix(env)}${projectName}-${service.name}:`);
-        content.push(`    image: \${DOCKER_REGISTRY-}${getPrefix(env)}${projectName}-${service.name}`);
-        content.push(`    container_name: ${getPrefix(env)}${projectName}-${service.name}`);
-        content.push(`    networks:`);
-        content.push(`      - ${getPrefix(env)}${projectName}-net`);
-        content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
-
-        if (service.infra?.length > 0 && env.useInfrastructureFrom) {
-            const network = getExternalNetwork(env.useInfrastructureFrom);
-            content.push(`      - ${network}`);
-        }
-
-        if (env.exposeLocalPorts && service.localPort) {
-            content.push(`    ports:`);
-            content.push(`      - ${service.localPort}:80`);
-        }
-
-        content.push(`    build:`);
-        content.push(`      context: ${service.dockerContext}`);
-        content.push(`      dockerfile: ${service.servicePath ? `${service.servicePath}/` : ''}Dockerfile-${env.name}`);
-
-        if (env.localVolume && service.localVolume) {
-            content.push(`    volumes:`);
-            content.push(`      - ${service.dockerContext}${service.servicePath ? `/${service.servicePath}` : ''}:${service.localVolume}`);
-        }
-
-        content.push(`    restart: unless-stopped`);
-        content.push(`    mem_limit: 1g`);
-        content.push('    mem_reservation: 750m');
-
-        let hasEnvVars = false;
         const infraContent = [];
+        const envsToAddToEachBackend = [];
+
         if (service.infra?.length > 0 && !env.useInfrastructureFrom) {
             for (let infra of service.infra) {
                 if (infra.type === 'postgres') {
                     infraContent.push('');
                     addPostgres(service, infraContent, infra, env);
 
-                    if (!hasEnvVars) {
-                        hasEnvVars = true;
-                        content.push(`    environment:`);
-                    }
-
+                    // TODO: Make sure 'environment' line is not added twice.
+                    envsToAddToEachBackend.push(`    environment:`);
                     const databaseName = infra.database ?? service.name;
-                    content.push(`      - DATABASE_URL=postgres://postgres:admin@${getPrefix(env)}${projectName}-${service.name}-postgres:5432/${databaseName}?sslmode=disable`);
+                    envsToAddToEachBackend.push(`      - DATABASE_URL=postgres://postgres:admin@${getPrefix(env)}${projectName}-${service.name}-postgres:5432/${databaseName}?sslmode=disable`);
 
                     continue;
                 }
@@ -120,6 +88,43 @@ module.exports = function(config, fs) {
                 throw new Error('Unknown infrastructure type.');
             }
         }
+
+        if (!service.backends) { service.backends = [ {} ] };
+        for (let backend of service.backends) {
+            content.push(`  ${getPrefix(env)}${projectName}-${service.name}:`);
+            content.push(`    image: \${DOCKER_REGISTRY-}${getPrefix(env)}${projectName}-${service.name}`);
+            content.push(`    container_name: ${getPrefix(env)}${projectName}-${service.name}`);
+            content.push(`    networks:`);
+            content.push(`      - ${getPrefix(env)}${projectName}-net`);
+            content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
+
+            if (service.infra?.length > 0 && env.useInfrastructureFrom) {
+                const network = getExternalNetwork(env.useInfrastructureFrom);
+                content.push(`      - ${network}`);
+            }
+
+            if (env.exposeLocalPorts && backend.localPort) {
+                content.push(`    ports:`);
+                content.push(`      - ${backend.localPort}:80`);
+            }
+
+            content.push(`    build:`);
+            content.push(`      context: ${service.dockerContext}`);
+            content.push(`      dockerfile: ${backend.servicePath ? `${backend.servicePath}/` : ''}Dockerfile-${env.name}`);
+
+            if (env.localVolume && backend.localVolume) {
+                content.push(`    volumes:`);
+                content.push(`      - ${service.dockerContext}${backend.servicePath ? `/${backend.servicePath}` : ''}:${backend.localVolume}`);
+            }
+
+            content.push(`    restart: unless-stopped`);
+            content.push(`    mem_limit: 1g`);
+            content.push('    mem_reservation: 750m');
+            content.push(...envsToAddToEachBackend);
+            content.push('');
+        }
+
+        content = content.slice(0, -1);
         content.push(...infraContent);
 
         return content;

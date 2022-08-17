@@ -22,15 +22,19 @@
         {
             "name": "typing",
             "dockerContext": "./backend/typing",
-            "servicePath": "typing-node",
             "infra": [
                 {
                     "type": "postgres",
                     "ports": "5432:5432"
                 }
             ],
-            "localPort": 30101,
-            "localVolume": "/usr/src/app"
+            "backends": [
+                {
+                    "servicePath": "typing-node",
+                    "localPort": 30101,
+                    "localVolume": "/usr/src/app"
+                }
+            ]
         },
         {
             "name": "ui",
