@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
+#set -Eeuo pipefail
 
 if [ "$1" == "prod" ]; then
     docker-compose -p tyr -f ./docker-compose.production.yml up -d --build
