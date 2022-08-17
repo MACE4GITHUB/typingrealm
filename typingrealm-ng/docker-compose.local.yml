@@ -32,9 +32,13 @@ services:
     networks:
       - local-typingrealm-net
       - local-typingrealm-ui-net
+    ports:
+      - 30080:80
     build:
       context: ./frontend
       dockerfile: Dockerfile-local
+    volumes:
+      - ./frontend:/usr/share/nginx/html
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m

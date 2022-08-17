@@ -39,8 +39,12 @@
         {
             "name": "ui",
             "dockerContext": "./frontend",
-            "localPort": 30080,
-            "localVolume": "/usr/share/nginx/html"
+            "backends": [
+                {
+                    "localPort": 30080,
+                    "localVolume": "/usr/share/nginx/html"
+                }
+            ]
         }
     ]
 }
