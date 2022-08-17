@@ -12,13 +12,22 @@ export default function(app) {
     const typingResultRepository = new TypingResultRepository(pool);
 
     app.get('/api/typing', async (req, res) => {
-        res.send(await typingResultRepository.getAll());
+        const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
+        res.send(await typingResultRepository.getAll(profile));
         res.status(200).end();
     });
 
     app.post('/api/typing', async (req, res) => {
         const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
         await typingResultRepository.save(req.body, profile); // TODO: Make the profile information available in the context of repository?
+
+        const all = await typingResultRepository.getAll(profile);
+        let totalCharactersTyped = 0;
+        all.forEach(result => totalCharactersTyped += result.text.length);
+
+        res.send({
+            totalCharactersTyped
+        });
         res.status(201).end();
     });
 }

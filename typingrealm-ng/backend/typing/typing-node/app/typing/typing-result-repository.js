@@ -5,11 +5,11 @@ export default class TypingResultRepository {
         this.#pool = pgPool;
     }
 
-    async getAll() {
+    async getAll(profile) {
         const client = await this.#pool.connect();
 
         try {
-            const result = await client.query('select * from typing_bundle');
+            const result = await client.query('select * from typing_bundle where profile_id = $1', [ profile ]);
 
             return result.rows;
         } finally {
