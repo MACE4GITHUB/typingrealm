@@ -32,6 +32,29 @@ body {
     background-color: #ede;
 }
 
+.hidden {
+    display: none;
+}
+
+#statistics {
+    font-size: 1.8rem;
+    margin: 50px auto;
+}
+
+.statistics-entry {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.statistics-entry-name {
+    width: 400px;
+}
+
+.statistics-entry-value {
+    width: 300px;
+}
+
 .loader {
   border: 16px solid #eee;
   border-top: 16px solid #e99;

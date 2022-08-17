@@ -31,4 +31,5 @@ export default async function submitTypingResult(typer) {
     const json = await result.json();
 
     console.log('Submitted typing result', typer.result, json);
+    return json;
 }
