@@ -32,7 +32,8 @@
                 {
                     "servicePath": "typing-node",
                     "localPort": 30101,
-                    "localVolume": "/usr/src/app"
+                    "localVolume": "/usr/src/app",
+                    "replicas": 3
                 }
             ]
         },

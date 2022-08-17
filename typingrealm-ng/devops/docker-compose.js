@@ -94,39 +94,50 @@ module.exports = function(config, fs) {
         } ] };
 
         for (let backend of service.backends) {
+            let replicas = backend.replicas ?? 1;
+            if (replicas === 0) replicas = 1; // TODO: Implement possibility to specify 0 replicas.
             backend.serviceId = backend.servicePath ?? service.name;
 
-            content.push(`  ${getPrefix(env)}${projectName}-${backend.serviceId}:`);
-            content.push(`    image: \${DOCKER_REGISTRY-}${getPrefix(env)}${projectName}-${backend.serviceId}`);
-            content.push(`    container_name: ${getPrefix(env)}${projectName}-${backend.serviceId}`);
-            content.push(`    networks:`);
-            content.push(`      - ${getPrefix(env)}${projectName}-net`);
-            content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
-
-            if (service.infra?.length > 0 && env.useInfrastructureFrom) {
-                const network = getExternalNetwork(env.useInfrastructureFrom);
-                content.push(`      - ${network}`);
+            function getReplicaPostfix(replica) {
+                if (replica === 0) return '';
+                return `-${replica + 1}`;
             }
 
-            if (env.exposeLocalPorts && backend.localPort) {
-                content.push(`    ports:`);
-                content.push(`      - ${backend.localPort}:80`);
+            if (env.localVolume || env.exposeLocalPorts) replicas = 1;
+
+            for (let replica = 0; replica < replicas ?? 1; replica++) {
+                content.push(`  ${getPrefix(env)}${projectName}-${backend.serviceId}${getReplicaPostfix(replica)}:`);
+                content.push(`    image: \${DOCKER_REGISTRY-}${getPrefix(env)}${projectName}-${backend.serviceId}`);
+                content.push(`    container_name: ${getPrefix(env)}${projectName}-${backend.serviceId}${getReplicaPostfix(replica)}`);
+                content.push(`    networks:`);
+                content.push(`      - ${getPrefix(env)}${projectName}-net`);
+                content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
+
+                if (service.infra?.length > 0 && env.useInfrastructureFrom) {
+                    const network = getExternalNetwork(env.useInfrastructureFrom);
+                    content.push(`      - ${network}`);
+                }
+
+                if (env.exposeLocalPorts && backend.localPort) {
+                    content.push(`    ports:`);
+                    content.push(`      - ${backend.localPort}:80`);
+                }
+
+                content.push(`    build:`);
+                content.push(`      context: ${service.dockerContext}`);
+                content.push(`      dockerfile: ${backend.servicePath ? `${backend.servicePath}/` : ''}Dockerfile-${env.name}`);
+
+                if (env.localVolume && backend.localVolume) {
+                    content.push(`    volumes:`);
+                    content.push(`      - ${service.dockerContext}${backend.servicePath ? `/${backend.servicePath}` : ''}:${backend.localVolume}`);
+                }
+
+                content.push(`    restart: unless-stopped`);
+                content.push(`    mem_limit: 1g`);
+                content.push('    mem_reservation: 750m');
+                content.push(...envsToAddToEachBackend);
+                content.push('');
             }
-
-            content.push(`    build:`);
-            content.push(`      context: ${service.dockerContext}`);
-            content.push(`      dockerfile: ${backend.servicePath ? `${backend.servicePath}/` : ''}Dockerfile-${env.name}`);
-
-            if (env.localVolume && backend.localVolume) {
-                content.push(`    volumes:`);
-                content.push(`      - ${service.dockerContext}${backend.servicePath ? `/${backend.servicePath}` : ''}:${backend.localVolume}`);
-            }
-
-            content.push(`    restart: unless-stopped`);
-            content.push(`    mem_limit: 1g`);
-            content.push('    mem_reservation: 750m');
-            content.push(...envsToAddToEachBackend);
-            content.push('');
         }
 
         content = content.slice(0, -1);

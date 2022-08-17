@@ -21,6 +21,36 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
 
+  dev-typingrealm-typing-node-2:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-typing-node
+    container_name: dev-typingrealm-typing-node-2
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-typing-net
+    build:
+      context: ./backend/typing
+      dockerfile: typing-node/Dockerfile-dev
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    environment:
+      - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
+
+  dev-typingrealm-typing-node-3:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-typing-node
+    container_name: dev-typingrealm-typing-node-3
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-typing-net
+    build:
+      context: ./backend/typing
+      dockerfile: typing-node/Dockerfile-dev
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+    environment:
+      - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
+
   dev-typingrealm-typing-postgres:
     image: postgres
     container_name: dev-typingrealm-typing-postgres
