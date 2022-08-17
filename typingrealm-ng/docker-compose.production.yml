@@ -13,8 +13,8 @@ services:
       - typingrealm-net
       - typingrealm-typing-net
     build:
-      context: ./backend/typing-node
-      dockerfile: Dockerfile-production
+      context: ./backend/typing
+      dockerfile: typing-node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m

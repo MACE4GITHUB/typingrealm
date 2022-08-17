@@ -18,10 +18,10 @@ services:
     ports:
       - 30101:80
     build:
-      context: ./backend/typing-node
-      dockerfile: Dockerfile-local
+      context: ./backend/typing
+      dockerfile: typing-node/Dockerfile-local
     volumes:
-      - ./backend/typing-node:/usr/src/app
+      - ./backend/typing/typing-node:/usr/src/app
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m

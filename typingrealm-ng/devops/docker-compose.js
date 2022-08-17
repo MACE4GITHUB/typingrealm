@@ -87,11 +87,11 @@ module.exports = function(config, fs) {
 
         content.push(`    build:`);
         content.push(`      context: ${service.dockerContext}`);
-        content.push(`      dockerfile: Dockerfile-${env.name}`);
+        content.push(`      dockerfile: ${service.servicePath ? `${service.servicePath}/` : ''}Dockerfile-${env.name}`);
 
         if (env.localVolume && service.localVolume) {
             content.push(`    volumes:`);
-            content.push(`      - ${service.dockerContext}:${service.localVolume}`);
+            content.push(`      - ${service.dockerContext}${service.servicePath ? `/${service.servicePath}` : ''}:${service.localVolume}`);
         }
 
         content.push(`    restart: unless-stopped`);

@@ -21,7 +21,8 @@
     "services": [
         {
             "name": "typing",
-            "dockerContext": "./backend/typing-node",
+            "dockerContext": "./backend/typing",
+            "servicePath": "typing-node",
             "infra": [
                 {
                     "type": "postgres",
