@@ -2,7 +2,8 @@ const baseUri = 'https://dev.api.typingrealm.com';
 const typingApiUri = `${baseUri}/typing`;
 const typingApi = {
     uri: typingApiUri,
-    typingSubmitEndpoint: `${typingApiUri}/api/typing`
+    typingSubmitEndpoint: `${typingApiUri}/api/typing`,
+    typingAnalyzeAllEndpoint: `${typingApiUri}/api/typing/analyze-all`
 };
 
 const authApiUri = typingApiUri;

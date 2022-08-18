@@ -43,12 +43,18 @@ async function processKeyDown(event) {
             statisticsElement.innerHTML = '';
 
             // TODO: Fill statistics element with data.
-            addAnalyticsEntry('Total characters typed', statisticsResult.totalCharactersCount);
-            addAnalyticsEntry('Total errors', statisticsResult.errorCharactersCount);
-            addAnalyticsEntry('Total time taken', `${(statisticsResult.totalTimeMs / 1000).toFixed(2)} s`);
-            addAnalyticsEntry('Average speed', `${statisticsResult.speedWpm.toFixed(2)} WPM`);
-            addAnalyticsEntry('Precision', `${statisticsResult.precision.toFixed(2)} %`);
+            addAnalyticsEntry('Total characters typed', statisticsResult.current.totalCharactersCount);
+            addAnalyticsEntry('Total errors', statisticsResult.current.errorCharactersCount);
+            addAnalyticsEntry('Total time taken', `${(statisticsResult.current.totalTimeMs / 1000).toFixed(2)} s`);
+            addAnalyticsEntry('Average speed', `${statisticsResult.current.speedWpm.toFixed(2)} WPM`);
+            addAnalyticsEntry('Precision', `${statisticsResult.current.precision.toFixed(2)} %`);
             statisticsElement.innerHTML += '<div class="statistics-entry" style="margin-top: 50px">Press ENTER to start typing next text</div>';
+            statisticsElement.innerHTML += '<div class="statistics-entry" style="margin-bottom: 50px; font-size: 1.5rem">Below is the all-time statistics</div>';
+            addAnalyticsEntry('Total characters typed', statisticsResult.allTime.totalCharactersCount);
+            addAnalyticsEntry('Total errors', statisticsResult.allTime.errorCharactersCount);
+            addAnalyticsEntry('Total time taken', `${(statisticsResult.allTime.totalTimeMs / 1000).toFixed(2)} s`);
+            addAnalyticsEntry('Average speed', `${statisticsResult.allTime.speedWpm.toFixed(2)} WPM`);
+            addAnalyticsEntry('Precision', `${statisticsResult.allTime.precision.toFixed(2)} %`);
 
             function addAnalyticsEntry(name, value) {
                 const element = document.createElement('div');

@@ -31,5 +31,16 @@ export default async function submitTypingResult(typer) {
     const json = await result.json();
 
     console.log('Submitted typing result', typer.result, json);
-    return json;
+
+    const allTimeResult = await fetch(config.typingApi.typingAnalyzeAllEndpoint, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    const allTimeJson = await allTimeResult.json();
+
+    return {
+        current: json,
+        allTime: allTimeJson
+    };
 }

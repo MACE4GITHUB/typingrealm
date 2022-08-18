@@ -2,7 +2,8 @@ const baseUri = 'http://localhost:30101';
 const typingApiUri = baseUri;
 const typingApi = {
     uri: typingApiUri,
-    typingSubmitEndpoint: `${typingApiUri}/api/typing`
+    typingSubmitEndpoint: `${typingApiUri}/api/typing`,
+    typingAnalyzeAllEndpoint: `${typingApiUri}/api/typing/analyze-all`
 };
 
 const authApiUri = typingApiUri;
