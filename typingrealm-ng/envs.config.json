@@ -2,6 +2,15 @@
     "projectName": "typingrealm",
     "infrastructureDataFolder": "./infrastructure-data",
     "caddyfile": "./reverse-proxy/Caddyfile.host",
+    "infraTypes": [
+        {
+            "type": "postgres",
+            "volume": "/var/lib/postgresql/data",
+            "environment": [
+                "POSTGRES_PASSWORD=admin"
+            ]
+        }
+    ],
     "envs": [
         {
             "name": "local",

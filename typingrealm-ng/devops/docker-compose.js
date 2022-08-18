@@ -75,7 +75,7 @@ module.exports = function(config, fs) {
             for (let infra of service.infra) {
                 if (infra.type === 'postgres') {
                     infraContent.push('');
-                    addPostgres(service, infraContent, infra, env);
+                    addInfra(service, infraContent, infra, env);
 
                     // TODO: Make sure 'environment' line is not added twice.
                     envsToAddToEachBackend.push(`    environment:`);
@@ -162,7 +162,7 @@ module.exports = function(config, fs) {
         return content;
     }
 
-    function addPostgres(service, content, infra, env) {
+    function addInfra(service, content, infra, env) {
         const infraName = infra.name ?? infra.type;
         const infraImage = infra.name ?? infra.type;
 
@@ -185,13 +185,25 @@ module.exports = function(config, fs) {
             content.push(`      - ${hostPort}:${containerPort}`);
         }
 
-        content.push(`    volumes:`);
-        content.push(`      - ${infraFolder}/${env.name}/${service.name}/${infraName}:/var/lib/postgresql/data`);
+        const infraType = config.infraTypes.find(x => x.type === infra.type);
+        if (!infraType) throw new Error(`Infra with type ${infra.type} is not found.`);
+
+        if (infraType.volume) {
+            content.push(`    volumes:`);
+            content.push(`      - ${infraFolder}/${env.name}/${service.name}/${infraName}:${infraType.volume}`);
+        }
+
         content.push(`    restart: unless-stopped`);
         content.push(`    mem_limit: 1g`);
         content.push('    mem_reservation: 750m');
-        content.push('    environment:');
-        content.push('      - POSTGRES_PASSWORD=admin');
+
+        if (infraType.environment) {
+            content.push('    environment:');
+
+            for (let envString of infraType.environment) {
+                content.push(`      - ${envString}`);
+            }
+        }
     }
 
     function getExternalNetwork(envWithInfrastructure) {
