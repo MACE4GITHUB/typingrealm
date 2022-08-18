@@ -12,12 +12,15 @@
         {
             "name": "dev",
             "isLoadBalanced": "true",
-            "exposeInfraPorts": "true"
+            "exposeInfraPorts": "true",
+            "infraPortPrefix": "2"
         },
         {
             "name": "production",
             "isLoadBalanced": "true",
-            "noPrefix": "true"
+            "noPrefix": "true",
+            "exposeInfraPorts": "true",
+            "infraPortPrefix": "1"
         }
     ],
     "services": [

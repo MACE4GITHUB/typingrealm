@@ -174,8 +174,15 @@ module.exports = function(config, fs) {
         content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
 
         if (infra.ports && env.exposeInfraPorts) {
+            let portsValue = infra.ports;
+            if (!env.infraPortPrefix) throw new Error('Infra port prefix should be specified if ports are exposed.');
+
+            let [hostPort, containerPort] = portsValue.split(':');
+            hostPort = `${env.infraPortPrefix}${hostPort.substring(hostPort.length - 3, hostPort.length)}`;
+            portsValue = env.infraPortPrefix + portsValue;
+
             content.push(`    ports:`);
-            content.push(`      - ${infra.ports}`);
+            content.push(`      - ${hostPort}:${containerPort}`);
         }
 
         content.push(`    volumes:`);

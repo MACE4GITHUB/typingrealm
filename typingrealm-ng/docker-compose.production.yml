@@ -69,6 +69,8 @@ services:
     networks:
       - typingrealm-net
       - typingrealm-typing-net
+    ports:
+      - 1432:5432
     volumes:
       - ./infrastructure-data/production/typing/postgres:/var/lib/postgresql/data
     restart: unless-stopped
