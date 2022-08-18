@@ -70,7 +70,7 @@ services:
       - dev-typingrealm-net
       - dev-typingrealm-typing-net
     ports:
-      - 2432:5432
+      - 12432:5432
     volumes:
       - ./infrastructure-data/dev/typing/postgres:/var/lib/postgresql/data
     restart: unless-stopped

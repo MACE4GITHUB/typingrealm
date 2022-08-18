@@ -178,7 +178,7 @@ module.exports = function(config, fs) {
             if (!env.infraPortPrefix) throw new Error('Infra port prefix should be specified if ports are exposed.');
 
             let [hostPort, containerPort] = portsValue.split(':');
-            hostPort = `${env.infraPortPrefix}${hostPort.substring(hostPort.length - 3, hostPort.length)}`;
+            hostPort = `${10 + Number(env.infraPortPrefix)}${hostPort.substring(hostPort.length - 3, hostPort.length)}`;
             portsValue = env.infraPortPrefix + portsValue;
 
             content.push(`    ports:`);
