@@ -30,12 +30,33 @@ export default function(app) {
         res.send(analytics);
         res.status(201).end();
     });
+
+    app.get('/api/typing/analyze-all', async (req, res) => {
+        const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
+        const allData = await typingResultRepository.getAll(profile);
+
+        const aggregated = allData.map(analyze).reduce((result, data) => {
+            return {
+                totalCharactersCount: result.totalCharactersCount + data.totalCharactersCount,
+                errorCharactersCount: result.errorCharactersCount + data.errorCharactersCount,
+                totalTimeMs: result.totalTimeMs + data.totalTimeMs
+            };
+        }, {
+            totalCharactersCount: 0,
+            errorCharactersCount: 0,
+            totalTimeMs: 0
+        });
+
+        aggregated.speedWpm = (60 * 1000 * aggregated.totalCharactersCount / aggregated.totalTimeMs) / 5,
+        aggregated.precision = 100 * (aggregated.totalCharactersCount - aggregated.errorCharactersCount) / aggregated.totalCharactersCount
+
+        res.send(aggregated);
+        res.status(201).end();
+    })
 }
 
 function analyze(result) {
-    const createdPerf = result.createdPerf;
     const text = result.text;
-    const textLength = text.length;
 
     let started = false;
     let index = 0;

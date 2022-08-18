@@ -9,9 +9,40 @@ export default class TypingResultRepository {
         const client = await this.#pool.connect();
 
         try {
-            const result = await client.query('select * from typing_bundle where profile_id = $1', [ profile ]);
+            const result = await client.query(`
+select id, text
+from typing_bundle
+where profile_id = $1
+`, [ profile ]);
 
-            return result.rows;
+            const data = [];
+            for (let row of result.rows) {
+                const id = row.id;
+                const text = row.text;
+                const eventsResult = await client.query(`
+select order_index, index, event_type, key, perf
+from event
+where typing_bundle_id = $1
+`, [ id ]);
+
+                const events = eventsResult.rows
+                    .sort((a, b) => a.order_index - b.order_index)
+                    .map(r => {
+                        return {
+                            index: r.index,
+                            eventType: r.event_type,
+                            key: r.key,
+                            perf: r.perf
+                        };
+                    });
+
+                data.push({
+                    text: text,
+                    events: events
+                });
+            }
+
+            return data;
         } finally {
             client.release();
         }
