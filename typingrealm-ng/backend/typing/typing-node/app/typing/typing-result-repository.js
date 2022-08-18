@@ -32,7 +32,7 @@ where typing_bundle_id = $1
                             index: r.index,
                             eventType: r.event_type,
                             key: r.key,
-                            perf: r.perf
+                            perf: r.perf / 1000
                         };
                     });
 
