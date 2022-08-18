@@ -93,7 +93,7 @@ module.exports = function(config, fs) {
                     infraContent.push('');
                     addInfra(service, infraContent, infra, env);
 
-                    envsToAddToEachBackend.push(`      - CACHE_URL=${getPrefix(env)}${projectName}-${service.name}-redis:6379`);
+                    envsToAddToEachBackend.push(`      - CACHE_URL=redis://${getPrefix(env)}${projectName}-${service.name}-redis:6379`);
                     continue;
                 }
 
