@@ -3,5 +3,6 @@ export default {
         'https://typingrealm.com'
     ],
     typingApiPort: 80,
-    typingDbConnectionString: process.env.DATABASE_URL
+    typingDbConnectionString: process.env.DATABASE_URL,
+    cacheConnectionString: process.env.CACHE_URL
 }

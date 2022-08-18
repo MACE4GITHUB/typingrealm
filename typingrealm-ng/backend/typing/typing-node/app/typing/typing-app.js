@@ -4,12 +4,15 @@ import pg from 'pg';
 import config from '../config/config.js';
 const { Pool } = pg; // Singleton throughout the whole typing app, consider refactoring.
 
+import Cache from './caching/index.js';
+
 export default function(app) {
     const pool = new Pool({
         connectionString: config.typingDbConnectionString
     });
 
     const typingResultRepository = new TypingResultRepository(pool);
+    const cache = new Cache();
 
     app.get('/api/typing', async (req, res) => {
         const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
