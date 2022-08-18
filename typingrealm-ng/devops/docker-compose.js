@@ -72,16 +72,28 @@ module.exports = function(config, fs) {
         const envsToAddToEachBackend = [];
 
         if (service.infra?.length > 0 && !env.useInfrastructureFrom) {
+            let headerAdded = false;
             for (let infra of service.infra) {
+                if (!headerAdded) {
+                    envsToAddToEachBackend.push(`    environment:`);
+                    headerAdded = true;
+                }
+
                 if (infra.type === 'postgres') {
                     infraContent.push('');
                     addInfra(service, infraContent, infra, env);
 
-                    // TODO: Make sure 'environment' line is not added twice.
-                    envsToAddToEachBackend.push(`    environment:`);
                     const databaseName = infra.database ?? service.name;
                     envsToAddToEachBackend.push(`      - DATABASE_URL=postgres://postgres:admin@${getPrefix(env)}${projectName}-${service.name}-postgres:5432/${databaseName}?sslmode=disable`);
 
+                    continue;
+                }
+
+                if (infra.type === 'redis') {
+                    infraContent.push('');
+                    addInfra(service, infraContent, infra, env);
+
+                    envsToAddToEachBackend.push(`      - CACHE_URL=${getPrefix(env)}${projectName}-${service.name}-redis:6379`);
                     continue;
                 }
 

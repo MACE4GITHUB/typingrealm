@@ -9,6 +9,10 @@
             "environment": [
                 "POSTGRES_PASSWORD=admin"
             ]
+        },
+        {
+            "type": "redis",
+            "volume": "/data"
         }
     ],
     "envs": [
@@ -41,6 +45,10 @@
                 {
                     "type": "postgres",
                     "ports": "5432:5432"
+                },
+                {
+                    "type": "redis",
+                    "ports": "6379:6379"
                 }
             ],
             "backends": [

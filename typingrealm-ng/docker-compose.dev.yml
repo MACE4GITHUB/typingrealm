@@ -32,6 +32,7 @@ services:
     mem_reservation: 750m
     environment:
       - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
+      - CACHE_URL=dev-typingrealm-typing-redis:6379
 
   dev-typingrealm-typing-node-2:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-typing-node
@@ -47,6 +48,7 @@ services:
     mem_reservation: 750m
     environment:
       - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
+      - CACHE_URL=dev-typingrealm-typing-redis:6379
 
   dev-typingrealm-typing-node-3:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-typing-node
@@ -62,6 +64,7 @@ services:
     mem_reservation: 750m
     environment:
       - DATABASE_URL=postgres://postgres:admin@dev-typingrealm-typing-postgres:5432/typing?sslmode=disable
+      - CACHE_URL=dev-typingrealm-typing-redis:6379
 
   dev-typingrealm-typing-postgres:
     image: postgres
@@ -78,6 +81,20 @@ services:
     mem_reservation: 750m
     environment:
       - POSTGRES_PASSWORD=admin
+
+  dev-typingrealm-typing-redis:
+    image: redis
+    container_name: dev-typingrealm-typing-redis
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-typing-net
+    ports:
+      - 12379:6379
+    volumes:
+      - ./infrastructure-data/dev/typing/redis:/data
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
 
   dev-typingrealm-ui:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-ui
