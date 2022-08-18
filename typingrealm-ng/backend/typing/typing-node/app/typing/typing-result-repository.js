@@ -5,18 +5,30 @@ export default class TypingResultRepository {
         this.#pool = pgPool;
     }
 
-    async getAll(profile) {
+    async getAll(profile, sinceId) {
         const client = await this.#pool.connect();
 
         try {
-            const result = await client.query(`
+            let result = [];
+            if (sinceId) {
+                result = (await client.query(`
 select id, text
 from typing_bundle
 where profile_id = $1
-`, [ profile ]);
+and id >= $2
+order by id
+`, [ profile, sinceId ])).rows;
+            } else {
+                result = (await client.query(`
+select id, text
+from typing_bundle
+where profile_id = $1
+order by id
+`, [ profile ])).rows;
+            }
 
             const data = [];
-            for (let row of result.rows) {
+            for (let row of result) {
                 const id = row.id;
                 const text = row.text;
                 const eventsResult = await client.query(`
@@ -37,6 +49,7 @@ where typing_bundle_id = $1
                     });
 
                 data.push({
+                    id: id,
                     text: text,
                     events: events
                 });
@@ -76,8 +89,6 @@ where typing_bundle_id = $1
                 ];
             });
 
-            console.log(bundleArguments, eventValuesArray);
-
             const valuesString = generateValuesString(eventValuesArray.length, eventValuesArray[0].length);
             function generateValuesString(length, size) {
                 let string = '';
@@ -94,7 +105,6 @@ where typing_bundle_id = $1
                 return string;
             }
             const sql = `insert into event(typing_bundle_id, order_index, index, event_type, key, perf) values${valuesString}`;
-            console.log(sql);
 
             await client.query(sql, eventValuesArray.flatMap(x => x));
 

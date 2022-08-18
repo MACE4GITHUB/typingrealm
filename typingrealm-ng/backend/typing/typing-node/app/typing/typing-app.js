@@ -36,26 +36,63 @@ export default function(app) {
 
     app.get('/api/typing/analyze-all', async (req, res) => {
         const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
-        const allData = await typingResultRepository.getAll(profile);
 
-        const aggregated = allData.map(analyze).reduce((result, data) => {
+        let cachedAnalytics = await cache.get(`analytics_all_time_${profile}`);
+        console.log('Read cached', cachedAnalytics);
+
+        let lastProcessedId = 0;
+        try {
+            if (cachedAnalytics) {
+                cachedAnalytics = JSON.parse(cachedAnalytics);
+                lastProcessedId = cachedAnalytics.lastProcessedId ?? 0;
+
+                if (!isValid(cachedAnalytics)) {
+                    console.log('Cached value is not valid, re-analyzing.');
+                    cachedAnalytics = null;
+                    lastProcessedId = 0;
+                }
+            }
+        } catch (error) {
+            console.log('Error when reading cache. Resetting cache.', error);
+            lastProcessedId = 0;
+        }
+
+        console.log('Getting records since', Number(lastProcessedId) + 1);
+        const unprocessedData = await typingResultRepository.getAll(profile, Number(lastProcessedId) + 1);
+        console.log(`Got ${unprocessedData.length} records from the database`);
+
+        const aggregated = unprocessedData.map(analyze).reduce((result, data) => {
             return {
                 totalCharactersCount: result.totalCharactersCount + data.totalCharactersCount,
                 errorCharactersCount: result.errorCharactersCount + data.errorCharactersCount,
                 totalTimeMs: result.totalTimeMs + data.totalTimeMs
             };
-        }, {
+        }, cachedAnalytics ? cachedAnalytics : {
             totalCharactersCount: 0,
             errorCharactersCount: 0,
             totalTimeMs: 0
         });
 
+        lastProcessedId = unprocessedData[unprocessedData.length - 1]?.id ?? 0;
+
         aggregated.speedWpm = (60 * 1000 * aggregated.totalCharactersCount / aggregated.totalTimeMs) / 5,
         aggregated.precision = 100 * (aggregated.totalCharactersCount - aggregated.errorCharactersCount) / aggregated.totalCharactersCount
 
+        const cachedObject = Object.assign({ lastProcessedId }, aggregated);
+        console.log('Caching', cachedObject);
+        await cache.set(`analytics_all_time_${profile}`, JSON.stringify(cachedObject));
+
         res.send(aggregated);
         res.status(201).end();
-    })
+    });
+}
+
+function isValid(cachedAnalytics) {
+    for (let field in cachedAnalytics) {
+        if (cachedAnalytics[field] == null) return false;
+    }
+
+    return true;
 }
 
 function analyze(result) {

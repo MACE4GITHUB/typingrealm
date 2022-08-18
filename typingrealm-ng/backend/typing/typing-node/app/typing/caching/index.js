@@ -13,6 +13,6 @@ export default class RedisCache {
     }
 
     set(key, value) {
-        return client.set(key);
+        return client.set(key, value);
     }
 }
