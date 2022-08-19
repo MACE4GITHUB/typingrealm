@@ -5,6 +5,31 @@ async function submitTypingResultMock(typer) {
     console.log('MOCK submitted typing results', typer.result);
 }
 
+export async function getProfileAndGlobalStatistics() {
+    const token = await tokenProvider();
+
+    const allTimeResult = await fetch(config.typingApi.typingAnalyzeAllEndpoint, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    const allTimeJson = await allTimeResult.json();
+
+    const globalResult = await fetch(config.typingApi.typingGlobalStatisticsEndpoint, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    const globalJson = await globalResult.json();
+
+    const response = {
+        allTime: allTimeJson,
+        global: globalJson
+    };
+
+    return response;
+}
+
 export default async function submitTypingResult(typer) {
     const uri = config.typingApi.typingSubmitEndpoint;
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -32,26 +57,9 @@ export default async function submitTypingResult(typer) {
 
     console.log('Submitted typing result', typer.result, json);
 
-    const allTimeResult = await fetch(config.typingApi.typingAnalyzeAllEndpoint, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
-    const allTimeJson = await allTimeResult.json();
+    const profileAndGlobal = await getProfileAndGlobalStatistics();
 
-    const globalResult = await fetch(config.typingApi.typingGlobalStatisticsEndpoint, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
-    const globalJson = await globalResult.json();
-
-    const response = {
-        current: json,
-        allTime: allTimeJson,
-        global: globalJson
-    };
-    console.log(response);
+    const response = Object.assign({ current: json }, profileAndGlobal);
 
     return response;
 }
