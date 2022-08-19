@@ -1,9 +1,9 @@
 {
   "type": "module",
-  "name": "typingrealm-backend",
+  "name": "typingrealm-typing",
   "version": "1.0.0",
-  "description": "TypingRealm backend",
-  "main": "index.js",
+  "description": "TypingRealm Typing backend",
+  "main": "app/index.js",
   "scripts": {
     "start": "node app/index.js",
     "start:prod": "dbmate --url $DATABASE_URL wait && dbmate --url $DATABASE_URL up && node app/index.js",

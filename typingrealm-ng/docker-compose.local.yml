@@ -3,6 +3,7 @@ version: '3.4'
 networks:
   local-typingrealm-net:
   local-typingrealm-typing-net:
+  local-typingrealm-texts-net:
   local-typingrealm-ui-net:
   dev-tyr_dev-typingrealm-net:
     external: true
@@ -22,6 +23,23 @@ services:
       dockerfile: typing-node/Dockerfile-local
     volumes:
       - ./backend/typing/typing-node:/usr/src/app
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  local-typingrealm-texts-node:
+    image: ${DOCKER_REGISTRY-}local-typingrealm-texts-node
+    container_name: local-typingrealm-texts-node
+    networks:
+      - local-typingrealm-net
+      - local-typingrealm-texts-net
+    ports:
+      - 30102:80
+    build:
+      context: ./backend/texts
+      dockerfile: texts-node/Dockerfile-local
+    volumes:
+      - ./backend/texts/texts-node:/usr/src/app
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m

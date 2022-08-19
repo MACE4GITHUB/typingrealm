@@ -8,11 +8,11 @@ typingrealm.com {
 
 api.typingrealm.com {
     handle_path /typing/* {
-        reverse_proxy typingrealm-typing-node:80 typingrealm-typing-node-2:80 typingrealm-typing-node-3:80 {
-            lb_policy round_robin
-            health_path /health
-            health_interval 10s
-        }
+        reverse_proxy typingrealm-typing-api:80
+    }
+
+    handle_path /texts/* {
+        reverse_proxy typingrealm-texts-api:80
     }
 
     respond 404
@@ -25,6 +25,10 @@ dev.typingrealm.com {
 dev.api.typingrealm.com {
     handle_path /typing/* {
         reverse_proxy dev-typingrealm-typing-api:80
+    }
+
+    handle_path /texts/* {
+        reverse_proxy dev-typingrealm-texts-api:80
     }
 
     respond 404

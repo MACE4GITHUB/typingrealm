@@ -2,11 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import config from './config/config.js';
-import registerTypingApp from './typing/index.js';
-import registerAuthApp from './auth/index.js';
+import registerTextsApp from './texts/index.js';
 
 const app = express();
-const port = config.typingApiPort ?? 80;
+const port = config.port ?? 80;
 
 console.log('Applying CORS policy', config.cors);
 app.use(cors({
@@ -16,11 +15,8 @@ app.use(cors({
 // Parse request body as JSON.
 app.use(bodyParser.json());
 
-// Register /api/typing service.
-registerTypingApp(app);
-
-// Register mock Auth service.
-registerAuthApp(app);
+// Register /api/texts service.
+registerTextsApp(app);
 
 // Health check endpoint with a counter.
 let healthCheckCount = 0;
