@@ -25,8 +25,9 @@ async function processKeyDown(event) {
         statisticsElement.classList.add('hidden');
         textElement.classList.remove('hidden');
 
-        // Show loader.
-        textElement.innerHTML = '<div class="loader"></div>';
+        // TODO: Show loader if loading takes too much time.
+        // But for now we have lightning-fast cache, disable the loader.
+        //textElement.innerHTML = '<div class="loader"></div>';
 
         // Retrieve next text from the API.
         const text = await retrieveText();
