@@ -3,6 +3,7 @@ version: '3.4'
 networks:
   typingrealm-net:
   typingrealm-typing-net:
+  typingrealm-texts-net:
   typingrealm-ui-net:
 
 services:
@@ -92,6 +93,57 @@ services:
       - 11379:6379
     volumes:
       - ./infrastructure-data/production/typing/redis:/data
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  typingrealm-texts-api:
+    image: caddy
+    container_name: typingrealm-texts-api
+    networks:
+      - typingrealm-net
+      - typingrealm-texts-net
+    volumes:
+      - ./backend/texts/Caddyfile-production:/etc/caddy/Caddyfile
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  typingrealm-texts-node:
+    image: ${DOCKER_REGISTRY-}typingrealm-texts-node
+    container_name: typingrealm-texts-node
+    networks:
+      - typingrealm-net
+      - typingrealm-texts-net
+    build:
+      context: ./backend/texts
+      dockerfile: texts-node/Dockerfile-production
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  typingrealm-texts-node-2:
+    image: ${DOCKER_REGISTRY-}typingrealm-texts-node
+    container_name: typingrealm-texts-node-2
+    networks:
+      - typingrealm-net
+      - typingrealm-texts-net
+    build:
+      context: ./backend/texts
+      dockerfile: texts-node/Dockerfile-production
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  typingrealm-texts-node-3:
+    image: ${DOCKER_REGISTRY-}typingrealm-texts-node
+    container_name: typingrealm-texts-node-3
+    networks:
+      - typingrealm-net
+      - typingrealm-texts-net
+    build:
+      context: ./backend/texts
+      dockerfile: texts-node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m

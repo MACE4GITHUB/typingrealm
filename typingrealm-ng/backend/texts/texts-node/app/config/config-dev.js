@@ -5,7 +5,5 @@ export default {
         'https://localhost',
         'https://typingrealm.com',
         'https://dev.typingrealm.com'
-    ],
-    typingDbConnectionString: process.env.DATABASE_URL,
-    cacheConnectionString: process.env.CACHE_URL
+    ]
 }

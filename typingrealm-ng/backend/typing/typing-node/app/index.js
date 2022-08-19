@@ -3,7 +3,6 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import config from './config/config.js';
 import registerTypingApp from './typing/index.js';
-import registerTextsApp from './texts/index.js';
 import registerAuthApp from './auth/index.js';
 
 const app = express();
@@ -19,9 +18,6 @@ app.use(bodyParser.json());
 
 // Register /api/typing service.
 registerTypingApp(app);
-
-// Register /api/texts service.
-registerTextsApp(app);
 
 // Register mock Auth service.
 registerAuthApp(app);

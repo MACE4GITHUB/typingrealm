@@ -13,7 +13,7 @@ const authApi = {
     tokenEndpoint: `${authApiUri}/api/auth/token`
 };
 
-const textsApiUri = typingApiUri;
+const textsApiUri = `${baseUri}/texts`;
 const textsApi = {
     uri: textsApiUri,
     generateTextEndpoint: `${textsApiUri}/api/texts`

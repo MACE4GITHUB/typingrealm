@@ -1,5 +1,6 @@
-const baseUri = 'http://localhost:30101';
-const typingApiUri = baseUri;
+const typingBaseUri = 'http://localhost:30101';
+const textsBaseUri = 'http://localhost:30102';
+const typingApiUri = typingBaseUri;
 const typingApi = {
     uri: typingApiUri,
     typingSubmitEndpoint: `${typingApiUri}/api/typing`,
@@ -7,13 +8,13 @@ const typingApi = {
     typingGlobalStatisticsEndpoint: `${typingApiUri}/api/typing/global-statistics`
 };
 
-const authApiUri = typingApiUri;
+const authApiUri = typingBaseUri;
 const authApi = {
     uri: authApiUri,
     tokenEndpoint: `${authApiUri}/api/auth/token`
 };
 
-const textsApiUri = typingApiUri;
+const textsApiUri = textsBaseUri;
 const textsApi = {
     uri: textsApiUri,
     generateTextEndpoint: `${textsApiUri}/api/texts`

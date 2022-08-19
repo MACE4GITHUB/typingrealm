@@ -2,9 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import config from './config/config.js';
-import registerTypingApp from './typing/index.js';
 import registerTextsApp from './texts/index.js';
-import registerAuthApp from './auth/index.js';
 
 const app = express();
 const port = config.port ?? 80;

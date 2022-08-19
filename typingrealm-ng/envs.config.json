@@ -61,6 +61,20 @@
             ]
         },
         {
+            "name": "texts",
+            "isLoadBalanced": true,
+            "dockerContext": "./backend/texts",
+            "infra": [],
+            "backends": [
+                {
+                    "servicePath": "texts-node",
+                    "localPort": 30102,
+                    "localVolume": "/usr/src/app",
+                    "replicas": 3
+                }
+            ]
+        },
+        {
             "name": "ui",
             "dockerContext": "./frontend",
             "backends": [

@@ -2,12 +2,12 @@ FROM node:18
 
 WORKDIR /usr/src/app
 
-COPY typing-node/package*.json ./
+COPY texts-node/package*.json ./
 
 RUN npm install
 #RUN npm ci --only=production
 
-COPY typing-node/app app/
-COPY typing-node/app/config/config-dev.js app/config/config.js
+COPY texts-node/app app/
+COPY texts-node/app/config/config-dev.js app/config/config.js
 
 CMD [ "npm", "run", "start:prod" ]
