@@ -23,10 +23,10 @@ async function processKeyDown(event) {
     if (event.key === 'Enter') {
         // Hide statistics.
         statisticsElement.classList.add('hidden');
-        textElement.classList.remove('hidden');
 
         // TODO: Show loader if loading takes too much time.
         // But for now we have lightning-fast cache, disable the loader.
+        //textElement.classList.remove('hidden');
         //textElement.innerHTML = '<div class="loader"></div>';
 
         // Retrieve next text from the API.
@@ -87,6 +87,7 @@ async function processKeyDown(event) {
         // Remove loader and add Typer characters to the text element.
         textElement.innerHTML = '';
         textElement.append(...localTyper.characterSpans);
+        textElement.classList.remove('hidden');
 
         // Set the new typer so it can start accepting keyboard input.
         typer = localTyper;
