@@ -20,9 +20,9 @@ services:
       - 30101:80
     build:
       context: ./backend/typing
-      dockerfile: typing-node/Dockerfile-local
+      dockerfile: node/Dockerfile-local
     volumes:
-      - ./backend/typing/typing-node:/usr/src/app
+      - ./backend/typing/node:/usr/src/app
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -37,9 +37,9 @@ services:
       - 30102:80
     build:
       context: ./backend/texts
-      dockerfile: texts-node/Dockerfile-local
+      dockerfile: node/Dockerfile-local
     volumes:
-      - ./backend/texts/texts-node:/usr/src/app
+      - ./backend/texts/node:/usr/src/app
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m

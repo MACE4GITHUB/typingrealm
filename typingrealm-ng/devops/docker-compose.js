@@ -108,7 +108,7 @@ module.exports = function(config, fs) {
         for (let backend of service.backends) {
             let replicas = backend.replicas ?? 1;
             if (replicas === 0) replicas = 1; // TODO: Implement possibility to specify 0 replicas.
-            backend.serviceId = backend.servicePath ?? service.name;
+            backend.serviceId = backend.servicePath ? `${service.name}-${backend.servicePath}` : service.name;
 
             function getReplicaPostfix(replica) {
                 if (replica === 0) return '';

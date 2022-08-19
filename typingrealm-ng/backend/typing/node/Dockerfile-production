@@ -5,13 +5,13 @@ RUN chmod +x /usr/local/bin/dbmate
 
 WORKDIR /usr/src/app
 
-COPY typing-node/package*.json ./
+COPY node/package*.json ./
 
 #RUN npm install
 RUN npm ci --only=production
 
-COPY typing-node/app app/
-COPY typing-node/app/config/config-production.js app/config/config.js
+COPY node/app app/
+COPY node/app/config/config-production.js app/config/config.js
 COPY db db/
 
 CMD [ "npm", "run", "start:prod" ]
