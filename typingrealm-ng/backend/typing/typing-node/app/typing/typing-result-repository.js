@@ -5,6 +5,21 @@ export default class TypingResultRepository {
         this.#pool = pgPool;
     }
 
+    async getAllProfiles() {
+        const client = await this.#pool.connect();
+
+        try {
+            const result = await client.query(`
+select distinct profile_id
+from typing_bundle
+`);
+
+            return result.rows.map(row => row.profile_id);
+        } finally {
+            client.release();
+        }
+    }
+
     async getAll(profile, sinceId) {
         const client = await this.#pool.connect();
 

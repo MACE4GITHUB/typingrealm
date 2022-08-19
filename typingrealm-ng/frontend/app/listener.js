@@ -56,6 +56,12 @@ async function processKeyDown(event) {
             addAnalyticsEntry('Total time taken', `${humanizeDuration(Math.round(statisticsResult.allTime.totalTimeMs / 100) * 100)}`);
             addAnalyticsEntry('Average speed', `${statisticsResult.allTime.speedWpm.toFixed(2)} WPM`);
             addAnalyticsEntry('Precision', `${statisticsResult.allTime.precision.toFixed(2)} %`);
+            statisticsElement.innerHTML += '<div class="statistics-entry" style="margin: 100px; font-size: 1.5rem">Below is the global statistics for ALL users</div>';
+            addAnalyticsEntry('Total characters typed', statisticsResult.global.totalCharactersCount);
+            addAnalyticsEntry('Total errors', statisticsResult.global.errorCharactersCount);
+            addAnalyticsEntry('Total time taken', `${humanizeDuration(Math.round(statisticsResult.global.totalTimeMs / 100) * 100)}`);
+            addAnalyticsEntry('Average speed', `${statisticsResult.global.speedWpm.toFixed(2)} WPM`);
+            addAnalyticsEntry('Precision', `${statisticsResult.global.precision.toFixed(2)} %`);
 
             function addAnalyticsEntry(name, value) {
                 const element = document.createElement('div');

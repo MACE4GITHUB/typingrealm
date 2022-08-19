@@ -39,8 +39,19 @@ export default async function submitTypingResult(typer) {
     });
     const allTimeJson = await allTimeResult.json();
 
-    return {
+    const globalResult = await fetch(config.typingApi.typingGlobalStatisticsEndpoint, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    const globalJson = await globalResult.json();
+
+    const response = {
         current: json,
-        allTime: allTimeJson
+        allTime: allTimeJson,
+        global: globalJson
     };
+    console.log(response);
+
+    return response;
 }

@@ -3,7 +3,8 @@ const typingApiUri = baseUri;
 const typingApi = {
     uri: typingApiUri,
     typingSubmitEndpoint: `${typingApiUri}/api/typing`,
-    typingAnalyzeAllEndpoint: `${typingApiUri}/api/typing/analyze-all`
+    typingAnalyzeAllEndpoint: `${typingApiUri}/api/typing/analyze-all`,
+    typingGlobalStatisticsEndpoint: `${typingApiUri}/api/typing/global-statistics`
 };
 
 const authApiUri = typingApiUri;
