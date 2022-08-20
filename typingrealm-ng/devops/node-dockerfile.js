@@ -14,6 +14,27 @@ module.exports = function(config, env, service, backend, fs) {
         lines.push('');
 
         write();
+
+        const local = [];
+        local.push('#!/bin/bash');
+        local.push('');
+
+        for (let component of config.nodeComponents) {
+            local.push('(');
+            local.push(`    cd ../../framework/${backend.type}/${component}`);
+            local.push('    npm install');
+            local.push(')');
+        }
+
+        local.push('');
+        local.push('npm install');
+        local.push('npm run start');
+        local.push('');
+
+        fs.writeFile(`./${config.dockerContext}/${service.name}/${backend.type}/local-start.sh`, local.join('\n'), err => {
+            console.log(err);
+        });
+
         return;
     }
 
