@@ -3,6 +3,9 @@
     "infrastructureDataFolder": "./infrastructure-data",
     "caddyfile": "./reverse-proxy/Caddyfile.host",
     "dockerContext": "./backend",
+    "nodeComponents": [
+        "host"
+    ],
     "infraTypes": [
         {
             "type": "postgres",

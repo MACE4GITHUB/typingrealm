@@ -1,4 +1,5 @@
 const generateLoadBalancer = require('./load-balancer.js');
+const generateNodeDockerfile = require('./node-dockerfile.js');
 
 module.exports = function(config, fs) {
     const projectName = config.projectName;
@@ -110,6 +111,8 @@ module.exports = function(config, fs) {
         } ] };
 
         for (let backend of service.backends) {
+            generateNodeDockerfile(config, env, service, backend, fs);
+
             let replicas = backend.replicas ?? 1;
             if (replicas === 0) replicas = 1; // TODO: Implement possibility to specify 0 replicas.
             backend.serviceId = backend.type ? `${service.name}-${backend.type}` : service.name;
