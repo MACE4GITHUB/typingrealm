@@ -2,6 +2,7 @@
     "projectName": "typingrealm",
     "infrastructureDataFolder": "./infrastructure-data",
     "caddyfile": "./reverse-proxy/Caddyfile.host",
+    "dockerContext": "./backend",
     "infraTypes": [
         {
             "type": "postgres",
@@ -40,7 +41,6 @@
         {
             "name": "typing",
             "isLoadBalanced": true,
-            "dockerContext": "./backend",
             "infra": [
                 {
                     "type": "postgres",
@@ -67,7 +67,6 @@
         {
             "name": "texts",
             "isLoadBalanced": true,
-            "dockerContext": "./backend",
             "infra": [],
             "backends": [
                 {

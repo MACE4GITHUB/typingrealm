@@ -126,7 +126,7 @@ module.exports = function(config, fs) {
                 content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
                 // TODO: Expose local ports here (after balancing) intead of from direct containers.
                 content.push(`    volumes:`);
-                content.push(`      - ${service.dockerContext}/${service.name}/Caddyfile-${env.name}:/etc/caddy/Caddyfile`);
+                content.push(`      - ${service.dockerContext ?? config.dockerContext}/${service.name}/Caddyfile-${env.name}:/etc/caddy/Caddyfile`);
                 content.push(`    restart: unless-stopped`);
                 content.push(`    mem_limit: 1g`);
                 content.push('    mem_reservation: 750m');
@@ -157,7 +157,7 @@ module.exports = function(config, fs) {
 
 
                 content.push(`    build:`);
-                content.push(`      context: ${service.dockerContext}`);
+                content.push(`      context: ${service.dockerContext ?? config.dockerContext}`);
                 content.push(`      dockerfile: ${dockerFile}`);
 
                 if (env.localVolume && backend.localVolumes?.length > 0) {
