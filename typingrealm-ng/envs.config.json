@@ -40,7 +40,7 @@
         {
             "name": "typing",
             "isLoadBalanced": true,
-            "dockerContext": "./backend/typing",
+            "dockerContext": "./backend",
             "infra": [
                 {
                     "type": "postgres",
@@ -54,9 +54,11 @@
             "backends": [
                 {
                     "servicePath": "node",
+                    "dockerFilePath": "typing/node",
                     "localPort": 30101,
                     "localVolumes": [
-                        "./backend/typing/node:/usr/src/app"
+                        "./backend/framework/node:/usr/src/app/framework/node",
+                        "./backend/typing/node:/usr/src/app/typing/node"
                     ],
                     "replicas": 3
                 }
@@ -65,14 +67,16 @@
         {
             "name": "texts",
             "isLoadBalanced": true,
-            "dockerContext": "./backend/texts",
+            "dockerContext": "./backend",
             "infra": [],
             "backends": [
                 {
                     "servicePath": "node",
+                    "dockerFilePath": "texts/node",
                     "localPort": 30102,
                     "localVolumes": [
-                        "./backend/texts/node:/usr/src/app"
+                        "./backend/framework/node:/usr/src/app/framework/node",
+                        "./backend/texts/node:/usr/src/app/texts/node"
                     ],
                     "replicas": 3
                 }

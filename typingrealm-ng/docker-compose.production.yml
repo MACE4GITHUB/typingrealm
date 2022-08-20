@@ -26,8 +26,8 @@ services:
       - typingrealm-net
       - typingrealm-typing-net
     build:
-      context: ./backend/typing
-      dockerfile: node/Dockerfile-production
+      context: ./backend
+      dockerfile: typing/node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -42,8 +42,8 @@ services:
       - typingrealm-net
       - typingrealm-typing-net
     build:
-      context: ./backend/typing
-      dockerfile: node/Dockerfile-production
+      context: ./backend
+      dockerfile: typing/node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -58,8 +58,8 @@ services:
       - typingrealm-net
       - typingrealm-typing-net
     build:
-      context: ./backend/typing
-      dockerfile: node/Dockerfile-production
+      context: ./backend
+      dockerfile: typing/node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -116,8 +116,8 @@ services:
       - typingrealm-net
       - typingrealm-texts-net
     build:
-      context: ./backend/texts
-      dockerfile: node/Dockerfile-production
+      context: ./backend
+      dockerfile: texts/node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -129,8 +129,8 @@ services:
       - typingrealm-net
       - typingrealm-texts-net
     build:
-      context: ./backend/texts
-      dockerfile: node/Dockerfile-production
+      context: ./backend
+      dockerfile: texts/node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -142,8 +142,8 @@ services:
       - typingrealm-net
       - typingrealm-texts-net
     build:
-      context: ./backend/texts
-      dockerfile: node/Dockerfile-production
+      context: ./backend
+      dockerfile: texts/node/Dockerfile-production
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
