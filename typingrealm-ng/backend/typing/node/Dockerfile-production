@@ -18,7 +18,7 @@ WORKDIR /usr/src/app
 
 COPY typing/node/app ./typing/node/app/
 COPY typing/node/app/config/config-production.js ./typing/node/app/config/config.js
-COPY tying/db ./typing/node/db/
+COPY typing/db ./typing/node/db/
 
 WORKDIR /usr/src/app/typing/node
 CMD [ "npm", "run", "start:prod" ]
