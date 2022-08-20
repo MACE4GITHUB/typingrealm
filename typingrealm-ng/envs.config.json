@@ -74,13 +74,19 @@
             "backends": [
                 {
                     "type": "node",
+                    "replicas": 3,
 
                     "localPort": 30102,
                     "localVolumes": [
                         "./backend/framework/node:/usr/src/app/framework/node",
                         "./backend/texts/node:/usr/src/app/texts/node"
-                    ],
-                    "replicas": 3
+                    ]
+                },
+                {
+                    "type": "dotnet",
+                    "replicas": 3,
+
+                    "skipLocal": true
                 }
             ]
         },

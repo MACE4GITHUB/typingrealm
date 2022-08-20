@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "TypingRealm.Texts.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Debug"
+      },
+      "applicationUrl": "http://0.0.0.0:31102"
+    }
+  }
+}

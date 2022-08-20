@@ -110,8 +110,12 @@ module.exports = function(config, fs) {
             serviceId: service.name
         } ] };
 
+        let addedCaddy = false;
         for (let backend of service.backends) {
             generateNodeDockerfile(config, env, service, backend, fs);
+
+            /* Temporary hack until I figure out how to debug projects in Docker. */
+            if (env.name === 'local' && backend.skipLocal) continue;
 
             let replicas = backend.replicas ?? 1;
             if (replicas === 0) replicas = 1; // TODO: Implement possibility to specify 0 replicas.
@@ -124,7 +128,8 @@ module.exports = function(config, fs) {
 
             if (env.localVolume || env.exposeLocalPorts) replicas = 1;
 
-            if (service.isLoadBalanced && env.isLoadBalanced) {
+            if (service.isLoadBalanced && env.isLoadBalanced && !addedCaddy) {
+                addedCaddy = true;
                 content.push(`  ${getPrefix(env)}${projectName}-${service.name}-api:`);
                 content.push(`    image: caddy`);
                 content.push(`    container_name: ${getPrefix(env)}${projectName}-${service.name}-api`);

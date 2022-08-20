@@ -148,6 +148,45 @@ services:
     mem_limit: 1g
     mem_reservation: 750m
 
+  dev-typingrealm-texts-dotnet:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-texts-dotnet
+    container_name: dev-typingrealm-texts-dotnet
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-texts-net
+    build:
+      context: ./backend
+      dockerfile: texts/dotnet/Dockerfile-dev
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  dev-typingrealm-texts-dotnet-2:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-texts-dotnet
+    container_name: dev-typingrealm-texts-dotnet-2
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-texts-net
+    build:
+      context: ./backend
+      dockerfile: texts/dotnet/Dockerfile-dev
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
+  dev-typingrealm-texts-dotnet-3:
+    image: ${DOCKER_REGISTRY-}dev-typingrealm-texts-dotnet
+    container_name: dev-typingrealm-texts-dotnet-3
+    networks:
+      - dev-typingrealm-net
+      - dev-typingrealm-texts-net
+    build:
+      context: ./backend
+      dockerfile: texts/dotnet/Dockerfile-dev
+    restart: unless-stopped
+    mem_limit: 1g
+    mem_reservation: 750m
+
   dev-typingrealm-ui:
     image: ${DOCKER_REGISTRY-}dev-typingrealm-ui
     container_name: dev-typingrealm-ui
