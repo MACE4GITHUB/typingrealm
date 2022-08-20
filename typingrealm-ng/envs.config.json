@@ -53,8 +53,8 @@
             ],
             "backends": [
                 {
-                    "servicePath": "node",
-                    "dockerFilePath": "typing/node",
+                    "type": "node",
+
                     "localPort": 30101,
                     "localVolumes": [
                         "./backend/framework/node:/usr/src/app/framework/node",
@@ -71,8 +71,8 @@
             "infra": [],
             "backends": [
                 {
-                    "servicePath": "node",
-                    "dockerFilePath": "texts/node",
+                    "type": "node",
+
                     "localPort": 30102,
                     "localVolumes": [
                         "./backend/framework/node:/usr/src/app/framework/node",

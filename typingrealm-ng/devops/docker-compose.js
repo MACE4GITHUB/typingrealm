@@ -108,7 +108,7 @@ module.exports = function(config, fs) {
         for (let backend of service.backends) {
             let replicas = backend.replicas ?? 1;
             if (replicas === 0) replicas = 1; // TODO: Implement possibility to specify 0 replicas.
-            backend.serviceId = backend.servicePath ? `${service.name}-${backend.servicePath}` : service.name;
+            backend.serviceId = backend.type ? `${service.name}-${backend.type}` : service.name;
 
             function getReplicaPostfix(replica) {
                 if (replica === 0) return '';
@@ -151,9 +151,9 @@ module.exports = function(config, fs) {
                     content.push(`      - ${backend.localPort}:80`);
                 }
 
-                const dockerFile = backend.dockerFilePath
-                    ? `${backend.dockerFilePath}/Dockerfile-${env.name}`
-                    : `${backend.servicePath ? `${backend.servicePath}/` : ''}Dockerfile-${env.name}`;
+                const dockerFile = backend.type
+                    ? `${service.name}/${backend.type}/Dockerfile-${env.name}`
+                    : `Dockerfile-${env.name}`;
 
 
                 content.push(`    build:`);
