@@ -1,5 +1,5 @@
 export default {
-    cors: [
+    corsOrigins: [
         'http://localhost:8080',
         'http://localhost:30080',
         'https://localhost',

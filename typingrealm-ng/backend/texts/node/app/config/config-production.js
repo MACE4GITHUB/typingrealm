@@ -1,5 +1,5 @@
 export default {
-    cors: [
+    corsOrigins: [
         'https://typingrealm.com'
     ]
 }

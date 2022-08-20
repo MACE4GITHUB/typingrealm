@@ -2,12 +2,19 @@ FROM node:18
 
 WORKDIR /usr/src/app
 
-COPY node/package*.json ./
+COPY texts/node/package*.json ./texts/node/
+COPY framework/node ./framework/node
 
-#RUN npm install
+WORKDIR /usr/src/app/framework/node/host
 RUN npm ci --only=production
 
-COPY node/app app/
-COPY node/app/config/config-production.js app/config/config.js
+WORKDIR /usr/src/app/texts/node
+#RUN npm install
+RUN npm ci --only=production
+WORKDIR /usr/src/app
 
+COPY texts/node/app ./texts/node/app/
+COPY texts/node/app/config/config-production.js ./texts/node/app/config/config.js
+
+WORKDIR /usr/src/app/texts/node
 CMD [ "npm", "run", "start:prod" ]

@@ -13,12 +13,10 @@
   "author": "Ivan Zyranau",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.20.0",
-    "cors": "^2.8.5",
-    "express": "^4.18.1",
     "google-auth-library": "^8.2.0",
     "node-fetch": "^3.2.10",
     "pg": "^8.7.3",
-    "redis": "^4.2.0"
+    "redis": "^4.2.0",
+    "@typingrealm/host": "file:../../framework/node/host"
   }
 }
