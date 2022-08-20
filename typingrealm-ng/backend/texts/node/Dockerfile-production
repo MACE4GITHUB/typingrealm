@@ -5,8 +5,13 @@ WORKDIR /usr/src/app
 COPY texts/node/package*.json ./texts/node/
 COPY framework/node ./framework/node
 
+WORKDIR /usr/src/app/framework/node/host
+RUN npm ci --only=production
+
+WORKDIR /usr/src/app/texts/node
 #RUN npm install
 RUN npm ci --only=production
+WORKDIR /usr/src/app
 
 COPY texts/node/app ./texts/node/app/
 COPY texts/node/app/config/config-production.js ./texts/node/app/config/config.js
