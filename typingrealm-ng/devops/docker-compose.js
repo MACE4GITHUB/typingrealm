@@ -155,9 +155,11 @@ module.exports = function(config, fs) {
                 content.push(`      context: ${service.dockerContext}`);
                 content.push(`      dockerfile: ${backend.servicePath ? `${backend.servicePath}/` : ''}Dockerfile-${env.name}`);
 
-                if (env.localVolume && backend.localVolume) {
+                if (env.localVolume && backend.localVolumes?.length > 0) {
                     content.push(`    volumes:`);
-                    content.push(`      - ${service.dockerContext}${backend.servicePath ? `/${backend.servicePath}` : ''}:${backend.localVolume}`);
+                    for (let volume of backend.localVolumes) {
+                        content.push(`      - ${volume}`);
+                    }
                 }
 
                 content.push(`    restart: unless-stopped`);

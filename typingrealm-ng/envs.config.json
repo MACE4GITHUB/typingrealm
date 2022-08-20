@@ -55,7 +55,9 @@
                 {
                     "servicePath": "node",
                     "localPort": 30101,
-                    "localVolume": "/usr/src/app",
+                    "localVolumes": [
+                        "./backend/typing/node:/usr/src/app"
+                    ],
                     "replicas": 3
                 }
             ]
@@ -69,7 +71,9 @@
                 {
                     "servicePath": "node",
                     "localPort": 30102,
-                    "localVolume": "/usr/src/app",
+                    "localVolumes": [
+                        "./backend/texts/node:/usr/src/app"
+                    ],
                     "replicas": 3
                 }
             ]
@@ -80,7 +84,9 @@
             "backends": [
                 {
                     "localPort": 30080,
-                    "localVolume": "/usr/share/nginx/html"
+                    "localVolumes": [
+                        "./frontend:/usr/share/nginx/html"
+                    ]
                 }
             ]
         }
