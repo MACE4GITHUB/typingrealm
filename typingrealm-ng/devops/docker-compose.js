@@ -1,3 +1,5 @@
+const generateLoadBalancer = require('./load-balancer.js');
+
 module.exports = function(config, fs) {
     const projectName = config.projectName;
     const infraFolder = config.infrastructureDataFolder;
@@ -16,6 +18,8 @@ module.exports = function(config, fs) {
         for (let service of config.services) {
             content.push(...getServiceEntries(service, env));
             content.push("");
+
+            generateLoadBalancer(config, env, service, fs, getPrefix(env));
         }
 
         fs.writeFile(`./docker-compose.${env.name}.yml`, content.join('\n'), err => {
@@ -154,7 +158,6 @@ module.exports = function(config, fs) {
                 const dockerFile = backend.type
                     ? `${service.name}/${backend.type}/Dockerfile-${env.name}`
                     : `Dockerfile-${env.name}`;
-
 
                 content.push(`    build:`);
                 content.push(`      context: ${service.dockerContext ?? config.dockerContext}`);

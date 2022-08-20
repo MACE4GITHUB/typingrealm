@@ -82,6 +82,7 @@
             ]
         },
         {
+            "notService": "true",
             "name": "ui",
             "dockerContext": "./frontend",
             "backends": [
