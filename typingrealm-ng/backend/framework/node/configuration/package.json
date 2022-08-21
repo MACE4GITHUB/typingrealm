@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "name": "@typingrealm/configuration",
+  "version": "1.0.0",
+  "description": "TypingRealm Configuration library",
+  "main": "index.js",
+  "author": "Ivan Zyranau",
+  "license": "MIT",
+  "dependencies": {}
+}

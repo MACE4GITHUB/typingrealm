@@ -17,6 +17,7 @@
     "node-fetch": "^3.2.10",
     "pg": "^8.7.3",
     "redis": "^4.2.0",
-    "@typingrealm/host": "file:../../framework/node/host"
+    "@typingrealm/host": "file:../../framework/node/host",
+    "@typingrealm/configuration": "file:../../framework/node/configuration"
   }
 }

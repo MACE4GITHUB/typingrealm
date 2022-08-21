@@ -4,6 +4,7 @@
     "caddyfile": "./reverse-proxy/Caddyfile.host",
     "dockerContext": "./backend",
     "nodeComponents": [
+        "configuration",
         "host"
     ],
     "dotnetComponents": [

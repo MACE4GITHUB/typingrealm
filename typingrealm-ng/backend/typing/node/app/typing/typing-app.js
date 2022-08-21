@@ -1,7 +1,7 @@
 import TypingResultRepository from './typing-result-repository.js';
 
 import pg from 'pg';
-import config from '../config/config.js';
+import config from '@typingrealm/configuration';
 const { Pool } = pg; // Singleton throughout the whole typing app, consider refactoring.
 
 import Cache from './caching/index.js';

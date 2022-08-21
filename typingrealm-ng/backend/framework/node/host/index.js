@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import config from '@typingrealm/configuration';
 
 const app = express();
 
-export default function startHost(port, corsOrigins, configureCallback) {
-    if (!port) port = 80;
+export default function startHost(configureCallback) {
+    const port = config.port;
+    const corsOrigins = config.corsOrigins;
 
     console.log('Applying CORS policy', corsOrigins);
     app.use(cors({

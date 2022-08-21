@@ -1,0 +1,17 @@
+# Caddy (reverse proxy) data files
+**/reverse-proxy/caddy_data/
+**/infrastructure-data/
+
+**/.vs/
+**/bin/
+**/obj/
+**/*.*proj.user
+
+# Certs
+*.pem
+
+# Logs folders
+**/logs/
+
+# Nodejs
+**/node_modules/
