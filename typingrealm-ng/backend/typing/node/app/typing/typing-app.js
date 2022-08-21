@@ -6,7 +6,7 @@ const { Pool } = pg; // Singleton throughout the whole typing app, consider refa
 
 import Cache from './caching/index.js';
 const pool = new Pool({
-    connectionString: config.typingDbConnectionString
+    connectionString: config.dbConnectionString
 });
 const typingResultRepository = new TypingResultRepository(pool);
 const cache = new Cache();
