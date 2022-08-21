@@ -1,5 +1,6 @@
 const generateLoadBalancer = require('./load-balancer.js');
 const generateNodeDockerfile = require('./node-dockerfile.js');
+const generateDotnetDockerFile = require('./dotnet-dockerfile.js');
 
 module.exports = function(config, fs) {
     const projectName = config.projectName;
@@ -113,6 +114,7 @@ module.exports = function(config, fs) {
         let addedCaddy = false;
         for (let backend of service.backends) {
             generateNodeDockerfile(config, env, service, backend, fs);
+            generateDotnetDockerFile(config, env, service, backend, fs);
 
             /* Temporary hack until I figure out how to debug projects in Docker. */
             if (env.name === 'local' && backend.skipLocal) continue;

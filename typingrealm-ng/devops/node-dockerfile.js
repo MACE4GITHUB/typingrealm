@@ -43,6 +43,7 @@ module.exports = function(config, env, service, backend, fs) {
         lines.push('RUN chmod +x /usr/local/bin/dbmate');
     }
 
+    // TODO: Don't copy whole framework folder, just package.json for installing node packages for cache.
     lines.push('WORKDIR /usr/src/app');
     lines.push(`COPY ${service.name}/${backend.type}/package*.json ./${service.name}/${backend.type}/`);
     lines.push(`COPY framework/${backend.type} ./framework/${backend.type}`);

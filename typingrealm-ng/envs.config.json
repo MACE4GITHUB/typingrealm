@@ -6,6 +6,9 @@
     "nodeComponents": [
         "host"
     ],
+    "dotnetComponents": [
+        "TypingRealm.Hosting"
+    ],
     "infraTypes": [
         {
             "type": "postgres",
@@ -86,7 +89,11 @@
                     "type": "dotnet",
                     "replicas": 3,
 
-                    "skipLocal": true
+                    "skipLocal": true,
+                    "projects": [
+                        "TypingRealm.Texts.Api"
+                    ],
+                    "hostProject": "TypingRealm.Texts.Api"
                 }
             ]
         },
