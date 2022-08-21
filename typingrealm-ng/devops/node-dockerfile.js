@@ -50,6 +50,7 @@ module.exports = function(config, env, service, backend, fs) {
     for (let component of config.nodeComponents) {
         lines.push(`COPY framework/${backend.type}/${component}/package*.json ./framework/${backend.type}/${component}/`);
     }
+    lines.push(`COPY ${service.name}/config-${env.name}.json ./${service.name}/config.json`);
     lines.push('');
 
     for (let component of config.nodeComponents) {
@@ -65,7 +66,6 @@ module.exports = function(config, env, service, backend, fs) {
     lines.push(`WORKDIR /usr/src/app/${service.name}/${backend.type}`);
     lines.push('RUN npm ci --only=production');
     lines.push(`COPY ${service.name}/${backend.type}/app ./app/`);
-    lines.push(`COPY ${service.name}/${backend.type}/app/config/config-${env.name}.js ./app/config/config.js`);
 
     if (service.infra.some(x => x.type === 'postgres')) {
         lines.push(`COPY ${service.name}/db ./db`);

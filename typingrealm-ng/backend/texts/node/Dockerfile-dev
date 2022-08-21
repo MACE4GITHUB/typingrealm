@@ -3,6 +3,7 @@ FROM node:18
 WORKDIR /usr/src/app
 COPY texts/node/package*.json ./texts/node/
 COPY framework/node/host/package*.json ./framework/node/host/
+COPY texts/config-dev.json ./texts/config.json
 
 WORKDIR /usr/src/app/framework/node/host
 RUN npm ci --only=production
@@ -13,6 +14,5 @@ COPY framework/node ./framework/node/
 WORKDIR /usr/src/app/texts/node
 RUN npm ci --only=production
 COPY texts/node/app ./app/
-COPY texts/node/app/config/config-dev.js ./app/config/config.js
 
 CMD [ "npm", "run", "start:prod" ]
