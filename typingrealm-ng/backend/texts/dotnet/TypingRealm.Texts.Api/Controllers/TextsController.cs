@@ -18,7 +18,11 @@ public sealed class TextsController : ControllerBase
     [HttpGet]
     public async ValueTask<GeneratedTextDto> GenerateText()
     {
-        var text = await _textRetriever.RetrieveTextAsync();
+        var text = string.Empty;
+        while (text.Length < 100)
+        {
+            text += await _textRetriever.RetrieveTextAsync();
+        }
 
         return new GeneratedTextDto(text);
     }
