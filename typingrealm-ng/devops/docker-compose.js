@@ -1,6 +1,7 @@
 const generateLoadBalancer = require('./load-balancer.js');
 const generateNodeDockerfile = require('./node-dockerfile.js');
 const generateDotnetDockerFile = require('./dotnet-dockerfile.js');
+const generateConfigFile = require('./config.js');
 
 module.exports = function(config, fs) {
     const projectName = config.projectName;
@@ -22,6 +23,7 @@ module.exports = function(config, fs) {
             content.push("");
 
             generateLoadBalancer(config, env, service, fs, getPrefix(env));
+            generateConfigFile(config, env, service, fs);
         }
 
         fs.writeFile(`./docker-compose.${env.name}.yml`, content.join('\n'), err => {

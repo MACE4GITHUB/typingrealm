@@ -27,7 +27,8 @@
             "name": "local",
             "useInfrastructureFrom": "dev",
             "exposeLocalPorts": "true",
-            "localVolume": "true"
+            "localVolume": "true",
+            "isDefaultConfig": true
         },
         {
             "name": "dev",
