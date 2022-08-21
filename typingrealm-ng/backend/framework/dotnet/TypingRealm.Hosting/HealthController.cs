@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TypingRealm.Texts.Api.Controllers;
+namespace TypingRealm.Hosting;
 
 public sealed class Counter
 {
@@ -12,7 +12,6 @@ public sealed class Counter
 
 public sealed record HealthResponse(int Count);
 
-// TODO: Move this to diagnostics framework.
 public sealed class HealthController : ControllerBase
 {
     private readonly Counter _counter;

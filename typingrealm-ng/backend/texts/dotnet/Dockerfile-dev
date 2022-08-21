@@ -6,10 +6,16 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY .editorconfig .
 COPY Directory.Build.props .
-COPY ["texts/dotnet/TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj", "TypingRealm.Texts.Api/"]
+COPY ["framework/dotnet/TypingRealm.Hosting/TypingRealm.Hosting.csproj", "framework/dotnet/TypingRealm.Hosting/"]
+COPY ["texts/dotnet/TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj", "texts/dotnet/TypingRealm.Texts.Api/"]
+WORKDIR /src/framework/dotnet
+RUN dotnet restore "TypingRealm.Hosting/TypingRealm.Hosting.csproj"
+WORKDIR /src/texts/dotnet
 RUN dotnet restore "TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj"
-COPY texts/dotnet .
-WORKDIR "/src/TypingRealm.Texts.Api"
+WORKDIR /src
+COPY framework/dotnet framework/dotnet/
+COPY texts/dotnet texts/dotnet/
+WORKDIR "/src/texts/dotnet/TypingRealm.Texts.Api"
 RUN dotnet build "TypingRealm.Texts.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish

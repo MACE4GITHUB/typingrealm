@@ -1,1 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk.Web" />
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\dotnet\TypingRealm.Hosting\TypingRealm.Hosting.csproj" />
+  </ItemGroup>
+</Project>
