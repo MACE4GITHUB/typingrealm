@@ -8,8 +8,6 @@ COPY .editorconfig .
 COPY Directory.Build.props .
 COPY ["framework/dotnet/TypingRealm.Hosting/TypingRealm.Hosting.csproj", "framework/dotnet/TypingRealm.Hosting/"]
 COPY ["texts/dotnet/TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj", "texts/dotnet/TypingRealm.Texts.Api/"]
-WORKDIR /src/framework/dotnet
-RUN dotnet restore "TypingRealm.Hosting/TypingRealm.Hosting.csproj"
 WORKDIR /src/texts/dotnet
 RUN dotnet restore "TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj"
 WORKDIR /src

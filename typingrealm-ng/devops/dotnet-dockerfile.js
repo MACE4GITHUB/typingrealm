@@ -28,12 +28,6 @@ module.exports = function(config, env, service, backend, fs) {
         lines.push(`COPY ["${service.name}/${backend.type}/${project}/${project}.csproj", "${service.name}/${backend.type}/${project}/"]`);
     }
 
-    lines.push(`WORKDIR /src/framework/${backend.type}`);
-
-    for (let component of config.dotnetComponents) {
-        lines.push(`RUN dotnet restore "${component}/${component}.csproj"`);
-    }
-
     lines.push(`WORKDIR /src/${service.name}/${backend.type}`);
     lines.push(`RUN dotnet restore "${backend.hostProject}/${backend.hostProject}.csproj"`);
     lines.push('WORKDIR /src');
