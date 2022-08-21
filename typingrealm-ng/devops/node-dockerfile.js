@@ -46,13 +46,20 @@ module.exports = function(config, env, service, backend, fs) {
     // TODO: Don't copy whole framework folder, just package.json for installing node packages for cache.
     lines.push('WORKDIR /usr/src/app');
     lines.push(`COPY ${service.name}/${backend.type}/package*.json ./${service.name}/${backend.type}/`);
-    lines.push(`COPY framework/${backend.type} ./framework/${backend.type}`);
+
+    for (let component of config.nodeComponents) {
+        lines.push(`COPY framework/${backend.type}/${component}/package*.json ./framework/${backend.type}/${component}/`);
+    }
     lines.push('');
 
     for (let component of config.nodeComponents) {
         lines.push(`WORKDIR /usr/src/app/framework/${backend.type}/${component}`);
         lines.push('RUN npm ci --only=production');
     }
+
+    lines.push('');
+    lines.push(`WORKDIR /usr/src/app`);
+    lines.push(`COPY framework/${backend.type} ./framework/${backend.type}/`);
 
     lines.push('');
     lines.push(`WORKDIR /usr/src/app/${service.name}/${backend.type}`);

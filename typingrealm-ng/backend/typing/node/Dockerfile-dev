@@ -4,10 +4,13 @@ RUN curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/relea
 RUN chmod +x /usr/local/bin/dbmate
 WORKDIR /usr/src/app
 COPY typing/node/package*.json ./typing/node/
-COPY framework/node ./framework/node
+COPY framework/node/host/package*.json ./framework/node/host/
 
 WORKDIR /usr/src/app/framework/node/host
 RUN npm ci --only=production
+
+WORKDIR /usr/src/app
+COPY framework/node ./framework/node/
 
 WORKDIR /usr/src/app/typing/node
 RUN npm ci --only=production
