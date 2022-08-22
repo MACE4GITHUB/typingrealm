@@ -25,7 +25,6 @@ export default function startHost(configureCallback) {
         res.status(200).end();
     });
 
-    console.log('test this is library');
     app.listen(port, () => {
         console.log('Host started listening.');
     });
