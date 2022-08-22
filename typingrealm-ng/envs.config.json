@@ -8,6 +8,7 @@
         "host"
     ],
     "dotnetComponents": [
+        "TypingRealm.Configuration",
         "TypingRealm.Hosting"
     ],
     "infraTypes": [

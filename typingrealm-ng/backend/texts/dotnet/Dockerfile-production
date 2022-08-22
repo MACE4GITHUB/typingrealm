@@ -6,6 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY .editorconfig .
 COPY Directory.Build.props .
+COPY ["framework/dotnet/TypingRealm.Configuration/TypingRealm.Configuration.csproj", "framework/dotnet/TypingRealm.Configuration/"]
 COPY ["framework/dotnet/TypingRealm.Hosting/TypingRealm.Hosting.csproj", "framework/dotnet/TypingRealm.Hosting/"]
 COPY ["texts/dotnet/TypingRealm.Texts.Api/TypingRealm.Texts.Api.csproj", "texts/dotnet/TypingRealm.Texts.Api/"]
 WORKDIR /src/texts/dotnet
