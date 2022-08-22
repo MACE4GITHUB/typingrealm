@@ -16,6 +16,9 @@ module.exports = function(config, env, service, fs) {
         }
     }
 
+    serviceConfig.dbConnectionString = "env:DATABASE_URL";
+    serviceConfig.cacheConnectionString = "env:CACHE_URL";
+
     const serviceConfigContent = JSON.stringify(serviceConfig, null, 4) + '\n';
     const envPostfix = env.isDefaultConfig ? '' : `-${env.name}`;
 

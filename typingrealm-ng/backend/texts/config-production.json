@@ -1,5 +1,7 @@
 {
     "corsOrigins": [
         "https://typingrealm.com"
-    ]
+    ],
+    "dbConnectionString": "env:DATABASE_URL",
+    "cacheConnectionString": "env:CACHE_URL"
 }

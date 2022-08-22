@@ -8,8 +8,10 @@ console.log('Read config from file.', config);
 if (!config.port) config.port = 80;
 if (process.env.PORT) config.port = process.env.PORT;
 
-// Temporarily here.
-config.dbConnectionString = process.env.DATABASE_URL ?? config.dbConnectionString;
-config.cacheConnectionString = process.env.CACHE_URL ?? config.cacheConnectionString;
+for (let key in config) {
+    if (typeof config[key] === 'string' && config[key].startsWith('env:')) {
+        config[key] = process.env[config[key].split(':')[1]];
+    }
+}
 
 export default config;
