@@ -4,7 +4,5 @@
         "https://localhost",
         "https://typingrealm.com",
         "https://dev.typingrealm.com"
-    ],
-    "dbConnectionString": "env:DATABASE_URL",
-    "cacheConnectionString": "env:CACHE_URL"
+    ]
 }

@@ -43,7 +43,9 @@ module.exports = function(config, env, service, backend, fs) {
 
     lines.push('FROM base AS final');
     lines.push('WORKDIR /app');
-    lines.push('COPY --from=publish /app/publish .');
+    lines.push('COPY --from=publish /app/publish ./service/bin');
+    lines.push(`COPY ${service.name}/config-${env.name}.json ./config.json`);
+    lines.push(`WORKDIR /app/service/bin`);
     lines.push(`ENTRYPOINT ["dotnet", "${backend.hostProject}.dll"]`);
     lines.push('');
 

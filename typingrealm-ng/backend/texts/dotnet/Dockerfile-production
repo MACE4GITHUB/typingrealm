@@ -21,5 +21,7 @@ RUN dotnet publish "TypingRealm.Texts.Api.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=publish /app/publish ./service/bin
+COPY texts/config-production.json ./config.json
+WORKDIR /app/service/bin
 ENTRYPOINT ["dotnet", "TypingRealm.Texts.Api.dll"]
