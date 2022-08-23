@@ -2,11 +2,17 @@ import config from './config/index.js';
 
 const authAreaElement = document.getElementById('auth');
 
+const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+});
+const isBot = params.bot;
+
 let authInstance;
 export default function(google, clientId) {
     if (!authInstance) {
-        authInstance = new Auth(
-            new GoogleAuth(google, clientId));
+        authInstance = isBot
+            ? { getToken: () => 'bot' }
+            : new Auth(new GoogleAuth(google, clientId));
     }
 
     return authInstance;
