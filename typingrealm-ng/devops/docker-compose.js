@@ -79,7 +79,7 @@ module.exports = function(config, fs) {
         const infraContent = [];
         const envsToAddToEachBackend = [];
 
-        if (service.infra?.length > 0 && !env.useInfrastructureFrom) {
+        if (service.infra?.length > 0) {
             let headerAdded = false;
             for (let infra of service.infra) {
                 if (!headerAdded) {
@@ -92,7 +92,7 @@ module.exports = function(config, fs) {
                     addInfra(service, infraContent, infra, env);
 
                     const databaseName = infra.database ?? service.name;
-                    envsToAddToEachBackend.push(`      - DATABASE_URL=postgres://postgres:admin@${getPrefix(env)}${projectName}-${service.name}-postgres:5432/${databaseName}?sslmode=disable`);
+                    envsToAddToEachBackend.push(`      - DATABASE_URL=postgres://postgres:admin@${env.useInfrastructureFrom ? `${env.useInfrastructureFrom}-` : getPrefix(env)}${projectName}-${service.name}-postgres:5432/${databaseName}?sslmode=disable`);
 
                     continue;
                 }
@@ -101,7 +101,7 @@ module.exports = function(config, fs) {
                     infraContent.push('');
                     addInfra(service, infraContent, infra, env);
 
-                    envsToAddToEachBackend.push(`      - CACHE_URL=redis://${getPrefix(env)}${projectName}-${service.name}-redis:6379`);
+                    envsToAddToEachBackend.push(`      - CACHE_URL=redis://${env.useInfrastructureFrom ? `${env.useInfrastructureFrom}-` : getPrefix(env)}${projectName}-${service.name}-redis:6379`);
                     continue;
                 }
 
@@ -197,6 +197,7 @@ module.exports = function(config, fs) {
     }
 
     function addInfra(service, content, infra, env) {
+        if (env.useInfrastructureFrom) return;
         const infraName = infra.name ?? infra.type;
         const infraImage = infra.name ?? infra.type;
 
