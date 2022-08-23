@@ -68,12 +68,16 @@ function showStatistics(statisticsResult) {
     }
 
     statisticsElement.innerHTML += '<div class="statistics-entry" style="margin-top: 50px">Press ENTER to start typing next text</div>';
-    statisticsElement.innerHTML += '<div class="statistics-entry" style="margin-bottom: 50px; font-size: 1.5rem">Below is YOUR all-time statistics</div>';
-    addAnalyticsEntry('Total characters typed', statisticsResult.allTime.totalCharactersCount);
-    addAnalyticsEntry('Total errors', statisticsResult.allTime.errorCharactersCount);
-    addAnalyticsEntry('Total time taken', `${humanizeDuration(Math.round(statisticsResult.allTime.totalTimeMs / 100) * 100)}`);
-    addAnalyticsEntry('Average speed', `${statisticsResult.allTime.speedWpm.toFixed(2)} WPM`);
-    addAnalyticsEntry('Precision', `${statisticsResult.allTime.precision.toFixed(2)} %`);
+
+    // TODO: Also don't show all-users statistics if there is none at all.
+    if (statisticsResult.allTime.speedWpm) {
+        statisticsElement.innerHTML += '<div class="statistics-entry" style="margin-bottom: 50px; font-size: 1.5rem">Below is YOUR all-time statistics</div>';
+        addAnalyticsEntry('Total characters typed', statisticsResult.allTime.totalCharactersCount);
+        addAnalyticsEntry('Total errors', statisticsResult.allTime.errorCharactersCount);
+        addAnalyticsEntry('Total time taken', `${humanizeDuration(Math.round(statisticsResult.allTime.totalTimeMs / 100) * 100)}`);
+        addAnalyticsEntry('Average speed', `${statisticsResult.allTime.speedWpm.toFixed(2)} WPM`);
+        addAnalyticsEntry('Precision', `${statisticsResult.allTime.precision.toFixed(2)} %`);
+    }
     statisticsElement.innerHTML += '<div class="statistics-entry" style="margin: 100px; font-size: 1.5rem">Below is the global statistics for ALL users</div>';
     addAnalyticsEntry('Total characters typed', statisticsResult.global.totalCharactersCount);
     addAnalyticsEntry('Total errors', statisticsResult.global.errorCharactersCount);
