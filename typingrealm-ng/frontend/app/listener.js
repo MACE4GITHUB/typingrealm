@@ -9,6 +9,7 @@ let typer = null;
 
 export default async function() {
     const stats = await getProfileAndGlobalStatistics();
+
     showStatistics(stats);
 
     document.addEventListener('keydown', processKeyDown);
