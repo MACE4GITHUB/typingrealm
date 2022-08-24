@@ -25,6 +25,9 @@ services:
       - ./backend/framework/node:/usr/src/app/framework/node
       - ./backend/typing/node:/usr/src/app/typing/node
       - ./backend/typing/config.json:/usr/src/app/typing/config.json
+      - /usr/src/app/typing/node/node_modules/
+      - /usr/src/app/framework/node/configuration/node_modules/
+      - /usr/src/app/framework/node/host/node_modules/
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
@@ -49,6 +52,9 @@ services:
       - ./backend/framework/node:/usr/src/app/framework/node
       - ./backend/texts/node:/usr/src/app/texts/node
       - ./backend/texts/config.json:/usr/src/app/texts/config.json
+      - /usr/src/app/texts/node/node_modules/
+      - /usr/src/app/framework/node/configuration/node_modules/
+      - /usr/src/app/framework/node/host/node_modules/
     restart: unless-stopped
     mem_limit: 1g
     mem_reservation: 750m
