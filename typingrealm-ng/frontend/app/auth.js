@@ -5,13 +5,13 @@ const authAreaElement = document.getElementById('auth');
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
-const isBot = params.bot;
+const botName = params.bot;
 
 let authInstance;
 export default function(google, clientId) {
     if (!authInstance) {
-        authInstance = isBot
-            ? { getToken: () => 'bot' }
+        authInstance = botName
+            ? { getToken: () => `mock_token_bot${botName}` }
             : new Auth(new GoogleAuth(google, clientId));
     }
 

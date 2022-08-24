@@ -1,5 +1,5 @@
-const typingBaseUri = 'http://localhost:30101';
-const textsBaseUri = 'http://localhost:30102';
+const typingBaseUri = 'http://host.docker.internal:30101';
+const textsBaseUri = 'http://host.docker.internal:30102';
 const typingApiUri = typingBaseUri;
 const typingApi = {
     uri: typingApiUri,
