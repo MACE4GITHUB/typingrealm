@@ -2,11 +2,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Web UI",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:30080?bot=debug"
+        },
+        {
             "name": "Texts Docker:local",
+            "port": 50102,
             "type": "node",
             "request": "attach",
             "restart": true,
-            "port": 50102,
+            "address": "localhost",
+            "localRoot": "${workspaceFolder}/backend",
+            "remoteRoot": "/usr/src/app"
+        },
+        {
+            "name": "Typing Docker:local",
+            "port": 50101,
+            "type": "node",
+            "request": "attach",
+            "restart": true,
             "address": "localhost",
             "localRoot": "${workspaceFolder}/backend",
             "remoteRoot": "/usr/src/app"
