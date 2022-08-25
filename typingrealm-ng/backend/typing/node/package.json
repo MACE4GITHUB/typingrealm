@@ -6,6 +6,7 @@
   "main": "app/index.js",
   "scripts": {
     "start": "node app/index.js",
+    "start:mon": "nodemon -L",
     "start:prod": "dbmate --url $DATABASE_URL wait && dbmate --url $DATABASE_URL up && node app/index.js",
     "test": "echo 'Error: no test specified' && exit 1",
     "restart": "docker restart -t 1 local-typingrealm-typing-node"

@@ -9,6 +9,7 @@ module.exports = function(config, env, service, backend, fs) {
     lines.push('');
 
     if (env.name === 'local') {
+        lines.push(`RUN npm install -g nodemon`);
         lines.push(`WORKDIR /usr/src/app/${service.name}/${backend.type}`);
         lines.push('CMD [ "/bin/bash", "./local-start.sh" ]');
         lines.push('');
@@ -28,7 +29,7 @@ module.exports = function(config, env, service, backend, fs) {
 
         local.push('');
         local.push('npm install');
-        local.push('npm run start');
+        local.push('npm run start:mon');
         local.push('');
 
         fs.writeFile(`./${config.dockerContext}/${service.name}/${backend.type}/local-start.sh`, local.join('\n'), err => {
