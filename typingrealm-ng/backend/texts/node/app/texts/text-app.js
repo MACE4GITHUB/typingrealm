@@ -11,7 +11,7 @@ class AheadOfTimeTextGenerator {
     }
 
     async generateText() {
-        let text = this.#cache.pop();
+        const text = this.#cache.pop();
         if (text) return text;
 
         return await this.#generator.generateText();
@@ -27,19 +27,21 @@ class AheadOfTimeTextGenerator {
     }
 }
 
-export default function(app) {
+export default function textsApp(app) {
     const textGenerator = new AheadOfTimeTextGenerator(
         new TextGenerator());
 
     app.get('/api/texts', async (req, res) => {
         let text = '';
         while (text.length < 100) {
-            text += await textGenerator.generateText() + ' ';
+            /* eslint-disable no-await-in-loop */
+            text += `${await textGenerator.generateText()} `;
+            /* eslint-enable no-await-in-loop */
         }
         text = text.slice(0, -1);
 
         res.send({
-            text: text
+            text
         });
         res.status(200).end();
     });

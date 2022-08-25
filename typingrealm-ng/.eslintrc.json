@@ -1,0 +1,37 @@
+{
+    "ignorePatterns": [
+        "frontend/",
+        "devops/",
+        "backend/bots/"
+    ],
+    "extends": [ "eslint:recommended", "airbnb" ],
+    "parserOptions": {
+        "ecmaVersion": 13
+    },
+    "rules": {
+        "linebreak-style": "off", // I'm using git, it commits only \n.
+        "import/extensions": "off", // For now, until I figure it out or start using Typescript.
+        "arrow-parens": "off",
+        "indent": ["error", 4],
+        "no-console": "off", // TODO: Turn this rule back on, as error, after I set up logging.
+        //"one-var": ["error", "consecutive"],
+        "one-var": ["warn", "consecutive"],
+        "no-plusplus": "off",
+        "comma-dangle": ["error", "never"],
+        "no-restricted-exports": ["error", {
+            "restrictedNamedExports": [
+                "then"
+            ]
+        }],
+        "lines-between-class-members": [
+            "error", "always",
+            { "exceptAfterSingleLine": true }
+        ],
+        "no-return-await": "off", // Consider turning it on.
+        "function-paren-newline": "off", // Consider turning it on.
+        "no-use-before-define": "off",
+        "no-restricted-syntax": [ "error", "ForInStatement", "LabeledStatement", "WithStatement" ],
+        "no-continue": "off",
+        "class-methods-use-this": "warn" // Consider turning it on.
+    }
+}

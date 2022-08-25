@@ -14,7 +14,7 @@
   "author": "Ivan Zyranau",
   "license": "MIT",
   "dependencies": {
-    "node-fetch": "^3.2.10",
-    "@typingrealm/host": "file:../../framework/node/host"
+    "@typingrealm/host": "file:../../framework/node/host",
+    "node-fetch": "^3.2.10"
   }
 }

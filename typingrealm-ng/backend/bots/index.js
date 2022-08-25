@@ -1,7 +1,5 @@
 const webdriver = require('selenium-webdriver'),
-    By = webdriver.By,
-    until = webdriver.until,
-    Key = webdriver.Key;
+    { By, until, Key } = webdriver;
 
 // 10 bots.
 for (let i = 1; i <= 10; i++) {
@@ -13,11 +11,11 @@ for (let i = 1; i <= 10; i++) {
     try {
         driver.manage().deleteAllCookies();
 
-        driver.get('http://host.docker.internal:30080?bot=true').then(async function () {
+        driver.get('http://host.docker.internal:30080?bot=true').then(async () => {
             console.log('connected');
             try {
                 try {
-                    const element = await driver.wait(
+                    await driver.wait(
                         until.elementLocated(By.className('statistics-entry')),
                         2000
                     );

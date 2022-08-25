@@ -1,17 +1,16 @@
-import TypingResultRepository from './typing-result-repository.js';
-
-import pg from 'pg';
 import config from '@typingrealm/configuration';
-const { Pool } = pg; // Singleton throughout the whole typing app, consider refactoring.
-
+import pg from 'pg';
+import TypingResultRepository from './typing-result-repository.js';
 import Cache from './caching/index.js';
-const pool = new Pool({
-    connectionString: config.dbConnectionString
-});
-const typingResultRepository = new TypingResultRepository(pool);
-const cache = new Cache();
 
-export default function(app) {
+const { Pool } = pg, // Singleton throughout the whole typing app, consider refactoring.
+    pool = new Pool({
+        connectionString: config.dbConnectionString
+    }),
+    typingResultRepository = new TypingResultRepository(pool),
+    cache = new Cache();
+
+export default function typingApp(app) {
     app.get('/api/typing', async (req, res) => {
         const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
         res.send(await typingResultRepository.getAll(profile));
@@ -20,11 +19,9 @@ export default function(app) {
 
     app.post('/api/typing', async (req, res) => {
         const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
-        await typingResultRepository.save(req.body, profile); // TODO: Make the profile information available in the context of repository?
 
-        const all = await typingResultRepository.getAll(profile);
-        let totalCharactersTyped = 0;
-        all.forEach(result => totalCharactersTyped += result.text.length);
+        // TODO: Make the profile information available in the context of repository?
+        await typingResultRepository.save(req.body, profile);
 
         const analytics = analyze(req.body);
 
@@ -33,9 +30,8 @@ export default function(app) {
     });
 
     app.get('/api/typing/analyze-all', async (req, res) => {
-        const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2];
-
-        const aggregated = await getStatisticsForProfile(profile);
+        const profile = req.headers.authorization.split('Bearer ')[1].split('_')[2],
+            aggregated = await getStatisticsForProfile(profile);
 
         res.send(aggregated);
         res.status(200).end();
@@ -45,24 +41,26 @@ export default function(app) {
         const profiles = await typingResultRepository.getAllProfiles();
 
         const stats = [];
-        for (let profile of profiles) {
+        /* eslint-disable no-await-in-loop */
+        // TODO: Consider enabling eslint rule and refactoring the code.
+        for (const profile of profiles) {
             stats.push(await getStatisticsForProfile(profile));
         }
+        /* eslint-enable no-await-in-loop */
 
-        const aggregated = stats.reduce((result, stat) => {
-            return {
-                totalCharactersCount: result.totalCharactersCount + stat.totalCharactersCount,
-                errorCharactersCount: result.errorCharactersCount + stat.errorCharactersCount,
-                totalTimeMs: result.totalTimeMs + stat.totalTimeMs
-            };
-        }, {
+        const aggregated = stats.reduce((result, stat) => ({
+            totalCharactersCount: result.totalCharactersCount + stat.totalCharactersCount,
+            errorCharactersCount: result.errorCharactersCount + stat.errorCharactersCount,
+            totalTimeMs: result.totalTimeMs + stat.totalTimeMs
+        }), {
             totalCharactersCount: 0,
             errorCharactersCount: 0,
             totalTimeMs: 0
         });
 
-        aggregated.speedWpm = (60 * 1000 * aggregated.totalCharactersCount / aggregated.totalTimeMs) / 5,
-        aggregated.precision = 100 * (aggregated.totalCharactersCount - aggregated.errorCharactersCount) / aggregated.totalCharactersCount
+        /* eslint-disable max-len */
+        aggregated.speedWpm = ((60 * 1000 * aggregated.totalCharactersCount) / aggregated.totalTimeMs) / 5;
+        aggregated.precision = ((aggregated.totalCharactersCount - aggregated.errorCharactersCount) * 100) / aggregated.totalCharactersCount;
 
         res.send(aggregated);
         res.status(200).end();
@@ -94,13 +92,11 @@ async function getStatisticsForProfile(profile) {
     const unprocessedData = await typingResultRepository.getAll(profile, Number(lastProcessedId) + 1);
     console.log(`Got ${unprocessedData.length} records from the database`);
 
-    const aggregated = unprocessedData.map(analyze).reduce((result, data) => {
-        return {
-            totalCharactersCount: result.totalCharactersCount + data.totalCharactersCount,
-            errorCharactersCount: result.errorCharactersCount + data.errorCharactersCount,
-            totalTimeMs: result.totalTimeMs + data.totalTimeMs
-        };
-    }, cachedAnalytics ? cachedAnalytics : {
+    const aggregated = unprocessedData.map(analyze).reduce((result, data) => ({
+        totalCharactersCount: result.totalCharactersCount + data.totalCharactersCount,
+        errorCharactersCount: result.errorCharactersCount + data.errorCharactersCount,
+        totalTimeMs: result.totalTimeMs + data.totalTimeMs
+    }), cachedAnalytics ?? {
         totalCharactersCount: 0,
         errorCharactersCount: 0,
         totalTimeMs: 0
@@ -108,10 +104,10 @@ async function getStatisticsForProfile(profile) {
 
     lastProcessedId = unprocessedData[unprocessedData.length - 1]?.id ?? 0;
 
-    aggregated.speedWpm = (60 * 1000 * aggregated.totalCharactersCount / aggregated.totalTimeMs) / 5,
-    aggregated.precision = 100 * (aggregated.totalCharactersCount - aggregated.errorCharactersCount) / aggregated.totalCharactersCount
+    aggregated.speedWpm = ((60 * 1000 * aggregated.totalCharactersCount) / aggregated.totalTimeMs) / 5;
+    aggregated.precision = ((aggregated.totalCharactersCount - aggregated.errorCharactersCount) * 100) / aggregated.totalCharactersCount;
 
-    const cachedObject = Object.assign({ lastProcessedId }, aggregated);
+    const cachedObject = { lastProcessedId, ...aggregated };
     console.log('Caching', cachedObject);
     await cache.set(`analytics_all_time_${profile}`, JSON.stringify(cachedObject));
 
@@ -119,7 +115,9 @@ async function getStatisticsForProfile(profile) {
 }
 
 function isValid(cachedAnalytics) {
-    for (let field in cachedAnalytics) {
+    /* eslint-disable no-restricted-syntax */
+    for (const field in cachedAnalytics) {
+    /* eslint-enable no-restricted-syntax */
         if (cachedAnalytics[field] == null) return false;
     }
 
@@ -127,14 +125,12 @@ function isValid(cachedAnalytics) {
 }
 
 function analyze(result) {
-    const text = result.text;
+    const { text } = result;
 
-    let started = false;
     let index = 0;
 
-    for (let event of result.events) {
+    for (const event of result.events) {
         if (event.key === text[0]) {
-            started = true;
             break;
         }
 
@@ -142,16 +138,17 @@ function analyze(result) {
         continue;
     }
 
-    let events = result.events.slice(index);
-    const firstPerf = events[0].perf;
-    events.forEach(e => e.perf = e.perf - firstPerf);
+    const events = result.events.slice(index),
+        firstPerf = events[0].perf;
+
+    events.forEach(e => { e.perf -= firstPerf; });
 
     index = 0;
-    let errorIndex = null;
-    let wasErrors = 0;
-    let lastEvent = null;
+    let errorIndex = null,
+        wasErrors = 0,
+        lastEvent = null;
 
-    for (let event of events) {
+    for (const event of events) {
         if (event.eventType === 'keyup') continue;
 
         if (event.key === 'Backspace' && index > 0) {
@@ -181,15 +178,15 @@ function analyze(result) {
         }
     }
 
-    const totalCharactersCount = text.length;
-    const totalTimeMs = lastEvent.perf;
-    const analytics = {
-        totalCharactersCount: totalCharactersCount,
-        errorCharactersCount: wasErrors,
-        totalTimeMs: totalTimeMs,
-        speedWpm: (60 * 1000 * totalCharactersCount / totalTimeMs) / 5,
-        precision: 100 * (totalCharactersCount - wasErrors) / totalCharactersCount
-    }
+    const totalCharactersCount = text.length,
+        totalTimeMs = lastEvent.perf,
+        analytics = {
+            totalCharactersCount,
+            totalTimeMs,
+            errorCharactersCount: wasErrors,
+            speedWpm: ((60 * 1000 * totalCharactersCount) / totalTimeMs) / 5,
+            precision: ((totalCharactersCount - wasErrors) * 100) / totalCharactersCount
+        };
 
     return analytics;
 }

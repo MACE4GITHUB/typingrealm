@@ -1,8 +1,6 @@
 import { createClient } from 'redis';
 import config from '@typingrealm/configuration';
 
-console.log('cache', config);
-
 const client = createClient({
     url: config.cacheConnectionString
 });

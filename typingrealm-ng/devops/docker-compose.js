@@ -140,7 +140,7 @@ module.exports = function(config, fs) {
                 content.push(`    networks:`);
                 content.push(`      - ${getPrefix(env)}${projectName}-net`);
                 content.push(`      - ${getPrefix(env)}${projectName}-${service.name}-net`);
-                // TODO: Expose local ports here (after balancing) intead of from direct containers.
+                // TODO: Expose local ports here (after balancing) instead of from direct containers.
                 content.push(`    volumes:`);
                 content.push(`      - ${service.dockerContext ?? config.dockerContext}/${service.name}/Caddyfile-${env.name}:/etc/caddy/Caddyfile`);
                 content.push(`    restart: unless-stopped`);
