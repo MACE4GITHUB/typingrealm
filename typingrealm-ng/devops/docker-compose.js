@@ -165,6 +165,9 @@ module.exports = function(config, fs) {
                 if (env.exposeLocalPorts && backend.localPort) {
                     content.push(`    ports:`);
                     content.push(`      - ${backend.localPort}:80`);
+                    if (backend.debuggerPort) {
+                        content.push(`      - ${backend.debuggerPort}:9229`);
+                    }
                 }
 
                 const dockerFile = backend.type

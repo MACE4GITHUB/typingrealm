@@ -65,6 +65,7 @@
                     "type": "node",
 
                     "localPort": 30101,
+                    "debuggerPort": 50101,
                     "localVolumes": [
                         "./backend/framework/node:/usr/src/app/framework/node",
                         "./backend/typing/node:/usr/src/app/typing/node",
@@ -87,6 +88,7 @@
                     "replicas": 3,
 
                     "localPort": 30102,
+                    "debuggerPort": 50102,
                     "localVolumes": [
                         "./backend/framework/node:/usr/src/app/framework/node",
                         "./backend/texts/node:/usr/src/app/texts/node",

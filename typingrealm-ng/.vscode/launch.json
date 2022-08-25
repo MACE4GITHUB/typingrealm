@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Texts Docker:local",
+            "type": "node",
+            "request": "attach",
+            "restart": true,
+            "port": 50102,
+            "address": "localhost",
+            "localRoot": "${workspaceFolder}/backend",
+            "remoteRoot": "/usr/src/app"
+        }
+    ]
+}
