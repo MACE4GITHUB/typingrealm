@@ -1,3 +1,5 @@
+/* global humanizeDuration */
+
 import retrieveText from './text.js';
 import submitTypingResult, { getProfileAndGlobalStatistics } from './submit-typing-result.js';
 import Typer from './typer.js';
@@ -7,7 +9,7 @@ const statisticsElement = document.getElementById('statistics');
 
 let typer = null;
 
-export default async function() {
+export default async function listen() {
     const stats = await getProfileAndGlobalStatistics();
 
     showStatistics(stats);
@@ -28,19 +30,21 @@ async function processKeyDown(event) {
 
         // TODO: Show loader if loading takes too much time.
         // But for now we have lightning-fast cache, disable the loader.
-        //textElement.classList.remove('hidden');
-        //textElement.innerHTML = '<div class="loader"></div>';
+        /* textElement.classList.remove('hidden');
+        textElement.innerHTML = '<div class="loader"></div>'; */
 
         // Retrieve next text from the API.
         const text = await retrieveText();
 
         // Mock loading for viewing loader animation.
-        //await new Promise(r => setTimeout(r, 2000));
+        // await new Promise(r => setTimeout(r, 2000));
 
-        // Create new Typer from this text, set up callback to log the Typer results when we finish typing.
-        // Assign it to an intermediatory variable so that we don't start handling keyboard input yet.
-        let localTyper = new Typer(text, async (typer) => {
-            const statisticsResult = await submitTypingResult(typer);
+        // Create new Typer from this text, set up callback to log the Typer
+        // results when we finish typing.
+        // Assign it to an intermediatory variable so that we don't start
+        // handling keyboard input yet.
+        const localTyper = new Typer(text, async t => {
+            const statisticsResult = await submitTypingResult(t);
             showStatistics(statisticsResult);
         });
 

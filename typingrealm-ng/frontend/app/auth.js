@@ -1,14 +1,16 @@
+/* eslint-disable max-classes-per-file */
+
 import config from './config/index.js';
 
 const authAreaElement = document.getElementById('auth');
 
 const params = new Proxy(new URLSearchParams(window.location.search), {
-    get: (searchParams, prop) => searchParams.get(prop),
+    get: (searchParams, prop) => searchParams.get(prop)
 });
 const botName = params.bot;
 
 let authInstance;
-export default function(google, clientId) {
+export default function createAuth(google, clientId) {
     if (!authInstance) {
         authInstance = botName
             ? { getToken: () => `mock_token_bot${botName}` }
@@ -20,7 +22,7 @@ export default function(google, clientId) {
 
 export function tokenProvider() {
     return authInstance.getToken();
-};
+}
 
 /** Decorator around GoogleAuth. */
 class Auth {
@@ -93,6 +95,7 @@ class GoogleAuth {
 
         this.#idToken = auth.credential;
 
+        // eslint-disable-next-line no-cond-assign, space-in-parens
         for (let resolve; resolve = this.#promiseResolves.pop(); ) {
             resolve(this.#idToken);
         }

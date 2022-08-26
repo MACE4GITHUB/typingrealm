@@ -56,8 +56,8 @@ export default class Typer {
             characterSpan.innerText = character;
 
             this.#characters.push({
-                character: character,
-                characterSpan: characterSpan,
+                character,
+                characterSpan,
                 isTyped: false,
                 wasTypedWithError: false,
                 isTypedWithError: false
@@ -105,7 +105,7 @@ export default class Typer {
     type(event) {
         const perf = performance.now();
 
-        let key = event.key;
+        const { key } = event;
 
         const eventType = event.type;
 
@@ -114,38 +114,42 @@ export default class Typer {
 
         this.#events.push({
             key: key === 'Shift' ? event.code : key,
-            perf: perf,
+            perf,
             index: this.#index,
-            eventType: eventType
+            eventType
         });
 
         // Releasing keys or pressing shift doesn't alter current typing state.
         if (eventType === 'keyup' || key === 'Shift') return;
 
-        // If it is backspace - decrease index, move cursor back, clear typed state of last character.
+        // If it is backspace - decrease index, move cursor back,
+        // clear typed state of last character.
         if (key === 'Backspace') {
             this.#handleBackspace();
             return;
         }
 
         // Do not process weird keys apart from alphabet & punctuation & spaces.
-        if (!this.#isKeySymbol(event)) return;
+        if (!Typer.#isKeySymbol(event)) return;
 
         // Text character key was pressed.
         this.#handleCharacter(event.key);
     }
 
     /** Returns true when a character is a letter, number, punctuation or space. */
-    #isKeySymbol(event) {
+    static #isKeySymbol(event) {
+        /* eslint-disable max-len */
         return (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90)
-            || (event.keyCode == 32 /* space */) || (event.keyCode >= 106 && event.keyCode <= 111 /* signs */)
+            || (event.keyCode === 32 /* space */) || (event.keyCode >= 106 && event.keyCode <= 111 /* signs */)
             || (event.keyCode >= 186 && event.keyCode <= 192 /* punctuation */) || (event.keyCode >= 219 && event.keyCode <= 222 /* quotes */);
+        /* eslint-enable max-len */
     }
 
     #handleBackspace() {
         if (this.#index === 0) return; // Nothing to do when we are at the beginning of the text.
 
-        // If all characters have been typed but errors remained, this would not exist, hence ? check.
+        // If all characters have been typed but errors remained,
+        // this would not exist, hence ? check.
         this.#currentCharacter?.characterSpan.classList.remove('cursor');
         this.#index--;
         this.#currentCharacter.characterSpan.classList.add('cursor');
@@ -185,6 +189,8 @@ export default class Typer {
             if (this.#characters.every(x => !x.isTypedWithError)) {
                 this.#finishedAt = new Date();
                 this.#isFinished = true;
+
+                // eslint-disable-next-line no-unused-expressions
                 this.#finishedCallback && this.#finishedCallback(this);
             }
 

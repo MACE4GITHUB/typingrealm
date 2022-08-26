@@ -3,6 +3,10 @@
     "parserOptions": {
         "ecmaVersion": 13
     },
+    "globals": {
+        "window": "readonly", // Only for front-end.
+        "document": "readonly" // Only for front-end.
+    },
     "rules": {
         "linebreak-style": "off", // I'm using git, it commits only \n.
         "import/extensions": "off", // For now, until I figure it out or start using Typescript.
