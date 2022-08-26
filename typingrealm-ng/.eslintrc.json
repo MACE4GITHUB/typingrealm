@@ -1,7 +1,4 @@
 {
-    "ignorePatterns": [
-        "frontend/"
-    ],
     "extends": [ "eslint:recommended", "airbnb" ],
     "parserOptions": {
         "ecmaVersion": 13
@@ -29,7 +26,7 @@
         "no-return-await": "off", // Consider turning it on.
         "function-paren-newline": "off", // Consider turning it on.
         "no-use-before-define": "off",
-        "no-restricted-syntax": [ "error", "ForInStatement", "LabeledStatement", "WithStatement" ],
+        "no-restricted-syntax": [ "error", "LabeledStatement", "WithStatement" ],
         "no-continue": "off",
         "class-methods-use-this": "warn", // Consider turning it on.
         //"no-await-in-loop": "warn", // Consider turning it off.

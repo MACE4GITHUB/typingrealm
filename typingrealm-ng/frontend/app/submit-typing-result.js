@@ -1,23 +1,19 @@
 import { tokenProvider } from './auth.js';
 import config from './config/index.js';
 
-async function submitTypingResultMock(typer) {
-    console.log('MOCK submitted typing results', typer.result);
-}
-
 export async function getProfileAndGlobalStatistics() {
     const token = await tokenProvider();
 
     const allTimeResult = await fetch(config.typingApi.typingAnalyzeAllEndpoint, {
         headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         }
     });
     const allTimeJson = await allTimeResult.json();
 
     const globalResult = await fetch(config.typingApi.typingGlobalStatisticsEndpoint, {
         headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         }
     });
     const globalJson = await globalResult.json();
@@ -49,7 +45,7 @@ export default async function submitTypingResult(typer) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(body)
     });
@@ -59,7 +55,7 @@ export default async function submitTypingResult(typer) {
 
     const profileAndGlobal = await getProfileAndGlobalStatistics();
 
-    const response = Object.assign({ current: json }, profileAndGlobal);
+    const response = { current: json, ...profileAndGlobal };
 
     return response;
 }

@@ -9,15 +9,15 @@ async function verify(token) {
     });
     const payload = ticket.getPayload();
     console.log('verified', payload);
-    return payload['sub'];
+    return payload.sub;
 }
 
 /** This is a MOCK Auth app, it will be replaced by IdentityServer. */
-export default function(app) {
+export default function auth(app) {
     const map = new Map();
 
     app.post('/api/auth/token', async (req, res) => {
-        const token = req.body.token;
+        const { token } = req.body;
         const sub = await verify(token);
 
         let accessToken;

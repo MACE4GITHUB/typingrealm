@@ -1,5 +1,5 @@
 export default class TypingResultRepository {
-    #pool
+    #pool;
 
     constructor(pgPool) {
         this.#pool = pgPool;
@@ -43,9 +43,8 @@ order by id
             }
 
             const data = [];
-            for (let row of result) {
-                const id = row.id;
-                const text = row.text;
+            for (const row of result) {
+                const { id, text } = row;
                 const eventsResult = await client.query(`
 select order_index, index, event_type, key, perf
 from event
@@ -54,19 +53,17 @@ where typing_bundle_id = $1
 
                 const events = eventsResult.rows
                     .sort((a, b) => a.order_index - b.order_index)
-                    .map(r => {
-                        return {
-                            index: r.index,
-                            eventType: r.event_type,
-                            key: r.key,
-                            perf: r.perf / 1000
-                        };
-                    });
+                    .map(r => ({
+                        index: r.index,
+                        eventType: r.event_type,
+                        key: r.key,
+                        perf: r.perf / 1000
+                    }));
 
                 data.push({
-                    id: id,
-                    text: text,
-                    events: events
+                    id,
+                    text,
+                    events
                 });
             }
 
@@ -82,35 +79,44 @@ where typing_bundle_id = $1
         // TODO: Move this re-calculation logic on the level above, to business layer.
         // Or even consider doing it on the client (javascript) side.
         // Also consider sending finishedAt datetime just in case perf calculations lose precision.
-        const createdPerf = typingResult.createdPerf;
+        const { createdPerf } = typingResult;
 
         try {
             await client.query('begin');
 
-            const bundleArguments = [new Date().toISOString(), typingResult.text, profile, typingResult.clientCreatedAt, typingResult.clientFinishedAt, typingResult.clientTimezone, typingResult.clientTimezoneOffset];
+            const bundleArguments = [
+                new Date().toISOString(),
+                typingResult.text,
+                profile,
+                typingResult.clientCreatedAt,
+                typingResult.clientFinishedAt,
+                typingResult.clientTimezone,
+                typingResult.clientTimezoneOffset
+            ];
+
             const response = await client.query(
                 'insert into typing_bundle(submitted_at, text, profile_id, client_created_at, client_finished_at, client_timezone, client_timezone_offset) values($1, $2, $3, $4, $5, $6, $7) returning id;',
                 bundleArguments);
             const bundleId = response.rows[0].id;
 
-            const eventValuesArray = typingResult.events.map((e, index) => {
-                return [
-                    bundleId,
-                    index,
-                    e.index,
-                    e.eventType,
-                    e.key,
-                    Math.round((e.perf - createdPerf) * 1000)
-                ];
-            });
+            const eventValuesArray = typingResult.events.map((e, index) => [
+                bundleId,
+                index,
+                e.index,
+                e.eventType,
+                e.key,
+                Math.round((e.perf - createdPerf) * 1000)
+            ]);
 
-            const valuesString = generateValuesString(eventValuesArray.length, eventValuesArray[0].length);
+            const valuesString = generateValuesString(
+                eventValuesArray.length, eventValuesArray[0].length);
+
             function generateValuesString(length, size) {
                 let string = '';
                 for (let j = 0; j < length; j++) {
                     string += '(';
                     for (let i = 1; i <= size; i++) {
-                        string += `\$${i + j * size},`;
+                        string += `$${i + j * size},`;
                     }
                     string = string.slice(0, -1);
                     string += '),';

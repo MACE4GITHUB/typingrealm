@@ -6,8 +6,7 @@ import config from '@typingrealm/configuration';
 const app = express();
 
 export default function startHost(configureCallback) {
-    const port = config.port;
-    const corsOrigins = config.corsOrigins;
+    const { port, corsOrigins } = config;
 
     console.log('Applying CORS policy', corsOrigins);
     app.use(cors({
@@ -28,4 +27,4 @@ export default function startHost(configureCallback) {
     app.listen(port, () => {
         console.log('Host started listening.');
     });
-};
+}
