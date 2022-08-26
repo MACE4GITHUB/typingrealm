@@ -1,11 +1,8 @@
-module.exports = function(config, env, service, backend, fs) {
+module.exports = function generateDotnetDockerfile(config, env, service, backend, fs) {
     if (service.notService || backend.type !== 'dotnet') return;
 
     // TODO: Create local docker files as well.
     if (env.name === 'local') return;
-
-    const projectName = config.projectName;
-    const infraFolder = config.infrastructureDataFolder;
 
     // TODO: Incorporate DBMATE if postgres is present in infra.
 
@@ -20,11 +17,11 @@ module.exports = function(config, env, service, backend, fs) {
     lines.push('COPY .editorconfig .');
     lines.push('COPY Directory.Build.props .');
 
-    for (let component of config.dotnetComponents) {
+    for (const component of config.dotnetComponents) {
         lines.push(`COPY ["framework/${backend.type}/${component}/${component}.csproj", "framework/${backend.type}/${component}/"]`);
     }
     // TODO: Universalize: tarball all csproj files to copy only them in all the folders.
-    for (let project of backend.projects) {
+    for (const project of backend.projects) {
         lines.push(`COPY ["${service.name}/${backend.type}/${project}/${project}.csproj", "${service.name}/${backend.type}/${project}/"]`);
     }
 
@@ -33,7 +30,7 @@ module.exports = function(config, env, service, backend, fs) {
     lines.push('WORKDIR /src');
     lines.push(`COPY framework/${backend.type} framework/${backend.type}/`);
     lines.push(`COPY ${service.name}/${backend.type} ${service.name}/${backend.type}/`);
-    lines.push(`WORKDIR "/src/${service.name}/${backend.type}/${backend.hostProject}"`)
+    lines.push(`WORKDIR "/src/${service.name}/${backend.type}/${backend.hostProject}"`);
     lines.push(`RUN dotnet build "${backend.hostProject}.csproj" -c Release -o /app/build`);
 
     lines.push('');
@@ -45,7 +42,7 @@ module.exports = function(config, env, service, backend, fs) {
     lines.push('WORKDIR /app');
     lines.push('COPY --from=publish /app/publish ./service/bin');
     lines.push(`COPY ${service.name}/config-${env.name}.json ./config.json`);
-    lines.push(`WORKDIR /app/service/bin`);
+    lines.push('WORKDIR /app/service/bin');
     lines.push(`ENTRYPOINT ["dotnet", "${backend.hostProject}.dll"]`);
     lines.push('');
 
@@ -56,5 +53,4 @@ module.exports = function(config, env, service, backend, fs) {
             console.log(err);
         });
     }
-}
-
+};

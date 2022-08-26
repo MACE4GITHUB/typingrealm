@@ -27,7 +27,7 @@ document.body.insertBefore(input, document.body.firstChild);
 `);
 
                     while (true) {
-                        await new Promise(x => setTimeout(x, 1000));
+                        await new Promise(x => { setTimeout(x, 1000); });
                         console.log('sending ENTER');
                         const input = await driver.findElement(By.id('input'));
                         await input.sendKeys('webdriver', Key.RETURN);
@@ -53,16 +53,15 @@ document.body.insertBefore(input, document.body.firstChild);
                             }
 
                             try {
-                                const error = await driver.findElement(By.className('typed-error'));
+                                await driver.findElement(By.className('typed-error'));
                             } catch {
                                 continue;
                             }
 
-                            throw new Error("Found errors!");
+                            throw new Error('Found errors!');
                         }
                     }
-                }
-                catch (err) {
+                } catch (err) {
                     console.log(err);
                     console.log('did not get the element');
                 }
@@ -77,7 +76,7 @@ document.body.insertBefore(input, document.body.firstChild);
 }
 
 function delayFor(speedWpm) {
-    return new Promise(x => setTimeout(x, calculateDelay(speedWpm)));
+    return new Promise(x => { setTimeout(x, calculateDelay(speedWpm)); });
 }
 
 function calculateDelay(speedWpm) {
@@ -85,4 +84,6 @@ function calculateDelay(speedWpm) {
     const charactersPerSecond = speedCpm / 60;
     const secondsPerCharacter = 1 / charactersPerSecond;
     const msPerCharacter = secondsPerCharacter * 1000;
+
+    return msPerCharacter;
 }

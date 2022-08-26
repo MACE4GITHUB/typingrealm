@@ -1,15 +1,12 @@
-module.exports = function(config, env, service, backend, fs) {
+module.exports = function generateNodeDockerfile(config, env, service, backend, fs) {
     if (service.notService || backend.type !== 'node') return;
-
-    const projectName = config.projectName;
-    const infraFolder = config.infrastructureDataFolder;
 
     const lines = [];
     lines.push('FROM node:18');
     lines.push('');
 
     if (env.name === 'local') {
-        lines.push(`RUN npm install -g nodemon`);
+        lines.push('RUN npm install -g nodemon');
         lines.push(`WORKDIR /usr/src/app/${service.name}/${backend.type}`);
         lines.push('CMD [ "/bin/bash", "./local-start.sh" ]');
         lines.push('');
@@ -20,7 +17,7 @@ module.exports = function(config, env, service, backend, fs) {
         local.push('#!/bin/bash');
         local.push('');
 
-        for (let component of config.nodeComponents) {
+        for (const component of config.nodeComponents) {
             local.push('(');
             local.push(`    cd ../../framework/${backend.type}/${component}`);
             local.push('    npm install');
@@ -44,23 +41,24 @@ module.exports = function(config, env, service, backend, fs) {
         lines.push('RUN chmod +x /usr/local/bin/dbmate');
     }
 
-    // TODO: Don't copy whole framework folder, just package.json for installing node packages for cache.
+    // TODO: Don't copy whole framework folder, just package.json for installing
+    // node packages for cache.
     lines.push('WORKDIR /usr/src/app');
     lines.push(`COPY ${service.name}/${backend.type}/package*.json ./${service.name}/${backend.type}/`);
 
-    for (let component of config.nodeComponents) {
+    for (const component of config.nodeComponents) {
         lines.push(`COPY framework/${backend.type}/${component}/package*.json ./framework/${backend.type}/${component}/`);
     }
     lines.push(`COPY ${service.name}/config-${env.name}.json ./${service.name}/config.json`);
     lines.push('');
 
-    for (let component of config.nodeComponents) {
+    for (const component of config.nodeComponents) {
         lines.push(`WORKDIR /usr/src/app/framework/${backend.type}/${component}`);
         lines.push('RUN npm ci --only=production');
     }
 
     lines.push('');
-    lines.push(`WORKDIR /usr/src/app`);
+    lines.push('WORKDIR /usr/src/app');
     lines.push(`COPY framework/${backend.type} ./framework/${backend.type}/`);
 
     lines.push('');
@@ -83,5 +81,4 @@ module.exports = function(config, env, service, backend, fs) {
             console.log(err);
         });
     }
-}
-
+};
