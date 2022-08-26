@@ -26,7 +26,9 @@ input.id = 'input';
 document.body.insertBefore(input, document.body.firstChild);
 `);
 
+                    /* eslint-disable no-constant-condition */
                     while (true) {
+                    /* eslint-enable no-constant-condition */
                         await new Promise(x => { setTimeout(x, 1000); });
                         console.log('sending ENTER');
                         const input = await driver.findElement(By.id('input'));
@@ -38,7 +40,9 @@ document.body.insertBefore(input, document.body.firstChild);
                             2000
                         );
 
+                        /* eslint-disable no-constant-condition */
                         while (true) {
+                        /* eslint-enable no-constant-condition */
                             try {
                                 cursor = await driver.findElement(By.className('cursor'));
                                 let currentLetterValue = await cursor.getText();
