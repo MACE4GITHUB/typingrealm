@@ -7,6 +7,15 @@
         "window": "readonly", // Only for front-end.
         "document": "readonly" // Only for front-end.
     },
+    "overrides": [
+        {
+            "files": [ "**/*.test.js" ],
+            "plugins": [ "jest" ],
+            "extends": [ "plugin:jest/recommended" ],
+            "rules": {
+            }
+        }
+    ],
     "rules": {
         "linebreak-style": "off", // I'm using git, it commits only \n.
         "import/extensions": "off", // For now, until I figure it out or start using Typescript.
